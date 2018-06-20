@@ -9,7 +9,7 @@ myProperty2 = DATA STRING[20] (myClass);
  
 FORM myForm 'myForm'
     OBJECTS myObject = myClass
-    PROPERTIES(myObject) myProperty1, myProperty2 FORCE PANEL
+    PROPERTIES(myObject) myProperty1, myProperty2 PANEL
     FILTERGROUP myFilter
         FILTER 'myFilter' myProperty1(myObject)
 ;
