@@ -1,0 +1,43 @@
+MODULE UseCasePartition;
+
+//#sample1
+CLASS Order 'Заказ';
+CLASS OrderDetail 'Строка заказа';
+  
+order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
+//#sample1 end
+
+//#solution1
+index 'Номер строки' (OrderDetail d) = PARTITION SUM 1 ORDER d BY order(d) CHARWIDTH 4;
+//#solution1 end
+
+//#sample2
+date 'Дата' = DATA DATE (Order);
+  
+CLASS Customer 'Покупатель';
+customer 'Покупатель' = DATA Customer (Order);
+//#sample2 end
+
+//#solution2
+prevOrderDate 'Предыдущий заказ' (Order o) = PARTITION PREV date(o) ORDER date(o), o BY customer(o);
+//#solution2 end
+
+//#sample3
+CLASS Book 'Книга';
+  
+CLASS Batch 'Партия';
+book 'Книга' = DATA Book (Batch);
+date 'Дата прихода' = DATA DATE (Batch);
+  
+CLASS Stock 'Склад';
+currentBalance 'Остаток' = DATA INTEGER (Batch, Stock); // Остаток сделан первичным для примера. Обычно это вычисляемое свойство.
+//#sample3 end
+
+//#solution3
+quantity = DATA LOCAL INTEGER (Book);
+  
+quantityFIFO 'Кол-во по партии FIFO' (Batch b, Stock s) = PARTITION UNGROUP quantity
+                                                                    LIMIT STRICT currentBalance(b, s)
+                                                                    ORDER date(b), b
+                                                                    BY book(b);
+//#solution3 end

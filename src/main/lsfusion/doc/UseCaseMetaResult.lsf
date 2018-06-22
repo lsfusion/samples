@@ -1,0 +1,57 @@
+MODULE UseCaseMetaResult;
+
+//#usedefineobject
+CLASS Book 'Книга';
+TABLE book(Book);
+
+name 'Наименование' = DATA VARISTRING[100] (Book);
+
+FORM book 'Книга'
+    OBJECTS b = Book PANEL
+    PROPERTIES(b) name
+     
+    EDIT Book OBJECT b
+;
+  
+FORM books 'Книги'
+    OBJECTS b = Book
+    PROPERTIES(b) READONLY name
+    PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
+  
+    LIST Book OBJECT b
+;
+  
+NAVIGATOR {
+    NEW books;
+}
+
+CLASS Magazine 'Журнал';
+TABLE magazine(Magazine);
+
+name 'Наименование' = DATA VARISTRING[100] (Magazine);
+
+FORM magazine 'Журнал'
+    OBJECTS m = Magazine PANEL
+    PROPERTIES(m) name
+     
+    EDIT Magazine OBJECT m
+;
+  
+FORM magazines 'Журналы'
+    OBJECTS m = Magazine
+    PROPERTIES(m) READONLY name
+    PROPERTIES(m) NEWSESSION NEW, EDIT, DELETE
+  
+    LIST Magazine OBJECT m
+;
+  
+NAVIGATOR {
+    NEW magazines;
+}
+//#usedefineobject end
+
+//#extenddefineobject
+genre 'Жанр' = DATA VARISTRING[20] (Book);
+EXTEND FORM book PROPERTIES(b) genre; 
+EXTEND FORM books PROPERTIES(b) genre;
+//#extenddefineobject end

@@ -1,0 +1,309 @@
+MODULE InstructionSample;
+
+REQUIRE Authentication;
+
+//#group
+GROUP base : root; // Заголовком этой группы будет 'base'
+GROUP local 'Локальные свойства'; // Родительской группой local будет являться System.private
+//#group end
+
+//#on
+CLASS Sku;
+name = DATA VARSTRING[100] (Sku);
+
+ON {
+    LOCAL changedName = BOOLEAN (Sku);
+    changedName(Sku s) <- CHANGED(name(s));
+    IF (GROUP SUM 1 IF changedName(Sku s)) THEN {
+        MESSAGE 'Changed ' + (GROUP SUM 1 IF changedName(Sku s)) + ' skus!!!'; 
+    }    
+}
+
+CLASS Order;
+
+CLASS Customer;
+name = DATA VARSTRING[50] (Customer);
+
+customer = DATA Customer (Order);
+discount = DATA NUMERIC[6,2] (Order); 
+
+ON LOCAL {
+    FOR CHANGED(customer(Order o)) AND name(customer(o)) == 'Best customer' DO
+        discount(o) <- 50;
+}
+//#on end
+
+//#when
+CLASS Stock;
+name = DATA VARSTRING[50] (Stock);
+
+balance = DATA INTEGER (Sku, Stock);
+
+// отправить email, когда остаток в результате применения изменений сессии стал меньше 0
+WHEN balance(Sku s, Stock st) < 0 DO
+      EMAIL SUBJECT 'Остаток стал отрицательным по товару ' + name(s) + ' на складе ' + name(st);
+
+CLASS OrderDetail;
+order = DATA Order (OrderDetail) NONULL DELETE;
+discount = DATA NUMERIC[6,2] (OrderDetail);
+
+WHEN LOCAL CHANGED(customer(Order o)) AND name(customer(o)) == 'Best customer' DO
+    discount(OrderDetail d) <- 50 WHERE order(d) == o; 
+//#when end
+
+//#setwhen
+// при добавлении клиента, по умолчанию, предоставить ему заданную скидку
+defaultDiscount = DATA NUMERIC[6,2] ();
+discount = DATA NUMERIC[6,2] (Customer);
+discount(Customer c) <- defaultDiscount() WHEN SET(c IS Customer);
+
+quantity = DATA NUMERIC[10,2] (OrderDetail);
+price = DATA NUMERIC[10,2] (OrderDetail);
+sum = DATA NUMERIC[10,2] (OrderDetail);
+
+sum(OrderDetail d) <- quantity(d) * price(d) WHEN CHANGED(quantity(d)) OR CHANGED(price(d));
+//#setwhen end
+
+//#constraint
+// остаток не меньше 0
+CONSTRAINT balance(Sku s, Stock st) < 0 
+    MESSAGE 'Остаток не может быть отрицательным для ' + (GROUP CONCAT 'Товар : ' + name(Sku ss) + ' Склад : ' + name(Stock sst), '\n' IF SET(balance(ss, sst) < 0));
+
+barcode = DATA VARSTRING[15] (Sku);
+// "эмуляция" политики безопасности
+CONSTRAINT DROPCHANGED(barcode(Sku s)) AND name(currentUser()) != 'admin' MESSAGE 'Изменять штрих-код для уже созданного товара разрешено только администратору';
+
+sku = DATA Sku (OrderDetail);
+in = DATA BOOLEAN (Sku, Customer);
+
+CONSTRAINT sku(OrderDetail d) AND NOT in(sku(d), customer(order(d)))
+    CHECKED BY sku[OrderDetail] // будет применяться фильтр по доступным sku при выборе товара для строки заказа
+    MESSAGE 'В заказе выбран недоступный пользователю товар для выбранного покупателя';
+//#constraint end
+
+//#means
+is(Sku s) = s IS Sku;
+// для товара должны быть заданы штрих-код и наименование
+is(Sku s) => barcode(s);
+is(Sku s) => name(s);
+ 
+
+CLASS Invoice;
+CLASS InvoiceLine;
+invoice = DATA Invoice (InvoiceLine);
+is(InvoiceLine l) = l IS InvoiceLine; 
+// для строки документа должен быть задан документ, и при удалении документа, чтобы удалялись строки этого документа
+is(InvoiceLine l) => invoice(l) RESOLVE RIGHT;
+// равносильно объявлению document = DATA Invoice (InvoiceLine) NONULL DELETE;
+  
+// агрегация для f(a,b) создавать объект класса x, у которого свойство a(x) равняется a, а свойство b(x) равняется b
+CLASS A;
+CLASS B;
+f = DATA BOOLEAN (A, B);
+
+CLASS X;
+a = DATA A(X);
+b = DATA B(X);
+is (X x) = x IS X;
+
+f(a,b) => [= GROUP AGGR X x WHERE x IS X BY a(x), b(x)](a,b) RESOLVE LEFT;
+is(X x) => f(a(x), b(x)) RESOLVE RIGHT;
+//#means end
+
+//#class
+CLASS ABSTRACT Document; // Заголовком этого класса будет 'Document'
+CLASS IncomeDocument 'Приход' : Document;
+CLASS OutcomeDocument 'Расход' : Document;
+ 
+CLASS Person;
+CLASS Worker;
+CLASS Musician : Person, Worker; // множественное наследование
+ 
+CLASS Barcode 'Штрих-код'; // Родительским классом Barcode будет класс System.Object
+ 
+CLASS PrintOrientation {
+    portrait 'Книжная',
+    landscape 'Альбомная'
+}
+//#class end
+
+//#navigator
+FORM items;
+FORM stocks;
+FORM legalEntities;
+FORM shipments;
+hello() = { MESSAGE 'Hello world'; }
+hi() = { MESSAGE 'Hi'; }
+
+NAVIGATOR {
+    NEW FOLDER catalogs 'Справочники' WINDOW toolbar { // создаем новую папку навигатора и делаем, чтобы все ее потомки отображались в окно с вертикальным тулбаром
+        NEW items; // создаем в папке элемент-форму для формы items, имя элемента по умолчанию равняется имени формы 
+    }
+    catalogs {  // инструкция редактирования элемента навигатора
+        NEW FORM stocksNavigator 'Склады' = stocks; // создаем элемент-форму stocksNavigator для формы stocls и добавляем в папку catalogs последним элементом
+        NEW legalEntities AFTER items; // создаем элемент-форму с именем legalEntities в папку catalogs непосредственно за элементом items
+        NEW shipments;
+    }
+    NEW FOLDER documents 'Документы' WINDOW toolbar { // создаем еще одну папку, элементы которой будут также отображаться в окно с вертикальным тулбаром
+                                                      // сами папки будут отображаться в окне root, и при выборе одной из них в окне с вертикальным 
+                                                      // тулбаром будут показаны потомки именно этой папки
+        NEW ACTION hi;   // создаем элемент-действие
+        NEW ACTION h=hello;   // создаем элемент-действие
+        MOVE shipments BEFORE h; // инструкция перемещения элемента shipments из папки catalogs в папку document перед элементом hello     
+    }
+}
+//#navigator end
+
+//#window
+// cоздание системных окон в модуле System
+WINDOW root 'Корень' TOOLBAR HIDETITLE HIDESCROLLBARS HORIZONTAL POSITION(0, 0, 100, 6);
+WINDOW toolbar 'Тулбар' TOOLBAR HIDETITLE VERTICAL POSITION(0, 6, 20, 64);
+WINDOW tree 'Дерево' TOOLBAR HIDETITLE POSITION(0, 6, 20, 64);
+  
+// меню без скроллбаров под окном root
+WINDOW menu MENU HIDESCROLLBARS DRAWROOT POSITION(20, 6, 80, 4);
+  
+// горизонтальный тулбар внизу рабочего стола, в котором все кнопки будут выравниваться по центру, а текст выравниваться вверх
+// в этот тулбар можно, например, помещать формы для быстрого открытия
+WINDOW hotforms TOOLBAR HORIZONTAL VALIGN(CENTER) TEXTVALIGN(START) BOTTOM; 
+//#window end
+
+//#hidewindow
+HIDE WINDOW System.tree;
+//#hidewindow end
+
+//#extendclass
+CLASS ABSTRACT Shape;
+CLASS Box : Shape;
+
+CLASS Quadrilateral;
+EXTEND CLASS Box : Quadrilateral; // Добавляем наследование
+
+CLASS ShapeType {
+	point 'Точка',
+	segment 'Отрезок'
+} 
+ 
+EXTEND CLASS ShapeType { // Добавляем статический объект
+	circle 'Окружность'
+}
+//#extendclass end
+
+//#extendproperty
+CLASS ABSTRACT AClass;
+CLASS BClass : AClass;
+CLASS CClass : AClass;
+CLASS DClass : AClass;
+
+name(AClass a) = ABSTRACT STRING[50] (AClass);
+innerName(BClass b) = DATA STRING[50] (BClass);
+innerName(CClass c) = DATA STRING[50] (CClass);
+innerName(DClass d) = DATA STRING[50] (DClass);
+
+name(BClass b) = 'B' + innerName(b);
+name(CClass c) = 'C' + innerName(c);
+ 
+name[AClass](BClass b) += name(b);
+name(CClass c) += name(c); // Здесь слева будет найден name[AClass], потому что поиск идет только среди абстрактных свойств, справа же будет найден name[CClass]
+name(DClass d) += 'DClass' + innerName(d) IF d IS DClass;
+//#extendproperty end
+
+//#extendaction
+CLASS ABSTRACT Animal;
+whoAmI = ABSTRACT (Animal);
+
+CLASS Dog : Animal;
+whoAmI (Dog d) += { MESSAGE 'I am a dog!'; }
+
+CLASS Cat : Animal;
+whoAmI (Cat c) += { MESSAGE 'I am a сat!'; }
+
+ask () = {
+    FOR Animal a IS Animal DO
+        whoAmI(a); // для каждого объекта будет выдано соответствующее сообщение
+}
+
+onStarted = ABSTRACT LIST ();
+onStarted () += {
+    name(Sku s) <- '1';
+}
+onStarted () += {
+    name(Sku s) <- '2';
+}
+// сначала выполниться 1е действие, потом 2е действие
+
+CLASS Human;
+name = DATA VARSTRING[100] (Human);
+
+testName = ABSTRACT CASE (Human);
+
+testName (Human h) += WHEN name(h) == 'John' THEN { MESSAGE 'I am John'; } 
+testName (Human h) += WHEN name(h) == 'Bob' THEN { MESSAGE 'I am Bob'; } 
+//#extendaction end
+
+//#meta
+META objectProperties(object, type, caption)
+    object##Name 'Имя'##caption = DATA STRING[100](###object); // делаем заглавной первую букву
+    object##Type 'Тип'##caption = DATA type (###object);
+    object##Value 'Стоимость'##caption = DATA INTEGER (###object);
+END
+  
+META objectProperties(object, type)
+    @objectProperties(object, type, '');
+END
+//#meta end
+
+//#implementmeta
+CLASS Book;
+@objectProperties(book, INTEGER, 'Книга');
+
+CLASS Flower;
+@objectProperties(flower, STRING[100], ); // если не передать параметр, то он будет пустым
+
+CLASS Table;
+@objectProperties(table, NUMERIC[14,2]);
+//#implementmeta end
+
+//#table
+TABLE book (Book);
+
+in = DATA BOOLEAN (Sku, Stock);
+TABLE skuStock (Sku, Stock); // в ней будет храниться свойство in
+
+price = DATA NUMERIC[10,2] (Sku, DATE);
+TABLE skuDate (Sku, DATE); // в ней будет храниться свойство Sku
+
+TABLE sku (Sku) FULL;
+//#table end
+
+//#index
+INDEX customer(Order o);
+
+date = DATA DATE (Order);
+INDEX date(Order o), o;
+
+INDEX name(Sku s), price(s, DATE d), d;
+//#index end
+
+//#before
+changeName(Sku s, VARSTRING[100] name) = { name(s) <- name; }
+BEFORE changeName(Sku s, VARSTRING[100] name) DO MESSAGE 'Changing user name'; // Сообщение будет показано перед каждым вызовом changeName
+//#before end
+
+//#after
+changePrice(Sku s, DATE d, NUMERIC[10,2] price) = { price(s, d) <- price; }
+AFTER changePrice(Sku s, DATE d, NUMERIC[10,2] price) DO MESSAGE 'Price was changed'; // Сообщение будет показано после каждого вызова changePrice
+//#after end
+
+//#loggable
+LOGGABLE name[Sku], price[Sku, DATE];
+//#loggable end
+
+//#empty
+CLASS Result {
+    yes 'Да',
+    no 'Нет'
+};  // точка с запятой здесь не нужна, но ее наличие не является ошибкой
+  
+;;;; // это является допустимым кодом на lsFusion
+//#empty end

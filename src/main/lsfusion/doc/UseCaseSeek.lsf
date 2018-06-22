@@ -1,0 +1,122 @@
+MODULE UseCaseSeek;
+
+//#sample1
+REQUIRE Time;
+
+CLASS Category 'Категория';
+name 'Наименование' = DATA VARISTRING[50] (Category) IN recognize;
+
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[50] (Book) IN recognize;
+
+category 'Категория' = DATA Category (Book) NONULL;
+nameCategory 'Категория' (Book b) = name(category(b));
+
+FORM book 'Книга'
+    OBJECTS b = Book PANEL
+    PROPERTIES(b) name, nameCategory
+    
+    EDIT Book OBJECT b
+;
+
+FORM books 'Книги'
+    OBJECTS c = Category
+    PROPERTIES(c) READONLY name
+    PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE
+    
+    OBJECTS b = Book
+    PROPERTIES(b) READONLY name
+    FILTERS category(b) == c
+;
+
+NAVIGATOR {
+    NEW books;
+}
+//#sample1 end
+
+//#solution1
+createBook 'Создать книгу' (Category c) = {
+    NEWSESSION {
+        NEW newBook = Book {
+            category(newBook) <- c;
+            DIALOG book OBJECTS b = newBook INPUT DO {
+                SEEK books.b = newBook;
+            }
+        }
+    }
+}
+
+EXTEND FORM books
+    PROPERTIES(c) createBook TODRAW b TOOLBAR
+;
+//#solution1 end
+
+//#sample2
+CLASS Customer 'Покупатель';
+name 'Наименование' = DATA VARISTRING[50] (Customer) IN recognize;
+
+price 'Цена' = DATA NUMERIC[14,2] (Customer, Book);
+
+FORM prices 'Цены'
+    OBJECTS c = Customer PANEL
+    PROPERTIES(c) name SELECTOR
+    
+    OBJECTS b = Book
+    PROPERTIES name(b) READONLY, price(c, b)
+;
+
+NAVIGATOR {
+    NEW prices;
+}
+//#sample2 end
+
+//#solution2
+defaultCustomer 'Покупатель по умолчанию' = DATA Customer ();
+nameDefaultCustomer 'Покупатель по умолчанию' () = name(defaultCustomer());
+
+EXTEND FORM options PROPERTIES() nameDefaultCustomer;
+DESIGN options { commons { MOVE PROPERTY(nameDefaultCustomer()); } }
+
+EXTEND FORM prices
+    EVENTS ON INIT { SEEK prices.c = defaultCustomer(); }
+;
+//#solution2 end
+
+//#sample3
+FORM report 'Отчет'
+    OBJECTS dFrom = DATE PANEL, dTo = DATE PANEL
+    PROPERTIES VALUE(dFrom), VALUE(dTo)
+;
+
+NAVIGATOR {
+    NEW report;
+}
+//#sample3 end
+
+//#solution3
+setReportLastWeek 'Последняя неделя' () = {
+    SEEK report.dFrom = subtract(currentDate(), 7);
+    SEEK report.dTo = subtract(currentDate(), 1); 
+}
+setReportCurrentMonth 'Текущий месяц' () = {
+    SEEK report.dFrom = firstDayOfMonth(currentDate());
+    SEEK report.dTo = lastDayOfMonth(currentDate());
+}
+setReportLastMonth 'Последний месяц' () = {
+    SEEK report.dFrom = firstDayOfMonth(subtract(firstDayOfMonth(currentDate()), 1));
+    SEEK report.dTo = subtract(firstDayOfMonth(currentDate()), 1);
+}
+
+EXTEND FORM report
+    PROPERTIES() setReportLastWeek, setReportCurrentMonth, setReportLastMonth
+;
+//#solution3 end
+
+FORM customers 'Покупатели'
+    OBJECTS c = Customer
+    PROPERTIES(c) name, NEW, DELETE
+;
+
+NAVIGATOR {
+    NEW customers;
+}

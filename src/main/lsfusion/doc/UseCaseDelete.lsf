@@ -1,0 +1,34 @@
+MODULE UseCaseDelete;
+
+//#sample1
+CLASS Order 'Заказ';
+
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[50] (Book);
+  
+CLASS OrderDetail 'Строка заказа';
+order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
+book 'Книга' = DATA Book (OrderDetail);
+nameBook 'Книга' (OrderDetail d) = name(book(d));
+//#sample1 end
+
+//#solution1
+delete (Book b) = {
+    IF NOT [= GROUP SUM 1 BY book(OrderDetail d)](b) THEN
+        DELETE b;
+    ELSE
+        MESSAGE 'Запрещено удалять книгу, так как по ней есть заказ';
+}
+//#solution1 end
+
+//#solution2
+clear (Order o) = {
+
+    // Вариант 1
+    DELETE OrderDetail d WHERE order(d) == o; 
+    
+    // Вариант 2
+    FOR order(OrderDetail d) == o DO
+        DELETE d;
+}
+//#solution2 end

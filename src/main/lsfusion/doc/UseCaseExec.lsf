@@ -1,0 +1,43 @@
+MODULE UseCaseExec;
+
+//#sample1
+CLASS Category 'Категория';
+
+name 'Наименование' = DATA VARISTRING[50] (Category);
+id 'Код' = DATA INTEGER (Category);
+saleDate 'Дата начала продаж' = DATA DATE (Category);
+//#sample1 end
+
+//#solution1
+createCategory 'Создать категорию' (VARISTRING[50] name, INTEGER id, DATE saleDate) = {
+    NEW c = Category {
+        name(c) <- name;
+        id(c) <- id;
+        saleDate(c) <- saleDate;
+    }    
+}
+
+create3Categories 'Создать 3 категории' () = {
+    createCategory('Категория 1', 1, 2010_02_14);
+    createCategory('Категория 2', 2, 2011_03_08);
+    createCategory('Категория 3', 3, 2014_07_01);
+}
+//#solution1 end
+
+//#sample2
+parent 'Родитель' = DATA Category (Category); // если значение NULL, то родителя нету
+//#sample2 end
+
+//#solution2
+depth = DATA INTEGER (Category);
+fillDepth (Category c, INTEGER depth) = {
+    FOR parent(Category i) == c DO {
+        depth(i) <- depth;
+        fillDepth(i, depth + 1);
+    }
+}
+
+run() = {
+    fillDepth(NULL, 0);
+}
+//#solution2 end

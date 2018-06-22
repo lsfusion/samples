@@ -1,0 +1,9 @@
+MODULE EmployeeExample;	 	// Задаем имя модуля
+
+REQUIRE System, Utils;	 	// Перечисляем модули, от которых зависит модуль Employee
+NAMESPACE Employee;		 	// Задаем пространство имен
+ 
+CLASS Employee 'Сотрудник';	// Создаем класс
+CLASS Position 'Должность'; // Создаем еще один класс
+ 
+employeePosition(employee) = DATA Position (Employee); // Создаем свойство

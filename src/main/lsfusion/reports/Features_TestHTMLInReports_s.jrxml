@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="s" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="727e000d-3022-4c1d-bd2f-56bb0de8eea2">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="DefaultStyle" isDefault="true" vAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<style name="GroupCellStyle0" mode="Opaque" backcolor="#FFFFFF" vAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<field name="s.object" class="java.lang.Long"/>
+	<field name="store" class="java.lang.Long"/>
+	<field name="name(s)" class="java.lang.String"/>
+	<field name="storeSizeCode(s)" class="java.lang.String"/>
+	<field name="srichtext(s)" class="java.lang.String"/>
+	<field name="sr" class="java.lang.String"/>
+	<pageHeader>
+		<band height="18">
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="637709a9-c82b-4249-a1d1-32918e946255" style="GroupCellStyle0" stretchType="RelativeToBandHeight" x="0" y="0" width="45" height="18"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Склад"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="3808fc42-3a88-4047-b7ea-38877710ea94" style="GroupCellStyle0" stretchType="RelativeToBandHeight" x="45" y="0" width="242" height="18"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["name"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="a9af0c75-7a90-42f7-bf41-bd2d7e3a6d53" style="GroupCellStyle0" stretchType="RelativeToBandHeight" x="287" y="0" width="30" height="18"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Размер склада (код)"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="cbf76044-0822-49df-9477-33d36202d0fa" style="GroupCellStyle0" stretchType="RelativeToBandHeight" x="317" y="0" width="242" height="18"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["RichText"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="16f1473b-6222-42a1-afa4-e2d0fb31da9e" style="GroupCellStyle0" stretchType="RelativeToBandHeight" x="559" y="0" width="243" height="18"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["RichText"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="154">
+			<textField isStretchWithOverflow="true" pattern="#,##0.###" isBlankWhenNull="true">
+				<reportElement uuid="dc1d1f11-65c1-4a7a-b793-3353000e5446" style="GroupCellStyle0" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="45" height="18"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{store}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="00f56e7a-1a16-4b73-b906-254e5b62a94e" style="GroupCellStyle0" positionType="Float" stretchType="RelativeToBandHeight" x="45" y="0" width="242" height="18"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{name(s)}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="099523ae-1382-49af-ba43-6a15bf842c11" style="GroupCellStyle0" positionType="Float" stretchType="RelativeToBandHeight" x="287" y="0" width="30" height="18"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{storeSizeCode(s)}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="12c7bd1d-3b24-4db1-a47e-be467dc28b97" style="GroupCellStyle0" positionType="Float" stretchType="RelativeToBandHeight" x="559" y="0" width="243" height="18"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{sr}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement uuid="f8faf7ad-21ef-410e-97ba-f034e3442ba1" x="317" y="0" width="242" height="154"/>
+				<hc:html xmlns:hc="http://jasperreports.sourceforge.net/htmlcomponent" xsi:schemaLocation="http://jasperreports.sourceforge.net/htmlcomponent http://jasperreports.sourceforge.net/xsd/htmlcomponent.xsd" scaleType="RetainShape" horizontalAlign="Left" verticalAlign="Middle">
+					<hc:htmlContentExpression><![CDATA[$F{srichtext(s)}]]></hc:htmlContentExpression>
+				</hc:html>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

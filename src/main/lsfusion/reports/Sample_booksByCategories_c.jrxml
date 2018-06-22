@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2017-12-14T10:53:17 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="c" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="74ecb075-4f0d-458c-8a6a-1da29320401c">
+	<style name="DefaultStyle" isDefault="true" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<style name="GroupCellStyle0" mode="Opaque" backcolor="#DFDFDF" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<style name="GroupCellStyle1" mode="Opaque" backcolor="#FFFFFF" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<field name="c.object" class="java.lang.Long"/>
+	<field name="name(c)" class="java.lang.String"/>
+	<field name="countBooks(c)" class="java.lang.Integer"/>
+	<field name="b.object" class="java.lang.Long"/>
+	<field name="name(b)" class="java.lang.String"/>
+	<field name="nameCategory(b)" class="java.lang.String"/>
+	<group name="designGroup520">
+		<groupExpression><![CDATA[String.valueOf($F{c.object})]]></groupExpression>
+		<groupHeader>
+			<band height="18" splitType="Prevent">
+				<textField isStretchWithOverflow="true">
+					<reportElement style="GroupCellStyle0" stretchType="RelativeToBandHeight" x="0" y="0" width="96" height="18" uuid="ed8ba0f6-6d8f-4760-8a8d-6603bed33bcc"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA["Наименование"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="GroupCellStyle0" positionType="Float" stretchType="RelativeToBandHeight" x="96" y="0" width="459" height="18" uuid="c19d0286-f962-4b1f-a424-6eb3662e8a2b"/>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression><![CDATA[$F{name(c)}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="GroupCellStyle0" stretchType="RelativeToBandHeight" x="555" y="0" width="93" height="18" uuid="641949a8-8d3b-4d54-8d2a-7dda8286ed6c"/>
+					<textElement textAlignment="Center"/>
+					<textFieldExpression><![CDATA["Кол-во книг"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="GroupCellStyle0" positionType="Float" stretchType="RelativeToBandHeight" x="648" y="0" width="154" height="18" uuid="abfae971-5ab3-449d-a8b5-e0934787f74a"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$F{countBooks(c)}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<pageHeader>
+		<band height="18">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="GroupCellStyle1" stretchType="RelativeToBandHeight" x="0" y="0" width="555" height="18" uuid="c92d84ef-5dcd-41fe-bd98-1e75ced78294"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Наименование"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="GroupCellStyle1" stretchType="RelativeToBandHeight" x="555" y="0" width="247" height="18" uuid="51fdce65-098c-43b6-922f-7b2e3dd61c78"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Категория"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="18">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="GroupCellStyle1" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="555" height="18" uuid="b0b3afdc-bfb8-4e6d-be19-78ed1ff11793"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{name(b)}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="GroupCellStyle1" positionType="Float" stretchType="RelativeToBandHeight" x="555" y="0" width="247" height="18" uuid="974478ac-f290-412b-b2fd-c5e1d947a9bf"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{nameCategory(b)}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

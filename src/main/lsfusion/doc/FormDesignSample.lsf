@@ -1,0 +1,19 @@
+MODULE FormDesignSample;
+
+//#default
+CLASS myClass 'myClass';
+CLASS myClass2 'myClass2' : myClass;
+ 
+myProperty1 = DATA STRING[20] (myClass);
+myProperty2 = DATA STRING[20] (myClass);
+ 
+FORM myForm 'myForm'
+    OBJECTS myObject = myClass
+    PROPERTIES(myObject) myProperty1, myProperty2 FORCE PANEL
+    FILTERGROUP myFilter
+        FILTER 'myFilter' myProperty1(myObject)
+;
+ 
+NAVIGATOR {
+    NEW myForm;
+}

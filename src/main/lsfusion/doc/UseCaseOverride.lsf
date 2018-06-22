@@ -1,0 +1,74 @@
+MODULE UseCaseOverride;
+
+//#block1
+CLASS Category 'Категория';
+name 'Наименование' = DATA VARISTRING[50] (Category) IN recognize;
+
+parent 'Родитель' = DATA Category (Category) AUTOSET;
+nameParent 'Родитель' (Category c) = name(parent(c)) IN recognize;
+
+markup 'Надбавка' = DATA NUMERIC[8,2] (Category);
+//#block1 end
+
+//#block2
+level 'Уровень' (Category child, Category parent) = RECURSION 1l IF child IS Category AND parent == child
+                                                                 STEP 2l IF parent == parent($parent) MATERIALIZED;
+//#block2 end
+
+//#block3
+parent (Category child, LONG level) = GROUP MAX Category parent
+                                                       BY level(child, parent);
+//#block3 end
+
+//#block4
+nearestGroupLevel 'Ближайший уровень, для которого задана надбавка' (Category child) = 
+    GROUP MIN level(child, Category parent) IF markup(parent);
+//#block4 end
+
+//#block5
+nearestGroup 'Ближайшая группа, для которой задана надбавка' (Category category) = parent(category, nearestGroupLevel(category));
+
+overMarkup 'Надбавка перегруженная' (Category category) = markup(nearestGroup(category));
+//#block5 end
+
+//#block6
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[100] (Book) IN recognize;
+
+category 'Категория' = DATA Category (Book) AUTOSET;
+nameCategory 'Категория' (Book b) = name(category(b)) IN recognize; 
+//#block6 end
+
+//#block7
+markup 'Надбавка для товара' = DATA NUMERIC[8,2] (Book);
+
+overMarkup 'Надбавка перегруженная' (Book b) = OVERRIDE markup(b), overMarkup(category(b));
+//#block7 end
+
+//#block8
+FORM markups 'Надбавки'
+    TREE categories c = Category PARENT parent
+    PROPERTIES(c) name READONLY, markup, overMarkup
+    PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE
+    
+    OBJECTS b = Book
+    PROPERTIES(b) name READONLY, nameCategory READONLY, markup, overMarkup
+    PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
+    FILTERS level(category(b), c)
+;
+
+DESIGN markups {
+    NEW pane FIRST {
+        fill = 1;
+        type = SPLITH;
+        MOVE BOX(TREE categories);
+        MOVE BOX(b) {
+            fill = 2;
+        }
+    }
+}
+//#block8 end
+
+NAVIGATOR {
+    NEW markups;
+}

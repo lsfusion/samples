@@ -1,0 +1,831 @@
+MODULE ActionSample;
+
+REQUIRE Utils, Authentication, Chat, Time, Geo, Contact;
+
+CLASS Item;
+
+//#default
+showMessage = { MESSAGE 'Hello World!'; } 								// объявление действия
+loadImage 'Загрузить изображение' = ABSTRACT (Item); 	
+//#default end
+
+//#action
+CLASS Currency;
+name = DATA VARSTRING[30] (Currency);
+code = DATA INTEGER (Currency);
+
+CLASS Order;
+currency = DATA Currency (Order);
+customer = DATA VARSTRING[100] (Order);
+copy 'Копировать' (Order old) = { 
+    NEW new = Order {                                   // создается действие, состоящее из последовательного выполнения двух действий
+        currency(new) <- currency(old);                 // точка с запятой указывается после каждого оператора
+        customer(new) <- customer(old);
+    }                                                   // в этой строке точка с запятой не ставится, потому что оператор заканчивается на }
+}
+ 
+loadDefaultCurrency(VARISTRING[30] name, INTEGER code) = {
+    NEW c = Currency {
+        name(c) <- name;
+        code(c) <- code;
+    }
+}
+run () = {
+    loadDefaultCurrency('USD', 866);
+    loadDefaultCurrency('EUR', 1251);
+}
+//#action end
+
+//#abstract
+exportXls 'Выгрузить в Excel' = ABSTRACT CASE (Order);         // В данном случае создается ABSTRACT CASE OVERRIDE LAST
+exportXls (Order o) += WHEN name(currency(o)) == 'USD' THEN {
+    MESSAGE 'Export USD not implemented';
+} 
+
+CLASS Task;
+run 'Выполнить' = ABSTRACT (Task);                           // ABSTRACT MULTI EXCLUSIVE
+
+CLASS Task1 : Task;
+name = DATA VARSTRING[100] (Task);
+run (Task1 t) += {
+    MESSAGE 'Run Task1 ' + name(t);
+}
+
+
+CLASS OrderDetail;
+price = DATA NUMERIC[14,2] (OrderDetail);
+
+CLASS InvoiceDetail;
+price = DATA NUMERIC[14,2] (InvoiceDetail);
+fill = ABSTRACT LIST (OrderDetail, InvoiceDetail);   // ABSTRACT LIST LAST
+
+fill (OrderDetail od, InvoiceDetail id) += {
+    price(id) <- price(od);
+}
+//#abstract end
+
+//#activate
+//Форма с двумя закладками
+FORM myForm 'Моя форма'
+    OBJECTS u = CustomUser
+    PROPERTIES(u) name
+     
+    OBJECTS c = Chat
+    PROPERTIES(c) name
+;
+ 
+DESIGN myForm {
+    NEW tabbedPane FIRST {
+        type = TABBED;
+        NEW contacts {
+            caption = 'Контакты';
+            MOVE BOX(u);
+        }
+        NEW recent {
+            caption = 'Последние';
+            MOVE BOX(c);
+        }       
+    }
+}
+  
+testAction() = {
+    ACTIVATE FORM myForm;
+    ACTIVATE TAB myForm.recent;
+}
+
+CLASS ReceiptDetail;
+barcode = DATA VARSTRING[30] (ReceiptDetail);
+quantity = DATA VARSTRING[30] (ReceiptDetail);
+
+FORM POS
+    OBJECTS d = ReceiptDetail
+    PROPERTIES(d) barcode, quantityGrid = quantity
+;
+
+createReceiptDetail 'Добавить строку продажи'(VARSTRING[30] barcode) = {
+    NEW d = ReceiptDetail {
+        barcode(d) <- barcode;
+        ACTIVATE PROPERTY POS.quantityGrid;
+    }
+}
+//#activate end
+
+//#activeform
+FORM exampleForm;
+testActive = {
+    ACTIVE FORM exampleForm;
+    IF isActiveForm() THEN MESSAGE 'Example form is active';
+}
+//#activeform end
+
+//#apply
+CLASS Sku;
+id = DATA INTEGER (Sku);
+
+in = DATA LOCAL BOOLEAN (Sku);
+applyIn = {
+    in(Sku s) <- TRUE WHERE id(s) == 123; 
+    APPLY NESTED (in[Sku]) {};
+    FOR in(Sku s) DO
+        MESSAGE id(s); // показывает '123'
+}
+
+calculateInTransaction = {
+    APPLY {
+        id(Sku s) <- (GROUP MAX id(Sku ss)) (+) 1; // проставляем новый код внутри транзакции 
+    }
+}
+//#apply end
+
+//#ask
+testAsk () = {
+    ASK 'Вы действительно хотите продолжать ?' DO {
+        MESSAGE 'Вы продолжили';
+    }
+    
+    ASK 'Использовать старые значения ?' useOld = YESNO DO {
+        IF useOld THEN 
+            MESSAGE 'Используем старые значения';
+        ELSE
+            MESSAGE 'Используем новые значения';
+    }
+}
+//#ask end
+
+//#assign
+// установить всем клиентам у кого сумма заказа больше 100 скидку в размере 15 процентов
+CLASS Customer;
+discount = DATA NUMERIC[5,2] (Customer);
+totalOrders = DATA NUMERIC[14,2] (Customer);
+setDiscount = {
+    discount(Customer c) <- 15 WHERE totalOrders(c) > 100;
+}
+
+discount = DATA NUMERIC[5,2] (Customer, Item);
+in = DATA BOOLEAN (Item); 
+// изменить скидку для выбранных товаров для клиента
+setDiscount (Customer c) = {
+    discount(c, Item i) <- 15 WHERE in(i);
+}
+  
+// скопировать свойство g в свойство f
+f = DATA INTEGER (INTEGER);
+g = DATA INTEGER (INTEGER);
+copyFG = {
+    f(a) <- g(a);
+}
+//#assign end
+
+//#break
+testBreak () = {
+    FOR iterate(INTEGER i, 1, 100) DO {
+        IF i == 50 THEN BREAK; // дойдет только до 50
+    } 
+}     
+//#break end
+
+//#cancel
+dropChanges() = {
+    CANCEL NESTED (in[Sku]); // отменяем все изменения, кроме свойства in
+}
+//#cancel end
+
+//#case
+test = DATA INTEGER (INTEGER);
+caseActionTest(a) = { 
+    CASE
+        WHEN test(a) > 7 THEN MESSAGE '>7';
+        WHEN test(a) > 6 THEN MESSAGE '>6';
+        WHEN test(a) > 5 THEN MESSAGE '>5';
+}
+//#case end
+
+//#changeclass
+CLASS Document;
+date = DATA DATE (Document);
+
+CLASS ClosedDocument : Document;
+// переводит все документы с датой старше 2-х недель в статус закрыт
+changeStatus() = {
+    CHANGECLASS Document d TO ClosedDocument WHERE sum(date(d), 14) <= currentDate();
+}
+//#changeclass end
+
+//#custom
+showOnMap 'Показать на карте' = CUSTOM 'lsfusion.erp.utils.geo.ShowOnMapActionProperty' (DOUBLE, DOUBLE, MapProvider, STRING[100]);
+
+serviceDBMT 'Обслуживание БД (многопоточно, threadCount, timeout)' = CUSTOM 'lsfusion.server.logics.service.ServiceDBMultiThreadActionProperty' (INTEGER, INTEGER) NULL;
+
+printlnAction 'Вывести текст в консоль' = CUSTOM <{ System.out.println("action test"); }>; 
+setNoCancelInTransaction() = CUSTOM <{ context.getSession().setNoCancelInTransaction(true); }>; // здесь context - это параметр метода executeCustom
+//#custom end
+
+//#delete
+// удаление объекта
+deleteObject(obj) = { DELETE obj; }
+  
+// удаление всех неактивных товаров
+CLASS Article;
+active = DATA BOOLEAN (Article);
+deleteInactiveArticles() = { 
+    DELETE Article a WHERE a IS Article AND NOT active(a); // добавляется локальный параметр a, соответствующий перебираемым объектам
+}
+//#delete end
+
+//#dialog
+FORM selectSku
+    OBJECTS s = Sku
+    PROPERTIES(s) id
+;
+
+testDialog = {
+    DIALOG selectSku OBJECTS s INPUT DO {
+        MESSAGE 'Selected sku : ' + id(s);
+    }
+}
+
+sku = DATA Sku (OrderDetail);
+idSku (OrderDetail d) = id(sku(d));
+
+changeSku (OrderDetail d) = {
+    DIALOG selectSku OBJECTS s = sku(d) CHANGE;
+    
+    //равносильно первому варианту
+    DIALOG selectSku OBJECTS s = sku(d) INPUT NULL CONSTRAINTFILTER DO {
+        sku(d) <- s;
+    }
+}
+//#dialog end
+
+//#email
+emailUserPassUser 'Напоминание пароля' (CustomUser user) = { EMAIL
+    SUBJECT 'Напоминание пароля'
+    TO email(user)
+    INLINE remindUserPass OBJECTS u = user;
+}
+  
+justSendEmail 'Отправить письмо' () = { EMAIL
+    FROM 'luxsoft@adsl.by'
+    SUBJECT 'Тема письма'
+    TO 'xxx@tut.by'
+    INLINE HTML '<font color=#FF0000 size=+3>big red text</font>';
+}
+//#email end
+
+//#eval
+addProperty = { EVAL ACTION 'MESSAGE \'Hello World\''; }  // исходный код, состоящий из одной инструкции, задается строковой константой
+  
+code 'Исходные код' = DATA STRING[2000] ();              // свойство, в которое пользователь может ввести исходный код
+execute 'Выполнить код' = { EVAL code(); }      // действие, выполняющее этот код
+//#eval end
+
+//#exec
+importData(Sku sku, Order order) = {
+    MESSAGE 'Run import for ' + id(sku) + ' ' + customer(order);  
+}                                    // объявленное выше действие importData с двумя параметрами 
+
+order = DATA Order (OrderDetail) NONULL DELETE;
+runImport(OrderDetail d) = { importData(sku(d), order(d)); } // объявление действия runImport, которое будет вызывать importData
+//#exec end
+
+//#exportplain
+CLASS Store;
+
+name = DATA VARSTRING[20] (Sku);
+weight = DATA NUMERIC[10,2] (Sku);
+
+in = DATA BOOLEAN (Store, Sku);
+
+exportSkus (Store store) = {
+    EXPORT DBF CHARSET 'CP866' FROM id(Sku s), name(s), weight(s) WHERE in(store, s); // выгружаем в DBF все Sku, для которых задано in (Store, Sku) для нужного склада 
+    EXPORT FROM id(Sku s), name(s), weight(s) WHERE in(store, s) ORDER name(s) DESC; // выгружает JSON, сортируем по свойству name[Sku] в порядке убывания
+}
+//#exportplain end
+
+//#export
+FORM exportSku
+    OBJECTS st = Store
+
+    OBJECTS s = Sku
+    PROPERTIES(s) id, name, weight
+    FILTERS in(st, s) 
+;
+
+exportSku (Store store) = {
+    // выгружаем в DBF все Sku, для которых задано in (Store, Sku) для нужного склада 
+    EXPORT exportSku OBJECTS st = store DBF CHARSET 'CP866'; 
+    EXPORT exportSku XML HEADERS s 'items';
+    EXPORT exportSku OBJECTS st = store CSV ','; 
+}
+//#export end
+
+name = DATA VARSTRING[30] (Article);
+barcode = DATA VARSTRING[30] (Article);
+price = DATA INTEGER (Article);
+
+//#external
+testExportFile = DATA CUSTOMFILE ();
+
+externalHTTP() = { 
+    EXTERNAL HTTP 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile; 
+    OPEN exportFile(); 
+}
+externalSQL () = {
+    EXPORT TABLE FROM bc=barcode(Article a) WHERE name(a) LIKE '%Мясо%'; // получаем все штрих-коды товаров с именем мясо
+    EXTERNAL SQL 'jdbc:mysql://$1/test?user=root&password=' EXEC 'select price AS pc, articles.barcode AS brc from $2 x JOIN articles ON x.bc=articles.barcode' PARAMS 'localhost',exportFile() TO exportFile; // читаем цены для считанных штрих-кодов
+    
+    // для всех товаров с полученными штрих-кодами записываем цены
+    LOCAL price = INTEGER (INTEGER);
+    LOCAL barcode = VARSTRING[30] (INTEGER);
+    IMPORT FROM exportFile() TO price=pc,barcode=brc;
+    FOR barcode(Article a) = barcode(INTEGER i) DO 
+        price(a) <- price(i);
+}
+externalLSF() = { 
+    EXTERNAL LSF 'http://localhost:7651' EXEC 'System.testAction[]'; 
+}; 
+
+//#external end
+
+//#for
+name = DATA VARSTRING[100] (Store);
+
+testFor = {
+    LOCAL sum = INTEGER ();
+    FOR iterate(i, 1, 100) DO {
+        sum() <- sum() (+) i;
+    }
+    
+    FOR in(Sku s) DO {
+        MESSAGE 'Sku ' + id(s) + ' was selected';
+    }
+    
+    FOR Store st IS Store DO { // пробегаем по всем объектам класса Store
+        FOR in(st, Sku s) DO { // пробегаем по всем Sku, для которых in задано
+            MESSAGE 'There is Sku ' + id(s) + ' in store ' + name(st); 
+        }   
+        
+    }
+}
+//#for end
+
+//#ifthena
+// Действие, сравнивающее значение свойства count с числом 3 и выдающее пользователю сообщение
+moreThan3(obj) = {
+    IF count(obj) > 3 THEN 
+        MESSAGE '>3';
+    ELSE 
+        MESSAGE '<=3';
+}
+ 
+checkNullName (Store st)= {
+    IF NOT name(st) THEN
+        MESSAGE 'Name is null';
+}
+//#ifthena end
+
+quantity = DATA INTEGER (Store,Article);
+
+//#import
+import() = {
+
+    LOCAL xlsFile = EXCELFILE ();
+    
+    LOCAL field1 = STRING[50] (INTEGER);
+    LOCAL field2 = STRING[50] (INTEGER);
+    LOCAL field3 = STRING[50] (INTEGER);
+    LOCAL field4 = STRING[50] (INTEGER);
+
+    LOCAL headField1 = STRING[50] ();
+    LOCAL headField2 = STRING[50] ();
+
+    INPUT f = EXCELFILE DO {     
+        IMPORT XLS SHEET 2 FROM f TO field1 = C, field2, field3 = F, field4 = A;
+        IMPORT XLS SHEET ALL FROM f TO field1 = C, field2, field3 = F, field4 = A;
+        
+        FOR imported(INTEGER i) DO { // свойство imported - системное свойство, предназначенное для перебора данных
+            MESSAGE 'field1 value = ' + field1(i);
+            MESSAGE 'field2 value = ' + field2(i);
+            MESSAGE 'field3 value = ' + field3(i);
+            MESSAGE 'field4 value = ' + field4(i);
+       }
+    }
+    
+    LOCAL t = CUSTOMFILE ();
+    EXTERNAL SQL 'jdbc:postgresql://localhost/test?user=postgres&password=12345' EXEC 'SELECT x.a,x.b,x.c,x.d FROM orders x WHERE x.id = $1;' PARAMS '4553' TO t;
+    IMPORT FROM t() FIELDS INTEGER a, DATE b, STRING[50] c, STRING[50] d DO        // импорт с опцией FIELDS
+        NEW o = Order {
+            number(o) <- a;
+            date(o) <- b;
+            customer(o) <- c;
+            currency(o) <- GROUP MAX Currency currency IF name(currency) = d; // находим currency с данным именем
+        }
+    
+    
+    INPUT f = CUSTOMFILE DO  
+        IMPORT CSV '*' NOHEADER CHARSET 'utf-8' FROM f TO field1 = C, field2, field3 = F, field4 = A;
+    INPUT f = CUSTOMFILE DO  
+        IMPORT XML ATTR FROM f TO field1, field2;
+    INPUT f = CUSTOMFILE DO  
+        IMPORT XML ROOT 'element' ATTR FROM f TO field1, field2;      
+    INPUT f = CUSTOMFILE DO  
+        IMPORT XML LIST ATTR FROM f TO headField1, headField2;        
+ 
+    INPUT f = CUSTOMFILE DO  
+        IMPORT MDB FROM f TO field1 = 'MDBField1', field2 = 'MDBField2';
+
+    INPUT f = CUSTOMFILE DO  
+        INPUT memo = CUSTOMFILE DO  
+            IMPORT DBF MEMO memo FROM f TO field1 = 'DBFField1', field2 = 'DBFField2';
+}
+//#import end
+
+//#importForm
+
+date = DATA DATE (INTEGER);
+sku = DATA STRING[50] (INTEGER); 
+price = DATA NUMERIC[14,2] (INTEGER); 
+order = DATA INTEGER (INTEGER); 
+FORM import
+    OBJECTS o = INTEGER // заказы
+    OBJECTS od = INTEGER // строки заказов
+    PROPERTIES (o) dateOrder = date // импортируем дату из поля dateOrder
+    PROPERTIES (od) sku = sku, price = price // импортируем товар количество из полей sku и price
+    FILTERS order(od) = o // в order - записываем верхний заказ 
+    
+;
+
+importForm() = {
+    INPUT f = CUSTOMFILE DO {
+        IMPORT import JSON FROM f;
+        SHOW import; // показываем что импортировалось
+
+        // создаем объекты в базе        
+        FOR DATE date = date(INTEGER io) NEW o = Order DO {
+            date(o) <- date;
+            FOR order(INTEGER iod) = io NEW od = OrderDetail DO {
+                price(od) <- price(iod); 
+                sku(od) <- GROUP MAX Sku sku IF name(sku) = sku(iod); // находим sku с данным именем
+            }        
+        }             
+    }
+}
+//#importForm end
+
+//#input
+changeCustomer (Order o) = {
+    INPUT s = VARSTRING[100] DO {
+        customer(o) <- s;
+        IF s THEN
+            MESSAGE 'Customer changed to ' + s;
+        ELSE
+            MESSAGE 'Customer dropped';
+    }
+}
+
+FORM order
+    OBJECTS o = Order
+    PROPERTIES(o) customer ON CHANGE changeCustomer(o) 
+;
+
+testFile = {
+    INPUT f = CUSTOMFILE DO { // запрашиваем диалог по выбору файла
+        OPEN f; // открываем выбранный файл
+    }
+}
+//#input end
+
+FORM customers
+    OBJECTS c = VARSTRING[100]
+    FILTERS [=GROUP SUM 1 BY customer(Order o)](c)
+;
+
+//#request
+
+requestCustomer (Order o) = {
+    LOCAL resultValue = VARSTRING[100] ();
+    REQUEST {
+        ASK 'Choose from list?' DO
+            DIALOG customers OBJECTS c = resultValue() CHANGE;
+        ELSE
+            INPUT = resultValue() CHANGE; 
+    } DO
+        customer(o) <- resultValue();
+}
+
+FORM request
+    OBJECTS o = Order
+    PROPERTIES(o) customer ON CHANGE requestCustomer(o) // будет работать, к примеру, групповая корректировка  
+;
+
+//#request end
+
+//#message
+message = { MESSAGE 'Hello World!'; }                                // простое текстовое сообщение
+
+isGood = DATA BOOLEAN (Item);
+stringData(Item i) =  {
+    MESSAGE IF isGood(i) THEN 'Good' ELSE 'Bad';   // в зависимости от того, какой item будет передан действию, будет показываться окно с текстом 'Good', либо с текстом 'Bad'
+}
+  
+testMessage() = {                    // В этом случае пользователю будет выдано пять текстовых сообщений
+    LOCAL i = INTEGER();
+    i() <- 0;
+    WHILE i() < 5 DO {
+        i() <- i() + 1;
+        MESSAGE i();
+    }
+}
+ 
+testMessageNowait() = {              // В случае NOWAIT пользователю будет выдано одно текстовое сообщение, объединяющее сообщения от пяти вызовов MESSAGE
+    LOCAL i = INTEGER();
+    i() <- 0;
+    WHILE i() < 5 DO {
+        i() <- i() + 1;
+        MESSAGE i() NOWAIT;
+    }
+}
+//#message end
+
+//#multi
+CLASS Shape;
+
+CLASS Square : Shape;
+CLASS Circle : Shape;
+
+message (Square s) = { MESSAGE 'Square'; }
+message (Circle c) = { MESSAGE 'Circle'; }
+
+message (Shape s) = MULTI message[Square](s), message[Circle](s);
+//#multi end
+
+//#new
+newSku () = {
+    NEW s = Sku {
+        id(s) <- 425;
+        name(s) <- 'New Sku';
+    }
+}
+
+copy (Sku old) = {
+    NEW new = Sku {
+        id(new) <- id(old);
+        name(new) <- name(old);
+    }
+}
+
+createDetails (Order o) = {
+    FOR in(Sku s) NEW d = OrderDetail DO {
+        order(d) <- o;
+        sku(d) <- s; 
+    }
+}
+//#new end
+
+//#nestedsession
+testNestedSession () = {
+    NESTEDSESSION {
+        name(Sku s) <- 'aaa';
+        APPLY; // на самом деле изменения применятся не в базу данных, а в "верхнюю" сессию
+    }
+    
+    MESSAGE (GROUP SUM 1 IF name(Sku s) == 'aaa'); // возвращает все строки
+    CANCEL;
+    MESSAGE (GROUP SUM 1 IF name(Sku s) == 'aaa'); // возвращает NULL, если в базе не было раньше Sku с именем aaa
+    
+}
+
+FORM sku
+    OBJECTS s = Sku PANEL
+    PROPERTIES(s) id, name
+;
+newNestedSession() = {
+    NESTEDSESSION {
+        NEW s = Sku {
+            // показывает форму, но любые изменения в ней не будут применены в базу данных, а будут сохранены в "верхней сессии"
+            SHOW sku OBJECTS s = s;
+        }       
+    }
+}
+//#nestedsession end
+
+//#newexecutor
+testExecutor = {
+    NEWEXECUTOR {
+        FOR id(Sku s) DO {
+            NEWTHREAD {
+                NEWSESSION {
+                    name(s) <- VARSTRING[20](id(s)); // записываем в наименование код в 10 потоков
+                    APPLY;
+                }
+            }
+        }
+    } THREADS 10;
+}
+//#newexecutor end
+
+//#newsession
+testNewSession () = {
+    NEWSESSION {
+        NEW c = Currency {
+            name(c) <- 'USD';
+            code(c) <- 866;
+        }
+        APPLY;
+    }
+    // здесь новый объект класса Currency уже в базе данных
+    
+    LOCAL local = STRING[10] (Currency);
+    local(Currency c) <- 'Local';
+    NEWSESSION {
+        MESSAGE (GROUP SUM 1 IF local(Currency c) == 'Local'); // возвратит NULL
+    }
+    NEWSESSION NESTED (local) {
+        MESSAGE (GROUP SUM 1 IF local(Currency c) == 'Local'); // возвратит кол-во объектов класса Currency
+    }
+    
+    NEWSESSION {
+        NEW s = Sku {
+            id(s) <- 1234;
+            name(s) <- 'New Sku';
+            SHOW sku OBJECTS s = s;
+        }
+    }
+    
+}
+//#newsession end
+
+//#newthread
+testNewThread () = {
+    //Показ всем сообщения 'Сообщение'
+    FOR user(Connection conn) AND connectionStatus(conn) == ConnectionStatus.connectedConnection AND conn != currentConnection() DO {
+        NEWTHREAD MESSAGE 'Сообщение'; CONNECTION conn;
+    }
+      
+    //Выполнение действия action с периодичностью в 10 секунд и задержкой 5 секунд
+    NEWTHREAD MESSAGE 'Hello World'; SCHEDULE PERIOD 10000 DELAY 5000;
+}
+//#newthread end
+
+//#open
+image = DATA IMAGEFILE (Sku);
+openImage(Sku s) = { OPEN image(s); };
+openImageWait(Sku s) = { OPEN image(s) WAIT; };
+//#open end
+
+//#print
+FORM printOrder
+    OBJECTS o = Order
+    PROPERTIES(o) currency, customer
+    
+    OBJECTS d = OrderDetail
+    PROPERTIES(d) idSku, price
+    FILTERS order(d) == o
+;
+
+print (Order o) = {
+    PRINT printOrder OBJECTS o = o; // выводим на печать
+    
+    LOCAL file = CUSTOMFILE (); 
+    PRINT printOrder OBJECTS o = o DOCX TO file;
+    OPEN file(); 
+    
+    LOCAL sheetName = VARSTRING[255]();
+    sheetName() <- 'enctypted';
+    PRINT printOrder OBJECTS o = o XLS SHEET sheetName PASSWORD 'pass';
+}
+//#print end
+
+//#read
+readFiles() = {
+  
+    LOCAL importFile = CUSTOMFILE ();
+ 
+    //чтение из HTTP
+    READ 'http://lsfusion.ru/file.xlsx' TO importFile;
+    //чтение из HTTPS
+    READ 'https://lsfusion.ru/file.xlsx' TO importFile;
+    //чтение из HTTP с авторизацией
+    READ 'http://user:password@lsfusion.ru/file.xlsx' TO importFile;
+    //чтение из HTTPS с авторизацией
+    READ 'https://user:password@lsfusion.ru/file.xlsx' TO importFile;
+    //чтение из FTP
+    READ 'ftp://ftp.lsfusion.ru/file.xlsx' TO importFile MOVE 'ftp://ftp.lsfusion.ru/success/file.xlsx';
+    //чтение из SFTP
+    READ 'sftp://sftp.lsfusion.ru/file.xlsx' TO importFile MOVE 'sftp://sftp.lsfusion.ru/success/file.xlsx';
+    //чтение из FILE
+    READ 'file://D://lsfusion/file.xlsx' TO importFile DELETE;
+    //чтение из JDBC
+    READ 'jdbc://connectionString@query' TO importFile;
+    //чтение из MDB
+    READ 'mdb://path:table;where' TO importFile;
+}
+
+connectionString = DATA VARSTRING[100]();  
+importXls 'Импортировать надбавки'() = {
+    LOCAL importFile = CUSTOMFILE ();
+    READ connectionString() + '@SELECT field1, field2 FROM myTable' TO importFile;
+    
+    LOCAL field1 = INTEGER (INTEGER);
+    LOCAL field2 = STRING[10] (INTEGER);
+    IMPORT TABLE FROM importFile() TO field1, field2;
+}
+//#read end
+
+//#return
+importFile = {
+    LOCAL file = CUSTOMFILE ();
+    INPUT f = CUSTOMFILE DO {
+        file () <- f;
+    }
+    
+    IF NOT file() THEN RETURN;
+}
+//#return end
+
+//#seek
+number = DATA INTEGER (Order);
+FORM orders
+    OBJECTS o = Order
+    PROPERTIES(o) READONLY number, currency, customer
+;
+newOrder = {
+    NEW new = Order {
+        number(new) <- (GROUP MAX number(Order o)) (+) 1;
+        SEEK orders.o = new;
+    }
+}
+seekFirst = { SEEK FIRST orders.o; }
+seekLast = { SEEK LAST orders.o; }
+
+EXTEND FORM orders
+    PROPERTIES(o) newOrder, seekFirst, seekLast
+;
+//#seek end
+
+//#show
+date = DATA DATE (Order);
+FORM showForm
+    OBJECTS dateFrom = DATE, dateTo = DATE PANEL
+    PROPERTIES VALUE(dateFrom), VALUE(dateTo)
+    
+    OBJECTS o = Order
+    FILTERS date(o) >= dateFrom, date(o) <= dateTo
+;
+
+testShow () = {
+    SHOW showForm OBJECTS dateFrom = 2010_01_01, dateTo = 2010_12_31;
+    
+    NEWSESSION {
+        NEW s = Sku {
+            SHOW sku OBJECTS s = s FLOAT;
+        }
+    }
+}
+//#show end
+
+//#try
+tryToImport(CUSTOMFILE f) = {
+    TRY {
+        LOCAL a = STRING[10] (INTEGER);
+         
+        IMPORT XLS FROM f TO a = A;
+    }
+}
+
+CLASS MyLock {
+    lock 'Блокировка'
+}
+
+singleDo () = {
+    NEWSESSION {
+        lock(MyLock.lock);
+        IF lockResult() THEN 
+        TRY {
+            MESSAGE 'Lock Obtained';
+        } FINALLY unlock(MyLock.lock);
+    }
+}
+//#try end
+
+//#while
+iterateDates (DATE dateFrom, DATE dateTo) = {
+    LOCAL dateCur = DATE();              
+       
+    dateCur() <- dateFrom;
+    WHILE dateCur() <= dateTo DO {     
+        MESSAGE 'I have a date ' + dateCur();
+        dateCur() <- sum(dateCur(), 1);
+    }
+}
+//#while end
+
+//#write
+loadAndWrite () = {
+    INPUT f = CUSTOMFILE DO {
+        WRITE 'file:///home/user/loadedfile.csv' FROM f APPEND;
+        WRITE CLIENT '/home/user/loadedfile.txt' FROM f;
+        WRITE CLIENT DIALOG 'loadedfile' FROM f;
+    }
+}
+//#write end

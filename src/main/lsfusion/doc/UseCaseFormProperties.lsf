@@ -1,0 +1,36 @@
+MODULE UseCaseFormProperties;
+
+//#sample1
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[50] (Book) IN recognize;
+genre 'Жанр' = DATA VARISTRING[30] (Book) IN recognize;
+
+price 'Цена' = DATA NUMERIC[12,2] (Book) IN recognize;
+
+FORM books 'Книги'
+    OBJECTS b = Book
+    PROPERTIES(b) READONLY name, genre, price
+    PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
+;
+
+NAVIGATOR {
+    NEW books;
+}
+//#sample1 end
+
+//#solution1
+filtered 'Книга отфильтрована' (Book b) = FILTER books.b; 
+filteredCount 'Кол-во книг' = GROUP SUM 1 IF filtered(Book b);
+
+EXTEND FORM books
+    PROPERTIES() READONLY filteredCount TODRAW b TOOLBAR
+;
+//#solution1 end
+
+//#solution2
+index 'Порядок' (Book b) = PARTITION SUM 1 IF filtered(b) ORDER [= ORDER books.b](b); 
+
+EXTEND FORM books
+    PROPERTIES(b) index
+;
+//#solution2 end

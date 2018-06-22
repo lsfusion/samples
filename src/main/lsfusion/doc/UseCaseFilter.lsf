@@ -1,0 +1,76 @@
+MODULE UseCaseFilter;
+
+//#sample1
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[100] (Book);
+  
+CLASS Stock 'Склад';
+name 'Наименование' = DATA VARISTRING[100] (Stock);
+  
+balance 'Остаток' = DATA INTEGER (Book, Stock); // для примера сделано первичным свойством, хотя обычно оно вычисляемое
+//#sample1 end
+
+//#solution1
+FORM onStockObject 'Остатки'
+    OBJECTS s = Stock PANEL
+    PROPERTIES(s) name SELECTOR
+  
+    OBJECTS b = Book
+    PROPERTIES READONLY name(b), balance(b, s)
+    ORDER name(b)
+  
+    // Вариант 1
+    FILTERS balance(b, s)
+  
+    // Вариант 2
+    FILTERGROUP bal
+        FILTER 'С положительным остатком' balance(b, s) > 0 'F10'
+        FILTER 'С отрицательными остатком' balance(b, s) < 0 'F9'
+        FILTER 'С остатком' balance(b, s) 'F8' DEFAULT
+        FILTER 'Без остатка' NOT balance(b, s) 'F7'
+;
+//#solution1 end
+
+//#solution2
+filterStock = DATA LOCAL Stock ();
+nameFilterStock 'Склад' = name(filterStock());
+  
+FORM onStockLocal 'Остатки'
+    PROPERTIES() nameFilterStock
+  
+    OBJECTS sb = (s = Stock, b = Book)
+    PROPERTIES READONLY name(s), name(b), balance(b, s)
+    ORDER name(s), name(b)
+  
+    FILTERS s == filterStock() OR NOT filterStock()
+;
+//#solution2 end
+
+//#sample3
+CLASS Customer 'Покупатель';
+name 'Наименование' = DATA VARISTRING[100] (Customer);
+  
+CLASS Order 'Заказ';
+date 'Дата' = DATA DATE (Order);
+  
+customer 'Покупатель' = DATA Customer (Order);
+nameCustomer 'Покупатель' (Order o) = name(customer(o));
+//#sample3 end
+
+//#solution3
+filterCustomer = DATA LOCAL Customer ();
+nameFilterCustomer 'Покупатель' = name(filterCustomer());
+  
+FORM orders 'Заказы'
+    PROPERTIES() nameFilterCustomer
+  
+    OBJECTS dates = (dateFrom = DATE, dateTo = DATE) PANEL
+    PROPERTIES df = VALUE(dateFrom), dt = VALUE(dateTo)
+  
+    OBJECTS o = Order
+    PROPERTIES(o) READONLY do = date, nameCustomer
+    ORDER do DESC
+    FILTERS date(o) >= dateFrom, date(o) <= dateTo,
+            customer(o) == filterCustomer() OR NOT filterCustomer()
+;
+//#solution3 end

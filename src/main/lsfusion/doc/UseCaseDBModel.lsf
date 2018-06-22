@@ -1,0 +1,24 @@
+MODULE UseCaseDBModel;
+
+//#sample1
+CLASS Animal 'Животное';
+TABLE animal(Animal);
+
+name 'Наименование' = DATA VARSTRING[50] (Animal);
+//#sample1 end
+
+//#sample2
+CLASS Country 'Страна';
+
+TABLE animalCountry (Animal, Country);
+population 'Численность' = DATA INTEGER (Animal, Country);
+//#sample2 end
+
+//#sample3
+TABLE ageAnimalCountry (Animal, Country);
+averageAge 'Средний возраст' = DATA NUMERIC[8,2] (Animal, Country) TABLE ageAnimalCountry;
+//#sample3 end
+
+//#sample4
+totalPopulation 'Общая численность' (Animal a) = GROUP SUM population(a, Country c) MATERIALIZED;
+//#sample4 end

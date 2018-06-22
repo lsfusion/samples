@@ -1,0 +1,137 @@
+MODULE UseCaseLedger;
+
+//#skumaster
+REQUIRE Utils;
+
+CLASS SKU 'SKU';
+CLASS Stock 'Склад';
+//#skumaster end
+
+//#skuledger
+CLASS ABSTRACT SKULedger 'Регистр изменения остатка товара';
+
+posted 'Проведен' = ABSTRACT BOOLEAN (SKULedger);
+dateTime 'Дата/время' = ABSTRACT DATETIME (SKULedger);
+
+sku 'SKU' = ABSTRACT SKU (SKULedger);
+stock 'Склад' = ABSTRACT Stock (SKULedger);
+
+quantity 'Кол-во' = ABSTRACT NUMERIC[14,2] (SKULedger);
+
+balance 'Остаток' (Stock stock, SKU sku) = GROUP SUM quantity(SKULedger l) IF posted(l) BY stock(l), sku(l);
+
+balance 'Остаток на дату/время' (Stock stock, SKU sku, DATETIME dateTime) = 
+    GROUP SUM quantity(SKULedger l) IF posted(l) AND dateTime(l) <= DATETIME dt BY stock(l), sku(l), dateTime(l);
+//#skuledger end
+
+//#skureceipt
+CLASS Receipt 'Поступление на склад';
+posted 'Проведен' = DATA BOOLEAN (Receipt);
+dateTime 'Дата/время' = DATA DATETIME (Receipt);
+
+stock 'Склад' = DATA Stock (Receipt); 
+
+CLASS ReceiptDetail 'Строка поступления на склад';
+receipt 'Поступление' = DATA Receipt (ReceiptDetail) NONULL DELETE;
+
+sku 'SKU' = DATA SKU (ReceiptDetail);
+
+quantity 'Кол-во' = DATA NUMERIC[14,2] (ReceiptDetail);
+price 'Цена' = DATA NUMERIC[14,2] (ReceiptDetail);
+//#skureceipt end
+
+//#skureceiptimplement
+EXTEND CLASS ReceiptDetail : SKULedger;
+
+posted[SKULedger](ReceiptDetail d) += posted(receipt(d));
+dateTime[SKULedger](ReceiptDetail d) += dateTime(receipt(d));
+
+stock[SKULedger](ReceiptDetail d) += stock(receipt(d));
+
+sku[SKULedger](ReceiptDetail d) += sku(d);
+quantity[SKULedger](ReceiptDetail d) += quantity(d);
+//#skureceiptimplement end
+
+//#skutransfer
+CLASS Transfer 'Перемещение со склада на склад';
+posted 'Проведен' = DATA BOOLEAN (Transfer);
+dateTime 'Дата/время' = DATA DATETIME (Transfer);
+
+fromStock 'Склад (откуда)' = DATA Stock (Transfer); 
+toStock 'Склад (куда)' = DATA Stock (Transfer); 
+
+CLASS TransferDetail 'Строка отгрузки со склада';
+transfer 'Поступление' = DATA Transfer (TransferDetail) NONULL DELETE;
+
+sku 'SKU' = DATA SKU (TransferDetail);
+
+quantity 'Кол-во' = DATA NUMERIC[14,2] (TransferDetail);
+price 'Цена' = DATA NUMERIC[14,2] (TransferDetail);
+//#skutransfer end
+
+//#skutransferimplement
+EXTEND CLASS TransferDetail : SKULedger;
+
+posted(TransferDetail d) += posted(transfer(d));
+dateTime(TransferDetail d) += dateTime(transfer(d));
+
+stock(TransferDetail d) += fromStock(transfer(d));
+
+sku(TransferDetail d) += sku(d);
+quantity(TransferDetail d) += -quantity(d);
+//#skutransferimplement end
+
+//#skutransferaggregation
+CLASS TransferSKULedger 'Перемещение на склад (регистр)' : SKULedger; 
+@defineAggregation(transferDetail, transferSKULedger, posted);
+
+posted(TransferSKULedger d) += d IS TransferSKULedger;
+dateTime(TransferSKULedger d) += dateTime(transfer(transferDetail(d)));
+
+stock(TransferSKULedger d) += toStock(transfer(transferDetail(d)));
+
+sku(TransferSKULedger d) += sku(transferDetail(d));
+quantity(TransferSKULedger d) += quantity(transferDetail(d));
+//#skutransferaggregation end
+
+//#priceledger
+CLASS ABSTRACT PriceLedger 'Регистр изменения цены поступления';
+
+posted 'Проведен' = ABSTRACT BOOLEAN (PriceLedger);
+dateTime 'Дата/время' = ABSTRACT DATETIME (PriceLedger);
+
+sku 'SKU' = ABSTRACT SKU (PriceLedger);
+stock 'Склад' = ABSTRACT Stock (PriceLedger);
+
+price 'Цена' = ABSTRACT NUMERIC[14,2] (PriceLedger);
+
+price 'Цена' (Stock stock, SKU sku, DATETIME dateTime) = 
+    GROUP LAST price(PriceLedger l)
+          ORDER dateTime(l), l 
+          WHERE posted(l) AND dateTime(l) <= dateTime 
+          BY stock(l), sku(l); 
+
+price 'Цена' (Stock stock, SKU sku) =
+    GROUP LAST price(PriceLedger l)
+          ORDER dateTime(l), l
+          WHERE posted(l) 
+          BY stock(l), sku(l); 
+
+price 'Цена' (SKU sku, DATETIME dateTime) = 
+    GROUP LAST price(PriceLedger l)
+          ORDER dateTime(l), l 
+          WHERE posted(l) AND dateTime(l) <= dateTime 
+          BY sku(l);
+//#priceledger end
+
+//#pricereceiptimplement
+EXTEND CLASS ReceiptDetail : PriceLedger;
+
+posted[PriceLedger](ReceiptDetail d) += posted(receipt(d));
+dateTime[PriceLedger](ReceiptDetail d) += dateTime(receipt(d));
+
+stock[PriceLedger](ReceiptDetail d) += stock(receipt(d));
+
+sku[PriceLedger](ReceiptDetail d) += sku(d);
+price[PriceLedger](ReceiptDetail d) += price(d);
+//#pricereceiptimplement end

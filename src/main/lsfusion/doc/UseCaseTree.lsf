@@ -1,0 +1,52 @@
+MODULE UseCaseTree;
+
+//#sample1
+CLASS Category 'Категория';
+name 'Наименование' = DATA VARISTRING[50] (Category);
+
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[50] (Book);
+category 'Категория' = DATA Category (Book);
+//#sample1 end
+
+//#solution1
+FORM books 'Книги'
+    TREE cb c = Category, b = Book
+    PROPERTIES name(c), name(b)
+    FILTERS category(b) == c 
+;
+//#solution1 end
+
+//#sample2
+parent 'Родитель' = DATA Category (Category);
+//#sample2 end
+
+//#solution2
+FORM categories 'Категории'
+    TREE categories c = Category PARENT parent
+    PROPERTIES(c) name
+;
+//#solution2 end
+
+//#solution3
+level 'Уровень' (Category child, Category parent) = RECURSION 1l IF child IS Category AND parent == child
+                                                                 STEP 2l IF parent == parent($parent) MATERIALIZED;
+
+FORM categoryBooks 'Книги по категориям'
+    TREE categories c = Category PARENT parent
+    PROPERTIES(c) name
+
+    OBJECTS b = Book
+    PROPERTIES(b) name
+    FILTERS level(category(b), c)
+;
+
+DESIGN categoryBooks {
+    NEW pane FIRST {
+        fill = 1;
+        type = SPLITH;
+        MOVE BOX(TREE categories);
+        MOVE BOX(b);
+    }
+}
+//#solution3 end

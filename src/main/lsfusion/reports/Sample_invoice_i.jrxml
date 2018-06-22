@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2017-12-14T12:47:33 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="i" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b25c23a1-d12d-4ca5-bde7-c4ee638da690">
+	<style name="DefaultStyle" isDefault="true" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<style name="GroupCellStyle0" mode="Opaque" backcolor="#DFDFDF" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<style name="GroupCellStyle1" mode="Opaque" backcolor="#FFFFFF" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<field name="i.object" class="java.lang.Long"/>
+	<field name="date(i)" class="java.util.Date"/>
+	<field name="number(i)" class="java.lang.String"/>
+	<field name="d.object" class="java.lang.Long"/>
+	<field name="nameBook(d)" class="java.lang.String"/>
+	<field name="quantity(d)" class="java.lang.Integer"/>
+	<field name="price(d)" class="java.math.BigDecimal"/>
+	<group name="designGroup749">
+		<groupExpression><![CDATA[String.valueOf($F{i.object})]]></groupExpression>
+		<groupHeader>
+			<band splitType="Prevent">
+				<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			</band>
+		</groupHeader>
+	</group>
+	<title>
+		<band height="18">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="GroupCellStyle0" stretchType="RelativeToBandHeight" x="0" y="0" width="802" height="18" uuid="c4167945-d0e7-42a2-a7cb-64aa6680614f"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA["Счет №" + $F{number(i)} + " от " + $F{date(i)}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="18">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="GroupCellStyle1" stretchType="RelativeToBandHeight" x="0" y="0" width="606" height="18" uuid="9e5d59da-64aa-4944-ab45-571551ebda18"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Книга"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="GroupCellStyle1" stretchType="RelativeToBandHeight" x="606" y="0" width="97" height="18" uuid="75b59fb9-e255-4eac-8b00-5cbbc15fa2fe"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Количество"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="GroupCellStyle1" stretchType="RelativeToBandHeight" x="703" y="0" width="99" height="18" uuid="22fbf4f1-9d94-489e-b85f-f5ca0b0c6afd"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Цена"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="18">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="GroupCellStyle1" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="606" height="18" uuid="19c6b24e-d878-4228-b6e5-99a5d314f49a"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{nameBook(d)}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="GroupCellStyle1" positionType="Float" stretchType="RelativeToBandHeight" x="606" y="0" width="97" height="18" uuid="5a68d30b-a501-42f9-8004-e54a99f2b578"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{quantity(d)}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="GroupCellStyle1" positionType="Float" stretchType="RelativeToBandHeight" x="703" y="0" width="99" height="18" uuid="23144208-8f27-4cdc-94a0-7906efd0bcd0"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{price(d)}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

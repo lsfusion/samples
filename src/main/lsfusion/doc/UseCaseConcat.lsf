@@ -1,0 +1,29 @@
+MODULE UseCaseConcat;
+
+//#sample1
+CLASS Book 'Книга';
+CLASS Tag 'Тэг';
+name 'Наименование' = DATA VARISTRING[10] (Tag);
+  
+in 'Вкл' = DATA BOOLEAN (Tag, Book);
+//#sample1 end
+
+//#solution1
+tags 'Тэги' (Book b) = GROUP CONCAT name(Tag t) IF in(t, b), ',' ORDER name(t), t CHARWIDTH 10;
+//#solution1 end
+
+//#sample2
+CLASS Category 'Категория';
+  
+CLASS Author 'Автор';
+name 'Автор' = DATA VARISTRING[20] (Author);
+  
+category 'Категория' = DATA Category (Book);
+author 'Автор' = DATA Author (Book);
+//#sample2 end 
+
+//#solution2
+countBooks 'Кол-во книг' (Author a, Category c) = GROUP SUM 1 BY author(Book b), category(b);
+  
+authors 'Авторы' (Category c) = GROUP CONCAT name(Author a) IF countBooks(a, c) ORDER DESC countBooks(a, c), a;
+//#solution2 end

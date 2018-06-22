@@ -1,0 +1,25 @@
+//#module
+MODULE StockItem;
+//#module end
+
+//#require
+REQUIRE Shipment, Receipt;
+//#require end
+
+//#properties
+receivedQuantity 'Суммарный приход' (Item i, Stock s) = GROUP SUM quantity(ReceiptDetail d) BY item(d), stock(receipt(d));
+shippedQuantity 'Суммарный расход' (Item i, Stock s) = GROUP SUM quantity(ShipmentDetail d) BY item(d), stock(shipment(d));
+currentBalance 'Текущий остаток' (Item i, Stock s) = receivedQuantity (i, s) (-) shippedQuantity (i, s);
+//#properties end
+
+//#constraint
+CONSTRAINT currentBalance(Item i, Stock s) < 0 MESSAGE 'Остаток по товару не может быть отрицательным';
+//#constraint end
+
+//#form
+FORM currentBalanceItemStock 'Текущие остатки'
+    OBJECTS si = (s = Stock, i = Item)
+    PROPERTIES READONLY name(i), barcode(i), name(s), currentBalance(i, s)
+    FILTERS currentBalance(i, s)
+;
+//#form end

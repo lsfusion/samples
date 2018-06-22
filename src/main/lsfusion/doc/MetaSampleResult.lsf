@@ -1,0 +1,25 @@
+MODULE MetaSampleResult;
+
+FORM documentForm;
+FORM orderForm;
+showMessage = {};
+closeForm = {};
+
+CLASS Document;
+CLASS Type;
+
+//#resultmeta1
+EXTEND FORM documentForm
+    PROPERTIES() showMessage, closeForm
+;
+  
+EXTEND FORM orderForm
+    PROPERTIES() showMessage, closeForm
+;
+//#resultmeta1 end
+
+//#resultmeta2
+DocumentName 'Имя документа' = DATA STRING[100](Document);
+DocumentType 'Тип документа' = DATA Type (Document);
+DocumentValue 'Стоимость документа' = DATA INTEGER (Document);
+//#resultmeta2 end

@@ -1,0 +1,76 @@
+MODULE CRUDUseCase;
+
+//#sample1
+CLASS Type 'Тип' {
+    novel 'Роман',
+    thriller 'Триллер',
+    fiction 'Фантастика'
+}
+name 'Наименование' (Type g) = staticCaption(g) IF g IS Type;
+//#sample1 end
+
+//#solution1
+FORM types 'Список типов'
+    OBJECTS g = Type
+    PROPERTIES(g) READONLY name
+ 
+    LIST Type OBJECT g
+;
+//#solution1 end
+
+//#sample2
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[30] (Book) IN recognize;
+//#sample2 end
+
+//#solution2
+FORM book 'Книга' // форма для отображения "карточки" книги
+    OBJECTS b = Book PANEL
+    PROPERTIES(b) name
+     
+    EDIT Book OBJECT b
+;
+  
+FORM books 'Книги'
+    OBJECTS b = Book
+    PROPERTIES(b) READONLY name
+    PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
+  
+    LIST Book OBJECT b
+;
+  
+NAVIGATOR {
+    NEW books;
+}
+//#solution2 end
+
+//#sample3
+CLASS Genre 'Жанр';
+name 'Наименование' = DATA VARISTRING[30] (Genre);
+//#sample3 end
+
+//#solution3
+FORM genre 'Жанр'
+    OBJECTS g = Genre PANEL
+    PROPERTIES(g) name
+     
+    EDIT Genre OBJECT g
+;
+  
+FORM genres 'Жанры'
+    OBJECTS g = Genre
+    PROPERTIES(g) READONLY name
+    PROPERTIES(g) NEWSESSION NEW, EDIT, DELETE
+;
+ 
+FORM dialogGenre 'Жанры'
+    OBJECTS g = Genre
+    PROPERTIES(g) READONLY name
+  
+    LIST Genre OBJECT g
+;
+  
+NAVIGATOR {
+    NEW genres;
+}
+//#solution3 end

@@ -1,0 +1,214 @@
+MODULE UseCaseDocument;
+
+REQUIRE Utils;
+
+//#sample1
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[100] (Book) IN recognize;
+  
+CLASS Order 'Заказ';
+date 'Дата' = DATA DATE (Order);
+number 'Номер' = DATA VARSTRING[10] (Order);
+  
+CLASS OrderDetail 'Строка заказа';
+order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
+  
+book 'Книга' = DATA Book (OrderDetail) NONULL;
+nameBook 'Книга' (OrderDetail d) = name(book(d));
+  
+quantity 'Количество' = DATA INTEGER (OrderDetail);
+price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
+//#sample1 end
+
+//#solution1
+FORM order 'Заказ'
+    OBJECTS o = Order PANEL
+    PROPERTIES(o) date, number
+  
+    OBJECTS d = OrderDetail
+    PROPERTIES(d) nameBook, quantity, price, NEW, DELETE
+    FILTERS order(d) == o
+  
+    EDIT Order OBJECT o
+;
+ 
+  
+FORM orders 'Заказы'
+    OBJECTS o = Order
+    PROPERTIES(o) READONLY date, number
+    PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+;
+  
+NAVIGATOR {
+    NEW orders;
+}
+//#solution1 end
+
+//#solution2
+EXTEND FORM orders
+    OBJECTS d = OrderDetail
+    PROPERTIES(d) READONLY nameBook, quantity, price
+    FILTERS order(d) == o
+;
+//#solution2 end
+
+//#sample3
+posted 'Проведен' = DATA BOOLEAN (Order);
+reserved 'Зарезервировано' (Book b) = GROUP SUM quantity(OrderDetail d) IF posted(order(d)) BY book(d);
+
+EXTEND FORM order
+    PROPERTIES(o) posted
+; 
+//#sample3 end
+
+//#solution3
+post 'Провести' (Order o) = { posted(o) <- TRUE; }
+
+EXTEND FORM order
+    EVENTS ON OK post(o)
+;
+DESIGN order {
+    PROPERTY(formOk()) {
+        caption = 'Провести';
+    }
+}
+//#solution3 end
+
+//#solution4
+quantity 'Кол-во' (Order o, Book b) = GROUP SUM quantity(OrderDetail d) BY order(d), book(d);
+lastOrderDetail 'Последняя строка' (Order o, Book b) = GROUP LAST OrderDetail d ORDER d BY order(d), book(d);
+
+changeQuantity 'Изменить кол-во' (Order o, Book b) = {
+    INPUT q = INTEGER DO { // запрашиваем число
+        IF lastOrderDetail(o, b) THEN { // проверяем, есть ли хоть одна строка
+            IF q THEN // ввели число
+                quantity(OrderDetail d) <- q IF d == lastOrderDetail(o, b) WHERE order(d) == o AND book(d) == b; // записываем количество в последнюю строку с такой книгой
+            ELSE // сбросили число - удаляем строку
+                DELETE OrderDetail d WHERE order(d) == o AND book(d) == b;   
+        } ELSE
+            IF q THEN
+                NEW d = OrderDetail { // создаем новую строку
+                    order(d) <- o;
+                    book(d) <- b;
+                    quantity(d) <- q;
+                }
+    }
+}  
+
+EXTEND FORM order
+    OBJECTS b = Book
+    PROPERTIES name(b) READONLY, quantity(o, b) ON CHANGE changeQuantity(o, b)
+;
+
+DESIGN order {
+    NEW pane AFTER BOX(o) { // создаем контейнер после заголовка заказа
+        fill = 1;
+        type = TABBED;
+        MOVE BOX(d);
+        MOVE BOX(b) {
+            caption = 'Подбор';
+        }
+    }
+}
+
+//#solution4 end
+
+showCaseAction (INTEGER q, Order o, Book b) = {
+//#solution4a
+quantity(OrderDetail d) <- q WHERE d == lastOrderDetail(o, b);
+//#solution4a end
+}
+
+//#solution5a
+CLASS ABSTRACT Invoice 'Счет';
+date 'Дата' = ABSTRACT DATE (Invoice);
+number 'Номер' = ABSTRACT VARSTRING[10] (Invoice);
+
+CLASS ABSTRACT InvoiceDetail 'Строка счета';
+invoice 'Счет' = ABSTRACT Invoice (InvoiceDetail);
+book 'Книга' = ABSTRACT Book (InvoiceDetail);
+
+quantity 'Количество' = ABSTRACT INTEGER (InvoiceDetail);
+price 'Цена' = ABSTRACT NUMERIC[14,2] (InvoiceDetail);
+//#solution5a end
+
+//#solution5b
+FORM invoices 'Счета'
+    OBJECTS i = Invoice
+    PROPERTIES(i) READONLY date, number
+    PROPERTIES(i) NEWSESSION edit, DELETE
+;
+
+NAVIGATOR {
+    NEW invoices;
+}
+//#solution5b end
+
+//#solution5c
+CLASS UserInvoice 'Пользовательский счет' : Invoice;
+date 'Дата' = DATA DATE (UserInvoice);
+number 'Номер' = DATA VARSTRING[10] (UserInvoice);
+
+CLASS UserInvoiceDetail 'Строка пользовательского счета' : InvoiceDetail;
+userInvoice 'Пользовательский счет' = DATA UserInvoice (UserInvoiceDetail); 
+book 'Книга' = DATA Book (UserInvoiceDetail);
+nameBook 'Книга' (UserInvoiceDetail d) = name(book(d));
+
+quantity 'Количество' = DATA INTEGER (UserInvoiceDetail);
+price 'Цена' = DATA NUMERIC[14,2] (UserInvoiceDetail);
+
+// имплементим свойства счета
+date(UserInvoice i) += date(i);
+number(UserInvoice i) += number(i);
+
+// имплементим свойства строк счета
+invoice (UserInvoiceDetail d) += userInvoice(d);
+book (UserInvoiceDetail d) += book(d);
+
+quantity (UserInvoiceDetail d) += quantity(d);
+price (UserInvoiceDetail d) += price(d);
+//#solution5c end
+
+//#solution5d
+FORM userInvoice 'Счет (пользовательский)'
+    OBJECTS i = UserInvoice PANEL
+    PROPERTIES(i) date, number
+
+    OBJECTS d = UserInvoiceDetail
+    PROPERTIES(d) nameBook, quantity, price, NEW, DELETE
+    FILTERS userInvoice(d) == i
+    
+    EDIT UserInvoice OBJECT i
+;
+
+EXTEND FORM invoices
+    PROPERTIES(i) NEWSESSION NEW[UserInvoice]
+;
+//#solution5d end
+
+//#solution5e
+createInvoice 'Создать счет' = DATA BOOLEAN (Order);
+EXTEND FORM order PROPERTIES(o) createInvoice;
+
+// агрегированный счет
+CLASS OrderInvoice 'Счет на основе заказа' : Invoice; 
+@defineAggregation(order, orderInvoice, createInvoice);
+date(OrderInvoice i) += date(order(i));
+number(OrderInvoice i) += number(order(i));
+
+// агрегированные строки счета
+createInvoiceDetail 'Создать строку счета' (OrderDetail d) = createInvoice(order(d));
+
+CLASS OrderInvoiceDetail 'Строка счета на основе заказа' : InvoiceDetail;
+@defineAggregation(orderDetail, orderInvoiceDetail, createInvoiceDetail);
+
+invoice (OrderInvoiceDetail d) += orderInvoice(order(orderDetail(d)));
+book (OrderInvoiceDetail d) += book(orderDetail(d));  
+
+quantity (OrderInvoiceDetail d) += quantity(orderDetail(d));  
+price (OrderInvoiceDetail d) += price(orderDetail(d));
+//#solution5e end
+
+//#solution5f
+edit(OrderInvoice i) += { edit(order(i)); }
+//#solution5f end

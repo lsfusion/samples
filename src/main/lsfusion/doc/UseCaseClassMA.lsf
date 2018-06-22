@@ -1,0 +1,4 @@
+MODULE MA;
+
+CLASS ABSTRACT A; // объявляем абстрактный класс
+a = ABSTRACT STRING[10] (A); // объявляем абстрактное свойство a

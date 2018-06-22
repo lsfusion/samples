@@ -1,0 +1,181 @@
+MODULE UseCaseReports;
+
+//#sample1
+NAMESPACE Sample;
+
+CLASS Category 'Категория';
+name 'Наименование' = DATA VARISTRING[50] (Category) IN recognize;
+
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[100] (Book) IN recognize;
+
+category 'Категория' = DATA Category (Book) AUTOSET;
+nameCategory 'Категория' (Book b) = name(category(b)) IN recognize;
+
+countBooks 'Кол-во книг' (Category c) = GROUP SUM 1 BY category(Book b);
+
+FORM books 'Книги'
+    OBJECTS b = Book
+    PROPERTIES(b) READONLY name, nameCategory
+    PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
+; 
+//#sample1 end
+
+//#solution1a
+FORM booksByCategories 'Книги по категориям'
+    OBJECTS c = Category
+    PROPERTIES(c) name, countBooks
+    
+    OBJECTS b = Book
+    PROPERTIES(b) name, nameCategory
+    FILTERS category(b) == c 
+;
+//#solution1a end
+
+//#solution1b
+printBooksByCategories 'Книги по категориям' () = {
+    PRINT booksByCategories;
+}
+
+xlsxBooksByCategories 'Книги по категориям (XLSX)' () = {
+    PRINT booksByCategories XLSX;
+}
+//#solution1b end
+
+//#solution1c
+EXTEND FORM books
+    PROPERTIES() TODRAW b TOOLBAR printBooksByCategories, xlsxBooksByCategories
+;
+//#solution1c end
+
+//#sample2
+CLASS Invoice 'Счет';
+date 'Дата' = DATA DATE (Invoice);
+number 'Номер' = DATA VARSTRING[10] (Invoice);
+  
+CLASS InvoiceDetail 'Строка счета';
+invoice 'Счет' = DATA Invoice (InvoiceDetail) NONULL DELETE;
+  
+book 'Книга' = DATA Book (InvoiceDetail) NONULL;
+nameBook 'Книга' (InvoiceDetail d) = name(book(d));
+  
+quantity 'Количество' = DATA INTEGER (InvoiceDetail);
+price 'Цена' = DATA NUMERIC[14,2] (InvoiceDetail);
+
+FORM invoice 'Счет'
+    OBJECTS i = Invoice PANEL
+    PROPERTIES(i) date, number
+    
+    OBJECTS d = InvoiceDetail
+    PROPERTIES(d) nameBook, quantity, price, NEW, DELETE
+    FILTERS invoice(d) == i
+    
+    EDIT Invoice OBJECT i
+;
+
+FORM invoices 'Счета'
+    OBJECTS i = Invoice
+    PROPERTIES(i) READONLY date, number
+    PROPERTIES(i) NEWSESSION NEW, EDIT, DELETE
+;
+//#sample2 end
+
+//#solution2
+print 'Печать' (Invoice i) = {
+    PRINT invoice OBJECTS i = i;
+}
+printWord 'Печать (DOCX)' (Invoice i) = {
+    PRINT invoice OBJECTS i = i DOCX;
+}
+
+EXTEND FORM invoices
+    PROPERTIES(i) print TOOLBAR, printWord TOOLBAR
+;
+//#solution2 end
+
+//#sample3
+CLASS Customer 'Покупатель';
+name 'Наименование' = DATA VARISTRING[50] (Customer) IN recognize;
+
+FORM customers 'Покупатели'
+    OBJECTS c = Customer
+    PROPERTIES(c) READONLY name
+    PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE
+;
+
+customer 'Покупатель' = DATA Customer (Invoice);
+nameCustomer 'Покупатель' (Invoice i) = name(customer(i));
+
+EXTEND FORM invoice PROPERTIES(i) nameCustomer;
+
+CLASS Order 'Заказ';
+date 'Дата' = DATA DATE (Order);
+number 'Номер' = DATA VARSTRING[10] (Order);
+
+customer 'Покупатель' = DATA Customer (Order);
+nameCustomer 'Покупатель' (Order o) = name(customer(o));
+
+CLASS OrderDetail 'Строка заказа';
+order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
+  
+book 'Книга' = DATA Book (OrderDetail) NONULL;
+nameBook 'Книга' (OrderDetail d) = name(book(d));
+  
+quantity 'Количество' = DATA INTEGER (OrderDetail);
+price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
+
+FORM order 'Заказ'
+    OBJECTS o = Order PANEL
+    PROPERTIES(o) date, number, nameCustomer
+    
+    OBJECTS d = OrderDetail
+    PROPERTIES(d) nameBook, quantity, price, NEW, DELETE
+    FILTERS order(d) == o
+    
+    EDIT Order OBJECT o
+;
+
+FORM orders 'Заказы'
+    OBJECTS i = Order
+    PROPERTIES(i) READONLY date, number, nameCustomer
+    PROPERTIES(i) NEWSESSION NEW, EDIT, DELETE
+;
+//#sample3 end
+
+//#solution3
+FORM customerInfo 'Информация по клиенту'
+    OBJECTS c = Customer PANEL
+    PROPERTIES(c) name
+    
+    OBJECTS o = Order
+    PROPERTIES(o) date, number
+    FILTERS customer(o) == c
+    
+    OBJECTS od = OrderDetail
+    PROPERTIES(od) nameBook, quantity, price
+    FILTERS order(od) == o
+    
+    OBJECTS i = Invoice
+    PROPERTIES(i) date, number
+    FILTERS customer(i) == c
+    
+    OBJECTS id = InvoiceDetail
+    PROPERTIES(id) nameBook, quantity, price
+    FILTERS invoice(id) == i
+;
+
+printInfo 'Распечатать информацию' (Customer c) = {
+    PRINT customerInfo OBJECTS c = c;
+}
+
+EXTEND FORM customers
+    PROPERTIES(c) printInfo TOOLBAR
+;
+//#solution3 end
+
+NAVIGATOR {
+    NEW books;
+    NEW customers;
+    NEW invoices;
+    NEW orders;
+}

@@ -1,0 +1,38 @@
+MODULE UseCaseMeta;
+
+//#defineobject
+META defineObject(class, id, shortId, caption, multiCaption)
+    CLASS class caption;
+    TABLE id(class);
+    
+    name 'Наименование' = DATA VARISTRING[100] (class);
+
+    FORM id caption
+        OBJECTS shortId = class PANEL
+        PROPERTIES(shortId) name
+         
+        EDIT class OBJECT shortId
+    ;
+      
+    FORM id##s multiCaption
+        OBJECTS shortId = class
+        PROPERTIES(shortId) READONLY name
+        PROPERTIES(shortId) NEWSESSION NEW, EDIT, DELETE
+      
+        LIST class OBJECT shortId
+    ;
+      
+    NAVIGATOR {
+        NEW id##s;
+    }
+END
+
+META defineObject(id, shortId, caption, multiCaption)
+    @defineObject(###id, id, shortId, caption, multiCaption);
+END
+//#defineobject end
+
+//#usedefineobject
+@defineObject(book, b, 'Книга', 'Книги');
+@defineObject(magazine, m, 'Журнал', 'Журналы');
+//#usedefineobject end

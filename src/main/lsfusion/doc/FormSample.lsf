@@ -1,0 +1,428 @@
+MODULE FormSample;
+
+//#form
+CLASS Document;
+
+// объявляем форму Документы
+FORM documents 'Документы'
+    OBJECTS d = Document // Добавляем один объект класса Document
+    
+    // ... добавляем свойства и фильтры на форму 
+
+    LIST Document OBJECT d // помечаем что данная форма должна использоваться, когда необходимо выбрать документ, при этом объект d должен использоваться как возвращаемое значение
+;
+ 
+CLASS Item;
+
+// объявляем форму Товар
+FORM item 'Товар'
+    OBJECTS i = Item PANEL // добавляем объект класса Item и помечаем, что он должен отображаться в панель (то есть видимо только одно значение)
+
+    // ... добавляем свойства и фильтры на форму 
+
+    EDIT Item OBJECT i // помечаем что данная форма должна использоваться, когда необходимо добавлять или редактировать товар
+;
+
+// объявляем форму со списком Товаров
+FORM items 'Товары'
+    OBJECTS i = Item
+
+    // ... добавляем свойства и фильтры на форму 
+
+    PROPERTIES(i) NEWSESSION NEW, EDIT // добавляем кнопки, которые будут создавать и редактировать товар, используя форму item
+;
+
+CLASS Invoice;
+CLASS InvoiceDetail;
+
+// объявляем форму печати инвойса
+FORM printInvoice
+    OBJECTS i = Invoice // добавляем объект класса инвойс, для которого будет идти печать
+
+    // ... добавляем свойства и фильтры на форму 
+;
+  
+// разбиваем определение формы на две инструкции (вторую инструкцию можно перенести в другой модуль)
+EXTEND FORM printInvoice
+    OBJECTS d = InvoiceDetail // добавляем строки инвойса, каждая из которых будет использоваться в отчете в качестве детализации
+
+    // ... добавляем свойства и фильтры на форму 
+;
+print (Invoice invoice) = { PRINT printInvoice OBJECTS i = invoice; } // объявляем действие , при выполнении которого будет открываться форма печати инвойса
+//#form end
+
+//#objects
+CLASS Shipment;
+// объявляем форму поставки
+FORM shipments 'Поставки'
+    OBJECTS s = Shipment // добавляем один объект класса shipment
+                        PAGESIZE 100 // указываем, что таблица всегда должна содержать 100 рядов
+
+    // ... добавляем свойства и фильтры на форму 
+;
+  
+// Объявляем форму, которая будет отображать обороты по товару за заданный интервал
+name = DATA VARSTRING[100] (Item);
+revenue = DATA NUMERIC[16,2] (Item, DATE, DATE);
+
+FORM revenues 'Обороты по товарам'
+    OBJECTS interval = (dateFrom = DATE 'Дата (с)', dateTo = DATE 'Дата (по)') PANEL, // объявляем группу объектов, состоящую из 2х объектов класса Дата с соответствующими заголовками, которая будет всегда отображаться в виде панели
+            i = Item // добавляем список товаров
+    PROPERTIES VALUE(dateFrom), VALUE(dateTo) // добавляем на форму свойства значений объектов даты, при помощи которых пользователь сможет выбирать даты
+    PROPERTIES name(i), revenue(i, dateFrom, dateTo) // добавляем имя товаров и свойство с оборотами товара за интервал дат
+;
+//#objects end
+
+//#tree
+CLASS SkuGroup;
+name = DATA VARISTRING[100] (SkuGroup);
+active = DATA BOOLEAN (SkuGroup);
+parent = DATA SkuGroup (SkuGroup) AUTOSET;
+
+CLASS Sku;
+name = DATA VARISTRING[100] (Sku);
+skuGroup = DATA SkuGroup (Sku);
+
+  
+FORM skus 'Sku'
+    TREE groupTree g=SkuGroup PARENT parent
+    PROPERTIES READONLY name(g)
+    FILTERS active(g)
+    
+    OBJECTS s = Sku
+    PROPERTIES(s) name
+    FILTERS skuGroup(s) == g
+;
+ 
+CLASS Group1;
+name = DATA VARSTRING[100] (Group1);
+
+CLASS Group2;
+name = DATA VARSTRING[100] (Group2);
+
+CLASS Group3;
+name = DATA VARSTRING[100] (Group3);
+
+in = DATA BOOLEAN (Group1, Group2);
+in = DATA BOOLEAN (Group2, Group3);
+  
+FORM groups
+    TREE groups g1 = Group1, g2 = Group2, g3 = Group3
+    PROPERTIES READONLY name(g1), name(g2), name(g3)
+    FILTERS in(g1, g2), in(g2, g3)
+;
+//#tree end
+
+//#properties
+CLASS Order;
+date = DATA DATE (Order);
+time = DATA TIME (Order);
+number = DATA INTEGER (Order);
+series = DATA STRING[2] (Order);
+
+note = DATA VARISTRING[255] (Order);
+
+CLASS OrderDetail;
+order = DATA Order (OrderDetail) NONULL DELETE;
+date(OrderDetail d) = date(order(d));
+
+index (OrderDetail d) = PARTITION SUM 1 ORDER d BY order(d) CHARWIDTH 4;
+
+sku = DATA Sku (OrderDetail);
+nameSku (OrderDetail d) = name(sku(d));
+
+quantity = DATA NUMERIC[10,2] (OrderDetail);
+price = DATA NUMERIC[10,2] (OrderDetail);
+sum = DATA NUMERIC[12,2] (OrderDetail);
+
+sum (Order o) = GROUP SUM sum(OrderDetail d) BY order(d);
+
+quantity (Order o, Sku s) = GROUP SUM quantity(OrderDetail d) BY order(d), sku(d);
+lastDetail (Order o, Sku s) = GROUP MAX OrderDetail d BY order(d), sku(d); 
+changeQuantity (Order o, Sku s) = {
+    INPUT n = NUMERIC[10,2] DO {
+        IF lastDetail(o, s) THEN {
+            IF n THEN
+                quantity(OrderDetail d) <- n WHERE d == lastDetail(o, s);
+            ELSE
+                DELETE OrderDetail d  WHERE d == lastDetail(o, s);
+        } ELSE IF n THEN {
+            NEW d = OrderDetail {
+                order(d) <- o;
+                sku(d) <- s;
+                quantity(d) <- n;
+            }
+        }
+    }
+}
+
+stopOrder = DATA BOOLEAN (Sku);
+onStock = DATA NUMERIC[10,2] (Sku);
+ordered = DATA NUMERIC[10,2] (Sku);
+
+CLASS Customer;
+name = DATA VARISTRING[100] (Customer);
+FORM customers
+    OBJECTS c = Customer
+    PROPERTIES(c) READONLY name
+    LIST Customer OBJECT c
+;
+
+customer = DATA Customer (Order);
+nameCustomer (Order o) = name(customer(o));
+
+customer(OrderDetail d) = customer(order(d));
+
+CLASS Region;
+name = DATA VARSTRING[100] (Region); 
+
+region = DATA Region (Customer);
+
+// объявляем форму заказы
+FORM order 'Заказ'
+    OBJECTS o = Order PANEL // добавляем объект заказ на форму
+    PROPERTIES VALUE(o), // добавляем идентификатор заказа в базе данных
+               date(o), time(o), series(o), number(o), // добавляем свойства дата/время заказа, серия/номер заказа
+               nameCustomer(o), // добавляем наименование покупателя, которое по умолчанию будет доступным для редактирования
+                                     // при этом, при попытке его редактирования, будет вызываться диалог по выбору покупателя - форма, для которой установлен параметр LIST customer
+               note(o), // добавляем примечание
+               sum(o) READONLY // добавляем сумму по заказу без возможности редактирования, так как оно автоматически считается на основе суммы строк                                     
+                         
+    OBJECTS d = OrderDetail // добавляем объект строка заказа
+    PROPERTIES(d) // все свойства в этом блоке будут иметь вход строка заказа
+                  index READONLY, // добавляем порядковый номер строки и делаем, чтобы его нельзя было редактировать
+                  nameSku, // добавляем наименование
+                  quantity, price, sum, // добавляем количество, цена, сумму
+                  NEW, // добавляем предопределенное действие NEW, которое добавляет новую строку заказа
+                  DELETE // добавляем действие, которое будет удалять строку заказа
+    FILTERS order(d) == o // указываем, что должны показываться только строки, относящиеся к данному заказу
+  
+    OBJECTS s = Sku // добавляем объект sku, в который мы будем выводить итоги по каждому sku в заказе
+    PROPERTIES(s) name READONLY // добавляем наименование , при этом делая пометку, что его нельзя редактировать на этой форме
+     
+    PROPERTIES quantity(o, s) // добавляем свойство, в котором будет показываться заказанное количество по sku в данном заказе
+               ON CHANGE changeQuantity(o, s) // по умолчанию, несмотря на то, что свойство не помечено как READONLY, и при попытке его изменения ничего происходить не будет, так как quantity - это агрегированное свойство
+                                                           // в данном случае делается пометка, что при попытке изменения будет вызвано действие changeQuantity
+                                                           // в этом свойство написан алгоритм, который будет создавать/удалять строки заказа или изменять в них количество
+               READONLYIF stopOrder(s) // делаем, чтобы свойство было недоступно для редактирования, в случае, если выставлен запрет на заказ по данному sku
+               BACKGROUND stopOrder(s) // кроме того, подсвечиваем в таком случае эту ячейку своим фоном, чтобы пользователь заранее видел такие позиции
+  
+    EDIT Order OBJECT o // помечаем форму, как форму для редактирования заказов
+;
+  
+EXTEND FORM order // расширяем форму при помощи концепции Mixin
+    PROPERTIES onStock(s) BEFORE quantity(d), // добавляем на форму свойство текущего остатка перед количеством в заказе
+               ordered(s) BEFORE quantity(d) // добавляем на форму количество уже заказанного товара в рамках всех заказов
+;
+  
+FORM orders 'Заказы'
+    OBJECTS o = Order
+    PROPERTIES(o) READONLY VALUE, date, number // все свойства в этом блоке недоступны для редактирования
+    PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE // добавляем предопределенные действия NEW и EDIT, которые будут вызывать форму order для добавления заказов
+;
+  
+// создаем "отчет", в котором будут видны заказы за определенный интервал в разрезе покупателей в конкретном регионе
+FORM orderReport 'Продажи по складам'
+    OBJECTS interval = (dateFrom = DATE 'Дата (с)', dateTo = DATE 'Дата (по)') PANEL // объявляем группу объектов, состоящую из 2х объектов класса Дата с соответствующими заголовками, которая будет всегда отображаться в виде панели
+    PROPERTIES dateFrom = VALUE(dateFrom), dateTo = VALUE(dateTo) // добавляем на форму свойства значений объектов даты, при помощи которых пользователь сможет выбирать даты
+                                                                        // кроме того, присваиваем этим свойствам имена на форме dateFrom и dateTo соответственно
+     
+    OBJECTS r = Region PANEL // добавляем объект регион, по которому будет происходить фильтрация покупателей
+    PROPERTIES(r) name SELECTOR // добавляем свойство наименование региона, при этом помечаем, что при его редактировании должен вызываться диалог по выбору региона, выбранное значение которого будет использовано как текущее значение
+  
+    OBJECTS c = Customer // добавляем объект покупатели
+                         // специально не добавляем ни одного свойства, чтобы он был "невидимым", но он нужен для того, чтобы отображать покупателей в колонки
+    FILTERS region(c) == r // ставим фильтр на то, чтобы покупатели были только из этого региона
+  
+    OBJECTS s = Sku // добавляем объект sku, в таблице которого и будет показываться основная информация
+    PROPERTIES(s) name READONLY // добавляем наименование sku и не забываем сделать его READONLY, иначе пользователь сможет изменять наименования товара непосредственно в отчете
+     
+    PROPERTIES = [= GROUP SUM quantity(OrderDetail d) IF date(d) >= dateFrom AND date(d) <= dateTo BY sku(d), customer(d)](s, c) 
+                // добавляем свойство, в котором рассчитана количество заказанного sku по покупателям за определенный интервал дат
+               COLUMNS (c) // помечаем, что покупатели должны отображаться в колонки, при этом колонок будет столько же, сколько и рядов с учетом фильтров будет в объекте покупателя, и идти они будут в том же порядке
+               HEADER name(c) // задаем, что в качестве заголовка колонок будет использоваться имя покупателя
+;
+//#properties end
+
+//#filters
+CLASS Stock;
+name = DATA VARISTRING[100] (Stock);
+region = DATA Region (Stock);
+
+CLASS Group;
+name = DATA VARISTRING[100] (Group);
+
+group = DATA Group(Sku);
+nameGroup (Sku s) = name(group(s));
+
+active = DATA BOOLEAN (Sku); 
+
+onStock = DATA NUMERIC[10,2] (Stock, Sku);
+
+FORM onStock 'Остатки' // создаем форму, в которой можно смотреть остатки по товарам
+    OBJECTS r = Region FIXED PANEL // добавляем объект регион
+    PROPERTIES name(r) SELECTOR // добавляем свойство имя региона, при нажатии на который пользователь сможет его выбирать
+  
+    OBJECTS st = Stock // добавляем объект склады
+    PROPERTIES name(st) READONLY // добавляем имя склада
+    FILTERS region(st) == r // добавляем фильтр, чтобы показывались только склады выбранного региона
+  
+    OBJECTS s = Sku // добавляем товары
+    PROPERTIES READONLY groupName = nameGroup(s), name(s), onStock(st, s) // добавляем наименование группы товаров, присваивая ему groupName в качестве имени свойства на форме, а также наименование и остаток по товару
+    FILTERS active(s) // включаем, чтобы показывались только активные товары
+;
+//#filters end
+
+//#regularfilters
+active = DATA BOOLEAN (Stock);
+
+EXTEND FORM onStock // расширяем ранее созданную форму с остатками
+    FILTERGROUP stockActive // создаем группу фильтров с одним фильтрам, которая будет показываться в виде флажка, по которому пользователь сможет включать/отключать фильтр
+        FILTER 'Активные' active(st) 'F11' // добавляем отбор по только активным складам, который будет применяться по нажатию клавиши F11
+    FILTERGROUP skuAvailability // создаем новую группу фильтров, в которой пользователь сможет выбирать один из фильтров при помощи выпадающего списка
+        FILTER 'Есть на остатках' onStock(st, s) 'F10' DEFAULT // добавляем отбор, который будет показывать только товары на остатках, выбираться по клавише F10 и будет автоматически выбран при открытии формы
+;
+
+// ...  
+  
+EXTEND FORM onStock
+    EXTEND FILTERGROUP skuAvailability
+        FILTER 'Отрицательные остатки' onStock(st, s) < 0 'F9' // добавляем отбор по выражению
+;
+//#regularfilters end
+
+//#sort
+EXTEND FORM onStock // расширяем ранее созданную форму с остатками
+    ORDER name(s) // включаем сортировку по наименования склада в списке складов
+    ORDER groupName, onStock(st, s) DESC // включаем сортировку по возрастанию имени группы, а внутри по убыванию остатка на складе
+                                            // следует отметить, что в качестве свойства указывается имя свойства на форме groupName, а не просто имя свойства nameGroupSku
+;
+//#sort end
+
+//#events
+showImpossibleMessage() = { MESSAGE 'It\'s impossible'; };
+
+posted = DATA BOOLEAN (Invoice);
+
+FORM invoice 'Инвойс' // создаем форму по редактированию инвойса
+    OBJECTS i = Invoice PANEL // создаем объект класса инвойс
+
+//    ...  задаем остальное поведение формы
+  
+    EVENTS
+        ON OK { posted(i) <- TRUE; }, // указываем, что при нажатии пользователем OK должно выполняться действия, которое выполнит действия по "проведению" данного инвойса
+        ON DROP showImpossibleMessage() // по нажатию кнопки formDrop выдаем сообщение, что такого не может быть, так как эта кнопка по умолчанию будет показываться только в форме по выбору инвойса, а эта форма по сути является формой редактирования инвойса
+;
+
+CLASS Shift;
+currentShift = DATA Shift();
+
+CLASS Cashier;
+currentCashier = DATA Cashier();
+
+CLASS Receipt;
+shift = DATA Shift (Receipt);
+cashier = DATA Cashier (Receipt);
+
+FORM POS 'POS' // объявляем форму для продажи товара покупателю в торговом зале
+    
+    OBJECTS r = Receipt PANEL // добавляем объект, в котором будет храниться текущий чек
+//    ... объявляем поведение формы
+  
+;
+
+createReceipt () = {
+    NEW r = Receipt {
+        shift(r) <- currentShift();
+        cashier(r) <- currentCashier();
+        
+        SEEK POS.r = r;
+    }
+}
+
+EXTEND FORM POS // добавляем свойство через расширение формы, чтобы можно было сделать SEEK к уже созданному объекту на форме
+    EVENTS
+        ON INIT createReceipt() // при открытии формы выполняем действие по созданию нового чека, которое заполняет смену, кассира и прочую информацию
+;
+//#events end
+
+//#view
+// делаем форму печати ценника для товара
+labelFile = DATA VARSTRING[100] (Item);
+printLabelFile (Item i)= OVERRIDE labelFile(i), 'MyModule_printLabel_i.jrxml' IF i IS Item;
+FORM printLabel 'Печать ценника'
+    OBJECTS i = Item FIXED PANEL // добавляем товар, для которого будет печататься ценник
+    REPORTFILES i printLabelFile(i) // помечаем, что в качестве шаблона должен использоваться файл, имя которого лежит в свойстве labelFileItem
+                                   // например, пользователь может ввести туда myLabel1.jrxml, тогда система будет использовать файл, по пути /reports/custom/myLabel1.jrxml
+//  ... другие свойства, необходимые для печати
+;
+//#view end
+
+//#design
+DESIGN order { // настраиваем дизайн формы, начиная с дизайна по умолчанию
+    // отмечаем, что все изменения иерархии будут происходит для самого верхнего контейнера 
+    NEW orderPane FIRST { // создаем новый контейнер самым первым перед системными кнопками, в который положим два контейнера - шапка и спецификации
+        fill = 1; // указываем, что контейнер должен занимать все доступное ему место
+        type = SPLITV; // указываем, что контейнер будет вертикальным сплиттером
+        MOVE BOX(o) { // переносим в новый контейнер все, что касается объекта o
+            PANEL(o) { // настроим как отображаются свойства в панели объекта o
+                type = CONTAINERV; // делаем, чтобы все потомки шли сверху вниз
+                NEW headerRow1 { // создаем контейнер - первый ряд
+                    type = CONTAINERH;
+                    MOVE PROPERTY(date(o)) { // переносим свойство даты заказа
+                        caption = 'Дата редактируемого заказа'; // "перегружаем" заголовок свойства в дизайне формы (вместо стандартного)
+                        toolTip = 'Введите сюда дату, когда был сделан заказ'; //задаем подсказку для свойства дата заказа
+                        background = #00FFFF; // делаем фон красным
+                    }
+                    MOVE PROPERTY(time(o)) { // переносим свойство времени заказа
+                        foreground = #FF00FF; // делаем цвет зеленым
+                    }
+                    MOVE PROPERTY(number(o)) { // переносим свойство номер заказа
+                        charWidth = 5; // ставим, что пользователю желательно должно показываться 5 символов
+                    }
+                    MOVE PROPERTY(series(o)); // переносим свойство серия заказа
+                }
+                NEW headerRow2 {
+                    type = CONTAINERV; // потомки - сверху вниз
+                }
+                MOVE PROPERTY(note(o));
+            }
+              
+            size = (400, 300); //указываем, что контейнер o.box должен иметь базовый размер 400x300 пикселей
+        }
+        NEW detailPane { // создаем контейнер, в котором будут хранится различные спецификации по заказу
+            type = TABBED; // помечаем, что этот контейнер должен быть панелью закладок, где закладками являются его потомки
+            MOVE BOX(d) { // добавляем контейнер с строками заказа как одну из закладок верхней панели
+                caption = 'Строки'; // задаем заголовок панели закладки
+                PROPERTY(index(d)) { focusable = FALSE; } // делаем, чтобы колонка с номером строки никогда не могла иметь фокус
+                GRID(d) {
+                    defaultComponent = TRUE; // делаем, чтобы по умолчанию фокус при открытии формы устанавливался на таблицу строк
+                }
+            }
+            MOVE BOX(s) { // добавляем контейнер с итогами по sku как одну из закладок detailPane
+                caption = 'Подбор';
+            }
+        }
+    }
+}
+  
+// разбиваем определение формы на две инструкции (вторую инструкцию можно перенести в другой модуль)
+DESIGN order {
+    REMOVE TOOLBARLEFT; // убираем из иерархии контейнер с кнопками печати и экспорта в xls, тем самым делая их невидимыми
+}
+//#design end
+
+//#extendform
+CLASS ItemGroup;
+name = DATA VARISTRING[100] (ItemGroup);
+
+itemGroup = DATA ItemGroup (Item);
+
+EXTEND FORM items
+    PROPERTIES(i) NEWSESSION DELETE // добавляем на форму кнопку удаления
+    
+    OBJECTS g = ItemGroup BEFORE i // добавляем на форму объект группы товаров перед товаром
+    PROPERTIES(g) READONLY name
+    FILTERS itemGroup(i) == g // если бы объект был добавлен после объекта с товарами, то фильтрация шла бы по группе товаров, а не по товарам
+;
+//#extendform end

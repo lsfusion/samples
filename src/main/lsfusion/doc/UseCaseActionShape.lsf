@@ -1,0 +1,24 @@
+MODULE UseCaseActionShape;
+
+//#shape
+CLASS ABSTRACT Shape;
+whoAmI = ABSTRACT (Shape);
+//#shape end
+
+//#concreteclass
+CLASS Rectangle : Shape;
+CLASS Circle : Shape;
+//#concreteclass end
+
+//#concreteaction
+whoAmI (Rectangle r) += {
+    IF r IS Rectangle THEN {
+        MESSAGE 'I am a rectangle';
+    }
+}
+whoAmI (Circle c) += {
+    IF c IS Circle THEN {
+        MESSAGE 'I am a circle';
+    }
+}
+//#concreteaction end

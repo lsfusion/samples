@@ -1,0 +1,26 @@
+MODULE UseCaseNavigator;
+
+//#sample1
+FORM categories 'Категории';
+FORM books 'Книги';
+//#sample1 end
+
+//#solution1
+NAVIGATOR {
+    NEW FOLDER application 'Приложение' WINDOW toolbar FIRST {
+        NEW categories;
+        NEW books;
+    }
+}
+//#solution1 end
+
+//#solution2
+NAVIGATOR {
+    application {
+        NEW FOLDER masterData 'Справочники' {
+            NEW categories;
+            NEW books;
+        }
+    }
+}
+//#solution2 end

@@ -1,0 +1,106 @@
+MODULE UseCaseNewSession;
+
+//#sample1
+CLASS Order 'Заказ';
+
+isPosted 'Проведен' = DATA BOOLEAN (Order);
+number 'Номер' = DATA INTEGER (Order);
+
+FORM orders
+    OBJECTS o = Order
+    PROPERTIES(o) READONLY isPosted, number
+;
+//#sample1 end
+
+//#solution1
+post 'Провести' (Order o) = {
+    NEWSESSION {
+        isPosted(o) <- TRUE;
+        APPLY;
+    }
+}
+
+EXTEND FORM orders
+    PROPERTIES(o) post TOOLBAR
+;
+//#solution1 end
+
+//#sample2
+FORM order
+    OBJECTS o = Order PANEL
+    PROPERTIES(o) isPosted, number
+    
+    EDIT Order OBJECT o
+;
+//#sample2 end
+
+//#solution2
+newOrder () = {
+    NEWSESSION {
+        NEW o = Order {
+            number(o) <- (GROUP MAX number(Order oo)) (+) 1;
+            SHOW order OBJECTS o = o;
+        }
+    }
+}
+
+EXTEND FORM orders
+    // Вариант 1
+    PROPERTIES() newOrder TODRAW o TOOLBAR
+    
+    // Вариант 2
+    PROPERTIES(o) NEWSESSION NEW
+;
+//#solution2 end
+
+//#sample3
+selected 'Отм' = DATA LOCAL BOOLEAN (Order);
+EXTEND FORM orders
+    PROPERTIES(o) selected
+;
+//#sample3 end
+
+//#solution3
+deleteSelectedOrders 'Удалить отмеченные заказы' () = {
+    NEWSESSION NESTED(selected) {
+        DELETE Order o WHERE selected(o);
+        ASK 'Вы собираетесь удалить ' + (GROUP SUM 1 IF DROPPED(Order o)) + ' заказов. Продолжить ?' DO {
+            APPLY;
+        }
+    }
+}
+
+EXTEND FORM orders
+    PROPERTIES() deleteSelectedOrders TODRAW o TOOLBAR
+;
+//#solution3 end
+
+//#sample4
+CLASS Payment 'Платеж';
+
+date 'Дата' = DATA DATE (Payment);
+sum 'Сумма' = DATA NUMERIC[14,2] (Payment);
+
+order 'Заказ' = DATA Order (Payment);
+//#sample4 end
+
+//#solution4
+FORM orderPayments 'Платежи по заказу'
+    OBJECTS o = Order PANEL // Не добавляем свойств, чтобы этот объект не был вообще виден на форме
+    
+    OBJECTS p = Payment
+    PROPERTIES(p) date, sum, NEW, DELETE
+    FILTERS order(p) == o
+;
+
+editPayments 'Редактировать платежи' (Order o) = {
+    NESTEDSESSION {
+        SHOW orderPayments OBJECTS o = o;
+    }
+}
+
+EXTEND FORM order
+    PROPERTIES(o) editPayments
+;
+//#solution4 end
+

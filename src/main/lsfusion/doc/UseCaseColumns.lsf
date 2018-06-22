@@ -1,0 +1,80 @@
+MODULE UseCaseColumns;
+
+REQUIRE Utils;
+
+//#sample1
+CLASS Book 'Книга';
+name 'Наименование' = DATA VARISTRING[50] (Book) IN recognize;
+
+CLASS Customer 'Покупатель';
+name 'Наименование' = DATA VARISTRING[50] (Customer) IN recognize;
+
+price 'Цена' = DATA NUMERIC[14,2] (Book, Customer);
+//#sample1 end
+
+//#solution1
+FORM prices 'Цены'
+    OBJECTS c = Customer
+    
+    OBJECTS b = Book
+    PROPERTIES name(b) READONLY, price(b, c) COLUMNS (c) HEADER name(c)
+;
+//#solution1 end
+
+//#sample2
+gracePeriod 'Отсрочка, дней' = DATA INTEGER (Book, Customer); 
+//#sample2 end
+
+//#solution2
+selected 'Отм' = DATA BOOLEAN (Customer);
+
+headerName 'Заголовок цены' (Customer c) = name(c) + ': Цена';
+headerGrace 'Заголовок отсрочки' (Customer c) = name(c) + ': Отсрочка, дней';
+
+FORM pricesAndGracePeriods 'Цены и отсрочки'
+    OBJECTS s = Customer
+    PROPERTIES selected(s), name(s) READONLY
+    
+    OBJECTS c = Customer
+    FILTERS selected(c)
+    
+    OBJECTS b = Book
+    PROPERTIES name(b) READONLY, 
+               price(b, c) COLUMNS 'priceAndGrace' (c) HEADER headerName(c), 
+               gracePeriod(b, c) COLUMNS 'priceAndGrace' (c) HEADER headerGrace(c)
+;
+
+DESIGN pricesAndGracePeriods {
+    BOX(b) {
+        fill = 3;
+        PROPERTY(gracePeriod(b, c)) {
+            background = #FFFFAA;
+        }
+    }
+}
+//#solution2 end
+
+//#solution3
+in 'Вкл' = DATA BOOLEAN (INTEGER, INTEGER);
+
+row 'Заголовок ряда' (INTEGER r) = 'Ряд ' + (r AS INTEGER);
+column 'Заголовок колонки' (INTEGER c) = 'Колонка ' + (c AS INTEGER);
+
+FORM matrix 'Матрица'
+    OBJECTS m = (rows = INTEGER, columns = INTEGER) PANEL
+    PROPERTIES rs = VALUE(rows), cs = VALUE(columns)
+    
+    OBJECTS c = INTEGER
+    FILTERS iterate(c, 1, columns)
+    
+    OBJECTS r = INTEGER
+    PROPERTIES(r) row
+    PROPERTIES in(r, c) COLUMNS (c) HEADER column(c)
+    FILTERS iterate(r, 1, rows)
+;
+
+DESIGN matrix {
+    PROPERTY(rs) { caption = 'Кол-во рядов'; }
+    PROPERTY(cs) { caption = 'Кол-во колонок'; }
+}
+//#solution3 end

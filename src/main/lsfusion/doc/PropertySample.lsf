@@ -1,0 +1,47 @@
+MODULE PropertySample;
+
+REQUIRE Utils;
+
+CLASS Item;
+CLASS Team;
+GROUP baseGroup;
+TABLE team (Team);
+
+//#default
+cost 'Стоимость' (i) = DATA NUMERIC[12,3] (Item);		// cвойство задано контекстно-независимым оператором-свойством DATA
+weightedSum 'Взвешенная сумма' (a, b) = 2*a + 3*b; 		// cвойство задано выражением 
+diff = a - b; 											// заголовком этого свойства будет 'diff', а параметрами - (a, b)
+ 
+teamName 'Название команды' = DATA STRING[30](Team) IN baseGroup TABLE team; // свойство задано оператором DATA с указанием дополнительных опций свойства
+//#default end
+
+//#constant
+CLASS Direction {
+    north, east, south, west                        // объявляем статические объекты
+}
+  
+isNorth (Direction d) = d == Direction.north;  // здесь константное свойство создается из объекта Direction.north, которое затем используется оператором сравнения для построения свойства isNorth
+
+defaultDate() = 1982_07_13;                         // здесь константное свойство создается из литерала, описывающего дату
+
+CLASS Man;
+age 'Возраст' = DATA INTEGER (Man);
+isChild (Man m) = age(m) < 17;                        // здесь используется константное свойство, созданное из целого числа (целочисленного литерала)
+//#constant end
+
+//#set
+CLASS A;
+d = DATA INTEGER (A);
+
+f (b) = GROUP SUM 1 IF d(a) < b;
+messageF = { MESSAGE f(5); } // успешно выполнится
+
+g = GROUP SUM f(b);
+messageG = { MESSAGE g(); } // f(b) не NULL для бесконечного числа b, платформа выдаст ошибку
+//#set end
+
+//#set2
+hs = GROUP SUM 1 IF (a AS INTEGER) >= 4 AND a <= 6;
+messageHS = { MESSAGE hs(); } // теоретически должна выдать 3, но платформа все равно выдаст ошибку
+hi = GROUP SUM 1 IF iterate(a, 4, 6); // workaround: для работы с интервалами можно использовать свойство iterate (оно в свою очередь реализуется через рекурсию) 
+//#set2 end

@@ -1,0 +1,372 @@
+MODULE OperatorPropertySample;
+
+REQUIRE Authentication, Chat, Numerator;
+
+//#arithmetic
+sum(a, b) = a + b;
+dateDiff(date1, date2) = date2 - date1;
+transform(a, b, c) = -a * (b (+) c);
+//#arithmetic end
+
+//#brackets
+CLASS Letter;
+attachment1 = DATA CUSTOMFILE (Letter);
+attachment2 = DATA CUSTOMFILE (Letter);
+letterAttachments (Letter l) = STRUCT(attachment1(l), attachment2(l));
+secondAttachment(Letter l) = letterAttachments(l)[2]; // возвращает attachment2
+//#brackets end
+
+//#abstract
+CLASS Invoice;
+CLASS InvoiceDetail;
+CLASS Range;
+
+rateChargeExchange(invoice) = ABSTRACT NUMERIC[14,6] (Invoice);             // В данном случае создается ABSTRACT MULTI EXCLUSIVE
+backgroundSku 'Цвет' (d) = ABSTRACT CASE FULL COLOR (InvoiceDetail); // В данном случае создается ABSTRACT CASE OVERRIDE LAST, и если будут
+                                                                            // подходить несколько реализаций, то вычислена будет первая из них
+overVAT = ABSTRACT VALUE OVERRIDE FIRST Range (InvoiceDetail);          // Здесь же будет вычислена последняя из подходящих реализаций
+//#abstract end
+
+//#activetab
+//Форма с двумя закладками
+FORM tabbedForm 'Форма с табами'
+    OBJECTS u = CustomUser
+    PROPERTIES(u) name
+     
+    OBJECTS c = Chat
+    PROPERTIES(c) name
+;
+ 
+DESIGN tabbedForm {
+    NEW tabPane FIRST {
+        type = TABBED;
+        NEW contacts {
+            caption = 'Контакты';
+            MOVE BOX(u);
+        }
+        NEW recent {
+            caption = 'Последние';
+            MOVE BOX(c);
+        }       
+    }          
+}
+  
+//Активна ли закладка 'Последние'
+recentActive() = ACTIVE TAB tabbedForm.recent;
+//#activetab end
+
+//#case
+CLASS Color;
+id = DATA VARSTRING[100] (Color);
+
+background 'Цвет' (Color c) = CASE
+    WHEN id(c) == 'Black' THEN RGB(0,0,0)
+    WHEN id(c) == 'Red' THEN RGB(255,0,0)
+    WHEN id(c) == 'Green' THEN RGB(0,255,0)
+;
+  
+id (TypeExecEnv type) = CASE EXCLUSIVE
+    WHEN type == TypeExecEnv.materialize THEN 3
+    WHEN type == TypeExecEnv.disablenestloop THEN 2
+    WHEN type == TypeExecEnv.none THEN 1
+    ELSE 0
+;
+//#case end
+
+//#class
+CLASS A;
+a = ABSTRACT CASE VARSTRING[100] (A);
+
+CLASS B : A;
+b = DATA VARSTRING[100] (B);
+
+a(B b) += WHEN CLASS(b(b)) THEN b(b); // равносильно WHEN b IS B THEN b(b)
+//#class end
+
+//#concat
+CLASS Person;
+firstName = DATA VARSTRING[100] (Person);
+middleName = DATA VARSTRING[100] (Person);
+lastName = DATA VARSTRING[100] (Person);
+
+fullName(Person p) = CONCAT ' ', firstName(p), middleName(p), lastName(p);     // если какая-то часть имени не задана, то эта часть будет пропущена вместе с пробелом
+//#concat end
+
+//#data
+CLASS Item;
+quantity = DATA LOCAL INTEGER (Item);
+
+CLASS Country;
+isDayOff = DATA BOOLEAN (Country, DATE);
+//#data end
+
+//#exclusive
+background 'Цвет' (INTEGER i) = EXCLUSIVE RGB(255,238,165) IF i <= 5,
+                                                   RGB(255,160,160) IF i > 5;
+                                                   
+CLASS Human;
+
+CLASS Male : Human;
+CLASS Female : Human;
+
+name(Human h) = EXCLUSIVE 'Male' IF h IS Male, 'Female' IF h IS Female;
+//#exclusive end
+
+//#formula
+round(number, digits) = FORMULA 'round(CAST(($1) as numeric),$2)';  // свойство с двумя параметрами: округляемым числом и количеством знаков после запятой
+toString15(str) = FORMULA STRING[15] 'CAST($1 AS character(15))';   // свойство, преобразовывающее значение, переданное в качестве аргумента, к строковому типу длиной в 15 символов. 
+jumpWorkdays = FORMULA NULL DATE PG 'jumpWorkdays($1, $2, $3)', MS 'dbo.jumpWorkdays($1, $2, $3)'; // свойство с двумя различными реализациями для разных диалектов SQL
+//#formula end
+
+//#group
+CLASS Game;
+CLASS Team;
+hostGoals = DATA INTEGER (Game);
+hostTeam = DATA Team (Game); 
+hostGoalsScored(team) = GROUP SUM hostGoals(Game game) BY hostTeam(game);
+
+name = DATA VARSTRING[100] (Country);
+countryName = GROUP AGGR Country country WHERE country IS Country BY name(country); // получается свойство (VARSTRING[100]) -> Country
+
+CLASS Book;
+CLASS Tag;
+name = DATA VARSTRING[100] (Tag);
+in = DATA BOOLEAN (Book, Tag);
+
+tags(Book b) = GROUP CONCAT name(Tag t) IF in(b, t), ', ' ORDER name(t), t;
+//#group end
+
+//#if
+name = DATA VARSTRING[100] (Book);
+hasName (Book b) = TRUE IF name(b);
+
+background (Book b) = RGB(224, 255, 128) IF b IS Book;
+
+countTags (Book b) = GROUP SUM 1 IF in(b, Tag t);
+//#if end
+
+//#ifthen
+price1 = DATA NUMERIC[10,2] (Book);
+price2 = DATA NUMERIC[10,2] (Book);
+maxPrice (Book b) = IF price1(b) > price2(b) THEN price1(b) ELSE price2(b);
+  
+sex (Human h) = IF h IS Male THEN 'Male' ELSE ('Female' IF h IS Female); // если h будет другого класса, то будет NULL
+  
+isDifferent(a, b) = IF a != b THEN TRUE;
+//#ifthen end
+
+//#join1    
+f = DATA INTEGER (INTEGER, INTEGER, INTEGER);
+g = DATA INTEGER (INTEGER, INTEGER);
+h = DATA INTEGER (INTEGER, INTEGER);
+c(a, b) = f(g(a, b), h(b, 3), a);
+
+count = DATA STRING[255] (INTEGER);
+name = DATA STRING[255] (INTEGER);
+formatted(INTEGER a, INTEGER b) = [=FORMULA STRING[255] ' CAST($1 AS TEXT) || \' / \' || CAST($2 AS TEXT)'](count(a), name(b));
+//#join1 end   
+
+//#join2
+CLASS Triangle;
+cathetus1 = DATA DOUBLE(Triangle);
+cathetus2 = DATA DOUBLE(Triangle);
+
+hypotenuseSq(triangle) = cathetus1(triangle)*cathetus1(triangle) + cathetus2(triangle)*cathetus2(triangle);
+  
+hypotenuseSq2(triangle) = [= x*x + y*y](cathetus1(triangle), cathetus2(triangle)); // аналогичное свойство, заданное с помощью композиции
+//#join2 end
+
+//#max
+date1 = DATA DATE(INTEGER);
+date2 = DATA DATE(INTEGER);
+maxDate (INTEGER i) = MAX date1(i), date2(i);
+
+balance = DATA INTEGER (Item);
+outcome 'Остаток (неотрицательный)' (Item i) = MAX balance(i), 0;
+//#max end
+
+//#min
+minPrice(Book b) = MIN price1(b), price2(b);
+
+date (INTEGER i) = DATA DATE (INTEGER);
+minDate (INTEGER i) = MIN date(i), 2001_01_01;
+//#min end
+
+//#multi
+nameMulti (Human h) = MULTI 'Male' IF h IS Male, 'Female' IF h IS Female;
+
+CLASS Ledger;
+CLASS InLedger : Ledger;
+quantity = DATA INTEGER (InLedger);
+
+CLASS OutLedger : Ledger;
+quantity = DATA INTEGER (OutLedger);
+
+signedQuantity (Ledger l) = MULTI quantity[InLedger](l), quantity[OutLedger](l);
+//#multi end
+
+//#override
+CLASS Group;
+markup = DATA NUMERIC[8,2] (Group);
+
+markup = DATA NUMERIC[8,2] (Book);
+group = DATA Group (Book);
+overMarkup (Book b) = OVERRIDE markup(b), markup(group(b));
+
+notNullDate (INTEGER i) = OVERRIDE date(i), 2010_01_01; 
+//#override end
+
+//#partition
+// определяет место команды в конференции
+CLASS Conference;
+conference = DATA Conference (Team);
+points = DATA INTEGER (Team);
+gamesWon = DATA INTEGER (Team);
+place 'Место' (Team team) = PARTITION SUM 1 ORDER DESC points(team), gamesWon(team) BY conference(team);
+  
+// строим порядковые индексы объектов в базе по возрастанию их внутренних идентификаторов (то есть в порядке создания)
+index 'Номер' (Object o) = PARTITION SUM 1 IF o IS Object ORDER o;
+  
+// находит команду, следующую в турнирной таблице по конференции
+prevTeam (Team team) = PARTITION PREV team ORDER place(team), team BY conference(team);
+  
+// пример пропорционального распределения
+CLASS Order;
+transportSum 'Транспортные расходы' = DATA NUMERIC[10,2] (Order);
+
+CLASS OrderDetail;
+order = DATA Order (OrderDetail) NONULL DELETE;
+sum = DATA NUMERIC[14,2] (OrderDetail);
+
+transportSum 'Транспортные расходы по строке' (OrderDetail d) = PARTITION UNGROUP transportSum
+                                    PROPORTION STRICT ROUND(2) sum(d)
+                                    ORDER d
+                                    BY order(d);
+ 
+// пример распределения с лимитами
+discountSum 'Скидка' = DATA NUMERIC[10,2] (Order);
+discountSum 'Скидка по строке' (OrderDetail d) =
+    PARTITION UNGROUP discountSum
+                LIMIT STRICT sum(d)
+                ORDER sum(d), d
+                BY order(d);
+;
+//#partition end
+
+//#prev
+f = DATA INTEGER (A);
+// выдает по очереди все изменения f(a) в сессии
+messageFChanges = {
+    FOR CHANGED(f(A a)) DO
+        MESSAGE 'In this session f(a) changed from ' + PREV(f(a)) + ' TO ' + f(a);
+}
+
+CLASS Document;
+date = DATA DATE (Document);
+
+CLASS Article;
+price = DATA NUMERIC[14,2] (Document, Article);
+// записать в цену документа, последнюю использованную цену в БД
+// PREV важен чтобы не учитывалась цены введенные в этом документе
+// это особенно важно, если последняя использованная цена будет материализованной, тогда платформа сможет просто считать это значение из таблицы
+setPrice = {
+    price(Document d, Article a) <- PREV((GROUP LAST price(d, a) ORDER date(d), d));
+}
+//#prev end
+
+//#recursion1
+CLASS Node;
+edge = DATA BOOLEAN (Node, Node);
+
+// итерация по integer от from к to (это свойство по умолчанию входит в модуль System)
+iterate(i, from, to) = RECURSION i==from AND from IS INTEGER AND to IS INTEGER STEP i==$i+1 AND i<=to CYCLES IMPOSSIBLE;
+  
+// считает количество различных путей от a до b в графе
+pathes 'Кол-во путей' (a, b) = RECURSION 1 AND a IS Node AND b==a STEP 1 AND edge(b, $b);
+  
+// определяет на каком уровне находится child от parent, и null если не является потомком (тем самым это свойство можно использовать для определения всех child'ов)
+parent = DATA Group (Group);
+level 'Уровень' (Group child, Group parent) = RECURSION 1 AND child IS Group AND parent == child
+                                                                  STEP 1 AND parent == parent($parent);
+ 
+// числа Фибоначчи, свойство высчитывает все числа Фибоначи до значения to, (после будет возвращать null)
+fib(i, to) = RECURSION 1 IF (i==0 OR i==1) AND to IS INTEGER STEP 1 IF (i==$i+1 OR i==$i+2) AND i<to CYCLES IMPOSSIBLE;
+//#recursion1 end
+
+//#recursion2
+fib(i) = RECURSION 1 IF (i==0 OR i==1) STEP 1 IF (i==$i+1 OR i==$i+2);
+//#recursion2 end
+
+//#struct
+objectStruct(a, b) = STRUCT(a, f(b));
+stringStruct() = STRUCT(1, 'two', 3.0);
+//#struct end
+
+//#groupobject
+CLASS Store;
+name = DATA VARSTRING[100] (Store);
+
+FORM stores
+    OBJECTS s = Store
+;
+countF 'Кол-во фильтр. складов' = GROUP SUM 1 IF [= VIEW stores.s](Store s);
+orderF 'Порядок в группе объектов' (Store s) = PARTITION SUM 1 IF [= FILTER stores.s](s) ORDER [= ORDER stores.s](s), s;
+setNameX 'Добавить X к имени'() = {
+    LOCAL k = INTEGER ();
+    k() <- 0;
+    FOR [= FILTER stores.s](Store s) ORDER [= ORDER stores.s](s) DO {
+        k() <- k() + 1;
+        name(s) <- 'X' + k() + name(s);
+    }
+}
+//#groupobject end
+
+//#explicitcast
+itemCount = DATA INTEGER (Store);
+itemCountToString(s) = STRING[10](itemCount(s));
+
+barcode = DATA VARSTRING[15] (Item);
+longBarcode(Item i) = LONG(barcode(i));
+//#explicitcast end
+
+//#aonx
+likes = DATA BOOLEAN (Person, Person);
+likes(Person a, Person b, Person c) = likes(a, b) AND likes(a, c);
+outOfInterval1(value, left, right) = value < left OR value > right;  
+outOfInterval2(value, left, right) = NOT (value >= left AND value <= right);
+//#aonx end
+
+//#isas
+asOrder(object) = object AS Order;
+
+person = DATA Human (Order);
+isMale (Order o) = person(o) IS Male;
+//#isas end
+
+//#changed
+quantity = DATA NUMERIC[14,2] (OrderDetail);
+price = DATA NUMERIC[14,2] (OrderDetail);
+sum(OrderDetail d) <- quantity(d) * price(d) WHEN CHANGED(quantity(d)) OR CHANGED(price(d));
+
+createdUser = DATA CustomUser (Order);
+createdUser (Order o) <- currentUser() WHEN SET(o IS Order);
+
+numerator = DATA Numerator (Order);
+number = DATA VARSTRING[28] (Order);
+series = DATA STRING[2] (Order);
+WHEN SETCHANGED(numerator(Order o)) AND
+     NOT CHANGED(number(o)) AND
+     NOT CHANGED(series(o))
+     DO {
+        number(o) <- curStringValue(numerator(o));
+        series(o) <- series(numerator(o));
+        incrementValueSession(numerator(o));
+     }
+;
+//#changed end
+
+//#compare
+equalBarcodes = barcode(a) == barcode(b);
+outOfIntervalValue1(value, left, right) = value < left OR value > right; 
+outOfIntervalValue2(value, left, right) = NOT (value >= left AND value <= right);
+//#compare end
