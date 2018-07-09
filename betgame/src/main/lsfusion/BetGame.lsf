@@ -46,7 +46,7 @@ startedHomeScore 'Ставка (хозяева)' (Match m, CustomUser c) = homeS
 startedAwayScore 'Ставка (хозяева)' (Match m, CustomUser c) = awayScore(m, c) IF started(m);  
 
 hasBet 'Сделана ставка' (Match m, CustomUser c) = homeScore(m, c) AND awayScore(m, c);
-countBets 'Кол-во ставок' (Match m) = GROUP SUM 1 IF hasBet(Match m, CustomUser c) BY m; 
+countBets 'Кол-во ставок' (Match m) = GROUP SUM 1 IF hasBet(m, CustomUser c); 
 
 CONSTRAINT DROPPED(Match m IS Match) AND PREV(countBets(m)) MESSAGE 'Запрещено удалять матч, по которому сделаны ставки';
 
@@ -142,7 +142,7 @@ FORM standings 'Таблица'
 ;
 
 NAVIGATOR {
-    matches;
-    standings;
-    teams;
+    NEW matches;
+    NEW standings;
+    NEW teams;
 } 

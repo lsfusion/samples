@@ -19,6 +19,7 @@
         <module>crm</module>
         <module>features</module>
         <module>hockeystats</module>
+        <module>betgame</module>
         <module>mm</module>
     </modules>
 
