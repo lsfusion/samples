@@ -1,0 +1,119 @@
+MODULE Invoice;
+
+REQUIRE Customer, Employee, Category,
+        TimeEntry, 
+        Numerator, Utils;
+
+CLASS Invoice 'Счет';
+TABLE invoice (Invoice);
+
+project 'Проект' = DATA Project (Invoice) NONULL;
+nameProject 'Проект' (Invoice i) = name(project(i));
+
+customer 'Клиент' (Invoice i) = customer(project(i));
+nameCustomer 'Клиент' (Invoice i) = name(customer(i));
+
+date 'Дата' = DATA DATE (Invoice) NONULL;
+date(i) <- currentDate() WHEN SET(i IS Invoice);
+
+@defineNumbered(Invoice);
+@defineNumeratedDefault(Invoice, 'Счета', '');
+
+author 'Автор' = DATA Employee (Invoice);
+nameAuthor 'Автор' (Invoice i) = name(author(i));
+
+// Время выполнения
+
+invoice 'Счет' = DATA Invoice (TimeEntry);
+
+fromDate 'Дата с' = GROUP MIN dateStart(TimeEntry e) BY invoice(e);
+toDate 'Дата по' = GROUP MAX dateStart(TimeEntry e) BY invoice(e);
+
+fromDate 'Дата с' = GROUP MIN dateStart(TimeEntry e) BY invoice(e), task(e);
+
+hours 'Часов' = GROUP SUM NUMERIC[5,1](hours(TimeEntry e)) BY invoice(e);
+hours 'Часов' (Invoice i, Task t) = GROUP SUM NUMERIC[5,1](hours(TimeEntry e)) BY invoice(e), task(e);
+
+rate 'Ставка, руб.' = DATA NUMERIC[14,2] (Invoice, Task);
+rate(Invoice i, Task t) <- rate(project(i), category(employee(t))) WHEN SET(hours(i, t));
+
+hoursMonthly 'Часов в абонентской плате' = DATA NUMERIC[14,2] (Invoice);
+hoursMonthly (Invoice i) <- hoursMonthly(project(i)) WHEN CHANGED(project(i));
+
+sumMonthly 'Сумма абонентской платы' = DATA NUMERIC[14,2] (Invoice);
+sumMonthly (Invoice i) <- sumMonthly(project(i)) WHEN CHANGED(project(i));
+
+sum 'Сумма, руб.' (Invoice i, Task t) = hours(i, t) * rate(i, t);
+sum 'Сумма, руб.' (Invoice i) = GROUP SUM sum(i, Task t);
+
+hoursPay 'Часов к оплате' (Invoice i, Task t) = hours(i,t) (-) PARTITION UNGROUP hoursMonthly LIMIT hours(i,t) ORDER rate(i,t), fromDate(i,t), t BY i;
+hoursPay 'Часов к оплате' (Invoice i) = GROUP SUM hoursPay(i, Task t);
+
+sumPay 'Сумма к оплате' (Invoice i, Task t) = hoursPay(i,t) * rate(i, t);
+sumPay 'Сумма к оплате' (Invoice i) = GROUP SUM sumPay(i, Task t);
+
+CONSTRAINT extractMonth(fromDate(Invoice i)) != extractMonth(toDate(i)) AND hoursMonthly(i) MESSAGE 'Запрещено выставлять счет за несколько месяцев одновременно';
+
+removeInvoice 'Исключить' (TimeEntry e) = {
+    invoice(e) <- NULL;
+}
+
+codeEmployee 'Код' (Task t) = code(employee(t));
+nameCategoryEmployee 'Категория' (Task t) = nameCategory(employee(t));
+
+FORM invoice 'Счет'
+    OBJECTS i = Invoice PANEL
+    PROPERTIES(i) date, nameNumerator, series, number, nameCustomer, nameProject, fromDate, toDate, hours, hoursMonthly, hoursPay, sum, sumMonthly, sumPay
+    
+    OBJECTS t = Task
+    PROPERTIES(t) READONLY nameProject, codeEmployee, nameCategoryEmployee, nameEmployee, nameTaskType
+    PROPERTIES(i, t) fromDate READONLY, hours READONLY, hoursPay READONLY, rate, sum READONLY, sumPay READONLY
+    PROPERTIES(t) READONLY name, description PANEL
+    FILTERS hours(i, t),
+            assigned(project(t), currentEmployee())
+    
+    OBJECTS e = TimeEntry
+    PROPERTIES(e) READONLY nameActivity, dateTimeStart, hours BACKGROUND userHours(e), dateTimeFinish
+    PROPERTIES(e) removeInvoice TOOLBAR
+    FILTERS task(e) == t
+    
+    EDIT Invoice OBJECT i
+;
+
+DESIGN invoice {
+    NEW header FIRST {
+        caption = 'Счет';
+        NEW params {
+            type = CONTAINERH;
+            MOVE PROPERTY(date(i));
+            MOVE PROPERTY(nameNumerator(i));
+            MOVE PROPERTY(series(i));
+            MOVE PROPERTY(number(i));
+            MOVE PROPERTY(nameCustomer(i));
+            MOVE PROPERTY(nameProject(i));
+        }
+        NEW time {
+            type = CONTAINERH;
+            MOVE PROPERTY(fromDate(i));
+            MOVE PROPERTY(toDate(i));
+            MOVE PROPERTY(hours(i));
+            MOVE PROPERTY(hoursMonthly(i));
+            MOVE PROPERTY(hoursPay(i));
+            MOVE PROPERTY(sum(i));
+            MOVE PROPERTY(sumMonthly(i));
+            MOVE PROPERTY(sumPay(i));
+        }
+    }
+    NEW pane AFTER header {
+        fill = 1;
+        type = SPLITH;
+        MOVE BOX(t) { 
+            fill = 3;
+            MOVE PROPERTY(description(t)) {
+                fill = 0.5;
+                panelCaptionAbove = TRUE;
+            } 
+        }
+        MOVE BOX(e);
+    }
+}

@@ -1,0 +1,90 @@
+MODULE Task;
+
+REQUIRE Project, Employee;
+
+CLASS Task 'Задача';
+TABLE task(Task);
+
+name 'Название' = DATA VARSTRING[100] (Task);
+
+description 'Описание' = DATA TEXT (Task);
+
+project 'Проект' = DATA Project (Task) NONULL;
+nameProject 'Проект' (Task e) = name(project(e)); 
+
+customer 'Клиент' (Task e) = customer(project(e));
+nameCustomerProject 'Клиент' (Task e) = name(customer(e));
+
+employee 'Сотрудник' = DATA Employee (Task) NONULL;
+nameEmployee 'Сотрудник' (Task e) = name(employee(e));
+
+employee(Task t) <- currentEmployee() WHEN SET(t IS Task);  
+
+CONSTRAINT employee(Task e) AND project(e) AND NOT assigned(project(e), employee(e))
+    CHECKED BY employee, project
+    MESSAGE 'Для трудозатрат задан сотрудник, не назначенный на проект';
+
+completed 'Завершена' = DATA BOOLEAN (Task);
+notCompleted 'Не завершена' (Task t) = t IS Task AND NOT completed(t);
+
+// Тип
+
+CLASS TaskType 'Тип задачи';
+TABLE taskType (TaskType);
+
+name 'Название' = DATA VARSTRING[50] (TaskType);
+
+FORM taskTypes 'Типы задач'
+    OBJECTS a = TaskType
+    PROPERTIES(a) name, NEW, DELETE
+;
+
+FORM dialogTaskType 'Выбор типа задачи'
+    OBJECTS a = TaskType
+    PROPERTIES(a) READONLY name
+    
+    LIST TaskType OBJECT a;
+;
+
+NAVIGATOR {
+    masterData {
+        NEW taskTypes;
+    }
+}
+
+taskType 'Тип задачи' = DATA TaskType (Task) NONULL;
+nameTaskType 'Тип задачи' (Task t) = name(taskType(t));
+
+// --- Редактирование задачи
+
+FORM task 'Задача'
+    OBJECTS t = Task PANEL
+    PROPERTIES(t) nameCustomerProject, nameProject, nameTaskType, name, description
+    ORDER nameCustomerProject(t)
+    
+    EDIT Task OBJECT t
+;
+
+DESIGN task {
+    size = (1024, 768);
+    OBJECTS {
+        NEW projectInfo FIRST {
+            caption = 'Проект';
+            type = CONTAINERH;
+            MOVE PROPERTY(nameCustomerProject(t));
+            MOVE PROPERTY(nameProject(t));
+            MOVE PROPERTY(nameTaskType(t));
+            MOVE PROPERTY(name(t));
+        }
+        
+        NEW projectDescr {
+            fill = 1;
+            type = SPLITH;
+            MOVE PROPERTY(description(t)) {
+                fill = 1;
+                panelCaptionAbove = TRUE;
+            }
+        }
+        
+    }
+}

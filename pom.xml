@@ -3,59 +3,38 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>lsfusion.fsl</groupId>
-        <artifactId>fsl-logics</artifactId>
-        <version>1.3.5-SNAPSHOT</version>
-        <relativePath>../../fsl/fsl-logics/pom.xml</relativePath>
+        <groupId>lsfusion.build</groupId>
+        <artifactId>build</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../build/pom.xml</relativePath>
     </parent>
 
-    <groupId>lsfusion.samples</groupId>
+    <groupId>org.lsfusion.samples</groupId>
     <artifactId>samples</artifactId>
+    <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
     <name>Samples</name>
 
-    <profiles>
-        <profile>
-            <id>assemble</id>
-            <properties>
-                <platform.assemble.version>1.3.5-SNAPSHOT</platform.assemble.version>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>lsfusion.fsl</groupId>
-                    <artifactId>fsl-server</artifactId>
-                    <version>${platform.assemble.version}</version>
-                </dependency>
-                <!-- т.к. версия берётся из logics по parent'ам: -->
-                <dependency>
-                    <groupId>lsfusion.platform</groupId>
-                    <artifactId>server</artifactId>
-                    <version>${platform.assemble.version}</version>
-                </dependency>
-            </dependencies>
+    <modules>
+        <module>crm</module>
+        <module>features</module>
+        <module>hockeystats</module>
+        <module>mm</module>
+    </modules>
 
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>lsfusion.platform</groupId>
-                                    <artifactId>web-client</artifactId>
-                                    <version>${platform.assemble.version}</version>
-                                    <type>war</type>
-                                    <outputDirectory>target</outputDirectory>
-                                    <destFileName>web-client-${platform.assemble.version}.war</destFileName>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+    <!--<scm>-->
+        <!--<developerConnection>scm:svn:svn://server/lsfusion/custom-logics/trunk</developerConnection>-->
+    <!--</scm>-->
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

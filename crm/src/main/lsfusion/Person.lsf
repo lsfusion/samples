@@ -1,0 +1,23 @@
+MODULE Person;
+
+REQUIRE Project;
+
+CLASS Person 'Контактное лицо' : Contact;
+TABLE person (Person);
+
+customer 'Клиент' = DATA Customer (Person);
+nameCustomer 'Клиент' (Person p) = name(customer(p));
+
+EXTEND FORM customer
+    OBJECTS r = Person
+    
+    PROPERTIES(r) firstName, lastName, phone, email, NEW, DELETE
+    FILTERS customer(r) == c
+;
+
+DESIGN customer {
+    tabPane {
+        caption = 'Контактные лица';
+        MOVE BOX(r);
+    }
+}

@@ -1,0 +1,51 @@
+MODULE Customer;
+
+REQUIRE MasterData;
+
+CLASS Customer 'Клиент';
+TABLE customer(Customer);
+
+name 'Наименование' = DATA VARISTRING[200] (Customer) CHARWIDTH 15;
+
+FORM customer 'Клиент'
+    OBJECTS c = Customer PANEL
+    PROPERTIES(c) name 
+
+    EDIT Customer OBJECT c
+;
+
+DESIGN customer {
+    NEW pane FIRST {
+        fill = 1;
+        type = SPLITH;
+        NEW leftPane {
+            fill = 1;
+            MOVE BOX(c);
+        }
+        NEW tabPane {
+            fill = 2;
+            type = TABBED;
+        }
+    }
+}
+
+FORM customers 'Клиенты'
+    OBJECTS c = Customer
+    PROPERTIES(c) READONLY name
+    ORDER name(c)
+    
+    PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE 
+;
+
+FORM dialogCustomer 'Выбор клиента'
+    OBJECTS c = Customer
+    PROPERTIES(c) READONLY name
+    
+    LIST Customer OBJECT c
+;
+
+NAVIGATOR {
+    masterData {
+        NEW customers;
+    }
+}

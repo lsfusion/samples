@@ -1,0 +1,8 @@
+MODULE Dashboard;
+
+REQUIRE MasterData;
+
+NAVIGATOR {
+    NEW FOLDER dashboard 'Рабочий стол' BEFORE masterData WINDOW toolbar {
+    }
+}

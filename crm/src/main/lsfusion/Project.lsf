@@ -1,0 +1,56 @@
+MODULE Project;
+
+REQUIRE Customer, Employee;
+
+CLASS Project 'Проект';
+TABLE project(Project);
+
+name 'Наименование' = DATA VARISTRING[200] (Project) CHARWIDTH 15;
+
+customer 'Клиент' = DATA Customer (Project) NONULL;
+nameCustomer 'Клиент' (Project p) = name(customer(p));
+
+WHEN LOCAL SET(Customer c IS Customer) DO {
+    NEW p = Project {
+        customer(p) <- c;
+    }
+}
+
+EXTEND FORM customer
+    OBJECTS p = Project
+    PROPERTIES(p) name, NEW, DELETE
+    FILTERS customer(p) == c
+;
+
+DESIGN customer {
+    leftPane {
+        MOVE BOX(p);
+    }
+}
+
+FORM dialogProject 'Выбор проекта'
+    OBJECTS p = Project
+    PROPERTIES(p) READONLY nameCustomer, name
+    
+    LIST Project OBJECT p; 
+;  
+
+// ---------- Назначение пользователей ----------- //
+
+TABLE projectEmployee (Project, Employee);
+assigned 'Вкл' = DATA BOOLEAN (Project, Employee);
+
+assigned 'Вкл' (Customer c, Employee e) = GROUP SUM 1 IF assigned(Project p, e) BY customer(p);  
+
+EXTEND FORM employee
+    OBJECTS p = Project
+    
+    PROPERTIES assigned(p, e)
+    PROPERTIES(p) READONLY nameCustomer, name
+;
+
+DESIGN employee {
+    OBJECTS {
+        MOVE BOX(p) AFTER BOX(e);
+    }
+}

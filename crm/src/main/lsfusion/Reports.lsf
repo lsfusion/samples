@@ -1,0 +1,8 @@
+MODULE Reports;
+
+REQUIRE MasterData;
+
+NAVIGATOR {
+    NEW FOLDER reports 'Отчеты' BEFORE masterData WINDOW toolbar {
+    }
+}

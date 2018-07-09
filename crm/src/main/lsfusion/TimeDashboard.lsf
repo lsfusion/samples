@@ -1,0 +1,204 @@
+MODULE TimeDashboard;
+
+REQUIRE Time, TimeEntry, Person, ProjectDocument, Dashboard;
+
+NAMESPACE Time;
+
+startTimeEntry 'Начать новую задачу' (Project p, TaskType tt) = {
+    IF currentEmployee() THEN {
+        NEWSESSION {
+            NEW t = Task {
+                employee(t) <- currentEmployee();
+                project(t) <- p;
+                taskType(t) <- tt;
+                NEW e = TimeEntry {
+                    task(e) <- t;
+                    dateTimeStart(e) <- currentDateTime();
+                }
+            }
+            APPLY;
+        }
+    } ELSE
+        MESSAGE 'Вы должны быть залогинены под сотрудником, чтобы начать работу';
+}
+
+FORM timeDashboard 'Отметка времени' AUTOREFRESH 60
+    PROPERTIES currentDateTime()
+
+    OBJECTS p = Project
+    PROPERTIES(p) READONLY nameCustomer, name
+    FILTERS assigned(p, currentEmployee())
+    ORDER nameCustomer(p)
+    
+    OBJECTS r = Person
+    PROPERTIES(r) READONLY firstName, lastName, phone, email
+    FILTERS customer(r) == customer(p)
+    
+    OBJECTS d = Document
+    PROPERTIES(d) READONLY name, dateTimeLastVersion, nameAuthorLastVersion
+    PROPERTIES(d) openLastVersion TOOLBAR SHOWIF lastVersion(d), loadLastVersionAndApply TOOLBAR
+    PROPERTIES(p) newDocument TOOLBAR TODRAW d
+    PROPERTIES(d) NEWSESSION EDIT, DELETE
+    FILTERS customer(d) == customer(p)
+    
+    OBJECTS ce = Task PANEL
+    PROPERTIES(ce) nameCustomerProject READONLY, nameProject, nameTaskType, name, dateTimeStart, currentHours, description PANEL
+    FILTERS employee(ce) == currentEmployee() AND inProcess(ce)
+    ORDER nameCustomerProject(ce)
+    
+    OBJECTS t = TaskType PANEL
+    PROPERTIES(t) SELECTOR name SHOWIF NOT ce
+    PROPERTIES startTimeEntry(p, t) SHOWIF NOT ce
+    
+    OBJECTS fe = Task
+    PROPERTIES(fe) READONLY status BACKGROUND background(fe), nameCustomerProject, nameProject, nameTaskType, name, dateTimeStart, dateTimeFinish
+    PROPERTIES(fe) NEWSESSION NEW, EDIT, DELETE
+    FILTERS employee(fe) == currentEmployee()// AND (NOT inProcess(fe) OR onPause(fe))
+    ORDER nameCustomerProject(fe)
+    FILTERGROUP project
+        FILTER 'По проекту' project(fe) == p 'F9'
+    FILTERGROUP active
+        FILTER 'Активные' notCompleted(fe) OR dateFinish(fe) >= subtract(currentDate(), 1) DEFAULT 
+                
+    OBJECTS pa = TimeEntry
+    PROPERTIES (pa) READONLY dateTimeStart, dateTimeFinish, nameActivity, hours BACKGROUND userHours(pa), comment PANEL
+    FILTERS task(pa) == fe
+;
+
+DESIGN timeDashboard {
+    NEW pane FIRST {
+        type = SPLITV;
+        fill = 1;
+        NEW projectPane {
+            fill = 1;
+            type = SPLITH; 
+            MOVE BOX(p);
+            NEW projectInfo {
+                fill = 2;
+                type = TABBED;
+                MOVE BOX(r) {
+                    caption = 'Контактные лица';
+                }
+                MOVE BOX(d) {
+                    caption = 'Документы';
+                }
+            }
+        }
+        NEW tasks {
+            fill = 2;
+            caption = 'Трудозатраты';
+            type = SPLITH;
+            NEW current {
+                caption = 'Текущее время';
+                MOVE PROPERTY(name(t)) { caption = 'Тип задачи'; alignment = STRETCH; }
+                MOVE PROPERTY(startTimeEntry(p, t)) { fill = 1; }
+
+                MOVE PROPERTY(nameCustomerProject(ce)) { alignment = STRETCH; }
+                MOVE PROPERTY(nameProject(ce)) { alignment = STRETCH; }
+                MOVE PROPERTY(nameTaskType(ce)) { alignment = STRETCH; }
+                MOVE PROPERTY(name(ce)) { alignment = STRETCH; }
+                MOVE PROPERTY(dateTimeStart(ce)) { alignment = STRETCH; }
+                MOVE PROPERTY(currentHours(ce)) { alignment = STRETCH; }
+                MOVE PROPERTY(description(ce)) { panelCaptionAbove = TRUE; fill = 1; }
+                NEW save {
+                    alignment = STRETCH;
+                    type = CONTAINERH;
+                    MOVE PROPERTY(formApply()) { fill = 1; }
+                    MOVE PROPERTY(formCancel()) { fill = 1; }
+                }
+            }
+            NEW finished {
+                fill = 2;
+                type = SPLITV;
+                MOVE BOX(fe) {
+                    fill = 2;
+                    caption = 'Задачи';
+                }
+                NEW timeEntry {
+                    fill = 1;
+                    type = CONTAINERH;
+                    MOVE BOX (pa) {
+                        fill = 3;
+                    }
+                    MOVE PROPERTY(comment(pa)) {
+                        panelCaptionAbove = TRUE;
+                        fill = 1;
+                    } 
+                }
+            }
+        }
+    }
+    
+    TOOLBARLEFT {
+        MOVE PROPERTY(currentDateTime()) {
+            alignment = STRETCH;
+            caption = 'Текущее время';
+        }
+    }
+}
+
+finish 'Завершить' (Task t) = {
+    APPLY;
+    
+    NEWSESSION { 
+        dateTimeFinish(TimeEntry e) <- currentDateTime() WHERE task(e) == t AND NOT dateTimeFinish(e);
+        completed(t) <- TRUE;
+        DIALOG task OBJECTS t = t DO {
+            SEEK timeDashboard.fe = t;
+        }
+    }
+}
+
+pause 'Приостановить' (Task t) = {
+    IF employee(t) == currentEmployee()  THEN {
+        NEWSESSION {
+            dateTimeFinish(TimeEntry e) <- currentDateTime() WHERE task(e) == t AND NOT dateTimeFinish(e);
+            APPLY;
+        }
+    } ELSE
+        MESSAGE 'Вы должны быть залогинены под сотрудником, чтобы начать работу';
+}
+
+restart 'Возобновить выбранную' (Task t) = {
+    IF employee(t) == currentEmployee()  THEN {
+        IF completed(t) THEN {
+            ASK 'Вы действительно хотите возобновить уже завершенную задачу ?' DO {
+                NEWSESSION {
+                    NEW e = TimeEntry {
+                        task(e) <- t;
+                        dateTimeStart(e) <- currentDateTime();
+                    }
+                    completed(t) <- NULL;
+                    APPLY;
+                }
+            }
+        } ELSE 
+            NEWSESSION {
+                NEW e = TimeEntry {
+                    task(e) <- t;
+                    dateTimeStart(e) <- currentDateTime();
+                }
+                APPLY;
+            }
+    } ELSE
+        MESSAGE 'Вы должны быть залогинены под сотрудником, чтобы начать работу';
+}
+
+EXTEND FORM timeDashboard
+    PROPERTIES(ce) finish, pause SHOWIF inProcess(ce) 
+    PROPERTIES(fe) restart SHOWIF NOT ce
+;
+
+DESIGN timeDashboard {
+    current {
+        MOVE PROPERTY(finish(ce)) { alignment = STRETCH; fontStyle = 'bold'; }
+        MOVE PROPERTY(pause(ce)) { alignment = STRETCH; }
+        MOVE PROPERTY(restart(fe)) { alignment = STRETCH; fontStyle = 'bold'; }
+    }
+}
+
+NAVIGATOR {
+    dashboard {
+        NEW timeDashboard;
+    }
+}
