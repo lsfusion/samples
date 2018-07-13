@@ -3,11 +3,47 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>lsfusion.build</groupId>
+        <groupId>lsfusion.platform</groupId>
         <artifactId>build</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../build/pom.xml</relativePath>
     </parent>
+
+    <repositories>
+        <repository>
+            <id>lsfusion.public</id>
+            <name>lsFusion Public Repository</name>
+            <url>http://repo.lsfusion.org/repository/public</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>lsfusion</id>
+            <name>lsFusion Releases Repository</name>
+            <url>http://repo.lsfusion.org/repository/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>lsfusion.snapshots</id>
+            <name>lsFusion Snapshot Repository</name>
+            <url>http://repo.lsfusion.org/repository/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
     <groupId>org.lsfusion.samples</groupId>
     <artifactId>samples</artifactId>
@@ -32,6 +68,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>

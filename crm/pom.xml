@@ -5,9 +5,9 @@
     <parent>
         <groupId>lsfusion.fsl</groupId>
         <artifactId>fsl-logics</artifactId>
-        <version>1.3.4</version>
+        <version>1.3.5-SNAPSHOT</version>
 
-        <!--<relativePath>../../fsl/fsl-logics/pom.xml</relativePath>-->
+        <relativePath>../../fsl/fsl-logics/pom.xml</relativePath>
     </parent>
 
     <groupId>org.lsfusion.samples</groupId>
