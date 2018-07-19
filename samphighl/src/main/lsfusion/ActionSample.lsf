@@ -458,7 +458,8 @@ FORM import
 
 importForm() = {
     INPUT f = CUSTOMFILE DO {
-        IMPORT import JSON FROM f;
+        importFile() <- f;
+        IMPORT import JSON;
         SHOW import; // показываем что импортировалось
 
         // создаем объекты в базе        
