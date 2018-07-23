@@ -25,7 +25,7 @@ nameAuthor 'Автор' (Version v) = name(author(v));
 author (Version v) <- currentEmployee() WHEN SET(v IS Version);
 
 file 'Файл' = DATA CUSTOMFILE (Version) NONULL;
-open 'Открыть' (Version v) = { OPEN file(v); }
+open 'Открыть' (Version v) = { open(file(v)); }
 load 'Загрузить' (Version v) = { INPUT =file(v) CHANGE; }
 
 lastVersion 'Последняя версия' (Document d) = GROUP LAST Version v ORDER dateTime(v), v BY document(v) MATERIALIZED;
@@ -36,7 +36,7 @@ fileLastVersion 'Последний файл' (Document d)= file(lastVersion(d))
 authorLastVersion 'Автор' (Document d) = author(lastVersion(d));
 nameAuthorLastVersion 'Автор' (Document d) = name(authorLastVersion(d));
 
-openLastVersion 'Открыть' (Document d) = { OPEN fileLastVersion(d); }
+openLastVersion 'Открыть' (Document d) = { open(fileLastVersion(d)); }
 loadLastVersion 'Загрузить' (Document d) = {
     INPUT f = CUSTOMFILE DO {
         NEW v = Version {

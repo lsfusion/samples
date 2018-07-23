@@ -116,7 +116,7 @@ generateWord 'Сгенерировать (Word)' (Invoice i) = {
             value(detail) <- TEXT(formatPrice(sumPay(i) (+) sumMonthly(i))) WHERE key(detail) == 'SUM_PAY';
         }
         process(templateWord(project(i)));
-        OPEN resultTemplate();
+        open(resultTemplate());
     } ELSE
         MESSAGE 'Не выбран шаблон для клиента';
 }
