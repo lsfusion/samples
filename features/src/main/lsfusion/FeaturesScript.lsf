@@ -132,7 +132,7 @@ storeCaption(StoreSize storeSize) = staticCaption(storeSize) IF storeSize IS Sto
 //                                                                                                 [PREFCHARWIDTH <int value>]
 //                                                                                                 [IMAGE 'name'] [CHANGEKEY '<key code>' [SHOW | HIDE]] [AUTOSET] [CONFIRM]
 //                                                                                                 [REGEXP '<expression>' ['<regExp message>']] [LOGGABLE] [ECHO] [INDEXED]
-//                                                                                                 [AGGPROP] [NONULL [DELETE] [APPLY | SESSION] [FORMS form1, ..., formN]]
+//                                                                                                 [NONULL [DELETE] [APPLY | SESSION] [FORMS form1, ..., formN]]
 //                                                                                                 [ON (CHANGE | CHANGEWYS | EDIT) action]
 //                                                                                                 [EVENTID 'id'];
 

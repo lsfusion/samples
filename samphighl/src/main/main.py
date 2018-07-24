@@ -74,7 +74,7 @@ class LSFLexer(RegexLexer):
                     'HIDE', 'HIDESCROLLBARS', 'HIDETITLE', 'HINTNOUPDATE', 'HINTTABLE', 'HORIZONTAL',
                     'HTML', 'HTTP', 'IF', 'IMAGE', 'IMAGEFILE', 'IMAGELINK', 'IMPORT', 'IMPOSSIBLE', 'IN', 'INCREMENT', 'INDEX',
                     'INDEXED', 'INIT', 'INITFILTER', 'INLINE', 'INPUT', 'IS', 'JAVA', 'JOIN', 'JSON', 'KEYPRESS', 'LAST', 'LEFT', 'LENGTH', 'LIKE', 'LIMIT',
-                    'LIST', 'LOADFILE', 'LOCAL', 'LSF', 'LOGGABLE', 'MANAGESESSION', 'MAX', 'MAXCHARWIDTH', 'MDB',
+                    'LIST', 'LOCAL', 'LSF', 'LOGGABLE', 'MANAGESESSION', 'MAX', 'MAXCHARWIDTH', 'MDB',
                     'MEMO', 'MESSAGE', 'META', 'MIN', 'MINCHARWIDTH', 'MODAL', 'MODULE', 'MOVE', 'MS', 'MULTI', 'NAGGR', 'NAME', 'NAMESPACE',
                     'NAVIGATOR', 'NESTED', 'NEW', 'NEWEXECUTOR', 'NEWSESSION', 'NEWSQL', 'NEWTHREAD', 'NO', 'NOCANCEL', 'NOESCAPE', 'NOHEADER', 'NOHINT', 'NONULL',
                      'NOT', 'NOWAIT', 'NULL', 'NUMERIC', 'OBJECT',
