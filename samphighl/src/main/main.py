@@ -59,14 +59,14 @@ class LSFLexer(RegexLexer):
             (r"\b\d+(?:l|L)?\b", Number.Integer),       # INTEGER, LONG
             (r"#[0-9A-Fa-f]{6}", Number.Integer),       # COLOR        
             (words(('INTEGER', 'DOUBLE', 'LONG', 'BOOLEAN', 'DATE', 'DATETIME', 'TEXT', 'STRING', 'ISTRING', 'VARISTRING', 'VARSTRING', 'TIME', 'RICHTEXT',
-                    'ABSTRACT', 'ACTION', 'ACTIVE', 'ACTIVATE', 'ADDFORM', 'NEW', 'AFTER',
+                    'ABSTRACT', 'ACTION', 'ACTIVE', 'ACTIVATE', 'NEW', 'AFTER',
                     'AGGR', 'ALL', 'AND', 'APPEND', 'APPLY', 'AS', 'ASON', 'ASSIGN', 'ASYNCUPDATE', 'ATTACH',
                     'ATTR', 'AUTO', 'AUTOREFRESH', 'AUTOSET', 'BACKGROUND', 'BCC', 'BEFORE', 'BODY', 'BOTTOM', 'BREAK', 'BY', 'CANCEL', 'CANONICALNAME',
                     'CASE', 'CATCH', 'CC', 'CENTER', 'CHANGE', 'CHANGECLASS', 'CHANGED', 'CHANGEWYS', 'CHARSET', 'CHECK',
                     'CHECKED', 'CLASS', 'CLIENT', 'CLOSE', 'COLOR', 'COLUMNS', 'COMPLEX', 'CONCAT', 'CONFIRM', 'CONNECTION', 'CONSTRAINT',
                     'CONTAINERH', 'CONTAINERV', 'CONTEXTFILTER', 'CSV', 'CUSTOM', 'CUSTOMFILE', 'CUSTOMLINK', 'CYCLES', 'DATA', 'DBF', 'DEFAULT', 'DEFAULTCOMPARE', 'DELAY', 'DELETE',
                     'DESC', 'DESIGN', 'DIALOG', 'DO', 'DOC', 'DOCKED', 'DOCKEDMODAL', 'DOCX', 'DRAWROOT',
-                    'DROP', 'DROPCHANGED', 'DROPSET', 'ECHO', 'EDIT', 'EDITABLE', 'EDITFORM', 'EDITKEY',
+                    'DROP', 'DROPCHANGED', 'DROPSET', 'ECHO', 'EDIT', 'EDITABLE', 'EDITKEY',
                     'ELSE', 'EMAIL', 'END', 'EQUAL', 'EVAL', 'EVENTID', 'EVENTS', 'EXCELFILE', 'EXCELLINK',
                     'EXCEPTLAST', 'EXCLUSIVE', 'EXEC', 'EXPORT', 'EXTEND', 'EXTERNAL', 'FALSE', 'FIELDS', 'FILE', 'FILTER', 'FILTERGROUP',
                     'FILTERS', 'FINALLY', 'FIRST', 'FIXED', 'FIXEDCHARWIDTH', 'FOCUS', 'FOLDER', 'FOOTER', 'FOR', 'FORCE', 'FOREGROUND',
