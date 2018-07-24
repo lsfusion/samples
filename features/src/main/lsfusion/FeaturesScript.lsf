@@ -604,13 +604,6 @@ FORM testAddObject
     PROPERTIES name(a), name(b), count(a), addA(), addB(), addAllBTo(), AOBfor(a), countAOAAOB(a, b)
 ;
 
-
-// Add/Edit form action
-// statement syntax:
-// (ADDFORM | EDITFORM) [SESSION] className
-addActionTest() = {};
-editActionTest(obj) = {};
-
 // Custom action
 // statement syntax:
 // CUSTOM 'javaClassName'
@@ -897,7 +890,7 @@ FORM documentArticle 'По документам (caption)'
 // PROPERTIES [commonOptions] [alias1=]propName1(param1, ..., paramN1) [options1], ..., [aliasK=]propNameK(param1, ..., paramNK) [optionsK]
 // or
 // PROPERTIES(param1, ..., paramN) [commonOptions] [alias1=]propName1 [options1], ..., [aliasK=]propNameK [optionsK]
-// Special properties: VALUE, NEW, ADDFORM, ADDSESSIONFORM, EDITFORM, EDITSESSIONFORM, DELETE, DELETESESSION
+// Special properties: VALUE, NEW, ADDSESSIONFORM, EDITSESSIONFORM, DELETE, DELETESESSION
 // Property option:    [READONLY] [CHANGEABLE] [SELECTOR] [HINTNOUPDATE] [HINTTABLE] [COLUMNS (<groupObject list>)] [SHOWIF <mappedProperty>] [BACKGROUND <mappedProperty>]
 //                     [HEADER <mappedProperty>] [FOOTER <mappedProperty>] [READONLYIF <mappedProperty>] [PANEL | GRID] [TODRAW <groupObject>]
 //                     [FOREGROUND <mappedProperty>] [ON (CHANGE | CHANGEWYS | CONTEXTMENU | EDIT) <mappedAction>] [(BEFORE | AFTER) (propertyAlias | <mappedProperty>)] [EVENTID 'id']
@@ -1060,7 +1053,7 @@ FORM storeArticle 'По складам'
     PROPERTIES TODRAW s  setDefaultNames(), copyNameToArticles(s), copyStoreNameToArticle(s, a), copyStoreNameToArticleError(s, a), createNewStore(), showDocumentArticleModalForm(), showTestModalForm() TOOLBAR, testRequestInput(s) TOOLBAR
 //    PROPERTIES() countF, setNameX
     PROPERTIES(s, a) SHOWIF storeIsHuge(s) incomeQuantity2, outcomeQuantity2, lastQuantity
-    PROPERTIES(s) GRID storeSizeName, sss READONLY,  ssc1=storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi=simage, spdf, scustom, sexcel, testAbstractAction, editActionTest, loadf, savef, tstData, tstDestruct
+    PROPERTIES(s) GRID storeSizeName, sss READONLY,  ssc1=storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi=simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData, tstDestruct
     PROPERTIES(s, a) incomeQuantity, onlyIncomeQuantity, outcomeQuantity, foo, foo2 SHOWIF storeIsHuge(s), bar, foobar HEADER name(a), bar2, baz, baz2, balanceQuantity, testUnion HEADER name(s), testPartition, testFormula
     PROPERTIES currentTime(), allNames()
     FILTERGROUP filters1
