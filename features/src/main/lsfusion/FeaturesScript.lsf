@@ -890,7 +890,7 @@ FORM documentArticle 'По документам (caption)'
 // PROPERTIES [commonOptions] [alias1=]propName1(param1, ..., paramN1) [options1], ..., [aliasK=]propNameK(param1, ..., paramNK) [optionsK]
 // or
 // PROPERTIES(param1, ..., paramN) [commonOptions] [alias1=]propName1 [options1], ..., [aliasK=]propNameK [optionsK]
-// Special properties: VALUE, NEW, ADDSESSIONFORM, EDITSESSIONFORM, DELETE, DELETESESSION
+// Special properties: VALUE, NEW, DELETE
 // Property option:    [READONLY] [CHANGEABLE] [SELECTOR] [HINTNOUPDATE] [HINTTABLE] [COLUMNS (<groupObject list>)] [SHOWIF <mappedProperty>] [BACKGROUND <mappedProperty>]
 //                     [HEADER <mappedProperty>] [FOOTER <mappedProperty>] [READONLYIF <mappedProperty>] [PANEL | GRID] [TODRAW <groupObject>]
 //                     [FOREGROUND <mappedProperty>] [ON (CHANGE | CHANGEWYS | CONTEXTMENU | EDIT) <mappedAction>] [(BEFORE | AFTER) (propertyAlias | <mappedProperty>)] [EVENTID 'id']
@@ -2769,7 +2769,7 @@ NAVIGATOR {
 //FORM tstPart
 //    PROPERTIES () ungroup, ungroup2
 //    OBJECTS a=PA
-//    PROPERTIES (a) NEW, DELETESESSION, order, restr, result, result2
+//    PROPERTIES (a) NEW, order, restr, result, result2
 //;
 //
 //NAVIGATOR {
