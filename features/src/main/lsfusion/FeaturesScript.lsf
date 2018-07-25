@@ -577,7 +577,7 @@ documentBalance(Document document, Article article) = balanceQuantity(store(docu
 // statement syntax:
 // FORM formName
 // [OBJECTS object1 =mappingExpr1, ..., objectN =mappinExprN]
-// [NEWSESSION | | OLDSESSION] [DOCKED | MODAL | FULLSCREEN | DOCKEDMODAL] [CHECK] [SHOWDROP] [PRINT [AUTO]]
+// [NEWSESSION | | OLDSESSION] [DOCKED | FLOAT] [CHECK] [SHOWDROP] [PRINT [AUTO]]
 
 
 // Add object action
@@ -862,7 +862,7 @@ okMessage() = {
 
 //////////////// FORM STATEMENT /////////////////
 // Syntax:
-// FORM name ['caption'] [DOCKED | MODAL | FULLSCREEN | DOCKEDMODAL] | EXTEND FORM name
+// FORM name ['caption'] [DOCKED | FLOAT] | EXTEND FORM name
 // [(GroupObjects list | TreeGroupObjects list | Properties list | Filters list | Hints list | OrderBy list | filterGroup | dialog form | edit form)]
 // ...
 // [(GroupObjects list | TreeGroupObjects list | Properties list | Filters list | Hints list | OrderBy list | filterGroup | dialog form | edit form)];
