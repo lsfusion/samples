@@ -96,7 +96,7 @@ importOrders 'Импортировать заказы из директория'
         }
 
         APPLY;
-        READ 'file://' + serverDirectory() + '/' + f TO file MOVE 'file://' + serverDirectory() + '/' + (IF canceled() THEN 'error/' ELSE 'success/') + f;
+        move('file://' + serverDirectory() + '/' + f, 'file://' + serverDirectory() + '/' + (IF canceled() THEN 'error/' ELSE 'success/') + f);
     }	
 }
 //#solution2 end

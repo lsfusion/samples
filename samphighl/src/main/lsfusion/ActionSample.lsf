@@ -329,7 +329,7 @@ testExportFile = DATA CUSTOMFILE ();
 
 externalHTTP() = { 
     EXTERNAL HTTP 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile; 
-    OPEN exportFile(); 
+    open(exportFile()); 
 }
 externalSQL () = {
     EXPORT TABLE FROM bc=barcode(Article a) WHERE name(a) LIKE '%Мясо%'; // получаем все штрих-коды товаров с именем мясо
@@ -492,7 +492,7 @@ FORM order
 
 testFile = {
     INPUT f = CUSTOMFILE DO { // запрашиваем диалог по выбору файла
-        OPEN f; // открываем выбранный файл
+        open(f); // открываем выбранный файл
     }
 }
 //#input end
@@ -669,12 +669,6 @@ testNewThread () = {
 }
 //#newthread end
 
-//#open
-image = DATA IMAGEFILE (Sku);
-openImage(Sku s) = { OPEN image(s); };
-openImageWait(Sku s) = { OPEN image(s) WAIT; };
-//#open end
-
 //#print
 FORM printOrder
     OBJECTS o = Order
@@ -690,7 +684,7 @@ print (Order o) = {
     
     LOCAL file = CUSTOMFILE (); 
     PRINT printOrder OBJECTS o = o DOCX TO file;
-    OPEN file(); 
+    open(file()); 
     
     LOCAL sheetName = VARSTRING[255]();
     sheetName() <- 'enctypted';
@@ -712,11 +706,11 @@ readFiles() = {
     //чтение из HTTPS с авторизацией
     READ 'https://user:password@lsfusion.ru/file.xlsx' TO importFile;
     //чтение из FTP
-    READ 'ftp://ftp.lsfusion.ru/file.xlsx' TO importFile MOVE 'ftp://ftp.lsfusion.ru/success/file.xlsx';
+    READ 'ftp://ftp.lsfusion.ru/file.xlsx' TO importFile;
     //чтение из SFTP
-    READ 'sftp://sftp.lsfusion.ru/file.xlsx' TO importFile MOVE 'sftp://sftp.lsfusion.ru/success/file.xlsx';
+    READ 'sftp://sftp.lsfusion.ru/file.xlsx' TO importFile;
     //чтение из FILE
-    READ 'file://D://lsfusion/file.xlsx' TO importFile DELETE;
+    READ 'file://D://lsfusion/file.xlsx' TO importFile;
     //чтение из JDBC
     READ 'jdbc://connectionString@query' TO importFile;
     //чтение из MDB
