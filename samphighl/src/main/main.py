@@ -77,7 +77,7 @@ class LSFLexer(RegexLexer):
                     'MEMO', 'MESSAGE', 'META', 'MIN', 'MODULE', 'MOVE', 'MS', 'MULTI', 'NAGGR', 'NAME', 'NAMESPACE',
                     'NAVIGATOR', 'NESTED', 'NEW', 'NEWEXECUTOR', 'NEWSESSION', 'NEWSQL', 'NEWTHREAD', 'NO', 'NOCANCEL', 'NOESCAPE', 'NOHEADER', 'NOHINT', 'NONULL',
                      'NOT', 'NOWAIT', 'NULL', 'NUMERIC', 'OBJECT',
-                    'OBJECTS', 'OK', 'ON', 'OPEN', 'OPTIMISTICASYNC', 'OR', 'ORDER', 'OVERRIDE', 'PAGESIZE',
+                    'OBJECTS', 'OK', 'ON', 'OPTIMISTICASYNC', 'OR', 'ORDER', 'OVERRIDE', 'PAGESIZE',
                     'PANEL', 'PARENT', 'PARTITION', 'PASSWORD', 'PDF', 'PDFFILE', 'RAWFILE', 'PDFLINK', 'RAWLINK', 'PERIOD', 'MATERIALIZED', 'PG', 'POSITION',
                     'PREV', 'PRINT', 'PRIORITY', 'PROPERTIES', 'PROPERTY',
                     'PROPORTION', 'QUERYOK', 'QUERYCLOSE', 'QUICKFILTER', 'READ', 'READONLY', 'READONLYIF', 'RECURSION', 'REFLECTION', 'REGEXP', 'REMOVE',
