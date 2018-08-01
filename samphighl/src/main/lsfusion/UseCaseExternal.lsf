@@ -26,7 +26,7 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1
-pushCity 'Отправить' (City c) = {
+postCity 'Отправить' (City c) = {
     EXPORT JSON FROM countryId = id(country(c)), name = name(c);
 
     LOCAL result = CUSTOMFILE();
@@ -41,7 +41,7 @@ pushCity 'Отправить' (City c) = {
 }
 
 EXTEND FORM cities
-    PROPERTIES(c) pushCity
+    PROPERTIES(c) postCity
 ;
 //#solution1 end
  
