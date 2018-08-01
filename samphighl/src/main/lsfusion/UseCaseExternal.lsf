@@ -73,6 +73,8 @@ createCity (CUSTOMFILE f) = {
 CLASS Book 'Книга';
 id 'Код' = DATA VARSTRING[10] (Book) IN recognize;
 name 'Наименование' = DATA VARISTRING[100] (Book) IN recognize;
+
+book (VARSTRING[10] id) = GROUP AGGR Book b BY id(b); 
   
 CLASS Order 'Заказ';
 date 'Дата' = DATA DATE (Order);
@@ -111,11 +113,58 @@ NAVIGATOR {
 
 //#solution3
 FORM exportOrder
-    OBJECTS o = Order PANEL
-    PROPERTIES(o) date, number
+    OBJECTS order = Order PANEL
+    PROPERTIES dt = date(order), nm = number(order)
     
-    OBJECTS d = OrderDetail
-    PROPERTIES id = id(book(d)), quantity(d), price(d)
-    FILTERS order(d) == o
+    OBJECTS detail = OrderDetail
+    PROPERTIES id = id(book(detail)), qn = quantity(detail), pr = price(detail)
+    FILTERS order(detail) == order
+;
+
+exportOrder 'Отправить' (Order o) = {
+    EXPORT exportOrder OBJECTS order = o JSON;
+
+//    customFileToString(exportFile(), 'UTF-8');
+//    printToLog(resultString());
+//    
+    LOCAL result = CUSTOMFILE();
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=Location.importOrder' PARAMS exportFile() TO result;
+}
+
+EXTEND FORM orders
+    PROPERTIES(i) exportOrder;
 ;
 //#solution3 end
+
+//#solution4
+date = DATA LOCAL DATE(INTEGER);
+number = DATA LOCAL VARSTRING[10](INTEGER);
+
+order = DATA LOCAL INTEGER (INTEGER);
+id = DATA LOCAL VARSTRING[10] (INTEGER);
+quantity = DATA LOCAL INTEGER (INTEGER);
+price = DATA LOCAL NUMERIC[14,2] (INTEGER);
+FORM importOrder
+    OBJECTS order = INTEGER
+    PROPERTIES dt = date(order), nm = number(order)
+    
+    OBJECTS detail = INTEGER
+    PROPERTIES id = id(detail), quantity = quantity(detail), price = price(detail)
+    FILTERS order(detail) = order
+;
+
+importOrder (CUSTOMFILE f) = {
+    IMPORT importOrder JSON;
+    
+    FOR date(INTEGER order) DO NEW o = Order {
+        date(o) <- date(order);
+        number(o) <- number(order);
+        FOR order(INTEGER detail) = order DO NEW d = OrderDetail {
+            order(d) <- o;
+            book(d) <- book(id(detail)); 
+            quantity(d) <- quantity(detail); 
+            price(d) <- price(detail); 
+        }
+    }
+}
+//#solution4 end
