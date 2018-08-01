@@ -1,0 +1,121 @@
+MODULE UseCaseExternal;
+
+NAMESPACE Location;
+
+//#sample1
+CLASS Country 'Страна';
+id 'Код' = DATA VARSTRING[20] (Country) IN recognize;
+name 'Имя' = DATA VARISTRING[100] (Country) IN recognize;
+
+country (VARSTRING[20] id) = GROUP AGGR Country c BY id(c);
+
+CLASS City 'Город';
+name 'Имя' = DATA VARISTRING[100] (City) IN recognize;
+
+country 'Страна' = DATA Country (City);
+nameCountry 'Страна' (City c) = name(country(c));
+
+FORM cities 'Города'
+    OBJECTS c = City
+    PROPERTIES(c) name, nameCountry, NEW, DELETE
+;
+
+NAVIGATOR {
+    NEW cities;
+}
+//#sample1 end
+
+//#solution1
+pushCity 'Отправить' (City c) = {
+    EXPORT JSON FROM countryId = id(country(c)), name = name(c);
+
+    LOCAL result = CUSTOMFILE();
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=Location.createCity' PARAMS exportFile() TO result;
+    
+    LOCAL code = VARSTRING[10]();
+    LOCAL message = VARSTRING[100]();
+    IMPORT JSON LIST FROM result() TO code, message;
+    IF NOT code() == '0' THEN {
+        MESSAGE 'Ошибка: ' + message();
+    }   
+}
+
+EXTEND FORM cities
+    PROPERTIES(c) pushCity
+;
+//#solution1 end
+ 
+//#solution2
+createCity (CUSTOMFILE f) = {
+
+    LOCAL cy = VARSTRING[20] ();
+    LOCAL ne = VARSTRING[100] ();
+    
+    IMPORT JSON LIST FROM f AS CUSTOMFILE TO cy = countryId, ne = name;
+    
+    IF NOT country(cy()) THEN {
+        EXPORT JSON FROM code = '1', message = 'Некорректный код страны';
+        RETURN;
+    }
+    
+    NEW c = City {
+        name(c) <- ne();
+        country(c) <- country(cy());
+        
+        APPLY;
+    }
+    
+    EXPORT JSON FROM code = '0', message = 'OK';
+}
+//#solution2 end
+
+//#sample3
+CLASS Book 'Книга';
+id 'Код' = DATA VARSTRING[10] (Book) IN recognize;
+name 'Наименование' = DATA VARISTRING[100] (Book) IN recognize;
+  
+CLASS Order 'Заказ';
+date 'Дата' = DATA DATE (Order);
+number 'Номер' = DATA VARSTRING[10] (Order);
+  
+CLASS OrderDetail 'Строка заказа';
+order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
+  
+book 'Книга' = DATA Book (OrderDetail) NONULL;
+nameBook 'Книга' (OrderDetail d) = name(book(d));
+  
+quantity 'Количество' = DATA INTEGER (OrderDetail);
+price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
+
+FORM order 'Заказ'
+    OBJECTS o = Order PANEL
+    PROPERTIES(o) date, number
+    
+    OBJECTS d = OrderDetail
+    PROPERTIES(d) nameBook, quantity, price, NEW, DELETE
+    FILTERS order(d) == o
+    
+    EDIT Order OBJECT o
+;
+
+FORM orders 'Заказы'
+    OBJECTS i = Order
+    PROPERTIES(i) READONLY date, number
+    PROPERTIES(i) NEWSESSION NEW, EDIT, DELETE
+;
+
+NAVIGATOR {
+    NEW orders;
+}
+//#sample3 end
+
+//#solution3
+FORM exportOrder
+    OBJECTS o = Order PANEL
+    PROPERTIES(o) date, number
+    
+    OBJECTS d = OrderDetail
+    PROPERTIES id = id(book(d)), quantity(d), price(d)
+    FILTERS order(d) == o
+;
+//#solution3 end
