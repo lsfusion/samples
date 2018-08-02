@@ -124,9 +124,6 @@ FORM exportOrder
 exportOrder 'Отправить' (Order o) = {
     EXPORT exportOrder OBJECTS order = o JSON;
 
-//    customFileToString(exportFile(), 'UTF-8');
-//    printToLog(resultString());
-//    
     LOCAL result = CUSTOMFILE();
     EXTERNAL HTTP 'http://localhost:7651/exec?action=Location.importOrder' PARAMS exportFile() TO result;
 }
