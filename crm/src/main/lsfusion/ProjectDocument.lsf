@@ -25,8 +25,8 @@ nameAuthor 'Автор' (Version v) = name(author(v));
 author (Version v) <- currentEmployee() WHEN SET(v IS Version);
 
 file 'Файл' = DATA CUSTOMFILE (Version) NONULL;
-open 'Открыть' (Version v) = { open(file(v)); }
-load 'Загрузить' (Version v) = { INPUT =file(v) CHANGE; }
+open 'Открыть' (Version v)  { open(file(v)); }
+load 'Загрузить' (Version v)  { INPUT =file(v) CHANGE; }
 
 lastVersion 'Последняя версия' (Document d) = GROUP LAST Version v ORDER dateTime(v), v BY document(v) MATERIALIZED;
 
@@ -36,8 +36,8 @@ fileLastVersion 'Последний файл' (Document d)= file(lastVersion(d))
 authorLastVersion 'Автор' (Document d) = author(lastVersion(d));
 nameAuthorLastVersion 'Автор' (Document d) = name(authorLastVersion(d));
 
-openLastVersion 'Открыть' (Document d) = { open(fileLastVersion(d)); }
-loadLastVersion 'Загрузить' (Document d) = {
+openLastVersion 'Открыть' (Document d)  { open(fileLastVersion(d)); }
+loadLastVersion 'Загрузить' (Document d)  { 
     INPUT f = CUSTOMFILE DO {
         NEW v = Version {
             document(v) <- d;
@@ -46,7 +46,7 @@ loadLastVersion 'Загрузить' (Document d) = {
         }
     }
 }
-loadLastVersionAndApply 'Загрузить' (Document d) = {
+loadLastVersionAndApply 'Загрузить' (Document d)  { 
     NEWSESSION {
         loadLastVersion(d);
         APPLY;
@@ -102,7 +102,7 @@ DESIGN customer {
     }
 }
 
-newDocument 'Новый документ' (Project p) = {
+newDocument 'Новый документ' (Project p)  { 
     NEWSESSION {
         NEW d = Document {
             customer(d) <- customer(p);

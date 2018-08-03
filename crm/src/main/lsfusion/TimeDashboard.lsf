@@ -4,7 +4,7 @@ REQUIRE Time, TimeEntry, Person, ProjectDocument, Dashboard;
 
 NAMESPACE Time;
 
-startTimeEntry 'Начать новую задачу' (Project p, TaskType tt) = {
+startTimeEntry 'Начать новую задачу' (Project p, TaskType tt)  { 
     IF currentEmployee() THEN {
         NEWSESSION {
             NEW t = Task {
@@ -137,7 +137,7 @@ DESIGN timeDashboard {
     }
 }
 
-finish 'Завершить' (Task t) = {
+finish 'Завершить' (Task t)  { 
     APPLY;
     
     NEWSESSION { 
@@ -149,7 +149,7 @@ finish 'Завершить' (Task t) = {
     }
 }
 
-pause 'Приостановить' (Task t) = {
+pause 'Приостановить' (Task t)  { 
     IF employee(t) == currentEmployee()  THEN {
         NEWSESSION {
             dateTimeFinish(TimeEntry e) <- currentDateTime() WHERE task(e) == t AND NOT dateTimeFinish(e);
@@ -159,7 +159,7 @@ pause 'Приостановить' (Task t) = {
         MESSAGE 'Вы должны быть залогинены под сотрудником, чтобы начать работу';
 }
 
-restart 'Возобновить выбранную' (Task t) = {
+restart 'Возобновить выбранную' (Task t)  { 
     IF employee(t) == currentEmployee()  THEN {
         IF completed(t) THEN {
             ASK 'Вы действительно хотите возобновить уже завершенную задачу ?' DO {

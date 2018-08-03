@@ -14,7 +14,7 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1
-changeName(Book b) = {
+changeName(Book b)  { 
      INPUT s = VARISTRING[100] // вводим VARISTRING[100] "в параметр" s (автоматически оборачивается в REQUEST, то есть доступны групповая корректировки, PASTE и т.п.)
                      DO // проверка на requestCanceled
                           name(b) <- s;
@@ -65,7 +65,7 @@ NAVIGATOR {
 //#sample2 end
 
 //#solution2
-changeNameBook(Genre g, Order o) = {
+changeNameBook(Genre g, Order o)  { 
           DIALOG booksByGenre OBJECTS // (автоматически оборачивается в REQUEST, то есть доступны групповая корректировки, PASTE и т.п.)
                 g = g NULL, // разрешен NULL на входе
                 b = book(o) NULL INPUT bk NULL CONSTRAINTFILTER

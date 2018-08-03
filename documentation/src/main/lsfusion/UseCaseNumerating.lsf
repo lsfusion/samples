@@ -9,7 +9,7 @@ name 'Название' = DATA VARISTRING[50] (Book) IN recognize;
 //#numberaggr
 book (INTEGER number) = GROUP AGGR Book b BY number(b);
 
-bookExists (INTEGER number) = {
+bookExists (INTEGER number)  { 
     IF book(number) THEN
         MESSAGE 'Книга с номером ' + number + ' существует. Ее название : ' + name(book(number)); 
     ELSE

@@ -22,7 +22,7 @@ FORM order
 //#sample1 end
 
 //#solution1
-setDateDiscount 'Применить скидку (поздняя поставка)' (Order o) = {
+setDateDiscount 'Применить скидку (поздняя поставка)' (Order o)  { 
     date(o) <- sum(currentDate(), 30);
     discount(o) <- 5.0;
 }
@@ -51,7 +51,7 @@ EXTEND FORM order
 //#sample2 end
 
 //#solution2
-fillPrice 'Установить текущие цены' (Order o) = {
+fillPrice 'Установить текущие цены' (Order o)  { 
     price(OrderDetail d) <- price(book(d)) WHERE order(d) == o;
 }
   

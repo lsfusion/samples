@@ -62,7 +62,7 @@ EXTEND FORM order
 //#sample3 end
 
 //#solution3
-post 'Провести' (Order o) = { posted(o) <- TRUE; }
+post 'Провести' (Order o)  { posted(o) <- TRUE; }
 
 EXTEND FORM order
     EVENTS ON OK post(o)
@@ -78,7 +78,7 @@ DESIGN order {
 quantity 'Кол-во' (Order o, Book b) = GROUP SUM quantity(OrderDetail d) BY order(d), book(d);
 lastOrderDetail 'Последняя строка' (Order o, Book b) = GROUP LAST OrderDetail d ORDER d BY order(d), book(d);
 
-changeQuantity 'Изменить кол-во' (Order o, Book b) = {
+changeQuantity 'Изменить кол-во' (Order o, Book b)  { 
     INPUT q = INTEGER DO { // запрашиваем число
         IF lastOrderDetail(o, b) THEN { // проверяем, есть ли хоть одна строка
             IF q THEN // ввели число
@@ -113,7 +113,7 @@ DESIGN order {
 
 //#solution4 end
 
-showCaseAction (INTEGER q, Order o, Book b) = {
+showCaseAction (INTEGER q, Order o, Book b)  { 
 //#solution4a
 quantity(OrderDetail d) <- q WHERE d == lastOrderDetail(o, b);
 //#solution4a end
@@ -210,5 +210,5 @@ price (OrderInvoiceDetail d) += price(orderDetail(d));
 //#solution5e end
 
 //#solution5f
-edit(OrderInvoice i) += { edit(order(i)); }
+edit(OrderInvoice i) + {  edit(order(i)); }
 //#solution5f end

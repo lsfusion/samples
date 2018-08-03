@@ -5,7 +5,7 @@ REQUIRE Invoice, Word, Time;
 NAMESPACE Invoice;
 
 // Генерация шаблона
-generateInvoiceTemplate 'Создать шаблон для счета' () = {
+generateInvoiceTemplate 'Создать шаблон для счета' ()  { 
     NEWSESSION {
         NEW t = Template {
             NEW e = TemplateEntry {
@@ -95,7 +95,7 @@ rowText (Invoice i, Task t) = TEXT([= FORMULA VARSTRING[8] 'to_char(($1),\'DD.MM
                                                (OVERRIDE TEXT(formatPrice(sumPay(i, t))), '-') + 'lsFusionCSep');
 tableText (Invoice i) = GROUP CONCAT rowText(i, Task t), 'lsFusionRSep' ORDER fromDate(i, t), t;
 
-generateWord 'Сгенерировать (Word)' (Invoice i) = {
+generateWord 'Сгенерировать (Word)' (Invoice i)  { 
     IF templateWord(project(i)) THEN {
         value(TemplateEntry detail) <- NULL;
         FOR template (TemplateEntry detail) == templateWord(project(i)) DO {

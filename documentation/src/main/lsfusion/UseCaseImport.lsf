@@ -35,7 +35,7 @@ FORM order 'Заказ'
 //#sample1 end
 
 //#solution1
-importXlsx 'Импортировать из XLS' (Order o) = {
+importXlsx 'Импортировать из XLS' (Order o)  { 
     INPUT f = EXCELFILE DO {
     
         LOCAL bookId = VARSTRING[20] (INTEGER);
@@ -64,7 +64,7 @@ serverDirectory 'Директорий на сервере, из которого
 //#sample2 end
 
 //#solution2
-importOrders 'Импортировать заказы из директория' () = {
+importOrders 'Импортировать заказы из директория' ()  { 
 
     listFiles('file://' + serverDirectory());  
     
@@ -102,7 +102,7 @@ importOrders 'Импортировать заказы из директория'
 //#solution2 end
 
 //#solution3
-importBooks 'Импортировать книги' () = {
+importBooks 'Импортировать книги' ()  { 
     LOCAL file = CUSTOMFILE ();
     READ 'jdbc:sqlserver://localhost;databaseName=books;User=import;Password=password@SELECT id, name FROM books' TO file;
 

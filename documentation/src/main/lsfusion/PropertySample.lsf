@@ -34,14 +34,14 @@ CLASS A;
 d = DATA INTEGER (A);
 
 f (b) = GROUP SUM 1 IF d(a) < b;
-messageF = { MESSAGE f(5); } // успешно выполнится
+messageF  { MESSAGE f(5); } // успешно выполнится
 
 g = GROUP SUM f(b);
-messageG = { MESSAGE g(); } // f(b) не NULL для бесконечного числа b, платформа выдаст ошибку
+messageG  { MESSAGE g(); } // f(b) не NULL для бесконечного числа b, платформа выдаст ошибку
 //#set end
 
 //#set2
 hs = GROUP SUM 1 IF (a AS INTEGER) >= 4 AND a <= 6;
-messageHS = { MESSAGE hs(); } // теоретически должна выдать 3, но платформа все равно выдаст ошибку
+messageHS  { MESSAGE hs(); } // теоретически должна выдать 3, но платформа все равно выдаст ошибку
 hi = GROUP SUM 1 IF iterate(a, 4, 6); // workaround: для работы с интервалами можно использовать свойство iterate (оно в свою очередь реализуется через рекурсию) 
 //#set2 end

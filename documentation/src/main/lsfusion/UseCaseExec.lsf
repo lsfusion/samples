@@ -9,7 +9,7 @@ saleDate 'Дата начала продаж' = DATA DATE (Category);
 //#sample1 end
 
 //#solution1
-createCategory 'Создать категорию' (VARISTRING[50] name, INTEGER id, DATE saleDate) = {
+createCategory 'Создать категорию' (VARISTRING[50] name, INTEGER id, DATE saleDate)  { 
     NEW c = Category {
         name(c) <- name;
         id(c) <- id;
@@ -17,7 +17,7 @@ createCategory 'Создать категорию' (VARISTRING[50] name, INTEGER
     }    
 }
 
-create3Categories 'Создать 3 категории' () = {
+create3Categories 'Создать 3 категории' ()  { 
     createCategory('Категория 1', 1, 2010_02_14);
     createCategory('Категория 2', 2, 2011_03_08);
     createCategory('Категория 3', 3, 2014_07_01);
@@ -30,14 +30,14 @@ parent 'Родитель' = DATA Category (Category); // если значени
 
 //#solution2
 depth = DATA INTEGER (Category);
-fillDepth (Category c, INTEGER depth) = {
+fillDepth (Category c, INTEGER depth)  { 
     FOR parent(Category i) == c DO {
         depth(i) <- depth;
         fillDepth(i, depth + 1);
     }
 }
 
-run() = {
+run()  { 
     fillDepth(NULL, 0);
 }
 //#solution2 end

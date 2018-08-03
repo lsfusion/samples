@@ -13,7 +13,7 @@ FORM orders
 //#sample1 end
 
 //#solution1
-post 'Провести' (Order o) = {
+post 'Провести' (Order o)  { 
     NEWSESSION {
         isPosted(o) <- TRUE;
         APPLY;
@@ -35,7 +35,7 @@ FORM order
 //#sample2 end
 
 //#solution2
-newOrder () = {
+newOrder ()  { 
     NEWSESSION {
         NEW o = Order {
             number(o) <- (GROUP MAX number(Order oo)) (+) 1;
@@ -61,7 +61,7 @@ EXTEND FORM orders
 //#sample3 end
 
 //#solution3
-deleteSelectedOrders 'Удалить отмеченные заказы' () = {
+deleteSelectedOrders 'Удалить отмеченные заказы' ()  { 
     NEWSESSION NESTED(selected) {
         DELETE Order o WHERE selected(o);
         ASK 'Вы собираетесь удалить ' + (GROUP SUM 1 IF DROPPED(Order o)) + ' заказов. Продолжить ?' DO {
@@ -93,7 +93,7 @@ FORM orderPayments 'Платежи по заказу'
     FILTERS order(p) == o
 ;
 
-editPayments 'Редактировать платежи' (Order o) = {
+editPayments 'Редактировать платежи' (Order o)  { 
     NESTEDSESSION {
         SHOW orderPayments OBJECTS o = o;
     }

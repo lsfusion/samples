@@ -2,8 +2,8 @@ MODULE MetaSampleResult;
 
 FORM documentForm;
 FORM orderForm;
-showMessage = {};
-closeForm = {};
+showMessage  { };
+closeForm  { };
 
 CLASS Document;
 CLASS Type;

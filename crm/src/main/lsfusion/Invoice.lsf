@@ -54,7 +54,7 @@ sumPay 'Сумма к оплате' (Invoice i) = GROUP SUM sumPay(i, Task t);
 
 CONSTRAINT extractMonth(fromDate(Invoice i)) != extractMonth(toDate(i)) AND hoursMonthly(i) MESSAGE 'Запрещено выставлять счет за несколько месяцев одновременно';
 
-removeInvoice 'Исключить' (TimeEntry e) = {
+removeInvoice 'Исключить' (TimeEntry e)  { 
     invoice(e) <- NULL;
 }
 

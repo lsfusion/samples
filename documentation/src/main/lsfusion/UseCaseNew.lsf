@@ -13,7 +13,7 @@ nameCustomer 'Покупатель' (Order o) = name(customer(o));
 //#sample1 end
 
 //#solution1
-copyOrder 'Копировать' (Order o) = {
+copyOrder 'Копировать' (Order o)  { 
     NEW n = Order {
         date(n) <- date(o);
         customer(n) <- customer(o);
@@ -34,7 +34,7 @@ price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
 //#sample2 end
 
 //#solution2
-copyDetail (Order o) = {
+copyDetail (Order o)  { 
     NEW n = Order {
         date(n) <- date(o);
         customer(n) <- customer(o);

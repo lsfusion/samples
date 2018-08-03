@@ -8,7 +8,7 @@ name 'Наименование' = DATA VARISTRING[50] (Book);
 //#sample1 end
 
 //#solution1
-findNemo 'Найти книгу' () = {
+findNemo 'Найти книгу' ()  { 
     FOR isSubstring(name(Book b), 'Nemo')  == 1 DO {
         MESSAGE 'Найдена книга ' + name(b) + ' с внутренним кодом ' + b;
     } 
@@ -16,7 +16,7 @@ findNemo 'Найти книгу' () = {
 //#solution1 end
 
 //#solution2
-add100Books 'Добавить 100 книг' () = {
+add100Books 'Добавить 100 книг' ()  { 
     // Вариант 1
     FOR iterate(INTEGER i, 1, 100) NEW b = Book DO {
         name(b) <- 'Книга ' + i;
@@ -46,7 +46,7 @@ discountPrice 'Цена со скидкой' = DATA NUMERIC[14,2] (OrderDetail);
 //#sample3 end
 
 //#solution3
-makeDiscount 'Сделать скидку' (Order o) = {
+makeDiscount 'Сделать скидку' (Order o)  { 
     // Вариант 1
     FOR order(OrderDetail d) == o AND price(d) > 100 DO {
         discount(d) <- 10;
@@ -64,7 +64,7 @@ price 'Цена' = DATA NUMERIC[14,2] (Book);
 //#sample4 end
 
 //#solution4
-addSelectedBooks 'Добавить отмеченные книги' (Order o) = {
+addSelectedBooks 'Добавить отмеченные книги' (Order o)  { 
     // Вариант 1
     FOR price(Book b) > 100 NEW d = OrderDetail DO {
         order(d) <- o;

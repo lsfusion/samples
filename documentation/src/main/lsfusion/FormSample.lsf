@@ -48,7 +48,7 @@ EXTEND FORM printInvoice
 
     // ... добавляем свойства и фильтры на форму 
 ;
-print (Invoice invoice) = { PRINT printInvoice OBJECTS i = invoice; } // объявляем действие , при выполнении которого будет открываться форма печати инвойса
+print (Invoice invoice)  { PRINT printInvoice OBJECTS i = invoice; } // объявляем действие , при выполнении которого будет открываться форма печати инвойса
 //#form end
 
 //#objects
@@ -139,7 +139,7 @@ sum (Order o) = GROUP SUM sum(OrderDetail d) BY order(d);
 
 quantity (Order o, Sku s) = GROUP SUM quantity(OrderDetail d) BY order(d), sku(d);
 lastDetail (Order o, Sku s) = GROUP MAX OrderDetail d BY order(d), sku(d); 
-changeQuantity (Order o, Sku s) = {
+changeQuantity (Order o, Sku s)  { 
     INPUT n = NUMERIC[10,2] DO {
         IF lastDetail(o, s) THEN {
             IF n THEN
@@ -300,7 +300,7 @@ EXTEND FORM onStock // расширяем ранее созданную форм
 //#sort end
 
 //#events
-showImpossibleMessage() = { MESSAGE 'It\'s impossible'; };
+showImpossibleMessage()  { MESSAGE 'It\'s impossible'; };
 
 posted = DATA BOOLEAN (Invoice);
 
@@ -331,7 +331,7 @@ FORM POS 'POS' // объявляем форму для продажи товар
   
 ;
 
-createReceipt () = {
+createReceipt ()  { 
     NEW r = Receipt {
         shift(r) <- currentShift();
         cashier(r) <- currentCashier();

@@ -59,7 +59,7 @@ NAVIGATOR {
 in 'Отм' = DATA LOCAL BOOLEAN (TimeEntry);
 countTimeEntry = GROUP SUM 1 IF in(TimeEntry e);
 
-createInvoice 'Выставить счет' (Project p) = {
+createInvoice 'Выставить счет' (Project p)  { 
     NEWSESSION NESTED (in) {
         NEW i = Invoice {
             project(i) <- p;

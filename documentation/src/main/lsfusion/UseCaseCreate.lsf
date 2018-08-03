@@ -20,7 +20,7 @@ FORM books 'Книги'
 //#sample1 end
 
 //#solution1
-copy 'Копировать' (Book book) = {
+copy 'Копировать' (Book book)  { 
     NEWSESSION {
         NEW newBook = Book {
             name(newBook) <- name(book);
@@ -91,7 +91,7 @@ FORM invoice 'Счет'
 //#sample2 end
 
 //#solution2
-createInvoice 'Создать счет' (Order o) = {
+createInvoice 'Создать счет' (Order o)  { 
     NEWSESSION {
         NEW i = Invoice {
             date(i) <- date(o);
@@ -116,7 +116,7 @@ EXTEND FORM orders
 //#solution2 end
 
 //#solution3
-fillOrder 'Заполнить по заказу' (Invoice i) = {
+fillOrder 'Заполнить по заказу' (Invoice i)  { 
     DIALOG orders OBJECTS o INPUT DO {
         date(i) <- date(o);
         number(i) <- number(o);

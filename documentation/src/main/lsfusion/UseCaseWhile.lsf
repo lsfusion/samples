@@ -11,7 +11,7 @@ date 'Дата' = DATA DATE (Order);
 //#solution1
 countOrders (DATE date) = GROUP SUM 1 BY date(Order o);
 
-messageCountOrders 'Посчитать кол-во заказов' (DATE dFrom, DATE dTo) = {
+messageCountOrders 'Посчитать кол-во заказов' (DATE dFrom, DATE dTo)  { 
     // Вариант 1
     LOCAL date = DATE ();
     date() <- dFrom;
@@ -36,7 +36,7 @@ discountSum 'Сумма скидки' = DATA NUMERIC[14,2] (OrderDetail);
 //#sample2 end
 
 //#solution2
-distributeDiscount 'Распределить скидку' (Order o, NUMERIC[14,2] discount) = {
+distributeDiscount 'Распределить скидку' (Order o, NUMERIC[14,2] discount)  { 
     LOCAL discount = NUMERIC[14,2] ();
     discount() <- discount;
     
@@ -64,7 +64,7 @@ quantity 'Кол-во' = DATA NUMERIC[14,2] (Ledger);
 //#sample3 end
 
 //#solution3
-calculateIntegral (DATE dFrom, DATE dTo) = {
+calculateIntegral (DATE dFrom, DATE dTo)  { 
     LOCAL date = DATE();
     date() <- dFrom;
     

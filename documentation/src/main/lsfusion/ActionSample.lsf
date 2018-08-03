@@ -5,8 +5,8 @@ REQUIRE Utils, Authentication, Chat, Time, Geo;
 CLASS Item;
 
 //#default
-showMessage = { MESSAGE 'Hello World!'; } 								// объявление действия
-loadImage 'Загрузить изображение' = ABSTRACT (Item); 	
+showMessage  { MESSAGE 'Hello World!'; } 								// объявление действия
+loadImage 'Загрузить изображение'  ABSTRACT ( Item); 	
 //#default end
 
 //#action
@@ -17,37 +17,37 @@ code = DATA INTEGER (Currency);
 CLASS Order;
 currency = DATA Currency (Order);
 customer = DATA VARSTRING[100] (Order);
-copy 'Копировать' (Order old) = { 
+copy 'Копировать' (Order old)  { 
     NEW new = Order {                                   // создается действие, состоящее из последовательного выполнения двух действий
         currency(new) <- currency(old);                 // точка с запятой указывается после каждого оператора
         customer(new) <- customer(old);
     }                                                   // в этой строке точка с запятой не ставится, потому что оператор заканчивается на }
 }
  
-loadDefaultCurrency(VARISTRING[30] name, INTEGER code) = {
+loadDefaultCurrency(VARISTRING[30] name, INTEGER code)  { 
     NEW c = Currency {
         name(c) <- name;
         code(c) <- code;
     }
 }
-run () = {
+run ()  { 
     loadDefaultCurrency('USD', 866);
     loadDefaultCurrency('EUR', 1251);
 }
 //#action end
 
 //#abstract
-exportXls 'Выгрузить в Excel' = ABSTRACT CASE (Order);         // В данном случае создается ABSTRACT CASE OVERRIDE LAST
-exportXls (Order o) += WHEN name(currency(o)) == 'USD' THEN {
+exportXls 'Выгрузить в Excel'  ABSTRACT CASE ( Order);         // В данном случае создается ABSTRACT CASE OVERRIDE LAST
+exportXls (Order o) + WHEN name(currency(o)) == 'USD' THEN { 
     MESSAGE 'Export USD not implemented';
 } 
 
 CLASS Task;
-run 'Выполнить' = ABSTRACT (Task);                           // ABSTRACT MULTI EXCLUSIVE
+run 'Выполнить'  ABSTRACT ( Task);                           // ABSTRACT MULTI EXCLUSIVE
 
 CLASS Task1 : Task;
 name = DATA VARSTRING[100] (Task);
-run (Task1 t) += {
+run (Task1 t) + { 
     MESSAGE 'Run Task1 ' + name(t);
 }
 
@@ -57,9 +57,9 @@ price = DATA NUMERIC[14,2] (OrderDetail);
 
 CLASS InvoiceDetail;
 price = DATA NUMERIC[14,2] (InvoiceDetail);
-fill = ABSTRACT LIST (OrderDetail, InvoiceDetail);   // ABSTRACT LIST LAST
+fill  ABSTRACT LIST ( OrderDetail, InvoiceDetail);   // ABSTRACT LIST LAST
 
-fill (OrderDetail od, InvoiceDetail id) += {
+fill (OrderDetail od, InvoiceDetail id) + { 
     price(id) <- price(od);
 }
 //#abstract end
@@ -88,7 +88,7 @@ DESIGN myForm {
     }
 }
   
-testAction() = {
+testAction()  { 
     ACTIVATE FORM myForm;
     ACTIVATE TAB myForm.recent;
 }
@@ -102,7 +102,7 @@ FORM POS
     PROPERTIES(d) barcode, quantityGrid = quantity
 ;
 
-createReceiptDetail 'Добавить строку продажи'(VARSTRING[30] barcode) = {
+createReceiptDetail 'Добавить строку продажи'(VARSTRING[30] barcode)  { 
     NEW d = ReceiptDetail {
         barcode(d) <- barcode;
         ACTIVATE PROPERTY POS.quantityGrid;
@@ -112,7 +112,7 @@ createReceiptDetail 'Добавить строку продажи'(VARSTRING[30]
 
 //#activeform
 FORM exampleForm;
-testActive = {
+testActive  { 
     ACTIVE FORM exampleForm;
     IF isActiveForm() THEN MESSAGE 'Example form is active';
 }
@@ -123,14 +123,14 @@ CLASS Sku;
 id = DATA INTEGER (Sku);
 
 in = DATA LOCAL BOOLEAN (Sku);
-applyIn = {
+applyIn  { 
     in(Sku s) <- TRUE WHERE id(s) == 123; 
     APPLY NESTED (in[Sku]) {};
     FOR in(Sku s) DO
         MESSAGE id(s); // показывает '123'
 }
 
-calculateInTransaction = {
+calculateInTransaction  { 
     APPLY {
         id(Sku s) <- (GROUP MAX id(Sku ss)) (+) 1; // проставляем новый код внутри транзакции 
     }
@@ -138,7 +138,7 @@ calculateInTransaction = {
 //#apply end
 
 //#ask
-testAsk () = {
+testAsk ()  { 
     ASK 'Вы действительно хотите продолжать ?' DO {
         MESSAGE 'Вы продолжили';
     }
@@ -157,27 +157,27 @@ testAsk () = {
 CLASS Customer;
 discount = DATA NUMERIC[5,2] (Customer);
 totalOrders = DATA NUMERIC[14,2] (Customer);
-setDiscount = {
+setDiscount  { 
     discount(Customer c) <- 15 WHERE totalOrders(c) > 100;
 }
 
 discount = DATA NUMERIC[5,2] (Customer, Item);
 in = DATA BOOLEAN (Item); 
 // изменить скидку для выбранных товаров для клиента
-setDiscount (Customer c) = {
+setDiscount (Customer c)  { 
     discount(c, Item i) <- 15 WHERE in(i);
 }
   
 // скопировать свойство g в свойство f
 f = DATA INTEGER (INTEGER);
 g = DATA INTEGER (INTEGER);
-copyFG = {
+copyFG  { 
     f(a) <- g(a);
 }
 //#assign end
 
 //#break
-testBreak () = {
+testBreak ()  { 
     FOR iterate(INTEGER i, 1, 100) DO {
         IF i == 50 THEN BREAK; // дойдет только до 50
     } 
@@ -185,14 +185,14 @@ testBreak () = {
 //#break end
 
 //#cancel
-dropChanges() = {
+dropChanges()  { 
     CANCEL NESTED (in[Sku]); // отменяем все изменения, кроме свойства in
 }
 //#cancel end
 
 //#case
 test = DATA INTEGER (INTEGER);
-caseActionTest(a) = { 
+caseActionTest(a)  { 
     CASE
         WHEN test(a) > 7 THEN MESSAGE '>7';
         WHEN test(a) > 6 THEN MESSAGE '>6';
@@ -206,28 +206,28 @@ date = DATA DATE (Document);
 
 CLASS ClosedDocument : Document;
 // переводит все документы с датой старше 2-х недель в статус закрыт
-changeStatus() = {
+changeStatus()  { 
     CHANGECLASS Document d TO ClosedDocument WHERE sum(date(d), 14) <= currentDate();
 }
 //#changeclass end
 
 //#custom
-showOnMap 'Показать на карте' = CUSTOM 'lsfusion.utils.geo.ShowOnMapActionProperty' (DOUBLE, DOUBLE, MapProvider, STRING[100]);
+showOnMap 'Показать на карте'  CUSTOM  'lsfusion.utils.geo.ShowOnMapActionProperty' (DOUBLE, DOUBLE, MapProvider, STRING[100]);
 
-serviceDBMT 'Обслуживание БД (многопоточно, threadCount, timeout)' = CUSTOM 'lsfusion.server.logics.service.ServiceDBMultiThreadActionProperty' (INTEGER, INTEGER) NULL;
+serviceDBMT 'Обслуживание БД (многопоточно, threadCount, timeout)'  CUSTOM  'lsfusion.server.logics.service.ServiceDBMultiThreadActionProperty' (INTEGER, INTEGER) NULL;
 
-printlnAction 'Вывести текст в консоль' = CUSTOM <{ System.out.println("action test"); }>; 
-setNoCancelInTransaction() = CUSTOM <{ context.getSession().setNoCancelInTransaction(true); }>; // здесь context - это параметр метода executeCustom
+printlnAction 'Вывести текст в консоль'  CUSTOM  <{ System.out.println("action test"); }>; 
+setNoCancelInTransaction()  CUSTOM  <{ context.getSession().setNoCancelInTransaction(true); }>; // здесь context - это параметр метода executeCustom
 //#custom end
 
 //#delete
 // удаление объекта
-deleteObject(obj) = { DELETE obj; }
+deleteObject(obj)  { DELETE obj; }
   
 // удаление всех неактивных товаров
 CLASS Article;
 active = DATA BOOLEAN (Article);
-deleteInactiveArticles() = { 
+deleteInactiveArticles()  { 
     DELETE Article a WHERE a IS Article AND NOT active(a); // добавляется локальный параметр a, соответствующий перебираемым объектам
 }
 //#delete end
@@ -238,7 +238,7 @@ FORM selectSku
     PROPERTIES(s) id
 ;
 
-testDialog = {
+testDialog  { 
     DIALOG selectSku OBJECTS s INPUT DO {
         MESSAGE 'Selected sku : ' + id(s);
     }
@@ -247,7 +247,7 @@ testDialog = {
 sku = DATA Sku (OrderDetail);
 idSku (OrderDetail d) = id(sku(d));
 
-changeSku (OrderDetail d) = {
+changeSku (OrderDetail d)  { 
     DIALOG selectSku OBJECTS s = sku(d) CHANGE;
     
     //равносильно первому варианту
@@ -258,13 +258,13 @@ changeSku (OrderDetail d) = {
 //#dialog end
 
 //#email
-emailUserPassUser 'Напоминание пароля' (CustomUser user) = { EMAIL
+emailUserPassUser 'Напоминание пароля' (CustomUser user)  { EMAIL
     SUBJECT 'Напоминание пароля'
     TO email(user)
     INLINE remindUserPass OBJECTS u = user;
 }
   
-justSendEmail 'Отправить письмо' () = { EMAIL
+justSendEmail 'Отправить письмо' ()  { EMAIL
     FROM 'luxsoft@adsl.by'
     SUBJECT 'Тема письма'
     TO 'xxx@tut.by'
@@ -273,19 +273,19 @@ justSendEmail 'Отправить письмо' () = { EMAIL
 //#email end
 
 //#eval
-addProperty = { EVAL ACTION 'MESSAGE \'Hello World\''; }  // исходный код, состоящий из одной инструкции, задается строковой константой
+addProperty  { EVAL ACTION 'MESSAGE \'Hello World\''; }  // исходный код, состоящий из одной инструкции, задается строковой константой
   
 code 'Исходные код' = DATA STRING[2000] ();              // свойство, в которое пользователь может ввести исходный код
-execute 'Выполнить код' = { EVAL code(); }      // действие, выполняющее этот код
+execute 'Выполнить код'  { EVAL code(); }      // действие, выполняющее этот код
 //#eval end
 
 //#exec
-importData(Sku sku, Order order) = {
+importData(Sku sku, Order order)  { 
     MESSAGE 'Run import for ' + id(sku) + ' ' + customer(order);  
 }                                    // объявленное выше действие importData с двумя параметрами 
 
 order = DATA Order (OrderDetail) NONULL DELETE;
-runImport(OrderDetail d) = { importData(sku(d), order(d)); } // объявление действия runImport, которое будет вызывать importData
+runImport(OrderDetail d)  { importData(sku(d), order(d)); } // объявление действия runImport, которое будет вызывать importData
 //#exec end
 
 //#exportplain
@@ -296,7 +296,7 @@ weight = DATA NUMERIC[10,2] (Sku);
 
 in = DATA BOOLEAN (Store, Sku);
 
-exportSkus (Store store) = {
+exportSkus (Store store)  { 
     EXPORT DBF CHARSET 'CP866' FROM id(Sku s), name(s), weight(s) WHERE in(store, s); // выгружаем в DBF все Sku, для которых задано in (Store, Sku) для нужного склада 
     EXPORT CSV NOHEADER NOESCAPE FROM id(Sku s), name(s), weight(s) WHERE in(store, s); // выгружает CSV без строки заголовков и без экранирования спецсимволов
     EXPORT FROM id(Sku s), name(s), weight(s) WHERE in(store, s) ORDER name(s) DESC; // выгружает JSON, сортируем по свойству name[Sku] в порядке убывания
@@ -312,7 +312,7 @@ FORM exportSku
     FILTERS in(st, s) 
 ;
 
-exportSku (Store store) = {
+exportSku (Store store)  { 
     // выгружаем в DBF все Sku, для которых задано in (Store, Sku) для нужного склада 
     EXPORT exportSku OBJECTS st = store DBF CHARSET 'CP866'; 
     EXPORT exportSku XML HEADERS 'items'=s;
@@ -327,11 +327,11 @@ price = DATA INTEGER (Article);
 //#external
 testExportFile = DATA CUSTOMFILE ();
 
-externalHTTP() = { 
+externalHTTP()  { 
     EXTERNAL HTTP 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile; 
     open(exportFile()); 
 }
-externalSQL () = {
+externalSQL ()  { 
     EXPORT TABLE FROM bc=barcode(Article a) WHERE name(a) LIKE '%Мясо%'; // получаем все штрих-коды товаров с именем мясо
     EXTERNAL SQL 'jdbc:mysql://$1/test?user=root&password=' EXEC 'select price AS pc, articles.barcode AS brc from $2 x JOIN articles ON x.bc=articles.barcode' PARAMS 'localhost',exportFile() TO exportFile; // читаем цены для считанных штрих-кодов
     
@@ -342,7 +342,7 @@ externalSQL () = {
     FOR barcode(Article a) = barcode(INTEGER i) DO 
         price(a) <- price(i);
 }
-externalLSF() = { 
+externalLSF()  { 
     EXTERNAL LSF 'http://localhost:7651' EXEC 'System.testAction[]'; 
 }; 
 
@@ -351,7 +351,7 @@ externalLSF() = {
 //#for
 name = DATA VARSTRING[100] (Store);
 
-testFor = {
+testFor  { 
     LOCAL sum = INTEGER ();
     FOR iterate(i, 1, 100) DO {
         sum() <- sum() (+) i;
@@ -372,14 +372,14 @@ testFor = {
 
 //#ifthena
 // Действие, сравнивающее значение свойства count с числом 3 и выдающее пользователю сообщение
-moreThan3(obj) = {
+moreThan3(obj)  { 
     IF count(obj) > 3 THEN 
         MESSAGE '>3';
     ELSE 
         MESSAGE '<=3';
 }
  
-checkNullName (Store st)= {
+checkNullName (Store st) { 
     IF NOT name(st) THEN
         MESSAGE 'Name is null';
 }
@@ -388,7 +388,7 @@ checkNullName (Store st)= {
 quantity = DATA INTEGER (Store,Article);
 
 //#import
-import() = {
+import()  { 
 
     LOCAL xlsFile = EXCELFILE ();
     
@@ -456,7 +456,7 @@ FORM import
     
 ;
 
-importForm() = {
+importForm()  { 
     INPUT f = CUSTOMFILE DO {
         importFile() <- f;
         IMPORT import JSON;
@@ -475,7 +475,7 @@ importForm() = {
 //#importForm end
 
 //#input
-changeCustomer (Order o) = {
+changeCustomer (Order o)  { 
     INPUT s = VARSTRING[100] DO {
         customer(o) <- s;
         IF s THEN
@@ -490,7 +490,7 @@ FORM order
     PROPERTIES(o) customer ON CHANGE changeCustomer(o) 
 ;
 
-testFile = {
+testFile  { 
     INPUT f = CUSTOMFILE DO { // запрашиваем диалог по выбору файла
         open(f); // открываем выбранный файл
     }
@@ -504,7 +504,7 @@ FORM customers
 
 //#request
 
-requestCustomer (Order o) = {
+requestCustomer (Order o)  { 
     LOCAL resultValue = VARSTRING[100] ();
     REQUEST {
         ASK 'Choose from list?' DO
@@ -523,14 +523,14 @@ FORM request
 //#request end
 
 //#message
-message = { MESSAGE 'Hello World!'; }                                // простое текстовое сообщение
+message  { MESSAGE 'Hello World!'; }                                // простое текстовое сообщение
 
 isGood = DATA BOOLEAN (Item);
-stringData(Item i) =  {
+stringData(Item i)   { 
     MESSAGE IF isGood(i) THEN 'Good' ELSE 'Bad';   // в зависимости от того, какой item будет передан действию, будет показываться окно с текстом 'Good', либо с текстом 'Bad'
 }
   
-testMessage() = {                    // В этом случае пользователю будет выдано пять текстовых сообщений
+testMessage()  {                    // В этом случае пользователю будет выдано пять текстовых сообщений
     LOCAL i = INTEGER();
     i() <- 0;
     WHILE i() < 5 DO {
@@ -539,7 +539,7 @@ testMessage() = {                    // В этом случае пользов�
     }
 }
  
-testMessageNowait() = {              // В случае NOWAIT пользователю будет выдано одно текстовое сообщение, объединяющее сообщения от пяти вызовов MESSAGE
+testMessageNowait()  {              // В случае NOWAIT пользователю будет выдано одно текстовое сообщение, объединяющее сообщения от пяти вызовов MESSAGE
     LOCAL i = INTEGER();
     i() <- 0;
     WHILE i() < 5 DO {
@@ -555,28 +555,28 @@ CLASS Shape;
 CLASS Square : Shape;
 CLASS Circle : Shape;
 
-message (Square s) = { MESSAGE 'Square'; }
-message (Circle c) = { MESSAGE 'Circle'; }
+message (Square s)  { MESSAGE 'Square'; }
+message (Circle c)  { MESSAGE 'Circle'; }
 
 message (Shape s) = MULTI message[Square](s), message[Circle](s);
 //#multi end
 
 //#new
-newSku () = {
+newSku ()  { 
     NEW s = Sku {
         id(s) <- 425;
         name(s) <- 'New Sku';
     }
 }
 
-copy (Sku old) = {
+copy (Sku old)  { 
     NEW new = Sku {
         id(new) <- id(old);
         name(new) <- name(old);
     }
 }
 
-createDetails (Order o) = {
+createDetails (Order o)  { 
     FOR in(Sku s) NEW d = OrderDetail DO {
         order(d) <- o;
         sku(d) <- s; 
@@ -585,7 +585,7 @@ createDetails (Order o) = {
 //#new end
 
 //#nestedsession
-testNestedSession () = {
+testNestedSession ()  { 
     NESTEDSESSION {
         name(Sku s) <- 'aaa';
         APPLY; // на самом деле изменения применятся не в базу данных, а в "верхнюю" сессию
@@ -601,7 +601,7 @@ FORM sku
     OBJECTS s = Sku PANEL
     PROPERTIES(s) id, name
 ;
-newNestedSession() = {
+newNestedSession()  { 
     NESTEDSESSION {
         NEW s = Sku {
             // показывает форму, но любые изменения в ней не будут применены в базу данных, а будут сохранены в "верхней сессии"
@@ -612,7 +612,7 @@ newNestedSession() = {
 //#nestedsession end
 
 //#newexecutor
-testExecutor = {
+testExecutor  { 
     NEWEXECUTOR {
         FOR id(Sku s) DO {
             NEWTHREAD {
@@ -627,7 +627,7 @@ testExecutor = {
 //#newexecutor end
 
 //#newsession
-testNewSession () = {
+testNewSession ()  { 
     NEWSESSION {
         NEW c = Currency {
             name(c) <- 'USD';
@@ -658,7 +658,7 @@ testNewSession () = {
 //#newsession end
 
 //#newthread
-testNewThread () = {
+testNewThread ()  { 
     //Показ всем сообщения 'Сообщение'
     FOR user(Connection conn) AND connectionStatus(conn) == ConnectionStatus.connectedConnection AND conn != currentConnection() DO {
         NEWTHREAD MESSAGE 'Сообщение'; CONNECTION conn;
@@ -679,7 +679,7 @@ FORM printOrder
     FILTERS order(d) == o
 ;
 
-print (Order o) = {
+print (Order o)  { 
     PRINT printOrder OBJECTS o = o; // выводим на печать
     
     LOCAL file = CUSTOMFILE (); 
@@ -693,7 +693,7 @@ print (Order o) = {
 //#print end
 
 //#read
-readFiles() = {
+readFiles()  { 
   
     LOCAL importFile = CUSTOMFILE ();
  
@@ -718,7 +718,7 @@ readFiles() = {
 }
 
 connectionString = DATA VARSTRING[100]();  
-importXls 'Импортировать надбавки'() = {
+importXls 'Импортировать надбавки'()  { 
     LOCAL importFile = CUSTOMFILE ();
     READ connectionString() + '@SELECT field1, field2 FROM myTable' TO importFile;
     
@@ -729,7 +729,7 @@ importXls 'Импортировать надбавки'() = {
 //#read end
 
 //#return
-importFile = {
+importFile  { 
     LOCAL file = CUSTOMFILE ();
     INPUT f = CUSTOMFILE DO {
         file () <- f;
@@ -745,14 +745,14 @@ FORM orders
     OBJECTS o = Order
     PROPERTIES(o) READONLY number, currency, customer
 ;
-newOrder = {
+newOrder  { 
     NEW new = Order {
         number(new) <- (GROUP MAX number(Order o)) (+) 1;
         SEEK orders.o = new;
     }
 }
-seekFirst = { SEEK FIRST orders.o; }
-seekLast = { SEEK LAST orders.o; }
+seekFirst  { SEEK FIRST orders.o; }
+seekLast  { SEEK LAST orders.o; }
 
 EXTEND FORM orders
     PROPERTIES(o) newOrder, seekFirst, seekLast
@@ -769,7 +769,7 @@ FORM showForm
     FILTERS date(o) >= dateFrom, date(o) <= dateTo
 ;
 
-testShow () = {
+testShow ()  { 
     SHOW showForm OBJECTS dateFrom = 2010_01_01, dateTo = 2010_12_31;
     
     NEWSESSION {
@@ -781,7 +781,7 @@ testShow () = {
 //#show end
 
 //#try
-tryToImport(CUSTOMFILE f) = {
+tryToImport(CUSTOMFILE f)  { 
     TRY {
         LOCAL a = STRING[10] (INTEGER);
          
@@ -793,7 +793,7 @@ CLASS MyLock {
     lock 'Блокировка'
 }
 
-singleDo () = {
+singleDo ()  { 
     NEWSESSION {
         lock(MyLock.lock);
         IF lockResult() THEN 
@@ -805,7 +805,7 @@ singleDo () = {
 //#try end
 
 //#while
-iterateDates (DATE dateFrom, DATE dateTo) = {
+iterateDates (DATE dateFrom, DATE dateTo)  { 
     LOCAL dateCur = DATE();              
        
     dateCur() <- dateFrom;
@@ -817,7 +817,7 @@ iterateDates (DATE dateFrom, DATE dateTo) = {
 //#while end
 
 //#write
-loadAndWrite () = {
+loadAndWrite ()  { 
     INPUT f = CUSTOMFILE DO {
         WRITE 'file:///home/user/loadedfile.csv' FROM f APPEND;
         WRITE CLIENT '/home/user/loadedfile.txt' FROM f;

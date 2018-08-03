@@ -26,7 +26,7 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1
-postCity 'Отправить' (City c) = {
+postCity 'Отправить' (City c)  { 
     EXPORT JSON FROM countryId = id(country(c)), name = name(c);
 
     LOCAL result = CUSTOMFILE();
@@ -46,7 +46,7 @@ EXTEND FORM cities
 //#solution1 end
  
 //#solution2
-createCity (CUSTOMFILE f) = {
+createCity (CUSTOMFILE f)  { 
 
     LOCAL cy = VARSTRING[20] ();
     LOCAL ne = VARSTRING[100] ();
@@ -121,7 +121,7 @@ FORM exportOrder
     FILTERS order(detail) == order
 ;
 
-exportOrder 'Отправить' (Order o) = {
+exportOrder 'Отправить' (Order o)  { 
     EXPORT exportOrder OBJECTS order = o JSON;
 
     LOCAL result = CUSTOMFILE();
@@ -150,7 +150,7 @@ FORM importOrder
     FILTERS order(detail) = order
 ;
 
-importOrder (CUSTOMFILE f) = {
+importOrder (CUSTOMFILE f)  { 
     IMPORT importOrder JSON;
     
     FOR date(INTEGER order) DO NEW o = Order {

@@ -13,7 +13,7 @@ nameBook 'Книга' (OrderDetail d) = name(book(d));
 //#sample1 end
 
 //#solution1
-delete (Book b) = {
+delete (Book b)  { 
     IF NOT [= GROUP SUM 1 BY book(OrderDetail d)](b) THEN
         DELETE b;
     ELSE
@@ -22,7 +22,7 @@ delete (Book b) = {
 //#solution1 end
 
 //#solution2
-clear (Order o) = {
+clear (Order o)  { 
 
     // Вариант 1
     DELETE OrderDetail d WHERE order(d) == o; 

@@ -132,8 +132,8 @@ FORM items;
 FORM stocks;
 FORM legalEntities;
 FORM shipments;
-hello() = { MESSAGE 'Hello world'; }
-hi() = { MESSAGE 'Hi'; }
+hello()  { MESSAGE 'Hello world'; }
+hi()  { MESSAGE 'Hi'; }
 
 NAVIGATOR {
     NEW FOLDER catalogs 'Справочники' WINDOW toolbar { // создаем новую папку навигатора и делаем, чтобы все ее потомки отображались в окно с вертикальным тулбаром
@@ -210,24 +210,24 @@ name(DClass d) += 'DClass' + innerName(d) IF d IS DClass;
 
 //#extendaction
 CLASS ABSTRACT Animal;
-whoAmI = ABSTRACT (Animal);
+whoAmI  ABSTRACT ( Animal);
 
 CLASS Dog : Animal;
-whoAmI (Dog d) += { MESSAGE 'I am a dog!'; }
+whoAmI (Dog d) + {  MESSAGE 'I am a dog!'; }
 
 CLASS Cat : Animal;
-whoAmI (Cat c) += { MESSAGE 'I am a сat!'; }
+whoAmI (Cat c) + {  MESSAGE 'I am a сat!'; }
 
-ask () = {
+ask ()  { 
     FOR Animal a IS Animal DO
         whoAmI(a); // для каждого объекта будет выдано соответствующее сообщение
 }
 
-onStarted = ABSTRACT LIST ();
-onStarted () += {
+onStarted  ABSTRACT LIST ( );
+onStarted () + { 
     name(Sku s) <- '1';
 }
-onStarted () += {
+onStarted () + { 
     name(Sku s) <- '2';
 }
 // сначала выполниться 1е действие, потом 2е действие
@@ -235,10 +235,10 @@ onStarted () += {
 CLASS Human;
 name = DATA VARSTRING[100] (Human);
 
-testName = ABSTRACT CASE (Human);
+testName  ABSTRACT CASE ( Human);
 
-testName (Human h) += WHEN name(h) == 'John' THEN { MESSAGE 'I am John'; } 
-testName (Human h) += WHEN name(h) == 'Bob' THEN { MESSAGE 'I am Bob'; } 
+testName (Human h) + WHEN name(h) == 'John' THEN {  MESSAGE 'I am John'; } 
+testName (Human h) + WHEN name(h) == 'Bob' THEN {  MESSAGE 'I am Bob'; } 
 //#extendaction end
 
 //#meta
@@ -286,12 +286,12 @@ INDEX name(Sku s), price(s, DATE d), d;
 //#index end
 
 //#before
-changeName(Sku s, VARSTRING[100] name) = { name(s) <- name; }
+changeName(Sku s, VARSTRING[100] name)  { name(s) <- name; }
 BEFORE changeName(Sku s, VARSTRING[100] name) DO MESSAGE 'Changing user name'; // Сообщение будет показано перед каждым вызовом changeName
 //#before end
 
 //#after
-changePrice(Sku s, DATE d, NUMERIC[10,2] price) = { price(s, d) <- price; }
+changePrice(Sku s, DATE d, NUMERIC[10,2] price)  { price(s, d) <- price; }
 AFTER changePrice(Sku s, DATE d, NUMERIC[10,2] price) DO MESSAGE 'Price was changed'; // Сообщение будет показано после каждого вызова changePrice
 //#after end
 

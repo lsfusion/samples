@@ -35,7 +35,7 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1
-createBook 'Создать книгу' (Category c) = {
+createBook 'Создать книгу' (Category c)  { 
     NEWSESSION {
         NEW newBook = Book {
             category(newBook) <- c;
@@ -94,15 +94,15 @@ NAVIGATOR {
 //#sample3 end
 
 //#solution3
-setReportLastWeek 'Последняя неделя' () = {
+setReportLastWeek 'Последняя неделя' ()  { 
     SEEK report.dFrom = subtract(currentDate(), 7);
     SEEK report.dTo = subtract(currentDate(), 1); 
 }
-setReportCurrentMonth 'Текущий месяц' () = {
+setReportCurrentMonth 'Текущий месяц' ()  { 
     SEEK report.dFrom = firstDayOfMonth(currentDate());
     SEEK report.dTo = lastDayOfMonth(currentDate());
 }
-setReportLastMonth 'Последний месяц' () = {
+setReportLastMonth 'Последний месяц' ()  { 
     SEEK report.dFrom = firstDayOfMonth(subtract(firstDayOfMonth(currentDate()), 1));
     SEEK report.dTo = subtract(firstDayOfMonth(currentDate()), 1);
 }

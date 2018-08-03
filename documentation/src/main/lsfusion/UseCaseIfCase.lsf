@@ -15,7 +15,7 @@ price 'Цена' = DATA NUMERIC[14,2] (Book);
 //#sample1 end
 
 //#solution1
-setPriceIf 'Установить цену' (Book b) = {
+setPriceIf 'Установить цену' (Book b)  { 
     IF NOT category(b) THEN
         MESSAGE 'Не выбрана категория для книги';
     ELSE
@@ -27,7 +27,7 @@ setPriceIf 'Установить цену' (Book b) = {
 //#solution1 end
 
 //#solution2
-setPriceCase 'Установить цену' (Book b) = {
+setPriceCase 'Установить цену' (Book b)  { 
     CASE
         WHEN category(b) == Category.novel THEN
             price(b) <- 50.0;

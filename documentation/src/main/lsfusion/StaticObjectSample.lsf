@@ -11,7 +11,7 @@ CLASS Direction 'Направление'
   
 direction = DATA Direction ();
   
-showDirection = {
+showDirection  { 
     MESSAGE staticName(direction());
     MESSAGE staticCaption(direction());
 }

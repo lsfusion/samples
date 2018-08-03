@@ -22,7 +22,7 @@ nameTaskType 'Тип задачи' (TimeEntry e) = nameTaskType(task(e));
 nameTask 'Задача' (TimeEntry e) = name(task(e));
 
 descriptionTask 'Описание задачи' (TimeEntry e) = description(task(e));
-changeDescriptionTask (TimeEntry e) = { INPUT t = TEXT DO description(Task tt) <- t WHERE task(e) == tt; }
+changeDescriptionTask (TimeEntry e)  { INPUT t = TEXT DO description(Task tt) <- t WHERE task(e) == tt; }
 
 dateTimeStart 'Время начала' = DATA DATETIME (TimeEntry);
 dateTimeFinish 'Время окончания' = DATA DATETIME (TimeEntry);
@@ -190,7 +190,7 @@ totalPause (e) = GROUP SUM calcPause(TimeEntryPause p) IF timeEntry(p) == e;
 prevCalcHours (TimeEntry e) = hoursDiffDateTime(dateTimeFinish(e), dateTimeStart(e)) - OVERRIDE totalPause(e),0;
 
 //migratedEntry = DATA BOOLEAN ();
-//onStarted() += {
+//onStarted() + { 
 //    IF NOT migratedEntry() THEN {
 //        FOR Activity a IS Activity DO NEW tt = TaskType {
 //            name(tt) <- name(a);

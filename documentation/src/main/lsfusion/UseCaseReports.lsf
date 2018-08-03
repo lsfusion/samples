@@ -33,11 +33,11 @@ FORM booksByCategories 'Книги по категориям'
 //#solution1a end
 
 //#solution1b
-printBooksByCategories 'Книги по категориям' () = {
+printBooksByCategories 'Книги по категориям' ()  { 
     PRINT booksByCategories;
 }
 
-xlsxBooksByCategories 'Книги по категориям (XLSX)' () = {
+xlsxBooksByCategories 'Книги по категориям (XLSX)' ()  { 
     PRINT booksByCategories XLSX;
 }
 //#solution1b end
@@ -81,10 +81,10 @@ FORM invoices 'Счета'
 //#sample2 end
 
 //#solution2
-print 'Печать' (Invoice i) = {
+print 'Печать' (Invoice i)  { 
     PRINT invoice OBJECTS i = i;
 }
-printWord 'Печать (DOCX)' (Invoice i) = {
+printWord 'Печать (DOCX)' (Invoice i)  { 
     PRINT invoice OBJECTS i = i DOCX;
 }
 
@@ -164,7 +164,7 @@ FORM customerInfo 'Информация по клиенту'
     FILTERS invoice(id) == i
 ;
 
-printInfo 'Распечатать информацию' (Customer c) = {
+printInfo 'Распечатать информацию' (Customer c)  { 
     PRINT customerInfo OBJECTS c = c;
 }
 

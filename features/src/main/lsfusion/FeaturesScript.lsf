@@ -334,7 +334,7 @@ multiTestA(a) += caseDataC(a);
 //multiTestA2(a) += caseDataC(a);
 
 
-caseActionTest(a) = {
+caseActionTest(a)  { 
 	CASE
 	                        WHEN testInt(a) > 7 THEN { MESSAGE '>7'; }
 	                        WHEN testInt(a) > 6 THEN { MESSAGE '>6'; }
@@ -342,7 +342,7 @@ caseActionTest(a) = {
 }
                     ;
 
-caseActionTest2(a) = {
+caseActionTest2(a)  { 
 	CASE EXCLUSIVE
 	                        WHEN testInt(a) > 7 THEN { MESSAGE '>7'; }
 	                        WHEN testInt(a) > 6 THEN { MESSAGE '>6'; }
@@ -350,33 +350,33 @@ caseActionTest2(a) = {
 }
                      ;
 
-caseActionTestA = ABSTRACT CASE (CaseA);
-caseActionTestA(a) += WHEN testInt(a) > 7 THEN { MESSAGE '>7'; } 
-caseActionTestA(a) += WHEN testInt(a) > 6 THEN { MESSAGE '>6'; } 
-caseActionTestA(a) += WHEN testInt(a) > 5 THEN { MESSAGE '>5'; } 
+caseActionTestA  ABSTRACT CASE ( CaseA);
+caseActionTestA(a) + WHEN testInt(a) > 7 THEN {  MESSAGE '>7'; } 
+caseActionTestA(a) + WHEN testInt(a) > 6 THEN {  MESSAGE '>6'; } 
+caseActionTestA(a) + WHEN testInt(a) > 5 THEN {  MESSAGE '>5'; } 
 
-caseActionTestA2 = ABSTRACT CASE EXCLUSIVE (CaseA);
-caseActionTestA(a) += WHEN testInt(a) > 6 THEN { MESSAGE '>6'; }
-caseActionTestA(a) += WHEN testInt(a) = 6 THEN { MESSAGE '=6'; }
-caseActionTestA(a) += WHEN testInt(a) < 6 THEN { MESSAGE '<6'; }
+caseActionTestA2  ABSTRACT CASE EXCLUSIVE ( CaseA);
+caseActionTestA(a) + WHEN testInt(a) > 6 THEN {  MESSAGE '>6'; }
+caseActionTestA(a) + WHEN testInt(a) = 6 THEN {  MESSAGE '=6'; }
+caseActionTestA(a) + WHEN testInt(a) < 6 THEN {  MESSAGE '<6'; }
 
 //multiActionTest(a) = MULTI IF a IS CaseB THEN MESSAGE caseDataB(a), IF a IS CaseC THEN MESSAGE caseDataC(a);
 //multiActionTest2(a) = MULTI OVERRIDE IF a IS CaseB THEN MESSAGE caseDataB(a), IF a IS CaseC THEN MESSAGE caseDataC(a);
 
-//multiActionTestA = ABSTRACT MULTI (CaseA);
+//multiActionTestA  ABSTRACT MULTI ( CaseA);
 //multiActionTestA(a) += IF a IS CaseB THEN MESSAGE caseDataB(a);
 //multiActionTestA(a) += IF a IS CaseC THEN MESSAGE caseDataC(a);
 
-//multiActionTestA2 = ABSTRACT MULTI OVERRIDE (CaseA);
+//multiActionTestA2  ABSTRACT MULTI OVERRIDE ( CaseA);
 //multiActionTestA2(a) += IF a IS CaseB THEN MESSAGE caseDataB(a);
 //multiActionTestA2(a) += IF a IS CaseB THEN MESSAGE caseDataC(a);
 
 
 scase = DATA BOOLEAN ();
-caseAM() = { FOR IF scase() THEN TEXT s = '{classes.image}' ELSE s = '{classes.image.link}' DO MESSAGE s; };
-caseAMN = { MESSAGE 'Hello world!' NOWAIT; }
+caseAM()  { FOR IF scase() THEN TEXT s = '{classes.image}' ELSE s = '{classes.image.link}' DO MESSAGE s; };
+caseAMN  { MESSAGE 'Hello world!' NOWAIT; }
 
-dr(a) = { DRILLDOWN overrideTest(a); }
+dr(a)  { DRILLDOWN overrideTest(a); }
 
 FORM TestCase 'Тест CASE'
     OBJECTS a=CaseA, b=CaseB, c=CaseC
@@ -387,17 +387,17 @@ FORM TestCase 'Тест CASE'
     PROPERTIES NEW(b), NEW(c), caseDataB(b), caseDataC(c), caseAM(), scase(), caseAMN()
 ;
 
-testFormAction = { PRINT TestCase ; } 
-testFormActionAUTO = { PRINT TestCase NOPREVIEW; }  
-testFormActionXLSX = { PRINT TestCase XLSX; }
-testFormActionXLS = { PRINT TestCase XLS; } 
-testFormActionPDF = { PRINT TestCase PDF; }
-testFormActionExport = { PRINT TestCase PDF TO exportFile; } 
-testFormActionINF = { SHOW TestCase; }
-testFormActionINF2 = { SHOW TestCase; }
+testFormAction  { PRINT TestCase ; } 
+testFormActionAUTO  { PRINT TestCase NOPREVIEW; }  
+testFormActionXLSX  { PRINT TestCase XLSX; }
+testFormActionXLS  { PRINT TestCase XLS; } 
+testFormActionPDF  { PRINT TestCase PDF; }
+testFormActionExport  { PRINT TestCase PDF TO exportFile; } 
+testFormActionINF  { SHOW TestCase; }
+testFormActionINF2  { SHOW TestCase; }
 
 
-testMessageAction() = {
+testMessageAction()  { 
     LOCAL i = INTEGER();
     i() <- 0;
     WHILE i() < 5 DO {
@@ -406,7 +406,7 @@ testMessageAction() = {
     }
 } 
 
-testMessageActionNW() = {
+testMessageActionNW()  { 
     LOCAL i = INTEGER();
     i() <- 0;
     WHILE i() < 5 DO {
@@ -479,16 +479,16 @@ testAbstract(Store named) += 6 IF named IS Store;
 // Expression syntax:
 // ACTION ABSTRACT [CASE [OVERRIDE | EXCLUSIVE] | MULTI [OVERRIDE | EXCLUSIVE] | LIST] [CHECKED] (className1, ..., classNameN)
 
-testAbstractAction = ABSTRACT LIST (Object);
+testAbstractAction  ABSTRACT LIST ( Object);
 // overriding abstract action syntax:
 // actionName(namedParam1, ..., namedParamN) += actionBody;
 // or
 // actionName(namedParam1, ..., namedParamN) += WHEN expression THEN actionBody;
 
-testAbstractAction(Store store) += { IF store IS Store THEN MESSAGE 'testing store'; }
-testAbstractAction(Store store) += { IF store IS Store THEN MESSAGE 'testing store2'; }
-testAbstractAction(Document document) += { IF document IS Document THEN MESSAGE 'testing document'; }
-testAbstractAction(Document document) += { IF document IS Document THEN MESSAGE 'testing document2'; }
+testAbstractAction(Store store) + {  IF store IS Store THEN MESSAGE 'testing store'; }
+testAbstractAction(Store store) + {  IF store IS Store THEN MESSAGE 'testing store2'; }
+testAbstractAction(Document document) + {  IF document IS Document THEN MESSAGE 'testing document'; }
+testAbstractAction(Document document) + {  IF document IS Document THEN MESSAGE 'testing document2'; }
 
 // Formula property
 // Expression syntax:
@@ -591,10 +591,10 @@ AOBfor(a) = DATA AOB (AOA);
 countAOAAOB(a, b) = DATA INTEGER (AOA, AOB);
 count(a) = DATA INTEGER (AOA);
 
-addA() = { NEW AOA; }
-addB() = { NEW AOB; }
+addA()  { NEW AOA; }
+addB()  { NEW AOB; }
 
-addAllBTo() = { NEW AOB WHERE count[AOA](a) > 5 TO AOBfor(a); }
+addAllBTo()  { NEW AOB WHERE count[AOA](a) > 5 TO AOBfor(a); }
 
 FORM testAddObject
     OBJECTS a=AOA, b=AOB
@@ -625,14 +625,14 @@ CCBfor(a) = DATA CCB (CCA);
 countCCACCB(a, b) = DATA INTEGER (CCA, CCB);
 count(a) = DATA INTEGER (CCA);
 count(b) = DATA INTEGER (CCB);
-changeWhenCount 'countCCB > 5' (a, CCB b) = { CHANGECLASS a TO CCB WHERE count(b) > 5; }
-changeWhenCountAB 'countCCACCB > 5' (CCA a, CCB b) = { CHANGECLASS a TO CCB WHERE countCCACCB(a, b) > 5; }
-change(a) = { CHANGECLASS a TO CCB; }
-changeAllA 'all where CCA > 5' () = { CHANGECLASS CCA a TO CCB WHERE count(a) > 5; }
-deleteA 'delete A > 5' () = { DELETE CCA a WHERE count(a) > 5; }
+changeWhenCount 'countCCB > 5' (a, CCB b)  { CHANGECLASS a TO CCB WHERE count(b) > 5; }
+changeWhenCountAB 'countCCACCB > 5' (CCA a, CCB b)  { CHANGECLASS a TO CCB WHERE countCCACCB(a, b) > 5; }
+change(a)  { CHANGECLASS a TO CCB; }
+changeAllA 'all where CCA > 5' ()  { CHANGECLASS CCA a TO CCB WHERE count(a) > 5; }
+deleteA 'delete A > 5' ()  { DELETE CCA a WHERE count(a) > 5; }
 
-changeAllAWhenCountAB 'all count CCACCB > 5' (CCB b) = { CHANGECLASS CCA a TO CCB WHERE countCCACCB(a, b) > 5; }
-changeAllAWhenCount 'all count CCB > 5' (CCB b) = { CHANGECLASS CCA a TO CCB WHERE count(b) > 5 AND a IS CCA; }
+changeAllAWhenCountAB 'all count CCACCB > 5' (CCB b)  { CHANGECLASS CCA a TO CCB WHERE countCCACCB(a, b) > 5; }
+changeAllAWhenCount 'all count CCB > 5' (CCB b)  { CHANGECLASS CCA a TO CCB WHERE count(b) > 5 AND a IS CCA; }
 
 FORM testChangeClass
     OBJECTS a=CCA, b=CCB
@@ -664,32 +664,32 @@ FORM testChangeClass
 // EVAL expression
 
 script(doc) = DATA TEXT (Document);
-evalScript(Document doc) = { EVAL script(doc); }
+evalScript(Document doc)  { EVAL script(doc); }
 
 FORM TestEvalActionForm 'Тест скриптов'
 OBJECTS d=Document
 PROPERTIES(d) store, script, evalScript GRID;
 
 
-copyNameToArticles 'Скопировать имя склада в имена артиклей' (Store s) = {
+copyNameToArticles 'Скопировать имя склада в имена артиклей' (Store s)  { 
     name(Article a) <- (name(s) IF s IS Store) WHERE a IS Article;
 };
 
-copyStoreNameToArticle 'Добавить имя склада к имени артикля' (Named s, Named a) = {
+copyStoreNameToArticle 'Добавить имя склада к имени артикля' (Named s, Named a)  { 
 	NEWSESSION {
 	    name(a) <- name(a) + name(s);
 	    apply();
 	}
 };
 
-copyStoreNameToArticleError 'Скопировать имя склада в имя артикля (с ошибкой)' (Named s, Named a) = {
+copyStoreNameToArticleError 'Скопировать имя склада в имя артикля (с ошибкой)' (Named s, Named a)  { 
 	NEWSESSION {
 	    name(a) <- name(s);
 	    apply();
 	}
 };
 
-createNewStore '{addhugestore}' () = {
+createNewStore '{addhugestore}' ()  { 
     NEW Store;
 
     sessionObj() <- addedObject();
@@ -704,12 +704,12 @@ selCur = DATA LOCAL BOOLEAN (Document, Article);
 selAll = DATA LOCAL BOOLEAN (Document, Article);
 selArt = DATA LOCAL BOOLEAN (Article);
 
-testExec(Document document, Article article) = {
+testExec(Document document, Article article)  { 
     IF quantity(document, article) > 3 THEN
         name(article) <- 'More then 3';
 }
 
-testPush(Document document) = {
+testPush(Document document)  { 
 
     FOR selArt(Article article) DO // to be pushed
         testExec(document, article);
@@ -734,7 +734,7 @@ testPush(Document document) = {
 
 }
 
-testPush2(Document document) = {
+testPush2(Document document)  { 
 
     FOR date(Document document2) DO { // to be pushed
         name(Named article) <- 'NEW' IF article IS Article IF document IS IncomeDocument;
@@ -756,14 +756,14 @@ testPush2(Document document) = {
     date(document) <- NULL;
 }
 
-testDisable(Document document, Article article) = {
+testDisable(Document document, Article article)  { 
     applyOnlyWithoutRecalc();
     quantity(document, article) <- 6.0d;
     apply();
     applyAll();
 }
 
-copy(Document document) = {
+copy(Document document)  { 
     FOR quantity(document, Article article) NEW added = Article DO {
         name(added) <- name(article);
         quantity(document, added) <- quantity(document, article);
@@ -788,7 +788,7 @@ sheetNumber = DATA INTEGER ();
 kgrmat = DATA VARSTRING[100] (INTEGER); 
 polnaim = DATA VARSTRING[100] (INTEGER);
 
-importAction() = {
+importAction()  { 
     READ 'file://c:/sprgrm.dbf' TO importFile;
     READ 'file:///c:/sprgrm.fpt' TO memoFile;
 
@@ -825,7 +825,7 @@ CONSTRAINT foo(store, article) > 1000 CHECKED MESSAGE 'ошибка: >1000';
 // Syntax:
 // WHEN expression DO action [ORDER [DESC] expr1, ..., exprN] [SESSION];
 
-constraintAction (Store store, Article article) = {
+constraintAction (Store store, Article article)  { 
 //    EXEC cancel();
     IF foo(store, article) > 300000 THEN {
         MESSAGE name(article);
@@ -847,15 +847,15 @@ ON LOCAL globalInt() <- globalInt() (+) 1;
 
 BEFORE constraintAction(store, article) DO MESSAGE 'Before Aspect';
 
-cancledMessage() = {
+cancledMessage()  { 
     MESSAGE 'changes were canceled';
 }
 
-appliedMessage() = {
+appliedMessage()  { 
     MESSAGE 'form apply message';
 }
 
-okMessage() = {
+okMessage()  { 
     MESSAGE 'Now closing...';
     formClose();
 }
@@ -920,7 +920,7 @@ FORM documentArticle 'По документам (caption)'
 // Order list syntax:
 // ORDER (propertyAlias1 | <mappedProperty1>), ..., (propertyAliasN | <mappedPropertyN>)
 
-showDocumentArticleModalForm 'Показать модальную "По документам"'() = {
+showDocumentArticleModalForm 'Показать модальную "По документам"'()  { 
 	NEWSESSION {
 	    NEW Article;
 	
@@ -946,7 +946,7 @@ showDocumentArticleModalForm 'Показать модальную "По доку
 	}
 };
 
-testAction 'Показать "По документам" 3 раза'() = {
+testAction 'Показать "По документам" 3 раза'()  { 
     LOCAL i = INTEGER();
     i() <- 0;
     WHILE (i() < 3) DO {
@@ -971,7 +971,7 @@ DESIGN testModalForm {
     BOX(s) { flex = 0; }
 }
 
-showTestModalForm 'Показать док-модальную форму (влож. сессия)'() = {
+showTestModalForm 'Показать док-модальную форму (влож. сессия)'()  { 
     NESTEDSESSION { 
         DIALOG testModalForm OBJECTS store INPUT, article INPUT, s INPUT, i INPUT DOCKED DO {
             name(Named k) <- s WHERE k == store;
@@ -980,7 +980,7 @@ showTestModalForm 'Показать док-модальную форму (вло
     }    
 };
 
-setDefaultNames 'Задать имена по умолчанию' () = {
+setDefaultNames 'Задать имена по умолчанию' ()  { 
     FOR Store s IS Store DO {
         name(s) <- 'Склад '  + s;
     }
@@ -998,7 +998,7 @@ setDefaultNames 'Задать имена по умолчанию' () = {
 name(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 staticCaption(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 
-remindPasswordEmail 'Выслать пароль на этот email' (Contact u, STRING[200] to) = { EMAIL
+remindPasswordEmail 'Выслать пароль на этот email' (Contact u, STRING[200] to)  { EMAIL
 //    FROM 'luxsoft@adsl.by'
     SUBJECT 'Напоминание пароля для ' + email(u)
     TO (to IF to IS STRING[200])
@@ -1010,7 +1010,7 @@ remindPasswordEmail 'Выслать пароль на этот email' (Contact u
            remindUserPass OBJECTS u=(u AS CustomUser)
     ; }
 
-justSendEmail 'Просто выслать емэйл' (STRING[200] to) = { EMAIL
+justSendEmail 'Просто выслать емэйл' (STRING[200] to)  { EMAIL
     SUBJECT 'Тема письма'
     TO (to IF to IS STRING[200])
     INLINE HTML '<font color=#FF0000 size=+3>big red text</font>'; }
@@ -1020,15 +1020,15 @@ FORM TestEmailForm 'Тест EMAIL'
     PROPERTIES VALUE(s), login(u), email(u), NEW(u), remindPasswordEmail(u, s) TODRAW s, justSendEmail(s)
 ;
 
-testRequestInput 'Тестирование REQUEST input'(Store s) = {
+testRequestInput 'Тестирование REQUEST input'(Store s)  { 
     ASK 'Быть или не быть?' DO {
         INPUT x=COLOR DO
             scolor(s) <- IF x == #FF0000 THEN #00FF00 ELSE x WHERE s IS Store;
     }
 };
 
-loadf(Store s) = { open(simage(s)); }
-savef(Store s) = { INPUT =simage(s) CHANGE; }
+loadf(Store s)  { open(simage(s)); }
+savef(Store s)  { INPUT =simage(s) CHANGE; }
 
 //fs = ABSTRACT BOOLEAN (Store);
 //countF 'Кол-во фильтр. складов' = GROUP SUM 1 IF fs(s);
@@ -1064,7 +1064,7 @@ FORM TestSeek 'Тест SEEK'
 
 countF 'Кол-во фильтр. складов' = GROUP SUM 1 IF [= VIEW storeArticle.s](Store s);
 orderF 'Порядок в группе объектов' (Store s) = PARTITION SUM 1 IF [= FILTER storeArticle.s](s) ORDER [= ORDER storeArticle.s](s), s;
-setNameX 'Добавить X к имени'() = {
+setNameX 'Добавить X к имени'()  { 
     LOCAL k = INTEGER ();
     k() <- 0;
     FOR [= FILTER storeArticle.s](Store s) ORDER [= ORDER storeArticle.s](s) DO {
@@ -1076,14 +1076,14 @@ setNameX 'Добавить X к имени'() = {
 //    name(s) <- 'U' + name(s);
 //}
 
-seekX 'Seek object'() = {
+seekX 'Seek object'()  { 
     DIALOG storeArticle OBJECTS s INPUT NULL DO {
         SEEK storeArticle.s = s;
     }
 }
 
-seekLast = { SEEK LAST TestSeek.g ; }
-seekFirst = { SEEK FIRST TestSeek.g ; }
+seekLast  { SEEK LAST TestSeek.g ; }
+seekFirst  { SEEK FIRST TestSeek.g ; }
 
 editTest = DATA INTEGER ();
 
@@ -1093,31 +1093,31 @@ EXTEND FORM storeArticle
     PROPERTIES(s) orderF
 ;
 
-seekLC 'Seek object s Last' () = {
+seekLC 'Seek object s Last' ()  { 
     DIALOG TestSeek OBJECTS s INPUT DO {
         SEEK LAST TestSeek.s = s;
     }
 }
 
-seekFC 'Seek object s First'() = {
+seekFC 'Seek object s First'()  { 
     DIALOG TestSeek OBJECTS s INPUT DO {
         SEEK FIRST TestSeek.s = s;
     }
 }
 
-seekGFC 'Seek group (s, a) First' () = {
+seekGFC 'Seek group (s, a) First' ()  { 
     DIALOG TestSeek OBJECTS s INPUT NULL, a INPUT NULL DO {
         SEEK TestSeek.g OBJECTS s = s, a = a;
     }
 }
 
-seekPart 'Seek Part s Last' () = {
+seekPart 'Seek Part s Last' ()  { 
     DIALOG TestSeek OBJECTS s INPUT NULL DO {
         SEEK LAST TestSeek.g OBJECTS s = s;
     }
 }
 
-seekPartF 'Seek Part a First' () = {
+seekPartF 'Seek Part a First' ()  { 
     DIALOG TestSeek OBJECTS a INPUT NULL DO {
         SEEK TestSeek.g OBJECTS a = a;
     }
@@ -1443,13 +1443,13 @@ DESIGN TestReadOnlyIf {
     }
 }
 
-onChangeStoreName() = {
+onChangeStoreName()  { 
     INPUT i=INTEGER DO {
         MESSAGE 'Number: ' + i;
     }
 }
 
-onChangeSInteger(Store s) = {
+onChangeSInteger(Store s)  { 
     INPUT st=STRING[15] DO {
         MESSAGE 'String: ' + st;
     
@@ -1457,7 +1457,7 @@ onChangeSInteger(Store s) = {
     }
 }
 
-onEditStoreSizeCode() = {
+onEditStoreSizeCode()  { 
     INPUT int = INTEGER DO {
         LOCAL i = INTEGER();
     
@@ -1474,14 +1474,14 @@ onEditStoreSizeCode() = {
     }
 }
                                
-onEditSimple() = { MESSAGE 'Edit!'; }                               
+onEditSimple()  { MESSAGE 'Edit!'; }                               
                                
 FORM SelectStoreSize
     OBJECTS ss=StoreSize
     PROPERTIES(ss) READONLY VALUE, staticName, staticCaption, sizeCode
 ;
 
-onChangeSizeCode(Store store) = {
+onChangeSizeCode(Store store)  { 
     DIALOG SelectStoreSize OBJECTS ss INPUT DO {
         storeSize(store) <- ss;
     }
@@ -1489,16 +1489,16 @@ onChangeSizeCode(Store store) = {
     ASYNCUPDATE storeSizeCode(store);
 }
 
-onHelloWorld() = {
+onHelloWorld()  { 
     MESSAGE 'Hello world!';
 }
 
-onHelloWorld(Store s) = {
+onHelloWorld(Store s)  { 
     MESSAGE name(s) + 'Hello world!';
 }
 
 
-testOnStringChange() = {
+testOnStringChange()  { 
     MESSAGE 'On string change';
 }
 
@@ -1719,7 +1719,7 @@ DESIGN TestLayout {
     }
 }
 
-addDetailBarcode(Article article, STRING[15] barcode) = {
+addDetailBarcode(Article article, STRING[15] barcode)  { 
     LOCAL dialogBarcodeArticle = Article ();
     dialogBarcodeArticle() <- barcodeToArticle(barcode);
 
@@ -1732,7 +1732,7 @@ addDetailBarcode(Article article, STRING[15] barcode) = {
     }
 };
 
-changeAddDetailInputBarcode(Article article) = {
+changeAddDetailInputBarcode(Article article)  { 
     INPUT st = STRING[15] DO
         addDetailBarcode(article, st);
 };
@@ -1753,7 +1753,7 @@ FORM Stores
     OBJECTS s=Store
     PROPERTIES (s) VALUE, name, storeSizeName;
 
-changeContextStore(Article article) = {
+changeContextStore(Article article)  { 
     DIALOG Stores OBJECTS s=contextStore(article) CHANGE;
 }
 
@@ -1875,7 +1875,7 @@ FORM TestFocus 'Тест Focus'
     PROPERTIES(s, a) sadouble, partitionToArticles
 ;
 
-focusStoreName 'Перенести фокус на name(s)'() = { ACTIVATE PROPERTY TestFocus.name(s); }
+focusStoreName 'Перенести фокус на name(s)'()  { ACTIVATE PROPERTY TestFocus.name(s); }
 
 EXTEND FORM TestFocus
     PROPERTIES focusStoreName()
@@ -1994,7 +1994,7 @@ DESIGN wideModalForm {
     }
 }
 
-disappearingAction(SubStore ss) = {
+disappearingAction(SubStore ss)  { 
     SHOW wideModalForm OBJECTS s = ss ;
 }
 
@@ -2011,7 +2011,7 @@ FORM TestSessionProps 'Тест передачи значений между с�
     OBJECTS s = Store
     PROPERTIES (s) VALUE, name, storeSizeCode, ssstring, NEW
 ;
-testActionInNewSession() = {
+testActionInNewSession()  { 
     LOCAL addedStore = Store();
 //    NEWSESSION (addedStore, ssstring) {
     NEWSESSION NESTED LOCAL {
@@ -2027,7 +2027,7 @@ testActionInNewSession() = {
     }
 };
 
-testSessionPropsInApply() = {
+testSessionPropsInApply()  { 
     NEW s = Store {
         ssstring(s) <- 'some value';
         
@@ -2039,7 +2039,7 @@ testSessionPropsInApply() = {
     }
 };
 
-testNestedSession(Store s) = {
+testNestedSession(Store s)  { 
     ssstring(s) <- '<value from top session>';
     NESTEDSESSION {
         DIALOG TestSessionProps OBJECTS s = s DO {
@@ -2053,7 +2053,7 @@ EXTEND FORM TestSessionProps
     PROPERTIES  testActionInNewSession(), testSessionPropsInApply(), testNestedSession(s)
 ;
 
-testAddInNestedSession 'Добавить группу товаров'(ArticleGroup parentGroup) = {
+testAddInNestedSession 'Добавить группу товаров'(ArticleGroup parentGroup)  { 
 	NESTEDSESSION {
 	    NEW ag = ArticleGroup {
 	        parent(ag) <- parentGroup;
@@ -2106,7 +2106,7 @@ FORM TestKeepSessionProps 'Test LOCAL NESTED'
     PROPERTIES testSessionIntegerProperty()
 ;
 
-debuggableActionBegin(Store s) = {
+debuggableActionBegin(Store s)  { 
 //    MESSAGE 'Begin';
     name(s) <- 'name from action';
     
@@ -2121,7 +2121,7 @@ debuggableActionBegin(Store s) = {
     name(s) <- 'name from action';
     name(s) <- 'name from action';
 }
-debuggableActionEnd(Store x) = {
+debuggableActionEnd(Store x)  { 
 //    MESSAGE 'End';
     name(x) <- 'name from action';
     name(x) <- 'name from action';
@@ -2140,7 +2140,7 @@ x = DATA INTEGER (A)
 CONSTRAINT f(A a) > g(a) MESSAGE 'Forbidden';
 f(A a) => g(a) RESOLVE LEFT;
         
-tstCustom = CUSTOM 'samples.TestCustomActionProperty' ();
+tstCustom  CUSTOM  'samples.TestCustomActionProperty' ();
 
 //EXTERNAL examples
 
@@ -2152,14 +2152,14 @@ tstCustom = CUSTOM 'samples.TestCustomActionProperty' ();
 //externalDB = EXTERNAL DB 'jdbc:($1)://($2)/eqs?user=root&password=' EXEC 'select ($3), date from history' TO testFile;
 //externalHTTP = EXTERNAL HTTP 'https://www.gastronom.ru/($1)/images/20170418/b7568ebc.jpg' TO testFile, testFile2;
 //
-//testCustomHTTP(Store s) = { 
+//testCustomHTTP(Store s)  { 
 //    str1(s) <- 'binfiles';
 //    externalHTTP(str1(s));
 //    open(testFile());
 //    open(testFile2());
 //}
 //
-//testCustomDB(Store s) = { 
+//testCustomDB(Store s)  { 
 //    str1(s) <- 'mysql';
 //    str2(s) <- 'localhost';
 //    str3(s) <- 'id';
@@ -2170,7 +2170,7 @@ WHEN f(A a) < g(a) DO
     tstCustom();
 
 jss() = DATA INTEGER ();
-debuggableAction(Store s) = {
+debuggableAction(Store s)  { 
     LOCAL tttt = INTEGER();
     LOCAL abb = INTEGER (Store);
     jss() <- 1;
@@ -2273,8 +2273,8 @@ path(Store s) = DATA STRING[100](Store);
 
 file() = DATA LOCAL CUSTOMFILE ();
 
-readA(Store s) = { READ path(s) TO file; }  
-writeA(Store s) = { WRITE path(s) + 'txt' FROM file(); } 
+readA(Store s)  { READ path(s) TO file; }  
+writeA(Store s)  { WRITE path(s) + 'txt' FROM file(); } 
 
 FORM TestReadWrite 'Тест READ/WRITE'
     OBJECTS s=Store 
@@ -2452,7 +2452,7 @@ ottf = DATA INTEGER (Newtest);
 divtf(Newtest a) = newtf(a) / ottf(a) MATERIALIZED;
 ff = DATA LOCAL INTEGER (Newtest);
 
-testChange 'testChange' (Newtest t) = {
+testChange 'testChange' (Newtest t)  { 
     ff(t) <- 1;
     NEWSESSION NESTED LOCAL {
         ff(t) <- 2;    
@@ -2487,7 +2487,7 @@ CLASS Change;
 quantity = DATA INTEGER (Change, CommonObject);
 balanceChange (CommonObject commonObject) = GROUP SUM quantity(Change change, commonObject) MATERIALIZED;
 
-startFilling() = {
+startFilling()  { 
     FOR iterate(INTEGER i,0,20) DO
         NEWSESSION { NEWTHREAD {
             FOR iterate(INTEGER j, 0, 100) NEW c=Change DO {
@@ -2512,7 +2512,7 @@ x = DATA X (Y);
 data = DATA INTEGER (X);
 dataX(Y y) = data(x(y)) MATERIALIZED;
 
-startChanging() = {
+startChanging()  { 
 //    FOR iterate(i,0,4) DO
         NEWSESSION { NEWTHREAD {
                 FOR iterate(INTEGER j, 0, 1005) DO {
@@ -2525,7 +2525,7 @@ startChanging() = {
         }
 } 
 
-startAddDelete() = {
+startAddDelete()  { 
 //    FOR iterate(i,0,4) DO
 //        NEWTHREAD {
             FOR iterate(INTEGER j, 0, 1000) DO {
@@ -2547,7 +2547,7 @@ CLASS OPR29;
 valueP = DATA DATE (OPR29);
 valueG = DATA DATE ();
 
-testPush (DATE dateFrom, DATE dateTo) = {
+testPush (DATE dateFrom, DATE dateTo)  { 
     FOR iterate(DATE d, dateFrom, dateTo) NOINLINE (d) DO {
         FOR INTEGER q==dateTProp(d) NEW o=OPR29 DO {
             valueP(o) <- DATE(d);
@@ -2555,13 +2555,13 @@ testPush (DATE dateFrom, DATE dateTo) = {
      }
 }
 
-testPush2 () = {
+testPush2 ()  { 
     testPush(2015_01_01, 2015_02_02);
 }
 
 counter = DATA INTEGER ();
 
-testActionMsg() = {
+testActionMsg()  { 
     IF NOT counter() THEN {
         counter() <- 0;
     } 
@@ -2573,9 +2573,9 @@ testActionMsg() = {
 intPropA = 5000;
 intPropB = 0;
 intPropD() = intPropA() + intPropB();
-testNewThread = { NEWTHREAD testActionMsg(); SCHEDULE DELAY intPropD() - 2000; }
-testNewThread2= { NEWTHREAD testActionMsg(); SCHEDULE; }
-testNewThread3 = { NEWTHREAD testActionMsg(); SCHEDULE PERIOD intPropD() DELAY 2000L; }    
+testNewThread  { NEWTHREAD testActionMsg(); SCHEDULE DELAY intPropD() - 2000; }
+testNewThread2 { NEWTHREAD testActionMsg(); SCHEDULE; }
+testNewThread3  { NEWTHREAD testActionMsg(); SCHEDULE PERIOD intPropD() DELAY 2000L; }    
 
 FORM TestMultithreading 'Test Multithreading'
 //    OBJECTS o=CommonObject
@@ -2603,7 +2603,7 @@ FORM TestMultithreading2 'Test Multithreading'
     PROPERTIES (y) VALUE, dataX;
 ;
 
-testMakeZipFile() = {
+testMakeZipFile()  { 
 	NEWSESSION {
 	    LOCAL zippingFile = CUSTOMFILE ();
 	    READ 'file://c:/1.txt' TO zippingFile;
@@ -2620,31 +2620,31 @@ CLASS TestLink;
 TABLE testLink(TestLink);
 
 fileImage = DATA IMAGEFILE (TestLink);
-loadFileImage (TestLink i)= { INPUT =fileImage(i) CHANGE; }
-openFileImage (TestLink i)= { open(fileImage(i)); }
+loadFileImage (TestLink i) { INPUT =fileImage(i) CHANGE; }
+openFileImage (TestLink i) { open(fileImage(i)); }
 
 linkImage(t) = DATA IMAGELINK (TestLink);
 @defineLinkDialog(linkImage, TestLink); 
-openLinkImage (TestLink i)= { open(linkImage(i)); }
+openLinkImage (TestLink i) { open(linkImage(i)); }
 
 filePDF = DATA PDFFILE (TestLink);
-loadFilePDF (TestLink i)= { INPUT =filePDF(i) CHANGE; }
-openFilePDF (TestLink i)= { open(filePDF(i)); }
+loadFilePDF (TestLink i) { INPUT =filePDF(i) CHANGE; }
+openFilePDF (TestLink i) { open(filePDF(i)); }
 
 linkPDF = DATA PDFLINK (TestLink);
-openLinkPDF (TestLink i)= { open(linkPDF(i)); }
+openLinkPDF (TestLink i) { open(linkPDF(i)); }
 
 linkRaw = DATA RAWLINK (TestLink);
-openLinkRaw (TestLink i)= { open(linkRaw(i)); }
+openLinkRaw (TestLink i) { open(linkRaw(i)); }
 
 linkExcel = DATA EXCELLINK (TestLink);
-openLinkExcel (TestLink i)= { open(linkExcel(i)); }
+openLinkExcel (TestLink i) { open(linkExcel(i)); }
 
 linkWord = DATA WORDLINK (TestLink);
-openLinkWord (TestLink i)= { open(linkWord(i)); }
+openLinkWord (TestLink i) { open(linkWord(i)); }
 
 linkCustom = DATA CUSTOMLINK (TestLink);
-openLinkCustom (TestLink i)= { open(linkCustom(i)); }
+openLinkCustom (TestLink i) { open(linkCustom(i)); }
 
 FORM TestLink 'TestLink'
     OBJECTS i = TestLink
@@ -2773,7 +2773,7 @@ NAVIGATOR {
 //    NEW tstPart;
 //}
 
-addIncomeDocument 'Добавить XXX' = {};
+addIncomeDocument 'Добавить XXX'  { };
 
 FORM DialDocument
     OBJECTS o = IncomeDocument PANEL
@@ -2782,13 +2782,13 @@ FORM DialDocument
     EDIT IncomeDocument OBJECT o;
 ;
 
-testInvocation() = {
+testInvocation()  { 
 
     SHOW TestLink DOCKED;
     
 }
 
-testDelete(Object o) = {
+testDelete(Object o)  { 
     IF NOT sessionOwners() THEN {
         ASK 'Точно?' DO {
             DELETE o;
@@ -2798,7 +2798,7 @@ testDelete(Object o) = {
         DELETE o;
 }
 
-newTestDelete(Object o) = {
+newTestDelete(Object o)  { 
 	NEWSESSION {
 	    testDelete(o);
 	}
@@ -2813,15 +2813,15 @@ FORM DialCDocument
     EDIT CIncomeDocument OBJECT o;
 ;
 
-editCIncomeDocument 'Edit C' (IncomeDocument d) = {
+editCIncomeDocument 'Edit C' (IncomeDocument d)  { 
     SHOW EDIT CIncomeDocument =d;
 }
 
-testFormNull(IncomeDocument d) = {
+testFormNull(IncomeDocument d)  { 
     SHOW DialCDocument OBJECTS o = d;
 }
 
-testNullRun() = {
+testNullRun()  { 
     testFormNull(NULL);
 }
 
@@ -2863,7 +2863,7 @@ NAVIGATOR {
 
 dq = DATA DOUBLE (Store, Article);
 
-changeB(Store s, Article a) = {
+changeB(Store s, Article a)  { 
     ASK 'Точно?' DO
         INPUT d = DOUBLE DO
             dq(s, a) <- d (+) 1;       
@@ -2891,7 +2891,7 @@ FORM TFA1 'TEST 1'
     EDIT A1 OBJECT a1
 ;
 
-//edit(A1 a1) += { SHOW TFA1 OBJECTS a1=a1; }
+//edit(A1 a1) + {  SHOW TFA1 OBJECTS a1=a1; }
 
 CLASS A2 : A0;
 a2 = DATA VARSTRING[30] (A2);
@@ -2902,7 +2902,7 @@ FORM TFA2 'TEST 2'
 //    EDIT A2 OBJECT a2
 ;
 
-//edit(A2 a2) += { SHOW TFA2 OBJECTS a2=a2; }
+//edit(A2 a2) + {  SHOW TFA2 OBJECTS a2=a2; }
 
 CLASS A3 : A0;
 a3 = DATA VARSTRING[30] (A3);
@@ -2913,9 +2913,9 @@ FORM TFA3 'TEST 3'
     EDIT A3 OBJECT a3
 ;
 
-//edit(A3 a3) += { SHOW TFA3 OBJECTS a3=a3; }
+//edit(A3 a3) + {  SHOW TFA3 OBJECTS a3=a3; }
 
-changeC(Store s, Article a) = {
+changeC(Store s, Article a)  { 
     INPUT 
             z=dq(s,a) CHANGE DO {
         DIALOG InputC OBJECTS 
@@ -2936,12 +2936,12 @@ changeC(Store s, Article a) = {
 //    }
 }
 
-changeA(A0 a) = {
+changeA(A0 a)  { 
     formEdit(a);
 }
 
 fltest = DATA CUSTOMFILE ();
-test 'TEST INPUT FILE' () = {
+test 'TEST INPUT FILE' ()  { 
     INPUT =fltest() CHANGE;
 }
 
@@ -2951,7 +2951,7 @@ FORM ListA0
 ;
 
 testExternalResult = DATA LOCAL CUSTOMFILE ();
-testExternal(a, b) = { 
+testExternal(a, b)  { 
     EXTERNAL SQL 'jdbc:postgresql://localhost/vitalur?user=postgres&password=11111' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult; 
 }
 
@@ -2967,7 +2967,7 @@ FORM ShowX
     FILTERS imported(i)    
 ;
 
-testExport (Store s) = {
+testExport (Store s)  { 
     LOCAL t = CUSTOMFILE ();
     EXPORT TABLE FROM a=incomeQuantity(s,Article a), b=name(a), c=barcode(a), d=name(a), s=name(s) WHERE incomeQuantity(s, a) TO t;
 //    open(t());
@@ -3005,7 +3005,7 @@ NAVIGATOR {
     NEW ImpQ;
 }
 
-testImport (CUSTOMFILE cf) = {
+testImport (CUSTOMFILE cf)  { 
     IMPORT TABLE FROM cf TO xa=a, xb=b, xc=c, xd=d, xs=s;
     FOR barcode(Article a) = xc(INTEGER i) AND name(Store s) = xs(i) DO {
         impQ(s, a) <- xa(i);
@@ -3025,17 +3025,17 @@ FORM articlesTest
     FILTERS name(s)
 ;
 
-testExportJSONForm() = {
+testExportJSONForm()  { 
     EXPORT articlesTest JSON;
     open(exportFile());
 }  
 
-testExportXMLForm = {
+testExportXMLForm  { 
     EXPORT articlesTest XML;
     open(exportFile());
 }
 
-testExportDBFForm = {
+testExportDBFForm  { 
     EXPORT articlesTest DBF;
     open(exportFiles('a'));
 }
@@ -3157,7 +3157,7 @@ vtst = DATA LOCAL VARSTRING[10] (INTEGER);
 tst2 = DATA LOCAL VARSTRING[10] ();
 vtst2 = DATA LOCAL VARSTRING[10] ();
 
-testStrings() = {
+testStrings()  { 
     tst() <- 'dfd     ';
     vtst() <- 'bdfd     ';
 
@@ -3201,7 +3201,7 @@ NAVIGATOR {
 f = DATA LOCAL INTEGER (INTEGER);
 g = DATA LOCAL INTEGER (INTEGER, INTEGER);
 
-tstexp() = {	
+tstexp()  { 	
 	
 	f(INTEGER a) <- 5 WHERE a=1;
 	f(INTEGER a) <- 6 WHERE a=2;
@@ -3216,7 +3216,7 @@ tstexp() = {
 //	test(5);
 }	
 
-tstimp() = {	
+tstimp()  { 	
 	
 	LOCAL result = INTEGER ();
 	LOCAL xml = CUSTOMFILE ();

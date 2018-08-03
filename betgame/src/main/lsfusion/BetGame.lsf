@@ -59,12 +59,12 @@ CONSTRAINT CHANGED(awayScore(Match m)) AND NOT started(m) MESSAGE 'Запрещ�
 currentHomeScore 'Ставка (хозяева)' (Match m) = homeScore(m, currentUser()); 
 currentAwayScore 'Ставка (гости)' (Match m) = awayScore(m, currentUser());
 
-changeCurrentHomeScore (Match m) = {
+changeCurrentHomeScore (Match m)  { 
     FOR CustomUser u == currentUser() DO
         INPUT =homeScore(m, u) CHANGE;
 }
 
-changeCurrentAwayScore (Match m) = {
+changeCurrentAwayScore (Match m)  { 
     FOR CustomUser u == currentUser() DO
         INPUT =awayScore(m, u) CHANGE;
 }
