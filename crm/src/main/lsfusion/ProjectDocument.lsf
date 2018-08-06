@@ -24,7 +24,7 @@ author 'Автор' = DATA Employee (Version);
 nameAuthor 'Автор' (Version v) = name(author(v));
 author (Version v) <- currentEmployee() WHEN SET(v IS Version);
 
-file 'Файл' = DATA CUSTOMFILE (Version) NONULL;
+file 'Файл' = DATA FILE (Version) NONULL;
 open 'Открыть' (Version v)  { open(file(v)); }
 load 'Загрузить' (Version v)  { INPUT =file(v) CHANGE; }
 
@@ -38,7 +38,7 @@ nameAuthorLastVersion 'Автор' (Document d) = name(authorLastVersion(d));
 
 openLastVersion 'Открыть' (Document d)  { open(fileLastVersion(d)); }
 loadLastVersion 'Загрузить' (Document d)  { 
-    INPUT f = CUSTOMFILE DO {
+    INPUT f = FILE DO {
         NEW v = Version {
             document(v) <- d;
             dateTime(v) <- currentDateTime();

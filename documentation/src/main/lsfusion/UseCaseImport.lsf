@@ -70,7 +70,7 @@ importOrders 'Импортировать заказы из директория'
     
     FOR VARISTRING[255] f = fileName(INTEGER j) AND NOT fileIsDirectory(j) DO NEWSESSION {
     
-        LOCAL file = CUSTOMFILE ();
+        LOCAL file = FILE ();
         READ 'file://' + serverDirectory() + '/' + f TO file;
         
         LOCAL date = DATE (INTEGER);
@@ -103,7 +103,7 @@ importOrders 'Импортировать заказы из директория'
 
 //#solution3
 importBooks 'Импортировать книги' ()  { 
-    LOCAL file = CUSTOMFILE ();
+    LOCAL file = FILE ();
     READ 'jdbc:sqlserver://localhost;databaseName=books;User=import;Password=password@SELECT id, name FROM books' TO file;
 
     LOCAL id = VARSTRING[20] (INTEGER);

@@ -10,8 +10,8 @@ transform(a, b, c) = -a * (b (+) c);
 
 //#brackets
 CLASS Letter;
-attachment1 = DATA CUSTOMFILE (Letter);
-attachment2 = DATA CUSTOMFILE (Letter);
+attachment1 = DATA FILE (Letter);
+attachment2 = DATA FILE (Letter);
 letterAttachments (Letter l) = STRUCT(attachment1(l), attachment2(l));
 secondAttachment(Letter l) = letterAttachments(l)[2]; // возвращает attachment2
 //#brackets end

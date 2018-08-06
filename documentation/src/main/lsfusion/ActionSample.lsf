@@ -212,12 +212,12 @@ changeStatus()  {
 //#changeclass end
 
 //#custom
-showOnMap 'Показать на карте'  CUSTOM  'lsfusion.utils.geo.ShowOnMapActionProperty' (DOUBLE, DOUBLE, MapProvider, STRING[100]);
+showOnMap 'Показать на карте'  INTERNAL  'lsfusion.utils.geo.ShowOnMapActionProperty' (DOUBLE, DOUBLE, MapProvider, STRING[100]);
 
-serviceDBMT 'Обслуживание БД (многопоточно, threadCount, timeout)'  CUSTOM  'lsfusion.server.logics.service.ServiceDBMultiThreadActionProperty' (INTEGER, INTEGER) NULL;
+serviceDBMT 'Обслуживание БД (многопоточно, threadCount, timeout)'  INTERNAL  'lsfusion.server.logics.service.ServiceDBMultiThreadActionProperty' (INTEGER, INTEGER) NULL;
 
-printlnAction 'Вывести текст в консоль'  CUSTOM  <{ System.out.println("action test"); }>; 
-setNoCancelInTransaction()  CUSTOM  <{ context.getSession().setNoCancelInTransaction(true); }>; // здесь context - это параметр метода executeCustom
+printlnAction 'Вывести текст в консоль'  INTERNAL  <{ System.out.println("action test"); }>; 
+setNoCancelInTransaction()  INTERNAL  <{ context.getSession().setNoCancelInTransaction(true); }>; // здесь context - это параметр метода executeCustom
 //#custom end
 
 //#delete
@@ -325,7 +325,7 @@ barcode = DATA VARSTRING[30] (Article);
 price = DATA INTEGER (Article);
 
 //#external
-testExportFile = DATA CUSTOMFILE ();
+testExportFile = DATA FILE ();
 
 externalHTTP()  { 
     EXTERNAL HTTP 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile; 
@@ -412,7 +412,7 @@ import()  {
        }
     }
     
-    LOCAL t = CUSTOMFILE ();
+    LOCAL t = FILE ();
     EXTERNAL SQL 'jdbc:postgresql://localhost/test?user=postgres&password=12345' EXEC 'SELECT x.a,x.b,x.c,x.d FROM orders x WHERE x.id = $1;' PARAMS '4553' TO t;
     IMPORT FROM t() FIELDS INTEGER a, DATE b, STRING[50] c, STRING[50] d DO        // импорт с опцией FIELDS
         NEW o = Order {
@@ -423,20 +423,20 @@ import()  {
         }
     
     
-    INPUT f = CUSTOMFILE DO  
+    INPUT f = FILE DO  
         IMPORT CSV '*' NOHEADER CHARSET 'utf-8' FROM f TO field1 = C, field2, field3 = F, field4 = A;
-    INPUT f = CUSTOMFILE DO  
+    INPUT f = FILE DO  
         IMPORT XML ATTR FROM f TO field1, field2;
-    INPUT f = CUSTOMFILE DO  
+    INPUT f = FILE DO  
         IMPORT XML ROOT 'element' ATTR FROM f TO field1, field2;      
-    INPUT f = CUSTOMFILE DO  
+    INPUT f = FILE DO  
         IMPORT XML LIST ATTR FROM f TO headField1, headField2;        
  
-    INPUT f = CUSTOMFILE DO  
+    INPUT f = FILE DO  
         IMPORT MDB FROM f TO field1 = 'MDBField1', field2 = 'MDBField2';
 
-    INPUT f = CUSTOMFILE DO  
-        INPUT memo = CUSTOMFILE DO  
+    INPUT f = FILE DO  
+        INPUT memo = FILE DO  
             IMPORT DBF MEMO memo FROM f TO field1 = 'DBFField1', field2 = 'DBFField2';
 }
 //#import end
@@ -457,7 +457,7 @@ FORM import
 ;
 
 importForm()  { 
-    INPUT f = CUSTOMFILE DO {
+    INPUT f = FILE DO {
         importFile() <- f;
         IMPORT import JSON;
         SHOW import; // показываем что импортировалось
@@ -491,7 +491,7 @@ FORM order
 ;
 
 testFile  { 
-    INPUT f = CUSTOMFILE DO { // запрашиваем диалог по выбору файла
+    INPUT f = FILE DO { // запрашиваем диалог по выбору файла
         open(f); // открываем выбранный файл
     }
 }
@@ -682,7 +682,7 @@ FORM printOrder
 print (Order o)  { 
     PRINT printOrder OBJECTS o = o; // выводим на печать
     
-    LOCAL file = CUSTOMFILE (); 
+    LOCAL file = FILE (); 
     PRINT printOrder OBJECTS o = o DOCX TO file;
     open(file()); 
     
@@ -695,7 +695,7 @@ print (Order o)  {
 //#read
 readFiles()  { 
   
-    LOCAL importFile = CUSTOMFILE ();
+    LOCAL importFile = FILE ();
  
     //чтение из HTTP
     READ 'http://lsfusion.ru/file.xlsx' TO importFile;
@@ -719,7 +719,7 @@ readFiles()  {
 
 connectionString = DATA VARSTRING[100]();  
 importXls 'Импортировать надбавки'()  { 
-    LOCAL importFile = CUSTOMFILE ();
+    LOCAL importFile = FILE ();
     READ connectionString() + '@SELECT field1, field2 FROM myTable' TO importFile;
     
     LOCAL field1 = INTEGER (INTEGER);
@@ -730,8 +730,8 @@ importXls 'Импортировать надбавки'()  {
 
 //#return
 importFile  { 
-    LOCAL file = CUSTOMFILE ();
-    INPUT f = CUSTOMFILE DO {
+    LOCAL file = FILE ();
+    INPUT f = FILE DO {
         file () <- f;
     }
     
@@ -781,7 +781,7 @@ testShow ()  {
 //#show end
 
 //#try
-tryToImport(CUSTOMFILE f)  { 
+tryToImport(FILE f)  { 
     TRY {
         LOCAL a = STRING[10] (INTEGER);
          
@@ -818,7 +818,7 @@ iterateDates (DATE dateFrom, DATE dateTo)  {
 
 //#write
 loadAndWrite ()  { 
-    INPUT f = CUSTOMFILE DO {
+    INPUT f = FILE DO {
         WRITE 'file:///home/user/loadedfile.csv' FROM f APPEND;
         WRITE CLIENT '/home/user/loadedfile.txt' FROM f;
         WRITE CLIENT DIALOG 'loadedfile' FROM f;

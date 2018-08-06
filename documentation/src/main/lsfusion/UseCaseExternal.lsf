@@ -29,7 +29,7 @@ NAVIGATOR {
 postCity 'Отправить' (City c)  { 
     EXPORT JSON FROM countryId = id(country(c)), name = name(c);
 
-    LOCAL result = CUSTOMFILE();
+    LOCAL result = FILE();
     EXTERNAL HTTP 'http://localhost:7651/exec?action=Location.createCity' PARAMS exportFile() TO result;
     
     LOCAL code = VARSTRING[10]();
@@ -46,12 +46,12 @@ EXTEND FORM cities
 //#solution1 end
  
 //#solution2
-createCity (CUSTOMFILE f)  { 
+createCity (FILE f)  { 
 
     LOCAL cy = VARSTRING[20] ();
     LOCAL ne = VARSTRING[100] ();
     
-    IMPORT JSON LIST FROM f AS CUSTOMFILE TO cy = countryId, ne = name;
+    IMPORT JSON LIST FROM f AS FILE TO cy = countryId, ne = name;
     
     IF NOT country(cy()) THEN {
         EXPORT JSON FROM code = '1', message = 'Некорректный код страны';
@@ -124,7 +124,7 @@ FORM exportOrder
 exportOrder 'Отправить' (Order o)  { 
     EXPORT exportOrder OBJECTS order = o JSON;
 
-    LOCAL result = CUSTOMFILE();
+    LOCAL result = FILE();
     EXTERNAL HTTP 'http://localhost:7651/exec?action=Location.importOrder' PARAMS exportFile() TO result;
 }
 
@@ -150,7 +150,7 @@ FORM importOrder
     FILTERS order(detail) = order
 ;
 
-importOrder (CUSTOMFILE f)  { 
+importOrder (FILE f)  { 
     IMPORT importOrder JSON;
     
     FOR date(INTEGER order) DO NEW o = Order {

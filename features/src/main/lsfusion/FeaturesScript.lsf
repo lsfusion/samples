@@ -139,14 +139,14 @@ storeCaption(StoreSize storeSize) = staticCaption(storeSize) IF storeSize IS Sto
 // Expression syntax:
 // DATA [LOCAL] returnClass ( [paramClass1, ..., paramClassN] )
 // If LOCAL modifier is specified, than local data property will be created.
-// Built-in types: INTEGER, LONG, DOUBLE, BOOLEAN, DATE, DATETIME, TEXT, STRING, ISTRING, TIME, WORDFILE, IMAGEFILE, PDFFILE, CUSTOMFILE, EXCELFILE, NUMERIC, COLOR
+// Built-in types: INTEGER, LONG, DOUBLE, BOOLEAN, DATE, DATETIME, TEXT, STRING, ISTRING, TIME, WORDFILE, IMAGEFILE, PDFFILE, FILE, EXCELFILE, NUMERIC, COLOR
 stime 'Время' (store) = DATA TIME (Store) IN base;
 sdate 'Дата' (store) = DATA DATE (Store) IN base;
 sdatetime 'ДатаВремя' (store) = DATA DATETIME (Store) IN base;
 sword 'Word' (store) = DATA WORDFILE (Store) IN base;
 simage 'Image' (store) = DATA IMAGEFILE (Store) IN base;
 spdf 'PDF' (store) = DATA PDFFILE (Store) IN base;
-scustom 'Custom file' (store) = DATA CUSTOMFILE (Store) IN base;
+scustom 'Custom file' (store) = DATA FILE (Store) IN base;
 sexcel 'Excel' (store) = DATA EXCELFILE (Store) IN base;
 scolor 'Color' (store) = DATA COLOR (Store) IN base;
 sinteger 'Integer' (store) = DATA INTEGER (Store);
@@ -603,7 +603,7 @@ FORM testAddObject
 
 // Custom action
 // statement syntax:
-// CUSTOM 'javaClassName'
+// INTERNAL 'javaClassName'
 
 // Message action
 // statement syntax:
@@ -780,8 +780,8 @@ nameArticle(QuantityString s) = name(article(s));
 importNumber = DATA INTEGER (INTEGER);
 importName = DATA VARSTRING[100] (INTEGER); 
 
-importFile = DATA LOCAL CUSTOMFILE ();
-memoFile = DATA LOCAL CUSTOMFILE ();
+importFile = DATA LOCAL FILE ();
+memoFile = DATA LOCAL FILE ();
 
 sheetNumber = DATA INTEGER ();
 
@@ -962,7 +962,7 @@ testAction 'Показать "По документам" 3 раза'()  {
 };
 
 FORM testModalForm 'Тестовая форма'
-    OBJECTS article=Article, i=INTEGER 'Новое имя товара ("Товар %N%"):' PANEL, store=Store, s=VARSTRING[50] 'Новое имя склада:' PANEL
+    OBJECTS article=Article, i 'Новое имя товара ("Товар %N%"):' =INTEGER PANEL, store=Store, s 'Новое имя склада:' =VARSTRING[50] PANEL
     PROPERTIES name(article), name(store), VALUE(s), VALUE(i)
 ;
 
@@ -1016,7 +1016,7 @@ justSendEmail 'Просто выслать емэйл' (STRING[200] to)  { EMAIL
     INLINE HTML '<font color=#FF0000 size=+3>big red text</font>'; }
 
 FORM TestEmailForm 'Тест EMAIL'
-    OBJECTS s=VARSTRING[100] 'Email:' PANEL, u=CustomUser
+    OBJECTS s 'Email:' =VARSTRING[100] PANEL, u=CustomUser
     PROPERTIES VALUE(s), login(u), email(u), NEW(u), remindPasswordEmail(u, s) TODRAW s, justSendEmail(s)
 ;
 
@@ -2140,12 +2140,12 @@ x = DATA INTEGER (A)
 CONSTRAINT f(A a) > g(a) MESSAGE 'Forbidden';
 f(A a) => g(a) RESOLVE LEFT;
         
-tstCustom  CUSTOM  'samples.TestCustomActionProperty' ();
+tstCustom  INTERNAL  'samples.TestCustomActionProperty' ();
 
 //EXTERNAL examples
 
-//testFile = DATA LOCAL CUSTOMFILE ();
-//testFile2 = DATA LOCAL CUSTOMFILE ();
+//testFile = DATA LOCAL FILE ();
+//testFile2 = DATA LOCAL FILE ();
 //str1 = DATA LOCAL VARSTRING[100] (Store);
 //str2 = DATA LOCAL VARSTRING[100] (Store);
 //str3 = DATA LOCAL VARSTRING[100] (Store);
@@ -2271,7 +2271,7 @@ FORM TestActionDebugger 'Тест ActionDebugger'
 
 path(Store s) = DATA STRING[100](Store);
 
-file() = DATA LOCAL CUSTOMFILE ();
+file() = DATA LOCAL FILE ();
 
 readA(Store s)  { READ path(s) TO file; }  
 writeA(Store s)  { WRITE path(s) + 'txt' FROM file(); } 
@@ -2605,7 +2605,7 @@ FORM TestMultithreading2 'Test Multithreading'
 
 testMakeZipFile()  { 
 	NEWSESSION {
-	    LOCAL zippingFile = CUSTOMFILE ();
+	    LOCAL zippingFile = FILE ();
 	    READ 'file://c:/1.txt' TO zippingFile;
 	    zipping(s) <- zippingFile() WHERE s == '1.txt';
 	    READ 'file://c:/2.xml' TO zippingFile;
@@ -2940,7 +2940,7 @@ changeA(A0 a)  {
     formEdit(a);
 }
 
-fltest = DATA CUSTOMFILE ();
+fltest = DATA FILE ();
 test 'TEST INPUT FILE' ()  { 
     INPUT =fltest() CHANGE;
 }
@@ -2950,7 +2950,7 @@ FORM ListA0
     PROPERTIES (a0) a
 ;
 
-testExternalResult = DATA LOCAL CUSTOMFILE ();
+testExternalResult = DATA LOCAL FILE ();
 testExternal(a, b)  { 
     EXTERNAL SQL 'jdbc:postgresql://localhost/vitalur?user=postgres&password=11111' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult; 
 }
@@ -2968,7 +2968,7 @@ FORM ShowX
 ;
 
 testExport (Store s)  { 
-    LOCAL t = CUSTOMFILE ();
+    LOCAL t = FILE ();
     EXPORT TABLE FROM a=incomeQuantity(s,Article a), b=name(a), c=barcode(a), d=name(a), s=name(s) WHERE incomeQuantity(s, a) TO t;
 //    open(t());
 //    IMPORT XML ROOT 'export' TO xa=a, xb=b, xc=c, xd=d, xs=s FROM t();
@@ -2991,7 +2991,7 @@ testExport (Store s)  {
     
     SHOW ShowX;
     
-    EXTERNAL LSF 'http://localhost:7651' EXEC 'Features.testImport[CUSTOMFILE]' PARAMS t();
+    EXTERNAL LSF 'http://localhost:7651' EXEC 'Features.testImport[FILE]' PARAMS t();
 }
 
 impQ = DATA DOUBLE (Store, Article);
@@ -3005,7 +3005,7 @@ NAVIGATOR {
     NEW ImpQ;
 }
 
-testImport (CUSTOMFILE cf)  { 
+testImport (FILE cf)  { 
     IMPORT TABLE FROM cf TO xa=a, xb=b, xc=c, xd=d, xs=s;
     FOR barcode(Article a) = xc(INTEGER i) AND name(Store s) = xs(i) DO {
         impQ(s, a) <- xa(i);
@@ -3106,7 +3106,7 @@ NAVIGATOR {
 }
 
 GROUP tgr 'ggf';
-t(Class1 c1) = 5 IF c1 IS Class1 IN tgr FIXEDCHARWIDTH 10;
+t(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 10 FIXED;
 ta(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 50;
 tv(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 10;
 x(Class2 c1) = 5 IF c1 IS Class2 IN tgr;
@@ -3206,8 +3206,8 @@ tstexp()  {
 	f(INTEGER a) <- 5 WHERE a=1;
 	f(INTEGER a) <- 6 WHERE a=2;
 	
-	LOCAL xml = CUSTOMFILE ();
-	LOCAL dbf = CUSTOMFILE ();	
+	LOCAL xml = FILE ();
+	LOCAL dbf = FILE ();	
 	EXPORT XML FROM f(INTEGER a) TO xml;
 	EXPORT DBF FROM f(INTEGER a) TO dbf;
 	EXPORT FROM 5, xml(), dbf();
@@ -3219,8 +3219,8 @@ tstexp()  {
 tstimp()  { 	
 	
 	LOCAL result = INTEGER ();
-	LOCAL xml = CUSTOMFILE ();
-	LOCAL dbf = CUSTOMFILE ();	
+	LOCAL xml = FILE ();
+	LOCAL dbf = FILE ();	
     EXTERNAL LSF 'http://localhost:7651' EXEC 'Features.tstexp[]' TO result, xml, dbf;
     
     open(xml());
