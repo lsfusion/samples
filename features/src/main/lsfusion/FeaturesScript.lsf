@@ -2643,7 +2643,7 @@ openLinkExcel (TestLink i) { open(linkExcel(i)); }
 linkWord = DATA WORDLINK (TestLink);
 openLinkWord (TestLink i) { open(linkWord(i)); }
 
-linkCustom = DATA CUSTOMLINK (TestLink);
+linkCustom = DATA LINK (TestLink);
 openLinkCustom (TestLink i) { open(linkCustom(i)); }
 
 FORM TestLink 'TestLink'
