@@ -772,7 +772,7 @@ copy(Document document)  {
 
 CLASS QuantityString;
 quantityx(Document document, Article article) = quantity(document, article);
-@defineAggregationClass(document, Document, article, Article, QuantityString, QuantityString, quantityx);
+QuantityString = AGGR QuantityString WHERE quantityx(Document document, Article article) MATERIALIZED INDEXED;
 dateDocument(QuantityString s) = date(document(s));
 storeNameDocument(QuantityString s) = storeName(document(s));
 nameArticle(QuantityString s) = name(article(s));
@@ -3292,13 +3292,13 @@ name = DATA VARISTRING[100] (XCDetail);
 TABLE xbc (XBCDetail);
 TABLE xbcd (XBCDetail);
 
-@defineAggregationClass(xa, XA, xb, XB, createXB);
+xb = AGGR XB WHERE createXB(XA xa) MATERIALIZED INDEXED;
 
-@defineAggregationClass(xa, XA, xc, XC, createXB);
+xc = AGGR XC WHERE createXB(XA xa) MATERIALIZED INDEXED;
 
-@defineAggregationClass(xADetail, XADetail, xBDetail, XBDetail, createXB);
+xBDetail = AGGR XBDetail WHERE createXB(XADetail xADetail) MATERIALIZED INDEXED;
 
-@defineAggregationClass(xADetail, XADetail, xCDetail, XCDetail, createXB);
+xCDetail = AGGR XCDetail WHERE createXB(XADetail xADetail) MATERIALIZED INDEXED;
 
 xb(XBDetail xbd) = xb(xa(xADetail(xbd)));
 xc(XCDetail xbd) = xc(xa(xADetail(xbd)));

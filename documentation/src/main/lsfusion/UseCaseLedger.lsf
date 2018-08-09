@@ -83,7 +83,7 @@ quantity(TransferDetail d) += -quantity(d);
 
 //#skutransferaggregation
 CLASS TransferSKULedger 'Перемещение на склад (регистр)' : SKULedger; 
-@defineAggregationClass(transferDetail, TransferDetail, transferSKULedger, TransferSKULedger, posted);
+transferSKULedger = AGGR TransferSKULedger WHERE posted(TransferDetail transferDetail) MATERIALIZED INDEXED;
 
 posted(TransferSKULedger d) += d IS TransferSKULedger;
 dateTime(TransferSKULedger d) += dateTime(transfer(transferDetail(d)));
