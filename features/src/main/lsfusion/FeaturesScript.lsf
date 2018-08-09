@@ -772,7 +772,7 @@ copy(Document document)  {
 
 CLASS QuantityString;
 quantityx(Document document, Article article) = quantity(document, article);
-@defineAggregation(document, article, QuantityString, quantityx);
+@defineAggregationClass(document, Document, article, Article, QuantityString, QuantityString, quantityx);
 dateDocument(QuantityString s) = date(document(s));
 storeNameDocument(QuantityString s) = storeName(document(s));
 nameArticle(QuantityString s) = name(article(s));

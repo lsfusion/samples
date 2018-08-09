@@ -192,7 +192,7 @@ EXTEND FORM order PROPERTIES(o) createInvoice;
 
 // агрегированный счет
 CLASS OrderInvoice 'Счет на основе заказа' : Invoice; 
-@defineAggregation(order, orderInvoice, createInvoice);
+@defineAggregationClass(order, Order, orderInvoice, OrderInvoice, createInvoice);
 date(OrderInvoice i) += date(order(i));
 number(OrderInvoice i) += number(order(i));
 
@@ -200,7 +200,7 @@ number(OrderInvoice i) += number(order(i));
 createInvoiceDetail 'Создать строку счета' (OrderDetail d) = createInvoice(order(d));
 
 CLASS OrderInvoiceDetail 'Строка счета на основе заказа' : InvoiceDetail;
-@defineAggregation(orderDetail, orderInvoiceDetail, createInvoiceDetail);
+@defineAggregationClass(orderDetail, OrderDetail, orderInvoiceDetail, OrderInvoiceDetail, createInvoiceDetail);
 
 invoice (OrderInvoiceDetail d) += orderInvoice(order(orderDetail(d)));
 book (OrderInvoiceDetail d) += book(orderDetail(d));  

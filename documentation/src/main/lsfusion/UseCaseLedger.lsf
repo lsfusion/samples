@@ -83,7 +83,7 @@ quantity(TransferDetail d) += -quantity(d);
 
 //#skutransferaggregation
 CLASS TransferSKULedger 'Перемещение на склад (регистр)' : SKULedger; 
-@defineAggregation(transferDetail, transferSKULedger, posted);
+@defineAggregationClass(transferDetail, TransferDetail, transferSKULedger, TransferSKULedger, posted);
 
 posted(TransferSKULedger d) += d IS TransferSKULedger;
 dateTime(TransferSKULedger d) += dateTime(transfer(transferDetail(d)));
