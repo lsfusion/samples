@@ -10,37 +10,9 @@
 
     <repositories>
         <repository>
-            <id>lsfusion.public</id>
-            <name>lsFusion Public Repository</name>
-            <url>http://repo.lsfusion.org/repository/public</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
             <id>lsfusion</id>
-            <name>lsFusion Releases Repository</name>
-            <url>http://repo.lsfusion.org/repository/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>lsfusion.snapshots</id>
-            <name>lsFusion Snapshot Repository</name>
-            <url>http://repo.lsfusion.org/repository/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
+            <name>lsFusion Public Repository</name>
+            <url>http://repo.lsfusion.org</url>
         </repository>
     </repositories>
 
