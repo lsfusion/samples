@@ -146,11 +146,12 @@ FORM importOrder
     PROPERTIES dt = date(order), nm = number(order)
     
     OBJECTS detail = INTEGER
-    PROPERTIES id = id(detail), quantity = quantity(detail), price = price(detail)
+    PROPERTIES id = id(detail), qn = quantity(detail), pr = price(detail)
     FILTERS order(detail) = order
 ;
 
 importOrder (FILE f)  { 
+    importFile() <- f;
     IMPORT importOrder JSON;
     
     FOR date(INTEGER order) DO NEW o = Order {
