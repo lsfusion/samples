@@ -8,14 +8,6 @@
     <version>1.0.0-SNAPSHOT</version>
     <name>Samples</name>
 
-    <repositories>
-        <repository>
-            <id>lsfusion</id>
-            <name>lsFusion Public Repository</name>
-            <url>http://repo.lsfusion.org</url>
-        </repository>
-    </repositories>
-
     <modules>
         <module>crm</module>
         <module>features</module>
