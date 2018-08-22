@@ -368,6 +368,28 @@ testFor  {
         
     }
 }
+
+newSku ()  { 
+    NEW s = Sku {
+        id(s) <- 425;
+        name(s) <- 'New Sku';
+    }
+}
+
+copy (Sku old)  { 
+    NEW new = Sku {
+        id(new) <- id(old);
+        name(new) <- name(old);
+    }
+}
+
+createDetails (Order o)  { 
+    FOR in(Sku s) NEW d = OrderDetail DO {
+        order(d) <- o;
+        sku(d) <- s; 
+    }
+}
+
 //#for end
 
 //#ifthena
@@ -562,26 +584,16 @@ message (Shape s) = MULTI message[Square](s), message[Circle](s);
 //#multi end
 
 //#new
+
 newSku ()  { 
-    NEW s = Sku {
+    LOCAL addedSkus = Sku (INTEGER);
+    NEW Sku WHERE iterate(i, 1, 3) TO addedSkus(i);
+    FOR Sku s = addedSkus(i) DO {
         id(s) <- 425;
         name(s) <- 'New Sku';
     }
 }
 
-copy (Sku old)  { 
-    NEW new = Sku {
-        id(new) <- id(old);
-        name(new) <- name(old);
-    }
-}
-
-createDetails (Order o)  { 
-    FOR in(Sku s) NEW d = OrderDetail DO {
-        order(d) <- o;
-        sku(d) <- s; 
-    }
-}
 //#new end
 
 //#nestedsession
