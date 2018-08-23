@@ -710,17 +710,17 @@ readFiles()  {
     LOCAL importFile = FILE ();
  
     //чтение из HTTP
-    READ 'http://lsfusion.ru/file.xlsx' TO importFile;
+    READ 'http://lsfusion.org/file.xlsx' TO importFile;
     //чтение из HTTPS
-    READ 'https://lsfusion.ru/file.xlsx' TO importFile;
+    READ 'https://lsfusion.org/file.xlsx' TO importFile;
     //чтение из HTTP с авторизацией
-    READ 'http://user:password@lsfusion.ru/file.xlsx' TO importFile;
+    READ 'http://user:password@lsfusion.org/file.xlsx' TO importFile;
     //чтение из HTTPS с авторизацией
-    READ 'https://user:password@lsfusion.ru/file.xlsx' TO importFile;
+    READ 'https://user:password@lsfusion.org/file.xlsx' TO importFile;
     //чтение из FTP
-    READ 'ftp://ftp.lsfusion.ru/file.xlsx' TO importFile;
+    READ 'ftp://ftp.lsfusion.org/file.xlsx' TO importFile;
     //чтение из SFTP
-    READ 'sftp://sftp.lsfusion.ru/file.xlsx' TO importFile;
+    READ 'sftp://sftp.lsfusion.org/file.xlsx' TO importFile;
     //чтение из FILE
     READ 'file://D://lsfusion/file.xlsx' TO importFile;
     //чтение из JDBC
