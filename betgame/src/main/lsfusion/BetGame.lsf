@@ -38,9 +38,9 @@ awayScore 'Результат (гости)' = DATA INTEGER (Match);
 homeScore 'Ставка (хозяева)' = DATA INTEGER (Match, CustomUser);
 awayScore 'Ставка (гости)' = DATA INTEGER (Match, CustomUser);
 
-home 'Победа (хозяева)' = [=GROUP SUM 1 IF homeScore(Match m, CustomUser c) > awayScore(m, c) BY m](Match m) IF started(m);   
-tie 'Ничья' = [=GROUP SUM 1 IF homeScore(Match m, CustomUser c) == awayScore(m, c) BY m](Match m) IF started(m);
-away 'Победа (гости)' = [=GROUP SUM 1 IF homeScore(Match m, CustomUser c) < awayScore(m, c) BY m](Match m) IF started(m);
+home 'Победа (хозяева)' (Match m) = (GROUP SUM 1 IF homeScore(m, CustomUser c) > awayScore(m, c)) IF started(m);   
+tie 'Ничья' (Match m) = (GROUP SUM 1 IF homeScore(m, CustomUser c) = awayScore(m, c)) IF started(m);
+away 'Победа (гости)' (Match m) = (GROUP SUM 1 IF homeScore(m, CustomUser c) < awayScore(m, c)) IF started(m);
 
 startedHomeScore 'Ставка (хозяева)' (Match m, CustomUser c) = homeScore(m, c) IF started(m);  
 startedAwayScore 'Ставка (хозяева)' (Match m, CustomUser c) = awayScore(m, c) IF started(m);  
