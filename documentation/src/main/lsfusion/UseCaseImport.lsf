@@ -4,9 +4,9 @@ MODULE UseCaseImport;
 REQUIRE Utils;
 
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[100] (Book) IN recognize;
+name 'Наименование' = DATA VARISTRING[100] (Book) IN id;
 
-id 'Код' = DATA VARSTRING[20] (Book) IN recognize;
+id 'Код' = DATA VARSTRING[20] (Book) IN id;
 book 'Книга' (VARSTRING[20] id) = GROUP AGGR Book b BY id(b);
 
 CLASS Order 'Заказ';

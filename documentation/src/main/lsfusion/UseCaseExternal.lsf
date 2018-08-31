@@ -4,13 +4,13 @@ NAMESPACE Location;
 
 //#sample1
 CLASS Country 'Страна';
-id 'Код' = DATA VARSTRING[20] (Country) IN recognize;
-name 'Имя' = DATA VARISTRING[100] (Country) IN recognize;
+id 'Код' = DATA VARSTRING[20] (Country) IN id;
+name 'Имя' = DATA VARISTRING[100] (Country) IN id;
 
 country (VARSTRING[20] id) = GROUP AGGR Country c BY id(c);
 
 CLASS City 'Город';
-name 'Имя' = DATA VARISTRING[100] (City) IN recognize;
+name 'Имя' = DATA VARISTRING[100] (City) IN id;
 
 country 'Страна' = DATA Country (City);
 nameCountry 'Страна' (City c) = name(country(c));
@@ -71,8 +71,8 @@ createCity (FILE f)  {
 
 //#sample3
 CLASS Book 'Книга';
-id 'Код' = DATA VARSTRING[10] (Book) IN recognize;
-name 'Наименование' = DATA VARISTRING[100] (Book) IN recognize;
+id 'Код' = DATA VARSTRING[10] (Book) IN id;
+name 'Наименование' = DATA VARISTRING[100] (Book) IN id;
 
 book (VARSTRING[10] id) = GROUP AGGR Book b BY id(b); 
   

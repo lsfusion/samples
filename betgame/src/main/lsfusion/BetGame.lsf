@@ -3,7 +3,7 @@ MODULE WorldCup2014;
 REQUIRE Authentication, Time;
 
 CLASS Team 'Команда';
-name 'Название' = DATA VARISTRING[50] (Team) IN recognize;
+name 'Название' = DATA VARISTRING[50] (Team) IN id;
 
 FORM team 'Команда'
     OBJECTS t = Team PANEL
@@ -21,16 +21,16 @@ FORM teams 'Команды'
 ;
 
 CLASS Match 'Матч';
-dateTime 'Начало матча' = DATA DATETIME (Match) NONULL IN recognize;
+dateTime 'Начало матча' = DATA DATETIME (Match) NONULL IN id;
 started (Match m) = dateTime(m) < currentDateTime();
 
 CONSTRAINT CHANGED(dateTime(Match m)) AND PREV(dateTime(m)) AND NOT DROPPED(m IS Match) MESSAGE 'Запрещено изменять время начала матча';
 
 homeTeam 'Хозяева' = DATA Team (Match) NONULL;
-nameHomeTeam 'Хозяева' (Match m) = name(homeTeam(m)) IN recognize; 
+nameHomeTeam 'Хозяева' (Match m) = name(homeTeam(m)) IN id; 
 
 awayTeam 'Гости' = DATA Team (Match) NONULL;
-nameAwayTeam 'Гости' (Match m) = name(awayTeam(m)) IN recognize; 
+nameAwayTeam 'Гости' (Match m) = name(awayTeam(m)) IN id; 
 
 homeScore 'Результат (хозяева)' = DATA INTEGER (Match);
 awayScore 'Результат (гости)' = DATA INTEGER (Match);

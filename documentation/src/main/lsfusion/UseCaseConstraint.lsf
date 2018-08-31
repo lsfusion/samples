@@ -4,7 +4,7 @@ REQUIRE Time;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book) IN recognize;
+name 'Наименование' = DATA VARISTRING[50] (Book) IN id;
 price 'Цена' = DATA NUMERIC[14,2] (Book);
 //#sample1 end
 
@@ -20,9 +20,9 @@ CONSTRAINT SET(price(Book b) > 100)
 
 //#sample2
 CLASS Order 'Заказ';
-date 'Дата' = DATA DATE (Order) IN recognize;
-number 'Номер' = DATA INTEGER (Order) IN recognize;
-posted 'Проведен' = DATA BOOLEAN (Order) IN recognize; 
+date 'Дата' = DATA DATE (Order) IN id;
+number 'Номер' = DATA INTEGER (Order) IN id;
+posted 'Проведен' = DATA BOOLEAN (Order) IN id; 
 //#sample2 end
 
 //#solution2
@@ -40,7 +40,7 @@ CLASS OrderDetail 'Строка заказа';
 order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
   
 book 'Книга' = DATA Book (OrderDetail) NONULL;
-nameBook 'Книга' (OrderDetail d) = name(book(d)) IN recognize;
+nameBook 'Книга' (OrderDetail d) = name(book(d)) IN id;
 
 price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
 //#sample4 end

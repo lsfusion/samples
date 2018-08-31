@@ -20,7 +20,7 @@ FORM types 'Список типов'
 
 //#sample2
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[30] (Book) IN recognize;
+name 'Наименование' = DATA VARISTRING[30] (Book) IN id;
 //#sample2 end
 
 //#solution2

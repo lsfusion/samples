@@ -4,10 +4,10 @@ REQUIRE Utils;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book) IN recognize;
+name 'Наименование' = DATA VARISTRING[50] (Book) IN id;
 
 CLASS Customer 'Покупатель';
-name 'Наименование' = DATA VARISTRING[50] (Customer) IN recognize;
+name 'Наименование' = DATA VARISTRING[50] (Customer) IN id;
 
 price 'Цена' = DATA NUMERIC[14,2] (Book, Customer);
 //#sample1 end

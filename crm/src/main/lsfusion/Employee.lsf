@@ -42,7 +42,7 @@ currentEmployee = currentUser() AS Employee;
 CLASS Practice 'Практика';
 TABLE practice (Practice);
 
-name 'Наименование' = DATA VARSTRING[50] (Practice) IN recognize CHARWIDTH 15;
+name 'Наименование' = DATA VARSTRING[50] (Practice) IN id CHARWIDTH 15;
 
 FORM practice 'Практика'
     OBJECTS p = Practice PANEL

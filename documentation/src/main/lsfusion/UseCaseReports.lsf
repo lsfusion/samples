@@ -4,13 +4,13 @@ MODULE UseCaseReports;
 NAMESPACE Sample;
 
 CLASS Category 'Категория';
-name 'Наименование' = DATA VARISTRING[50] (Category) IN recognize;
+name 'Наименование' = DATA VARISTRING[50] (Category) IN id;
 
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[100] (Book) IN recognize;
+name 'Наименование' = DATA VARISTRING[100] (Book) IN id;
 
 category 'Категория' = DATA Category (Book) AUTOSET;
-nameCategory 'Категория' (Book b) = name(category(b)) IN recognize;
+nameCategory 'Категория' (Book b) = name(category(b)) IN id;
 
 countBooks 'Кол-во книг' (Category c) = GROUP SUM 1 BY category(Book b);
 
@@ -95,7 +95,7 @@ EXTEND FORM invoices
 
 //#sample3
 CLASS Customer 'Покупатель';
-name 'Наименование' = DATA VARISTRING[50] (Customer) IN recognize;
+name 'Наименование' = DATA VARISTRING[50] (Customer) IN id;
 
 FORM customers 'Покупатели'
     OBJECTS c = Customer

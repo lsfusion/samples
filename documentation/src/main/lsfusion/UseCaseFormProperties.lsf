@@ -2,10 +2,10 @@ MODULE UseCaseFormProperties;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book) IN recognize;
-genre 'Жанр' = DATA VARISTRING[30] (Book) IN recognize;
+name 'Наименование' = DATA VARISTRING[50] (Book) IN id;
+genre 'Жанр' = DATA VARISTRING[30] (Book) IN id;
 
-price 'Цена' = DATA NUMERIC[12,2] (Book) IN recognize;
+price 'Цена' = DATA NUMERIC[12,2] (Book) IN id;
 
 FORM books 'Книги'
     OBJECTS b = Book

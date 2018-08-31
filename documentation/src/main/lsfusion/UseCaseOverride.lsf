@@ -2,10 +2,10 @@ MODULE UseCaseOverride;
 
 //#block1
 CLASS Category 'Категория';
-name 'Наименование' = DATA VARISTRING[50] (Category) IN recognize;
+name 'Наименование' = DATA VARISTRING[50] (Category) IN id;
 
 parent 'Родитель' = DATA Category (Category) AUTOSET;
-nameParent 'Родитель' (Category c) = name(parent(c)) IN recognize;
+nameParent 'Родитель' (Category c) = name(parent(c)) IN id;
 
 markup 'Надбавка' = DATA NUMERIC[8,2] (Category);
 //#block1 end
@@ -33,10 +33,10 @@ overMarkup 'Надбавка перегруженная' (Category category) = m
 
 //#block6
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[100] (Book) IN recognize;
+name 'Наименование' = DATA VARISTRING[100] (Book) IN id;
 
 category 'Категория' = DATA Category (Book) AUTOSET;
-nameCategory 'Категория' (Book b) = name(category(b)) IN recognize; 
+nameCategory 'Категория' (Book b) = name(category(b)) IN id; 
 //#block6 end
 
 //#block7
