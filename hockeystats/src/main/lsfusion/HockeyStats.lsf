@@ -80,7 +80,7 @@ gamesPlayed 'И' (Team team) = hostGamesPlayed(team) (+) guestGamesPlayed(team);
 //#gamesplayed end
 
 //#gameswon
-gamesWonBy(Team team, GameResult type) = OVERRIDE [=GROUP SUM 1 BY winner(Game game), result(game)](team, type), 0;
+gamesWonBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY winner(Game game), result(game)](team, type), 0;
 
 gamesWon 'В' (Team team) = gamesWonBy(team, GameResult.win);
 gamesWonOT 'ВО' (Team team) = gamesWonBy(team, GameResult.winOT);
@@ -88,7 +88,7 @@ gamesWonSO 'ВБ' (Team team) = gamesWonBy(team, GameResult.winSO);
 //#gameswon end
 
 //#gameslost
-gamesLostBy(Team team, GameResult type) = OVERRIDE [=GROUP SUM 1 BY looser(Game game), result(game)](team, type), 0;
+gamesLostBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY looser(Game game), result(game)](team, type), 0;
 
 gamesLost 'П' (Team team) = gamesLostBy(team, GameResult.win);
 gamesLostOT 'ПО' (Team team) = gamesLostBy(team, GameResult.winOT);

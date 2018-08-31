@@ -28,7 +28,7 @@ EXTEND FORM books
 //#solution1 end
 
 //#solution2
-index 'Порядок' (Book b) = PARTITION SUM 1 IF filtered(b) ORDER [= ORDER books.b](b); 
+index 'Порядок' (Book b) = PARTITION SUM 1 IF filtered(b) ORDER [ ORDER books.b](b); 
 
 EXTEND FORM books
     PROPERTIES(b) index

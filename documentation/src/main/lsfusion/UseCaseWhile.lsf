@@ -44,7 +44,7 @@ distributeDiscount 'Распределить скидку' (Order o, NUMERIC[14,
     leftSum(OrderDetail d) <- sum(d) WHERE order(d) == o;
     
     WHILE discount() > 0 DO {
-        FOR OrderDetail d == [= GROUP LAST OrderDetail od ORDER leftSum(od), od BY order(od)](o) DO { // находим строку с наибольшей "оставшейся" суммой
+        FOR OrderDetail d == [ GROUP LAST OrderDetail od ORDER leftSum(od), od BY order(od)](o) DO { // находим строку с наибольшей "оставшейся" суммой
             discountSum(d) <- MIN leftSum(d), discount();
             discount() <- discount() (-) discountSum(d); 
         }
@@ -69,13 +69,13 @@ calculateIntegral (DATE dFrom, DATE dTo)  {
     date() <- dFrom;
     
     LOCAL balance = NUMERIC[14,2] (Book);
-    balance(Book b) <- [= GROUP SUM quantity(Ledger l) IF date(l) < dFrom BY book(l)](b); 
+    balance(Book b) <- [ GROUP SUM quantity(Ledger l) IF date(l) < dFrom BY book(l)](b); 
     
     LOCAL cumBalance = NUMERIC[14,2] (Book);
 
     WHILE date() <= dTo DO {
         cumBalance(Book b) <- cumBalance(b) (+) balance(b); //
-        balance(Book b) <- balance(b) (+) [= GROUP SUM quantity(Ledger l) BY book(l), date(l)](date());
+        balance(Book b) <- balance(b) (+) [ GROUP SUM quantity(Ledger l) BY book(l), date(l)](date());
         date() <- sum(date(), 1);
     }
     

@@ -523,7 +523,7 @@ testFile  {
 
 FORM customers
     OBJECTS c = VARSTRING[100]
-    FILTERS [=GROUP SUM 1 BY customer(Order o)](c)
+    FILTERS [GROUP SUM 1 BY customer(Order o)](c)
 ;
 
 //#request

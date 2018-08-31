@@ -14,7 +14,7 @@ nameBook 'Книга' (OrderDetail d) = name(book(d));
 
 //#solution1
 delete (Book b)  { 
-    IF NOT [= GROUP SUM 1 BY book(OrderDetail d)](b) THEN
+    IF NOT [ GROUP SUM 1 BY book(OrderDetail d)](b) THEN
         DELETE b;
     ELSE
         MESSAGE 'Запрещено удалять книгу, так как по ней есть заказ';

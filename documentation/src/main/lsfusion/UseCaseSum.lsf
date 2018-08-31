@@ -47,7 +47,7 @@ date 'Дата' = DATA DATE (Ledger) INDEXED; // лучше добавлять �
 balance1 'Остаток на дату' (Book b, Stock s, DATE d) = GROUP SUM (IF out(Ledger l) THEN -quantity(l) ELSE quantity(l)) IF date(l) < d BY book(l), stock(l);
   
 // Вариант 2
-balance2 'Остаток на дату' (Book b, Stock s, DATE d) = currentBalance(b, s) (-) [= GROUP SUM (IF out(Ledger l) THEN -quantity(l) ELSE quantity(l)) IF date(l) >= d BY book(l), stock(l)](b, s);
+balance2 'Остаток на дату' (Book b, Stock s, DATE d) = currentBalance(b, s) (-) [ GROUP SUM (IF out(Ledger l) THEN -quantity(l) ELSE quantity(l)) IF date(l) >= d BY book(l), stock(l)](b, s);
 //#solution4 end
 
 //#solution5

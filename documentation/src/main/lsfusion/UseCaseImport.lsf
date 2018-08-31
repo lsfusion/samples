@@ -121,7 +121,7 @@ importBooks 'Импортировать книги' ()  {
     }
     
     // удаляем книги
-    DELETE Book b WHERE b IS Book AND NOT [= GROUP SUM 1 BY id(INTEGER i)](id(b));
+    DELETE Book b WHERE b IS Book AND NOT [ GROUP SUM 1 BY id(INTEGER i)](id(b));
 }
 //#solution3 end
 

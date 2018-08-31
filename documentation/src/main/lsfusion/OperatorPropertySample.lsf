@@ -163,7 +163,7 @@ c(a, b) = f(g(a, b), h(b, 3), a);
 
 count = DATA STRING[255] (INTEGER);
 name = DATA STRING[255] (INTEGER);
-formatted(INTEGER a, INTEGER b) = [=FORMULA STRING[255] ' CAST($1 AS TEXT) || \' / \' || CAST($2 AS TEXT)'](count(a), name(b));
+formatted(INTEGER a, INTEGER b) = [FORMULA STRING[255] ' CAST($1 AS TEXT) || \' / \' || CAST($2 AS TEXT)'](count(a), name(b));
 //#join1 end   
 
 //#join2
@@ -173,7 +173,7 @@ cathetus2 = DATA DOUBLE(Triangle);
 
 hypotenuseSq(triangle) = cathetus1(triangle)*cathetus1(triangle) + cathetus2(triangle)*cathetus2(triangle);
   
-hypotenuseSq2(triangle) = [= x*x + y*y](cathetus1(triangle), cathetus2(triangle)); // аналогичное свойство, заданное с помощью композиции
+hypotenuseSq2(triangle) = [ x*x + y*y](cathetus1(triangle), cathetus2(triangle)); // аналогичное свойство, заданное с помощью композиции
 //#join2 end
 
 //#max
@@ -309,12 +309,12 @@ name = DATA VARSTRING[100] (Store);
 FORM stores
     OBJECTS s = Store
 ;
-countF 'Кол-во фильтр. складов' = GROUP SUM 1 IF [= VIEW stores.s](Store s);
-orderF 'Порядок в группе объектов' (Store s) = PARTITION SUM 1 IF [= FILTER stores.s](s) ORDER [= ORDER stores.s](s), s;
+countF 'Кол-во фильтр. складов' = GROUP SUM 1 IF [ VIEW stores.s](Store s);
+orderF 'Порядок в группе объектов' (Store s) = PARTITION SUM 1 IF [ FILTER stores.s](s) ORDER [ ORDER stores.s](s), s;
 setNameX 'Добавить X к имени'()  { 
     LOCAL k = INTEGER ();
     k() <- 0;
-    FOR [= FILTER stores.s](Store s) ORDER [= ORDER stores.s](s) DO {
+    FOR [ FILTER stores.s](Store s) ORDER [ ORDER stores.s](s) DO {
         k() <- k() + 1;
         name(s) <- 'X' + k() + name(s);
     }

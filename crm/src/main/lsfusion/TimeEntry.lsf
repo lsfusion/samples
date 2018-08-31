@@ -36,7 +36,7 @@ dateTimeStart 'Дата начала' (Task t) = GROUP LAST dateTimeStart(TimeEn
 dateTimeFinish 'Дата завершения' (Task t) = GROUP LAST dateTimeFinish(TimeEntry e) ORDER dateTimeStart(e), e WHERE dateTimeStart(e) BY task(e);
 dateFinish 'Дата завершения' (Task t) = DATE(dateTimeFinish(t));
 
-secondsDiffDateTime (DATETIME dateFrom, DATETIME dateTo) = [= FORMULA INTEGER PG 'SELECT EXTRACT (epoch FROM (($1) - ($2)))'](dateFrom AS DATETIME, dateTo AS DATETIME);
+secondsDiffDateTime (DATETIME dateFrom, DATETIME dateTo) = [ FORMULA INTEGER PG 'SELECT EXTRACT (epoch FROM (($1) - ($2)))'](dateFrom AS DATETIME, dateTo AS DATETIME);
 hoursDiffDateTime (DATETIME dateFrom, DATETIME dateTo) = NUMERIC[5,1](secondsDiffDateTime(dateFrom, dateTo) / 3600.0); 
 
 calcHours (TimeEntry e) = hoursDiffDateTime(dateTimeFinish(e), dateTimeStart(e));
@@ -199,7 +199,7 @@ prevCalcHours (TimeEntry e) = hoursDiffDateTime(dateTimeFinish(e), dateTimeStart
 //            userHours(e) <- prevCalcHours(e) WHERE NOT userHours(e);
 //            project(t) <- project(e);
 //            employee(t) <- employee(e);
-//            taskType(t) <- [= GROUP BY name(TaskType tt) MAX tt](nameActivity(e));
+//            taskType(t) <- [ GROUP BY name(TaskType tt) MAX tt](nameActivity(e));
 //            completed(t) <- TRUE IF dateTimeFinish(e);
 //            
 //            task(e) <- t;

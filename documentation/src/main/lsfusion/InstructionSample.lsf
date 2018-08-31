@@ -106,7 +106,7 @@ a = DATA A(X);
 b = DATA B(X);
 is (X x) = x IS X;
 
-f(a,b) => [= GROUP AGGR X x WHERE x IS X BY a(x), b(x)](a,b) RESOLVE LEFT;
+f(a,b) => [ GROUP AGGR X x WHERE x IS X BY a(x), b(x)](a,b) RESOLVE LEFT;
 is(X x) => f(a(x), b(x)) RESOLVE RIGHT;
 //#means end
 

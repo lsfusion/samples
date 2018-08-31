@@ -82,12 +82,12 @@ toDateDDMMYY = FORMULA VARSTRING[8] 'to_char(($1),\'DD.MM.YY\')';
 
 
 formatPrice = FORMULA 'ltrim(to_char($1, \'999 999 999\'))';
-formatHours (NUMERIC[5,1] h)= replace([= FORMULA 'ltrim(to_char($1, \'990.9\'))'](h), '.', ',');
-formatHours (NUMERIC[5,1] h, NUMERIC[5,1] p)= replace([= FORMULA 'ltrim(to_char($1, \'990.9\'))'](h) + 
-                                                               IF h != p THEN ' (' + [= FORMULA 'ltrim(to_char($1, \'990.9\'))'](p) + ')' ELSE '',
+formatHours (NUMERIC[5,1] h)= replace([ FORMULA 'ltrim(to_char($1, \'990.9\'))'](h), '.', ',');
+formatHours (NUMERIC[5,1] h, NUMERIC[5,1] p)= replace([ FORMULA 'ltrim(to_char($1, \'990.9\'))'](h) + 
+                                                               IF h != p THEN ' (' + [ FORMULA 'ltrim(to_char($1, \'990.9\'))'](p) + ')' ELSE '',
                                                                '.', ',');
 
-rowText (Invoice i, Task t) = TEXT([= FORMULA VARSTRING[8] 'to_char(($1),\'DD.MM\')'](fromDate(i, t)) + 'lsFusionCSep' + 
+rowText (Invoice i, Task t) = TEXT([ FORMULA VARSTRING[8] 'to_char(($1),\'DD.MM\')'](fromDate(i, t)) + 'lsFusionCSep' + 
                                                (OVERRIDE codeEmployee(t),nameEmployee(t)) + 'lsFusionCSep' +
                                                (CONCAT '\n', nameTaskType(t), name(t), description(t)) + 'lsFusionCSep' +
                                                TEXT(formatHours(NUMERIC[5,1](hours(i, t)), NUMERIC[5,1](hoursPay(i, t)))) + 'lsFusionCSep' +

@@ -192,7 +192,7 @@ sessionObj() = DATA LOCAL Object ();
 
 // Join property
 // Expression syntax:
-// [JOIN] (name | '[=' propertyDefinition ']') (param1, ..., paramN)
+// [JOIN] (name | '[' propertyDefinition ']') (param1, ..., paramN)
 storeName 'Склад' (Document document) = JOIN name(store(document)) IN base;
 storeSizeName = staticCaption(storeSize(Store store)) IN base; // можем не указывать именованные параметры слева от '=', но все равно пользоваться ими
 
@@ -514,7 +514,7 @@ foo(store, article) = 5 * incomeQuantity(store, article);
 foo2(Store store, Article article) = - outcomeQuantity(store, article) + 5 * incomeQuantity(store, article);
 bar = incomeQuantity(Store store, Article article) * 5 - 3 - 4 + outcomeQuantity(store, article);
 bar2(store, article) = 3.5 * incomeQuantity(store, article) - (5 + outcomeQuantity(store, article));
-foobar(Store store, Article article) = [= x*x + y](foo(store, article), bar(store, article));   // lambda-like syntax
+foobar(Store store, Article article) = [ x*x + y](foo(store, article), bar(store, article));   // lambda-like syntax
 baz(Store store, Article article) = bar(store, article) > bar2(store, article) IN base;
 baz2 = foo(Store s, Article a) >= 15 == foo2(s, a) >= 15;
 
@@ -1062,17 +1062,17 @@ FORM TestSeek 'Тест SEEK'
     PROPERTIES VALUE(s), name(s), VALUE(a), name(a), incomeQuantity(s, a), storeSizeName(s)   
 ;
 
-countF 'Кол-во фильтр. складов' = GROUP SUM 1 IF [= VIEW storeArticle.s](Store s);
-orderF 'Порядок в группе объектов' (Store s) = PARTITION SUM 1 IF [= FILTER storeArticle.s](s) ORDER [= ORDER storeArticle.s](s), s;
+countF 'Кол-во фильтр. складов' = GROUP SUM 1 IF [ VIEW storeArticle.s](Store s);
+orderF 'Порядок в группе объектов' (Store s) = PARTITION SUM 1 IF [ FILTER storeArticle.s](s) ORDER [ ORDER storeArticle.s](s), s;
 setNameX 'Добавить X к имени'()  { 
     LOCAL k = INTEGER ();
     k() <- 0;
-    FOR [= FILTER storeArticle.s](Store s) ORDER [= ORDER storeArticle.s](s) DO {
+    FOR [ FILTER storeArticle.s](Store s) ORDER [ ORDER storeArticle.s](s) DO {
         k() <- k() + 1;
         name(s) <- 'X' + k() + name(s);
     }
 }
-//WHEN LOCAL CHANGED([= VIEW storeArticle.s](s)) DO {
+//WHEN LOCAL CHANGED([ VIEW storeArticle.s](s)) DO {
 //    name(s) <- 'U' + name(s);
 //}
 
@@ -1166,7 +1166,7 @@ DESIGN storeArticle {
     NEW newCont; 
 }
 
-//fs(s) += [= FILTER storeArticle.s](s);
+//fs(s) += [ FILTER storeArticle.s](s);
 
 DESIGN storeArticle {
     captionFont = 'bold 32';
