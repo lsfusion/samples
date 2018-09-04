@@ -1,0 +1,11 @@
+MODULE ResolveC;
+
+REQUIRE ResolveB, ResolveA;
+
+NAMESPACE ResolveA;
+
+x(B b) = f(b); // найдет объявление в ResolveA - ResolveA.f[A]
+y(B b) = ResolveB.f(b); // найдет объявление в ResolveA - ResolveB.f[B]
+
+@defineSmth(A, B); // найдет объявление в ResolveA - ResolveA.defineSmth(prm1, prm2)
+

@@ -1,0 +1,16 @@
+MODULE ResolveA;
+
+CLASS A;
+CLASS B : A;
+CLASS C : B;
+
+f = DATA INTEGER (A);
+f = DATA INTEGER (C);
+
+META defineSmth(prm1)
+    x = DATA INTEGER (prm1);
+END
+
+META defineSmth(prm1, prm2)
+    x = DATA INTEGER (prm1, prm2);    
+END
