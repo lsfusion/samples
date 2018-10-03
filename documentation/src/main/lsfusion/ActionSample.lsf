@@ -457,9 +457,6 @@ import()  {
         IMPORT XML LIST ATTR FROM f TO headField1, headField2;        
  
     INPUT f = FILE DO  
-        IMPORT MDB FROM f TO field1 = 'MDBField1', field2 = 'MDBField2';
-
-    INPUT f = FILE DO  
         INPUT memo = FILE DO  
             IMPORT DBF MEMO memo FROM f TO field1 = 'DBFField1', field2 = 'DBFField2';
 }
