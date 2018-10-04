@@ -1,7 +1,5 @@
 MODULE UseCaseExternal;
 
-REQUIRE Utils;
-
 NAMESPACE Location;
 
 //#sample1
@@ -200,7 +198,6 @@ FORM importOrderNew
 importOrderNew (FILE f)  { 
     importFile() <- f;
     
-    fileToString(importFile(), 'UTF-8');
     IMPORT importOrderNew JSON;
     
     NEW o = Order {
