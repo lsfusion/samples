@@ -134,30 +134,27 @@ EXTEND FORM orders
 //#solution3 end
 
 //#solution4
-date = DATA LOCAL DATE(INTEGER);
-number = DATA LOCAL VARSTRING[10](INTEGER);
+date = DATA LOCAL DATE();
+number = DATA LOCAL VARSTRING[10]();
 
-order = DATA LOCAL INTEGER (INTEGER);
 id = DATA LOCAL VARSTRING[10] (INTEGER);
 quantity = DATA LOCAL INTEGER (INTEGER);
 price = DATA LOCAL NUMERIC[14,2] (INTEGER);
 FORM importOrder
-    OBJECTS order = INTEGER
-    PROPERTIES dt = date(order), nm = number(order)
+    PROPERTIES dt = date(), nm = number()
     
     OBJECTS detail = INTEGER
     PROPERTIES id = id(detail), qn = quantity(detail), pr = price(detail)
-    FILTERS order(detail) = order
 ;
 
 importOrder (FILE f)  { 
     importFile() <- f;
     IMPORT importOrder JSON;
     
-    FOR date(INTEGER order) DO NEW o = Order {
-        date(o) <- date(order);
-        number(o) <- number(order);
-        FOR order(INTEGER detail) = order DO NEW d = OrderDetail {
+    NEW o = Order {
+        date(o) <- date();
+        number(o) <- number();
+        FOR id(INTEGER detail) DO NEW d = OrderDetail {
             order(d) <- o;
             book(d) <- book(id(detail)); 
             quantity(d) <- quantity(detail); 
