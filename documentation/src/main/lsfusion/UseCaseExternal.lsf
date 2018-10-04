@@ -1,5 +1,7 @@
 MODULE UseCaseExternal;
 
+REQUIRE Utils;
+
 NAMESPACE Location;
 
 //#sample1
@@ -163,3 +165,53 @@ importOrder (FILE f)  {
     }
 }
 //#solution4 end
+
+//#solution5
+GROUP order;
+FORM exportOrderNew
+    OBJECTS o = Order PANEL
+    PROPERTIES IN order dt = date(o), nm = number(o)
+    
+    OBJECTS detail = OrderDetail IN order
+    PROPERTIES id = id(book(detail)), qn = quantity(detail), pr = price(detail)
+    FILTERS order(detail) == o
+;
+
+exportOrderNew 'Отправить (новый)' (Order o)  { 
+    EXPORT exportOrderNew OBJECTS o = o JSON;
+
+    LOCAL result = FILE();
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=Location.importOrderNew' PARAMS exportFile() TO result;
+}
+
+EXTEND FORM orders
+    PROPERTIES(i) exportOrderNew;
+;
+//#solution5 end
+
+//#solution6
+FORM importOrderNew
+    PROPERTIES IN order dt = date(), nm = number()
+    
+    OBJECTS detail = INTEGER IN order
+    PROPERTIES id = id(detail), qn = quantity(detail), pr = price(detail)
+;
+
+importOrderNew (FILE f)  { 
+    importFile() <- f;
+    
+    fileToString(importFile(), 'UTF-8');
+    IMPORT importOrderNew JSON;
+    
+    NEW o = Order {
+        date(o) <- date();
+        number(o) <- number();
+        FOR id(INTEGER detail) DO NEW d = OrderDetail {
+            order(d) <- o;
+            book(d) <- book(id(detail)); 
+            quantity(d) <- quantity(detail); 
+            price(d) <- price(detail); 
+        }
+    }
+}
+//#solution6 end
