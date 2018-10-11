@@ -13,9 +13,15 @@ nameCountry 'Страна' (Region r)= name(country(r)) IN id;
 CLASS City 'Город';
 name 'Имя' = DATA VARISTRING[100] (City);
 
+country 'Страна' = DATA Country (City) NONULL DELETE;
+nameCountry (City c) = name(country(c));
+
+region 'Регион' = DATA Region (City);
+nameRegion (City c) = name(region(c));
+
 FORM cities 'Города'
     OBJECTS c = City
-    PROPERTIES(c) name, NEW, DELETE
+    PROPERTIES(c) name, nameCountry, nameRegion, NEW, DELETE
 ; 
 
 NAVIGATOR {
@@ -24,17 +30,7 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1
-country 'Страна' = DATA Country (City) NONULL DELETE;
-nameCountry (City c) = name(country(c));
-
-region 'Регион' = DATA Region (City);
-nameRegion (City c) = name(region(c));
-
 CONSTRAINT country(City c) != country(region(c)) CHECKED BY region[City] MESSAGE 'Страна региона города должна совпадать со страной города';
-
-EXTEND FORM cities
-    PROPERTIES(c) nameCountry, nameRegion
-;
 //#solution1 end
 
 //#solution2
