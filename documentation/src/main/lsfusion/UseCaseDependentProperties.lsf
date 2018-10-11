@@ -1,0 +1,54 @@
+MODULE UseCaseDependentProperties;
+
+//#sample1
+CLASS Country 'Страна';
+name 'Имя' = DATA VARISTRING[100] (Country) IN id;
+
+CLASS Region 'Регион';
+name 'Имя' = DATA VARISTRING[100] (Region) IN id;
+
+country 'Страна' = DATA Country (Region) NONULL DELETE;
+nameCountry 'Страна' (Region r)= name(country(r)) IN id;
+
+CLASS City 'Город';
+name 'Имя' = DATA VARISTRING[100] (City);
+
+FORM cities 'Города'
+    OBJECTS c = City
+    PROPERTIES(c) name, NEW, DELETE
+; 
+
+NAVIGATOR {
+    NEW cities;
+}
+//#sample1 end
+
+//#solution1
+country 'Страна' = DATA Country (City) NONULL DELETE;
+nameCountry (City c) = name(country(c));
+
+region 'Регион' = DATA Region (City);
+nameRegion (City c) = name(region(c));
+
+CONSTRAINT country(City c) != country(region(c)) CHECKED BY region[City] MESSAGE 'Страна региона города должна совпадать со страной города';
+
+EXTEND FORM cities
+    PROPERTIES(c) nameCountry, nameRegion
+;
+//#solution1 end
+
+//#solution2
+WHEN LOCAL CHANGED(region(City c)) AND NOT CHANGED(country(c)) DO {
+    country(c) <- country(region(c));
+}
+//#solution2 end
+
+//#solution3
+CONSTRAINT region(City c) AND NOT country(c) = country(region(c)) CHECKED BY region[City] MESSAGE 'Страна региона города должна совпадать со страной города';
+//#solution3 end
+
+//#solution4
+WHEN LOCAL CHANGED(country(City c)) AND country(c) != country(region(c)) DO {
+    region(c) <- NULL;
+}
+//#solution4 end
