@@ -48,3 +48,13 @@ WHEN LOCAL CHANGED(country(City c)) AND country(c) != country(region(c)) DO {
     region(c) <- NULL;
 }
 //#solution4 end
+
+//#solution5
+// 1 вариант
+WHEN SETCHANGED(country(region(City c))) DO
+    country(c) <- country(region(c));
+    
+// 2 вариант
+WHEN SETCHANGED(country(Region r)) DO
+    country(City c) <- country(r) WHERE region(c) = r;     
+//#solution5 end
