@@ -75,7 +75,7 @@ class LSFLexer(RegexLexer):
                     'INDEXED', 'INIT', 'INITFILTER', 'INLINE', 'INTERNAL', 'INPUT', 'IS', 'JAVA', 'JOIN', 'JSON', 'KEYPRESS', 'LAST', 'LEFT', 'LIKE', 'LIMIT',
                     'LIST', 'LOCAL', 'LSF', 'LOGGABLE', 'MANAGESESSION', 'MAX', 'MDB',
                     'MEMO', 'MESSAGE', 'META', 'MIN', 'MODULE', 'MOVE', 'MS', 'MULTI', 'NAGGR', 'NAME', 'NAMESPACE',
-                    'NAVIGATOR', 'NESTED', 'NEW', 'NEWEXECUTOR', 'NEWSESSION', 'NEWSQL', 'NEWTHREAD', 'NO', 'NOCANCEL', 'NOESCAPE', 'NOHEADER', 'NOHINT', 'NONULL',
+                    'NAVIGATOR', 'NESTED', 'NEW', 'NEWEXECUTOR', 'NEWSESSION', 'NEWSQL', 'NEWTHREAD', 'NO', 'NOCANCEL', 'NOESCAPE', 'NOHEADER', 'NOHINT', 'NONULL', 'NODEFAULT', 
                      'NOT', 'NOWAIT', 'NULL', 'NUMERIC', 'OBJECT',
                     'OBJECTS', 'OK', 'ON', 'OPTIMISTICASYNC', 'OR', 'ORDER', 'OVERRIDE', 'PAGESIZE',
                     'PANEL', 'PARENT', 'PARTITION', 'PASSWORD', 'PDF', 'PDFFILE', 'RAWFILE', 'PDFLINK', 'RAWLINK', 'PERIOD', 'MATERIALIZED', 'PG', 'POSITION',
