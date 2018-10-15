@@ -376,7 +376,9 @@ scase = DATA BOOLEAN ();
 caseAM()  { FOR IF scase() THEN TEXT s = '{classes.image}' ELSE s = '{classes.image.link}' DO MESSAGE s; };
 caseAMN  { MESSAGE 'Hello world!' NOWAIT; }
 
-dr(a)  { DRILLDOWN overrideTest(a); }
+dr(a)  { 
+    //DRILLDOWN overrideTest(a); 
+}
 
 FORM TestCase 'Тест CASE'
     OBJECTS a=CaseA, b=CaseB, c=CaseC
