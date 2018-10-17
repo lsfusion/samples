@@ -330,10 +330,7 @@ price = DATA INTEGER (Article);
 testExportFile = DATA FILE ();
 
 externalHTTP()  { 
-    LOCAL headers = TEXT(TEXT);
-    headers(h) <- 'text/xml' WHERE h = 'Content-type'; 
-    headers(h) <- 'inline' WHERE h = 'content-disposition';
-    EXTERNAL HTTP 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile HEADERS headers; 
+    EXTERNAL HTTP 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile; 
     open(exportFile()); 
 }
 externalSQL ()  { 
