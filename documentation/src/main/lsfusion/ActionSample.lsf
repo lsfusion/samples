@@ -813,6 +813,8 @@ singleDo ()  {
         IF lockResult() THEN 
         TRY {
             MESSAGE 'Lock Obtained';
+        } CATCH {
+            MESSAGE messageCaughtException();
         } FINALLY unlock(MyLock.lock);
     }
 }
