@@ -84,7 +84,7 @@ class LSFLexer(RegexLexer):
                     'REPORTFILES', 'REQUEST', 'REQUIRE', 'RESOLVE', 'RETURN', 'RGB', 'RIGHT', 'ROOT',
                     'ROUND', 'RTF', 'SCHEDULE', 'SCROLL', 'SEEK', 'SELECTOR', 'SESSION', 'SET', 'SETCHANGED', 'SETDROPPED', 'SHOW',
                     'SHOWIF', 'SINGLE', 'SHEET', 'SPLITH', 'SPLITV', 'SQL', 'STEP', 'STRETCH', 'STRICT', 'STRUCT', 'SUBJECT',
-                    'SUM', 'TAB', 'TABBED', 'TABLE', 'TEXTHALIGN', 'TEXTVALIGN', 'THEN', 'THREADS', 'TIME', 'TO', 'TODRAW',
+                    'SUM', 'TAB', 'TABBED', 'TABLE', 'TEXTHALIGN', 'TEXTVALIGN', 'THEN', 'THREADS', 'THROW', 'TIME', 'TO', 'TODRAW',
                     'TOOLBAR', 'TOP', 'TRAILING', 'TREE', 'TRUE', 'TRY', 'UNGROUP', 'VALIGN', 'VALUE',
                     'VERTICAL', 'VIEW', 'WHEN', 'WHERE', 'WHILE', 'WINDOW', 'WORDFILE', 'WORDLINK', 'WRITE', 'XLS', 'XLSX', 'XML', 'XOR', 'YES'), prefix=r'\b', suffix=r'\b'),
              Keyword),
