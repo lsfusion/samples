@@ -330,7 +330,7 @@ price = DATA INTEGER (Article);
 testExportFile = DATA FILE ();
 
 externalHTTP()  { 
-    EXTERNAL HTTP 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile; 
+    EXTERNAL HTTP GET 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile; 
     open(exportFile()); 
 }
 externalSQL ()  { 
