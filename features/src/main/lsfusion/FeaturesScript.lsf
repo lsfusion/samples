@@ -139,7 +139,8 @@ storeCaption(StoreSize storeSize) = staticCaption(storeSize) IF storeSize IS Sto
 // Expression syntax:
 // DATA [LOCAL] returnClass ( [paramClass1, ..., paramClassN] )
 // If LOCAL modifier is specified, than local data property will be created.
-// Built-in types: INTEGER, LONG, DOUBLE, BOOLEAN, DATE, DATETIME, TEXT, STRING, ISTRING, TIME, WORDFILE, IMAGEFILE, PDFFILE, FILE, EXCELFILE, NUMERIC, COLOR
+// Built-in types: INTEGER, LONG, DOUBLE, BOOLEAN, DATE, DATETIME, TEXT, STRING, ISTRING, 
+// TIME, WORDFILE, IMAGEFILE, PDFFILE, FILE, EXCELFILE, NUMERIC, COLOR, CSVFILE, HTMLFILE, JSONFILE, XMLFILE
 stime 'Время' (store) = DATA TIME (Store) IN base;
 sdate 'Дата' (store) = DATA DATE (Store) IN base;
 sdatetime 'ДатаВремя' (store) = DATA DATETIME (Store) IN base;
