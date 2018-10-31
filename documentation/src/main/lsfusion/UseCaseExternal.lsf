@@ -34,7 +34,7 @@ postCity 'Отправить' (City c)  {
     
     LOCAL code = VARSTRING[10]();
     LOCAL message = VARSTRING[100]();
-    IMPORT JSON LIST FROM result() TO code, message;
+    IMPORT JSON FROM result() TO() code, message;
     IF NOT code() == '0' THEN {
         MESSAGE 'Ошибка: ' + message();
     }   
@@ -51,7 +51,7 @@ createCity (FILE f)  {
     LOCAL cy = VARSTRING[20] ();
     LOCAL ne = VARSTRING[100] ();
     
-    IMPORT JSON LIST FROM f AS FILE TO cy = countryId, ne = name;
+    IMPORT JSON FROM f AS FILE TO() cy = countryId, ne = name;
     
     IF NOT country(cy()) THEN {
         EXPORT JSON FROM code = '1', message = 'Некорректный код страны';

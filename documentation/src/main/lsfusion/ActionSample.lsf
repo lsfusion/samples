@@ -454,7 +454,7 @@ import()  {
     INPUT f = FILE DO  
         IMPORT XML ROOT 'element' ATTR FROM f TO field1, field2;      
     INPUT f = FILE DO  
-        IMPORT XML LIST ATTR FROM f TO headField1, headField2;        
+        IMPORT XML ATTR FROM f TO() headField1, headField2;        
  
     INPUT f = FILE DO  
         INPUT memo = FILE DO  
