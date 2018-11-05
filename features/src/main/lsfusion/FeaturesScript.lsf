@@ -3039,8 +3039,8 @@ testExportXMLForm  {
 }
 
 testExportDBFForm  { 
-    EXPORT articlesTest DBF;
-    open(exportFiles('a'));
+    EXPORT articlesTest DBF TO a=exportFile;
+    open(exportFile());
 }
     
 FORM TestRequestInput 'Тест RequestInput'
