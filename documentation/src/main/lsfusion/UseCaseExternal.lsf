@@ -148,8 +148,7 @@ FORM importOrder
 ;
 
 importOrder (FILE f)  { 
-    importFile() <- f;
-    IMPORT importOrder JSON;
+    IMPORT importOrder JSON FROM f;
     
     NEW o = Order {
         date(o) <- date();
@@ -196,9 +195,7 @@ FORM importOrderNew
 ;
 
 importOrderNew (FILE f)  { 
-    importFile() <- f;
-    
-    IMPORT importOrderNew JSON;
+    IMPORT importOrderNew JSON FROM f;
     
     NEW o = Order {
         date(o) <- date();

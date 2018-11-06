@@ -479,8 +479,7 @@ FORM import
 
 importForm()  { 
     INPUT f = FILE DO {
-        importFile() <- f;
-        IMPORT import JSON;
+        IMPORT import JSON FROM f;
         SHOW import; // показываем что импортировалось
 
         // создаем объекты в базе        
