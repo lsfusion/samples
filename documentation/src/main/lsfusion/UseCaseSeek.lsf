@@ -47,7 +47,7 @@ createBook 'Создать книгу' (Category c)  {
 }
 
 EXTEND FORM books
-    PROPERTIES(c) createBook TODRAW b TOOLBAR
+    PROPERTIES(c) createBook DRAW b TOOLBAR
 ;
 //#solution1 end
 

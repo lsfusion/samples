@@ -46,7 +46,7 @@ newOrder ()  {
 
 EXTEND FORM orders
     // Вариант 1
-    PROPERTIES() newOrder TODRAW o TOOLBAR
+    PROPERTIES() newOrder DRAW o TOOLBAR
     
     // Вариант 2
     PROPERTIES(o) NEWSESSION NEW
@@ -71,7 +71,7 @@ deleteSelectedOrders 'Удалить отмеченные заказы' ()  {
 }
 
 EXTEND FORM orders
-    PROPERTIES() deleteSelectedOrders TODRAW o TOOLBAR
+    PROPERTIES() deleteSelectedOrders DRAW o TOOLBAR
 ;
 //#solution3 end
 

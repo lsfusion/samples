@@ -37,7 +37,7 @@ FORM timeDashboard 'Отметка времени' AUTOREFRESH 60
     OBJECTS d = Document
     PROPERTIES(d) READONLY name, dateTimeLastVersion, nameAuthorLastVersion
     PROPERTIES(d) openLastVersion TOOLBAR SHOWIF lastVersion(d), loadLastVersionAndApply TOOLBAR
-    PROPERTIES(p) newDocument TOOLBAR TODRAW d
+    PROPERTIES(p) newDocument TOOLBAR DRAW d
     PROPERTIES(d) NEWSESSION EDIT, DELETE
     FILTERS customer(d) == customer(p)
     

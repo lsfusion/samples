@@ -74,5 +74,5 @@ createInvoice 'Выставить счет' (Project p)  {
 
 EXTEND FORM invoiceDashboard
     PROPERTIES(t) in BEFORE namePractice(t)
-    PROPERTIES(p) createInvoice TODRAW t SHOWIF countTimeEntry() TOOLBAR
+    PROPERTIES(p) createInvoice DRAW t SHOWIF countTimeEntry() TOOLBAR
 ;

@@ -23,7 +23,7 @@ filtered 'Книга отфильтрована' (Book b) = FILTER books.b;
 filteredCount 'Кол-во книг' = GROUP SUM 1 IF filtered(Book b);
 
 EXTEND FORM books
-    PROPERTIES() READONLY filteredCount TODRAW b TOOLBAR
+    PROPERTIES() READONLY filteredCount DRAW b TOOLBAR
 ;
 //#solution1 end
 

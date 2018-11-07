@@ -44,7 +44,7 @@ xlsxBooksByCategories 'Книги по категориям (XLSX)' ()  {
 
 //#solution1c
 EXTEND FORM books
-    PROPERTIES() TODRAW b TOOLBAR printBooksByCategories, xlsxBooksByCategories
+    PROPERTIES() DRAW b TOOLBAR printBooksByCategories, xlsxBooksByCategories
 ;
 //#solution1c end
 

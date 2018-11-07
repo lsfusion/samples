@@ -892,7 +892,7 @@ FORM documentArticle 'По документам (caption)'
 // PROPERTIES(param1, ..., paramN) [commonOptions] [alias1=]propName1 [options1], ..., [aliasK=]propNameK [optionsK]
 // Special properties: VALUE, NEW, DELETE
 // Property option:    [READONLY] [CHANGEABLE] [SELECTOR] [HINTNOUPDATE] [HINTTABLE] [COLUMNS (<groupObject list>)] [SHOWIF <mappedProperty>] [BACKGROUND <mappedProperty>]
-//                     [HEADER <mappedProperty>] [FOOTER <mappedProperty>] [READONLYIF <mappedProperty>] [PANEL | GRID] [TODRAW <groupObject>]
+//                     [HEADER <mappedProperty>] [FOOTER <mappedProperty>] [READONLYIF <mappedProperty>] [PANEL | GRID] [DRAW <groupObject>]
 //                     [FOREGROUND <mappedProperty>] [ON (CHANGE | CHANGEWYS | CONTEXTMENU | EDIT) <mappedAction>] [(BEFORE | AFTER) (propertyAlias | <mappedProperty>)] [EVENTID 'id']
 
     PROPERTIES(document) GRID documentTypeString, storeName, date, testPush, testPush2, copy
@@ -1020,7 +1020,7 @@ justSendEmail 'Просто выслать емэйл' (STRING[200] to)  { EMAIL
 
 FORM TestEmailForm 'Тест EMAIL'
     OBJECTS s 'Email:' =VARSTRING[100] PANEL, u=CustomUser
-    PROPERTIES VALUE(s), login(u), email(u), NEW(u), remindPasswordEmail(u, s) TODRAW s, justSendEmail(s)
+    PROPERTIES VALUE(s), login(u), email(u), NEW(u), remindPasswordEmail(u, s) DRAW s, justSendEmail(s)
 ;
 
 testRequestInput 'Тестирование REQUEST input'(Store s)  { 
@@ -1050,7 +1050,7 @@ FORM storeArticle 'По складам'
 
     OBJECTS a=Article
     PROPERTIES sname=name(s), obja=VALUE(a), aname=name(a)
-    PROPERTIES TODRAW s  setDefaultNames(), copyNameToArticles(s), copyStoreNameToArticle(s, a), copyStoreNameToArticleError(s, a), createNewStore(), showDocumentArticleModalForm(), showTestModalForm() TOOLBAR, testRequestInput(s) TOOLBAR
+    PROPERTIES DRAW s  setDefaultNames(), copyNameToArticles(s), copyStoreNameToArticle(s, a), copyStoreNameToArticleError(s, a), createNewStore(), showDocumentArticleModalForm(), showTestModalForm() TOOLBAR, testRequestInput(s) TOOLBAR
 //    PROPERTIES() countF, setNameX
     PROPERTIES(s, a) SHOWIF storeIsHuge(s) incomeQuantity2, outcomeQuantity2, lastQuantity
     PROPERTIES(s) GRID storeSizeName, sss READONLY,  ssc1=storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi=simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData, tstDestruct
@@ -1641,7 +1641,7 @@ DESIGN TestOperators {
 FORM TestLayout 'Тест Layout'
     OBJECTS ss1=Store, ss2=Store, sa=Article, ss3=Store
     PROPERTIES(ss1) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble
-    PROPERTIES(ss2) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, st=stext TODRAW sa
+    PROPERTIES(ss2) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, st=stext DRAW sa
     PROPERTIES(sa) VALUE, name
     PROPERTIES(ss2, sa) incomeQuantity, outcomeQuantity, balanceQuantity
     PROPERTIES(ss2) PANEL si1=simage, st1=stext
@@ -2831,7 +2831,7 @@ testNullRun()  {
 FORM testAdd
     OBJECTS d = IncomeDocument
     PROPERTIES () testInvocation, testNullRun
-    PROPERTIES () addIncomeDocument TODRAW d
+    PROPERTIES () addIncomeDocument DRAW d
     PROPERTIES (d) GRID editCIncomeDocument, testFormNull
     PROPERTIES (d) a=NEWEDIT[CIncomeDocument]
     PROPERTIES (d) VALUE, objectClassName, storeName, NEW NEWSESSION, an = NEW NESTEDSESSION, as = NEWEDIT, EDIT, en = EDIT, es = EDIT, DELETE GRID, ds = DELETE GRID, testDelete GRID, newTestDelete GRID 
