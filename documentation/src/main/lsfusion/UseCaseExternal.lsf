@@ -166,7 +166,7 @@ importOrder (FILE f)  {
 //#solution5
 GROUP order;
 FORM exportOrderNew
-    OBJECTS o = Order PANEL
+    OBJECTS o = Order
     PROPERTIES IN order dt = date(o), nm = number(o)
     
     OBJECTS detail = OrderDetail IN order
