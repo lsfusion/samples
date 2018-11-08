@@ -351,8 +351,8 @@ EXTEND FORM POS // добавляем свойство через расшире
 labelFile = DATA VARSTRING[100] (Item);
 printLabelFile (Item i)= OVERRIDE labelFile(i), 'MyModule_printLabel_i.jrxml' IF i IS Item;
 FORM printLabel 'Печать ценника'
-    OBJECTS i = Item SUBREPORT printLabelFile(i) // добавляем товар, для которого будет печататься ценник
-                                   // помечаем, что в качестве шаблона должен использоваться файл, имя которого лежит в свойстве printLabelFile
+    OBJECTS i = Item               // добавляем товар, для которого будет печататься ценник
+    REPORT printLabelFile(i)       // помечаем, что в качестве шаблона должен использоваться файл, имя которого лежит в свойстве printLabelFile (предполагается что значение i будет передаваться в блоке OBJECTS)
                                    // например, пользователь может ввести туда myLabel1.jrxml, тогда система будет использовать файл, с именем myLabel1.jrxml
 //  ... другие свойства, необходимые для печати
 ;
