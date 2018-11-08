@@ -260,7 +260,7 @@ active = DATA BOOLEAN (Sku);
 onStock = DATA NUMERIC[10,2] (Stock, Sku);
 
 FORM onStock 'Остатки' // создаем форму, в которой можно смотреть остатки по товарам
-    OBJECTS r = Region FIXED PANEL // добавляем объект регион
+    OBJECTS r = Region PANEL // добавляем объект регион
     PROPERTIES name(r) SELECTOR // добавляем свойство имя региона, при нажатии на который пользователь сможет его выбирать
   
     OBJECTS st = Stock // добавляем объект склады
@@ -351,7 +351,7 @@ EXTEND FORM POS // добавляем свойство через расшире
 labelFile = DATA VARSTRING[100] (Item);
 printLabelFile (Item i)= OVERRIDE labelFile(i), 'MyModule_printLabel_i.jrxml' IF i IS Item;
 FORM printLabel 'Печать ценника'
-    OBJECTS i = Item FIXED PANEL // добавляем товар, для которого будет печататься ценник
+    OBJECTS i = Item PANEL // добавляем товар, для которого будет печататься ценник
     REPORTFILES i printLabelFile(i) // помечаем, что в качестве шаблона должен использоваться файл, имя которого лежит в свойстве labelFileItem
                                    // например, пользователь может ввести туда myLabel1.jrxml, тогда система будет использовать файл, по пути /reports/custom/myLabel1.jrxml
 //  ... другие свойства, необходимые для печати
