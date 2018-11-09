@@ -1,0 +1,20 @@
+MODULE GroupHierarchySample;
+
+CLASS A;
+CLASS B;
+CLASS C;
+CLASS D;
+CLASS E;
+
+f = DATA INTEGER (B, C);
+g = DATA INTEGER (A, C);
+c = DATA C (E);
+h = DATA INTEGER (B, D);
+
+//#default
+ 
+FORM myForm 'myForm'
+    OBJECTS A, B, C, D, E
+    PROPERTIES f(B, C), g(A, C)
+    FILTERS c(E) = C, h(B, D) 
+;

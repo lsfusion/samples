@@ -1,11 +1,11 @@
 MODULE FormDesignSample;
 
-//#default
 CLASS myClass 'myClass';
-CLASS myClass2 'myClass2' : myClass;
- 
+
 myProperty1 = DATA STRING[20] (myClass);
 myProperty2 = DATA STRING[20] (myClass);
+
+//#default
  
 FORM myForm 'myForm'
     OBJECTS myObject = myClass
@@ -13,7 +13,3 @@ FORM myForm 'myForm'
     FILTERGROUP myFilter
         FILTER 'myFilter' myProperty1(myObject)
 ;
- 
-NAVIGATOR {
-    NEW myForm;
-}
