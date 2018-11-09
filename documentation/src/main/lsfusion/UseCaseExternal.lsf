@@ -159,6 +159,8 @@ importOrder (FILE f)  {
             quantity(d) <- quantity(detail); 
             price(d) <- price(detail); 
         }
+        
+        APPLY;
     }
 }
 //#solution4 end
@@ -206,6 +208,8 @@ importOrderNew (FILE f)  {
             quantity(d) <- quantity(detail); 
             price(d) <- price(detail); 
         }
+        
+        APPLY;
     }
 }
 //#solution6 end
