@@ -14,7 +14,7 @@ h = DATA INTEGER (B, D);
 //#default
  
 FORM myForm 'myForm'
-    OBJECTS A, B, C, D, E
+    OBJECTS A, B SUBREPORT, C, D, E
     PROPERTIES f(B, C), g(A, C)
     FILTERS c(E) = C, h(B, D) 
 ;
