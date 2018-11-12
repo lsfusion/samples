@@ -213,3 +213,17 @@ importOrderNew (FILE f)  {
     }
 }
 //#solution6 end
+
+//#solution7
+FORM exportOrders
+    OBJECTS date = DATE PANEL
+    
+    OBJECTS order = Order PANEL
+    PROPERTIES nm = number(order)
+    FILTERS date(order) = date
+;
+
+getOrdersByDate (DATE d) {
+    EXPORT exportOrders OBJECTS date = d JSON;
+}
+//#solution7 end
