@@ -218,7 +218,7 @@ importOrderNew (FILE f)  {
 FORM exportOrders
     OBJECTS date = DATE PANEL
     
-    OBJECTS order = Order PANEL
+    OBJECTS order = Order
     PROPERTIES nm = number(order)
     FILTERS date(order) = date
 ;
