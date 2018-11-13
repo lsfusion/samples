@@ -68,12 +68,23 @@ FORM Order
     FILTERS order(Detail) = order
 ;
 
-exportToXml 'Экспорт' (Order o) {
+exportToXML 'Экспорт в XML' (Order o) {
     EXPORT Order OBJECTS order = o XML;
     open(exportFile());
 }
 
 EXTEND FORM orders
-    PROPERTIES(i) exportToXml TOOLBAR
+    PROPERTIES(i) exportToXML TOOLBAR
 ;
 //#solution1 end
+
+//#solution2
+exportToJSON 'Экспорт в JSON' (Order o) {
+    EXPORT Order OBJECTS order = o JSON;
+    open(exportFile());
+}
+
+EXTEND FORM orders
+    PROPERTIES(i) exportToJSON TOOLBAR
+;
+//#solution2 end
