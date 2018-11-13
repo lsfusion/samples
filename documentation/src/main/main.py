@@ -75,7 +75,7 @@ class LSFLexer(RegexLexer):
                     'HTML', 'HTMLFILE', 'HTMLLINK', 'HTTP', 'IF', 'IMAGE', 'IMAGEFILE', 'IMAGELINK', 'IMPORT', 'IMPOSSIBLE', 'IN', 'INDEX',
                     'INDEXED', 'INIT', 'INITFILTER', 'INLINE', 'INTERNAL', 'INPUT', 'IS', 'JAVA', 'JOIN',
                     'JSON', 'JSONFILE', 'JSONLINK', 'KEYPRESS', 'LAST', 'LEFT', 'LIKE', 'LINK', 'LIMIT',
-                    'LIST', 'LOCAL', 'LSF', 'LOGGABLE', 'MANAGESESSION', 'MAX', 'MDB',
+                    'LIST', 'LOCAL', 'LSF', 'LOGGABLE', 'MANAGESESSION', 'MAX',
                     'MEMO', 'MESSAGE', 'META', 'MIN', 'MODULE', 'MOVE', 'MS', 'MULTI', 'NAGGR', 'NAME', 'NAMESPACE',
                     'NAVIGATOR', 'NESTED', 'NEW', 'NEWEXECUTOR', 'NEWSESSION', 'NEWSQL', 'NEWTHREAD', 'NO', 'NOCANCEL', 'NOESCAPE', 'NOHEADER', 'NOHINT', 'NONULL', 'NODEFAULT', 
                      'NOT', 'NOWAIT', 'NULL', 'NUMERIC', 'OBJECT',
