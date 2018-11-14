@@ -38,9 +38,9 @@ FORM order 'Заказ'
 ;
 
 FORM orders 'Заказы'
-    OBJECTS i = Order
-    PROPERTIES(i) READONLY date, number, nameCustomer
-    PROPERTIES(i) NEWSESSION NEW, EDIT, DELETE
+    OBJECTS o = Order
+    PROPERTIES(o) READONLY date, number, nameCustomer
+    PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
 ;
 
 NAVIGATOR {
@@ -74,7 +74,7 @@ exportToXML 'Экспорт в XML' (Order o) {
 }
 
 EXTEND FORM orders
-    PROPERTIES(i) exportToXML TOOLBAR
+    PROPERTIES(o) exportToXML TOOLBAR
 ;
 //#solution1 end
 
@@ -85,6 +85,32 @@ exportToJSON 'Экспорт в JSON' (Order o) {
 }
 
 EXTEND FORM orders
-    PROPERTIES(i) exportToJSON TOOLBAR
+    PROPERTIES(o) exportToJSON TOOLBAR
 ;
 //#solution2 end
+
+//#solution3
+exportToCSV (DATE date) {
+    LOCAL file = FILE();
+    EXPORT CSV FROM number = number(order(OrderDetail d)), 
+                    customer = nameCustomer(order(d)), 
+                    book = nameBook(d), 
+                    quantity(d), 
+                    price(d) 
+           WHERE date(order(d)) = date TO file;
+    WRITE CLIENT DIALOG 'orders' FROM file();
+}
+
+FORM exportParameters 'Параметры'
+    OBJECTS d = DATE PANEL
+    PROPERTIES(d) 'Дата' = VALUE
+;
+exportToCSV 'Экспорт в CSV' () {
+    DIALOG exportParameters OBJECTS d INPUT DO
+        exportToCSV(d);
+}
+
+EXTEND FORM orders
+    PROPERTIES() exportToCSV DRAW o TOOLBAR 
+;
+//#solution3 end
