@@ -1,21 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Информация по клиенту" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="de7acb38-b01f-4696-ab05-ddb5acf9b5a3">
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Информация по клиенту" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="06ed2f8a-ff5b-497a-925f-5a8722df2e57">
 	<style name="DefaultStyle" isDefault="true" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
 		<box>
 			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 		</box>
 		<paragraph leftIndent="2" rightIndent="2"/>
 	</style>
-	<parameter name="c_report" class="net.sf.jasperreports.engine.JasperReport"/>
-	<parameter name="c_source" class="net.sf.jasperreports.engine.JRDataSource"/>
-	<parameter name="c_params" class="java.util.Map"/>
+	<style name="GroupCellStyle3" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<style name="GroupCellStyle2" mode="Opaque" backcolor="#D5D5D5" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<parameter name="o_report" class="net.sf.jasperreports.engine.JasperReport"/>
+	<parameter name="o_source" class="net.sf.jasperreports.engine.JRDataSource"/>
+	<parameter name="o_params" class="java.util.Map"/>
+	<parameter name="i_report" class="net.sf.jasperreports.engine.JasperReport"/>
+	<parameter name="i_source" class="net.sf.jasperreports.engine.JRDataSource"/>
+	<parameter name="i_params" class="java.util.Map"/>
+	<field name="c.object" class="java.lang.Long"/>
+	<field name="name(c)" class="java.lang.String"/>
+	<group name="designGroup">
+		<groupExpression><![CDATA[]]></groupExpression>
+		<groupHeader>
+			<band height="18" splitType="Prevent"/>
+		</groupHeader>
+	</group>
+	<group name="designGroup1153">
+		<groupExpression><![CDATA[String.valueOf($F{c.object})]]></groupExpression>
+		<groupHeader>
+			<band height="46" splitType="Prevent">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="GroupCellStyle2" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="802" height="46" uuid="dacafbf4-9be5-4748-b8e7-c01b1e4d98ab"/>
+					<textElement textAlignment="Center">
+						<font size="20"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Покупатель : " + $F{name(c)}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
 	<detail>
 		<band>
 			<subreport>
-				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="0" height="0" uuid="736d5fa9-2526-48f0-a7e6-3422f91274c5"/>
-				<parametersMapExpression><![CDATA[$P{c_params}]]></parametersMapExpression>
-				<dataSourceExpression><![CDATA[$P{c_source}]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{c_report}]]></subreportExpression>
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="0" height="0" uuid="9a51a576-f72c-4ccc-bb2c-95966743b540"/>
+				<parametersMapExpression><![CDATA[$P{o_params}]]></parametersMapExpression>
+				<dataSourceExpression><![CDATA[$P{o_source}]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{o_report}]]></subreportExpression>
+			</subreport>
+		</band>
+		<band>
+			<subreport>
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="0" height="0" uuid="4d75be9a-a015-4b45-9ac8-bf383332dd2a"/>
+				<parametersMapExpression><![CDATA[$P{i_params}]]></parametersMapExpression>
+				<dataSourceExpression><![CDATA[$P{i_source}]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{i_report}]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

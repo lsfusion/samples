@@ -19,6 +19,10 @@ FORM books 'Книги'
     PROPERTIES(b) READONLY name, nameCategory
     PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
 ; 
+
+NAVIGATOR {
+    NEW books;
+}
 //#sample1 end
 
 //#solution1a
@@ -78,6 +82,10 @@ FORM invoices 'Счета'
     PROPERTIES(i) READONLY date, number
     PROPERTIES(i) NEWSESSION NEW, EDIT, DELETE
 ;
+
+NAVIGATOR {
+    NEW invoices;
+}
 //#sample2 end
 
 //#solution2
@@ -102,6 +110,10 @@ FORM customers 'Покупатели'
     PROPERTIES(c) READONLY name
     PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE
 ;
+
+NAVIGATOR {
+    NEW customers;
+}
 
 customer 'Покупатель' = DATA Customer (Invoice);
 nameCustomer 'Покупатель' (Invoice i) = name(customer(i));
@@ -140,6 +152,10 @@ FORM orders 'Заказы'
     PROPERTIES(i) READONLY date, number, nameCustomer
     PROPERTIES(i) NEWSESSION NEW, EDIT, DELETE
 ;
+
+NAVIGATOR {
+    NEW orders;
+}
 //#sample3 end
 
 //#solution3
@@ -172,10 +188,3 @@ EXTEND FORM customers
     PROPERTIES(c) printInfo TOOLBAR
 ;
 //#solution3 end
-
-NAVIGATOR {
-    NEW books;
-    NEW customers;
-    NEW invoices;
-    NEW orders;
-}
