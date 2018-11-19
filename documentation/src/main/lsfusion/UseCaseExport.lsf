@@ -92,7 +92,7 @@ EXTEND FORM orders
 //#solution3
 exportToCSV (DATE date) {
     LOCAL file = FILE();
-    EXPORT CSV FROM number = number(order(OrderDetail d)), 
+    EXPORT CSV HEADER FROM number = number(order(OrderDetail d)), 
                     customer = nameCustomer(order(d)), 
                     book = nameBook(d), 
                     quantity(d), 
