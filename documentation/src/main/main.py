@@ -67,7 +67,7 @@ class LSFLexer(RegexLexer):
                     'CONTAINERH', 'CONTAINERV', 'CONTEXTMENU', 'CSV', 'CSVFILE', 'CSVLINK', 'CUSTOM',
                     'CYCLES', 'DATA', 'DBF', 'DEFAULT', 'DEFAULTCOMPARE', 'DELAY', 'DELETE',
                     'DESC', 'DESIGN', 'DIALOG', 'DO', 'DOC', 'DOCKED', 'DOCX', 'DRAWROOT', 'DROP', 'DROPCHANGED', 'ECHO', 'EDIT',
-                    'ELSE', 'EMAIL', 'END', 'EQUAL', 'EVAL', 'EVENTID', 'EVENTS', 'EXCELFILE', 'EXCELLINK',
+                    'ELSE', 'EMAIL', 'END', 'ESCAPE', 'EQUAL', 'EVAL', 'EVENTID', 'EVENTS', 'EXCELFILE', 'EXCELLINK',
                     'EXCEPTLAST', 'EXCLUSIVE', 'EXEC', 'EXPORT', 'EXTEND', 'EXTERNAL', 'FALSE', 'FIELDS', 'FILE', 'FILTER', 'FILTERGROUP',
                     'FILTERS', 'FINALLY', 'FIRST', 'FIXED', 'FOLDER', 'FOOTER', 'FOR', 'FORCE', 'FOREGROUND',
                     'FORM', 'FORMS', 'FORMULA', 'FROM', 'FULL', 'GET', 'GOAFTER', 'GRID', 'GROUP', 'GROUPCHANGE', 'HALIGN', 'HEADER',
