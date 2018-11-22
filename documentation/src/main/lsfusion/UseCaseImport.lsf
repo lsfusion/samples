@@ -171,9 +171,9 @@ FORM importOrder
     PROPERTIES(detail) price
     FILTERS order(detail) = order
     
-    OBJECTS info = OrderDetailInfo IN item
-    PROPERTIES(info) size, color, quantity
-    FILTERS detail(info) = detail
+    OBJECTS detailInfo = OrderDetailInfo IN item EXTID 'info'
+    PROPERTIES(detailInfo) size, color, quantity
+    FILTERS detail(detailInfo) = detail
 ;
 
 importOrderFromJSON 'Импорт из JSON' () {
