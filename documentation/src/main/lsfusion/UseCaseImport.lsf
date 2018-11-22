@@ -32,6 +32,16 @@ FORM order 'Заказ'
   
     EDIT Order OBJECT o
 ;
+
+FORM orders 'Заказы'
+    OBJECTS o = Order
+    PROPERTIES(o) READONLY date, number
+    PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+;
+
+NAVIGATOR {
+    NEW orders;
+}
 //#sample1 end
 
 //#solution1
@@ -61,6 +71,8 @@ EXTEND FORM order
 
 //#sample2
 serverDirectory 'Директорий на сервере, из которого импортировать заказы' = DATA VARSTRING[100] ();
+
+EXTEND FORM orders PROPERTIES() serverDirectory;
 //#sample2 end
 
 //#solution2
@@ -99,6 +111,8 @@ importOrders 'Импортировать заказы из директория'
         move('file://' + serverDirectory() + '/' + f, 'file://' + serverDirectory() + '/' + (IF canceled() THEN 'error/' ELSE 'success/') + f);
     }	
 }
+
+EXTEND FORM orders PROPERTIES() importOrders;
 //#solution2 end
 
 //#solution3
@@ -125,14 +139,52 @@ importBooks 'Импортировать книги' ()  {
 }
 //#solution3 end
 
-FORM orders 'Заказы'
-    OBJECTS o = Order
-    PROPERTIES(o) READONLY date, number
-    PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+//#sample4
+CLASS OrderDetailInfo 'Строка заказа (расшифровка)';
+
+detail = DATA OrderDetail (OrderDetailInfo) NONULL DELETE;
+size = DATA VARSTRING[100] (OrderDetailInfo);
+color = DATA VARSTRING[100] (OrderDetailInfo);
+quantity = DATA INTEGER (OrderDetailInfo);
+
+EXTEND FORM order
+    OBJECTS i = OrderDetailInfo
+    PROPERTIES(i) size, color, quantity, NEW, DELETE
+    FILTERS detail(i) = d
+;
+//#sample4 end
+
+//#solution4
+version = DATA LOCAL VARSTRING[100]();
+
+GROUP item;
+idItem = DATA LOCAL VARSTRING[100] (OrderDetail);
+
+FORM importOrder
+    PROPERTIES() version
     
-    PROPERTIES() serverDirectory, importOrders
+    OBJECTS order = Order
+    PROPERTIES(order) date, number
+    
+    OBJECTS detail = OrderDetail
+    PROPERTIES(detail) IN item idItem EXTID 'id'
+    PROPERTIES(detail) price
+    FILTERS order(detail) = order
+    
+    OBJECTS info = OrderDetailInfo IN item
+    PROPERTIES(info) size, color, quantity
+    FILTERS detail(info) = detail
 ;
 
-NAVIGATOR {
-    NEW orders;
+importOrderFromJSON 'Импорт из JSON' () {
+    INPUT f = FILE DO {
+        IMPORT importOrder JSON FROM f;
+        book(OrderDetail d) <- book(idItem(d)) WHERE idItem(d);
+        APPLY;
+    } 
 }
+
+EXTEND FORM orders
+    PROPERTIES() importOrderFromJSON DRAW o TOOLBAR
+;
+//#solution4 end
