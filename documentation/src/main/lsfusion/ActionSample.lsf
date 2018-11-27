@@ -266,11 +266,13 @@ emailUserPassUser 'Напоминание пароля' (CustomUser user)  { EMA
     INLINE remindUserPass OBJECTS u = user;
 }
   
-justSendEmail 'Отправить письмо' ()  { EMAIL
+justSendEmail 'Отправить письмо' ()  { 
+    stringToFile('<font color=#FF0000 size=+3>big red text</font>');
+    EMAIL
     FROM 'luxsoft@adsl.by'
     SUBJECT 'Тема письма'
     TO 'xxx@tut.by'
-    INLINE HTML '<font color=#FF0000 size=+3>big red text</font>';
+    INLINE PROPERTY resultFile();
 }
 //#email end
 
