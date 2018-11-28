@@ -2958,7 +2958,7 @@ FORM ListA0
 
 testExternalResult = DATA LOCAL FILE ();
 testExternal(a, b)  { 
-    EXTERNAL SQL 'jdbc:postgresql://localhost/vitalur?user=postgres&password=11111' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult; 
+    EXTERNAL SQL 'jdbc:postgresql://localhost/testdb?user=postgres&password=11111' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult; 
 }
 
 xa = DATA LOCAL DOUBLE (INTEGER); 

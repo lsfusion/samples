@@ -1,0 +1,155 @@
+MODULE Main;
+
+REQUIRE Service, Utils;
+
+CLASS Server 'Сервер';
+processId = DATA LONG (Server);
+text 'Текст ответа' = DATA TEXT (Server, LONG);
+
+baseDir 'Директорий запуска' = DATA STRING[50] ();
+dbPassword 'Пароль к базе' = DATA STRING[50] () CHARWIDTH 10 FIXED; // for postgres user
+serverStartCmd 'Команда запуска сервера' = DATA VARSTRING[1000] (); // will be started from some basedir subfolder 
+serverEncoding 'Кодирока консоли' = DATA STRING[10] (); // server console output encoding
+minPort 'Мин. порт' = DATA LONG (); 
+maxPort 'Макс. порт' = DATA LONG (); 
+
+EXTEND FORM options
+    PROPERTIES() baseDir, dbPassword, serverEncoding, serverStartCmd, minPort, maxPort
+;
+
+onStarted() + { // default for linux
+    IF NOT baseDir() THEN
+        baseDir() <- './box';
+    IF NOT serverStartCmd() THEN
+        serverStartCmd() <- 'java -cp ".:../server.jar" lsfusion.server.logics.BusinessLogicsBootstrap'; // windows : -> ;
+    IF NOT serverEncoding() THEN
+        serverEncoding() <- 'UTF-8'; // for windows may be single-byte (for example cp1251)
+    IF NOT minPort() THEN
+        minPort() <- 10000;
+    IF NOT maxPort() THEN
+        maxPort() <- 50000; 
+}
+
+server = DATA Server (LONG);
+port = DATA LOCAL NESTED LONG ();
+registerPort(Server server) {
+    APPLY {
+        port() <- mod(LONG(server), maxPort() - minPort()) + minPort();
+        WHILE server(port()) DO
+            port() <- port() + 1;            
+        server(LONG p) <- server WHERE p = port(); 
+    }        
+}
+
+port = GROUP NAGGR LONG p BY server(p); 
+unregisterPort(Server server) {
+    server(LONG p) <- NULL WHERE p = port(server);
+    APPLY;
+}
+
+
+processId = DATA LOCAL LONG ();
+runProcess INTERNAL 'RunProcessActionProperty' (Server, TEXT, TEXT, TEXT);
+killProcess INTERNAL 'KillProcessActionProperty' (Server);
+
+serverDir(Server server) = baseDir() + '/' + LONG(server);
+dbName(Server server) = 'db' + LONG(server);
+
+createServer 'Создать сервер' (Server server) {
+    registerPort(server);
+
+    LOCAL confDir = TEXT ();
+    confDir() <- serverDir(server) + '/conf';
+    mkdir(confDir());
+
+    WRITE 'file://' + confDir() + '/settings.properties' FROM RAWFILE('db.server=localhost'+'\n'+
+                                                              'db.name='+dbName(server)+'\n'+
+                                                              'db.user=postgres'+'\n'+
+                                                              'db.password='+dbPassword()+'\n'+                                                              
+                                                              'rmi.registryPort='+port());
+                                                              
+
+}
+
+deleteServer 'Удалить сервер' (Server server) {
+    EXTERNAL SQL 'jdbc:postgresql://localhost/tryonline?user=postgres&password='+dbPassword() EXEC 'DROP DATABASE ' + dbName(server) + ';';
+    
+    LOCAL confDir = TEXT ();
+    confDir() <- baseDir() + '/' + LONG(server);
+    delete(serverDir(server));
+
+    unregisterPort(server);
+}
+
+runServer 'Запустить сервер' (Server server, TEXT code) {
+    NEWTHREAD NEWSESSION NEWSQL {
+        LOCAL serverDir = TEXT ();
+        serverDir() <- baseDir() + '/' + LONG(server);
+        WRITE 'file://' + serverDir() + '/Main.lsf' FROM RAWFILE(code);
+        runProcess(server, serverStartCmd(), serverDir(), serverEncoding());
+        APPLY;
+    }
+}
+
+killServer 'Остановить сервер' (Server server) {
+    killProcess(server);
+
+    text(server, LONG answer) <- NULL;
+    APPLY;
+}
+
+startServer(JSONFILE file) {
+    IMPORT JSON FROM file FIELDS () TEXT code DO {
+        NEW server = Server {
+            APPLY;
+            createServer(server);
+            runServer(server, code);
+            EXPORT JSON FROM server=server;
+        }           
+    }
+}
+
+restartServer(JSONFILE file) {
+    IMPORT JSON FROM file FIELDS () LONG server, TEXT code DO {
+        FOR LONG(Server serverObject AS Server) = server DO {
+            killServer(serverObject);
+
+            runServer(serverObject, code);
+        }           
+    }
+}
+
+stopServer(JSONFILE file) {
+    IMPORT JSON FROM file FIELDS () LONG server DO {
+        FOR LONG(Server serverObject AS Server) = server DO {
+            killServer(serverObject);
+            
+            deleteServer(serverObject);
+        }    
+    }
+}
+
+getServerLog(JSONFILE file) {
+    IMPORT JSON FROM file FIELDS () LONG server, LONG lastAnswer DO {
+        FOR LONG(Server serverObject AS Server) = server DO {
+            LOCAL newAnswers = TEXT (LONG);
+            newAnswers(LONG answer) <- text(serverObject, answer) WHERE answer > lastAnswer;
+            EXPORT JSON FROM answer=(GROUP MAX LONG answer IF newAnswers(answer)),
+                        text=(GROUP CONCAT newAnswers(LONG answer),'' ORDER answer);                          
+        }
+    }
+}
+
+FORM servers 'Сервера'
+    OBJECTS s=Server
+    PROPERTIES (s) VALUE, port ON CHANGE { FOR LONG oldp = port(s) DO INPUT newp=oldp DO { server(oldp) <- NULL; server(newp) <- s; } ; }, NEW, EDIT, DELETE 
+    PROPERTIES (s) GRID createServer, killServer, deleteServer 
+    
+    OBJECTS a 'Ответы' = LONG
+    PROPERTIES VALUE(a), text(s, a)
+    FILTERS text(s, a)
+; 
+
+NAVIGATOR {
+    NEW servers;
+} 
