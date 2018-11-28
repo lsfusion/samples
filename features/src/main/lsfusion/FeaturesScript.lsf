@@ -650,7 +650,7 @@ FORM testChangeClass
 //  [FROM propertyExpression]
 //  SUBJECT propertyExpression
 //  (TO || CC || BCC) propertyExpression [ (TO || CC || BCC) propertyExpression ...]
-//  [(INLINE formName OBJECTS obj1=propertyExpression1, ..., objN=propertyExpressionN) ...]
+//  [(INLINE propertyExpression]
 //  [(ATTACH (PDF, DOCX, HTML, RTF) [NAME propertyExpression] formName OBJECTS obj1=propertyExpression1, ..., objN=propertyExpressionN) ...]
 
 // Confirm action
@@ -1001,13 +1001,16 @@ setDefaultNames 'Задать имена по умолчанию' ()  {
 name(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 staticCaption(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 
-remindPasswordEmail 'Выслать пароль на этот email' (Contact u, STRING[200] to)  { EMAIL
+remindPasswordEmail 'Выслать пароль на этот email' (Contact u, STRING[200] to)  {
+     LOCAL inlineFile = FILE (); 
+     PRINT remindUserPass OBJECTS u=(u AS CustomUser) HTML TO inlineFile;
+    EMAIL
 //    FROM 'luxsoft@adsl.by'
     SUBJECT 'Напоминание пароля для ' + email(u)
     TO (to IF to IS STRING[200])
     CC 'some@someserv.net'
 //    BCC 'luxsoft@adsl.by'
-    INLINE remindUserPass OBJECTS u=(u AS CustomUser)
+    INLINE inlineFile()
     ATTACH PDF
            NAME 'ATTACH: Напоминание пароля для ' + email(u)
            remindUserPass OBJECTS u=(u AS CustomUser)
@@ -1016,7 +1019,7 @@ remindPasswordEmail 'Выслать пароль на этот email' (Contact u
 justSendEmail 'Просто выслать емэйл' (STRING[200] to)  { EMAIL
     SUBJECT 'Тема письма'
     TO (to IF to IS STRING[200])
-    INLINE PROPERTY '<font color=#FF0000 size=+3>big red text</font>'; }
+    INLINE '<font color=#FF0000 size=+3>big red text</font>'; }
 
 FORM TestEmailForm 'Тест EMAIL'
     OBJECTS s 'Email:' =VARSTRING[100] PANEL, u=CustomUser

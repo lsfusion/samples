@@ -260,10 +260,13 @@ changeSku (OrderDetail d)  {
 //#dialog end
 
 //#email
-emailUserPassUser 'Напоминание пароля' (CustomUser user)  { EMAIL
+emailUserPassUser 'Напоминание пароля' (CustomUser user)  {
+    LOCAL inlineFile = FILE (); 
+    PRINT remindUserPass OBJECTS u = user HTML TO inlineFile;
+    EMAIL
     SUBJECT 'Напоминание пароля'
     TO email(user)
-    INLINE remindUserPass OBJECTS u = user;
+    INLINE inlineFile();
 }
   
 justSendEmail 'Отправить письмо' ()  { 
@@ -272,7 +275,7 @@ justSendEmail 'Отправить письмо' ()  {
     FROM 'luxsoft@adsl.by'
     SUBJECT 'Тема письма'
     TO 'xxx@tut.by'
-    INLINE PROPERTY resultFile();
+    INLINE resultFile();
 }
 //#email end
 
