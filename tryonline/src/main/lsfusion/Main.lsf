@@ -75,7 +75,7 @@ deleteServer 'Удалить сервер' (Server server) {
     EXTERNAL SQL 'jdbc:postgresql://localhost/tryonline?user=postgres&password='+dbPassword() EXEC 'DROP DATABASE ' + dbName(server) + ';';
     
     LOCAL confDir = TEXT ();
-    confDir() <- baseDir() + '/' + LONG(server);
+    confDir() <- serverDir(server);
     delete(serverDir(server));
 
     unregisterPort(server);
@@ -83,11 +83,8 @@ deleteServer 'Удалить сервер' (Server server) {
 
 runServer 'Запустить сервер' (Server server, TEXT code) {
     NEWTHREAD NEWSESSION NEWSQL {
-        LOCAL serverDir = TEXT ();
-        serverDir() <- baseDir() + '/' + LONG(server);
-        WRITE 'file://' + serverDir() + '/Main.lsf' FROM RAWFILE(code);
-        runProcess(server, serverStartCmd(), serverDir(), serverEncoding());
-        APPLY;
+        WRITE 'file://' + serverDir(server) + '/Main.lsf' FROM RAWFILE(code);
+        runProcess(server, serverStartCmd(), serverDir(server), serverEncoding());
     }
 }
 

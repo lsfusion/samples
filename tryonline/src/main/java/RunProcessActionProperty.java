@@ -56,20 +56,27 @@ public class RunProcessActionProperty extends ScriptingActionProperty {
 
             long lastFlush = System.currentTimeMillis();
             long answerId = 0;
-            StringBuilder outString = new StringBuilder();
+            StringBuilder outStringBuilder = new StringBuilder();
             byte[] b = new byte[10 * 1024];
             int bytesRead;
             while ((bytesRead = out.read(b)) != -1) {                
-                outString.append(new String(b, 0, bytesRead, encoding));
+                outStringBuilder.append(new String(b, 0, bytesRead, encoding));
                 long now = System.currentTimeMillis();
                 if((now - lastFlush) > 100) {
-                    text.change(outString.toString(), context, server, new DataObject(answerId++));                    
-                    context.applyException();                                        
-                    outString = new StringBuilder();
+                    outResult(context, server, text, answerId++, outStringBuilder.toString());
+                    outStringBuilder = new StringBuilder();
                 }                    
             }
+            String outString = outStringBuilder.toString();
+            if(!outString.isEmpty())
+                outResult(context, server, text, answerId, outString);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
+    }
+
+    public void outResult(ExecutionContext<ClassPropertyInterface> context, DataObject server, LCP<?> text, long answerId, String outString) throws SQLException, SQLHandledException {
+        text.change(outString, context, server, new DataObject(answerId));
+        context.applyException();
     }
 }
