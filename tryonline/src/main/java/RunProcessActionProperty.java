@@ -52,13 +52,12 @@ public class RunProcessActionProperty extends ScriptingActionProperty {
             Process p = Runtime.getRuntime().exec(command, null, new File(directory));
             runningProcesses.put((Long) server.object, new WeakReference<>(p));
             
-            InputStream out = p.getInputStream();
-
             long lastFlush = System.currentTimeMillis();
             long answerId = 0;
             StringBuilder outStringBuilder = new StringBuilder();
             byte[] b = new byte[10 * 1024];
             int bytesRead;
+            InputStream out = p.getInputStream();
             while ((bytesRead = out.read(b)) != -1) {                
                 outStringBuilder.append(new String(b, 0, bytesRead, encoding));
                 long now = System.currentTimeMillis();
@@ -69,7 +68,16 @@ public class RunProcessActionProperty extends ScriptingActionProperty {
             }
             String outString = outStringBuilder.toString();
             if(!outString.isEmpty())
-                outResult(context, server, text, answerId, outString);
+                outResult(context, server, text, answerId++, outString);
+
+            int exitValue = p.exitValue();
+            if(exitValue != 0) {
+                InputStream error = p.getInputStream();
+                StringBuilder errorStringBuilder = new StringBuilder();
+                while ((bytesRead = error.read(b)) != -1)
+                    errorStringBuilder.append(new String(b, 0, bytesRead, encoding));
+                outResult(context, server, text, answerId, '\n' + "Process finished with error, exit code : " + exitValue + '\n' + errorStringBuilder.toString());
+            }
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
