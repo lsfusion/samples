@@ -9,7 +9,7 @@
     <name>Samples</name>
 
     <modules>
-        <module>crm</module>
+        <module>timetracking</module>
         <module>features</module>
         <module>hockeystats</module>
         <module>betgame</module>
