@@ -1,0 +1,116 @@
+MODULE TimeReports;
+
+REQUIRE TimeEntry, Project, Reports;
+
+NAMESPACE Time;
+
+hours 'Часов' (DATE d) = GROUP SUM hours(TimeEntry e) BY dateStart(e);
+
+hours 'Часов' (Project p, DATE d) = GROUP SUM hours(TimeEntry e) BY project(e), dateStart(e);
+hours 'Часов (всего)' (Project p, DATE dFrom, DATE dTo) = 
+    GROUP SUM hours(TimeEntry e) IF dFrom <= dateStart(e) AND dTo >= dateStart(e) BY project(e); 
+
+header (DATE d) = VARSTRING[20] (d AS DATE);
+
+FORM projects 'По проектам'
+    OBJECTS dates = (dFrom = DATE, dTo = DATE) PANEL
+    PROPERTIES dFrom = VALUE(dFrom), dTo = VALUE(dTo)
+
+    OBJECTS d = DATE 
+    FILTERS hours(d), d >= dFrom, d <= dTo
+
+    OBJECTS p = Project
+    PROPERTIES(p) READONLY nameCustomer, name
+    PROPERTIES READONLY hours(p, dFrom, dTo)
+    FILTERS assigned(p, currentEmployee())
+    ORDER nameCustomer(p)
+    FILTERGROUP active FILTER 'Активный' active(customer(p)) 'F5' DEFAULT
+    
+    PROPERTIES READONLY hours(p, d) COLUMNS (d) HEADER header(d)
+    
+    OBJECTS t = TimeEntry
+    PROPERTIES(t) READONLY nameTaskType, nameTask, namePractice, nameEmployee
+    PROPERTIES(t) descriptionTask ON CHANGE changeDescriptionTask(t) PANEL
+    PROPERTIES(t) nameActivity, dateTimeStart, dateTimeFinish, hours BACKGROUND userHours(t), comment PANEL
+    FILTERS project(t) == p,
+            dateStart(t) >= dFrom AND dateStart(t) <= dTo 
+;
+
+DESIGN projects {
+    OBJECTS {
+        NEW timeEntry {
+            fill = 2;
+            type = SPLITH;
+            MOVE BOX(t) {
+                fill = 3;
+            }
+            NEW description {
+                MOVE PROPERTY(descriptionTask(t)) {
+                    panelCaptionAbove = TRUE;
+                    fill = 1;
+                }
+                MOVE PROPERTY(comment(t)) {
+                    panelCaptionAbove = TRUE;
+                    fill = 1;
+                }
+            }
+        }
+    }
+}
+
+
+hours 'Часов' (Employee e, DATE d) = GROUP SUM hours(TimeEntry te) BY employee(te), dateStart(te);
+hours 'Часов (всего)' (Employee e, DATE dFrom, DATE dTo) = 
+    GROUP SUM hours(TimeEntry te) IF dFrom <= dateStart(te) AND dTo >= dateStart(te) BY employee(te); 
+
+FORM employees 'По сотрудникам'
+    OBJECTS dates = (dFrom = DATE, dTo = DATE) PANEL
+    PROPERTIES dFrom = VALUE(dFrom), dTo = VALUE(dTo)
+
+    OBJECTS d = DATE 
+    FILTERS hours(d), d >= dFrom, d <= dTo
+
+    OBJECTS e = Employee
+    PROPERTIES(e) READONLY namePractice, firstName, lastName, login
+    PROPERTIES READONLY hours(e, dFrom, dTo)
+    
+    PROPERTIES READONLY hours(e, d) COLUMNS (d) HEADER header(d)
+    
+    OBJECTS t = TimeEntry
+    PROPERTIES(t) READONLY nameCustomerProject, nameProject, nameTaskType, nameTask
+    PROPERTIES(t) descriptionTask ON CHANGE changeDescriptionTask(t) PANEL
+    PROPERTIES(t) nameActivity, dateTimeStart, dateTimeFinish, hours BACKGROUND userHours(t), comment PANEL
+    FILTERS employee(t) == e,
+            dateStart(t) >= dFrom AND dateStart(t) <= dTo,
+            assigned(project(t), currentEmployee())
+;
+
+DESIGN employees {
+    OBJECTS {
+        NEW timeEntry {
+            fill = 2;
+            type = SPLITH;
+            MOVE BOX(t) {
+                fill = 3;
+            }
+            NEW description {
+                MOVE PROPERTY(descriptionTask(t)) {
+                    panelCaptionAbove = TRUE;
+                    fill = 1;
+                }
+                MOVE PROPERTY(comment(t)) {
+                    panelCaptionAbove = TRUE;
+                    fill = 1;
+                }
+            }
+        }
+    }
+}
+
+NAVIGATOR {
+    reports {
+        NEW projects;
+        NEW employees; 
+    }
+}
+

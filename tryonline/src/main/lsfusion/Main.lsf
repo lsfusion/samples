@@ -7,6 +7,8 @@ processId = DATA LONG (Server);
 text 'Текст ответа' = DATA TEXT (Server, LONG);
 
 baseDir 'Директорий запуска' = DATA STRING[50] ();
+examplesDBDir 'Директорий примеров (СУБД)' = DATA STRING[50] ();
+examplesPlatformDir 'Директорий примеров (Платформа)' = DATA STRING[50] ();
 dbPassword 'Пароль к базе' = DATA STRING[50] () CHARWIDTH 10 FIXED; // for postgres user
 serverStartCmd 'Команда запуска сервера' = DATA VARSTRING[1000] (); // will be started from some basedir subfolder 
 serverEncoding 'Кодирока консоли' = DATA STRING[10] (); // server console output encoding
@@ -14,7 +16,7 @@ minPort 'Мин. порт' = DATA LONG ();
 maxPort 'Макс. порт' = DATA LONG (); 
 
 EXTEND FORM options
-    PROPERTIES() baseDir, dbPassword, serverEncoding, serverStartCmd, minPort, maxPort
+    PROPERTIES() baseDir, examplesDBDir, examplesPlatformDir, dbPassword, serverEncoding, serverStartCmd, minPort, maxPort
 ;
 
 onStarted() + { // default for linux
@@ -134,6 +136,23 @@ getServerLog(JSONFILE file) {
             EXPORT JSON FROM answer=(GROUP MAX LONG answer IF newAnswers(answer)),
                         text=(GROUP CONCAT newAnswers(LONG answer),'' ORDER answer);                          
         }
+    }
+}
+
+getExamples(JSONFILE file) {
+    IMPORT JSON FROM file FIELDS () INTEGER mode DO {
+            LOCAL directory = VARSTRING[50] ();
+            directory() <- IF mode = 1 THEN examplesDBDir() ELSE examplesPlatformDir();
+            listFiles(directory()); 
+            
+            LOCAL file = TEXT (INTEGER);
+            FOR endsWith(fileName(INTEGER i), '.lsf') AND NOT fileIsDirectory(i) DO {
+                READ directory() + '/' + fileName(i);
+                fileToString(readFile(), 'UTF-8');
+                file(i) <- resultString();
+            }
+            
+            EXPORT JSON FROM caption = replace(fileName(INTEGER i), '.lsf', ''), text = file(i) WHERE file(i);                          
     }
 }
 
