@@ -1,4 +1,4 @@
-MODULE CRM;
+MODULE TimeTracking;
 
 REQUIRE Scheduler, Service, SystemEvents, Backup, EvalScript, SQLUtils, ProcessUtils, Chat, 
         Employee, Customer, Project, Category, ProjectDocument,
