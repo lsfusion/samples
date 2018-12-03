@@ -1004,6 +1004,10 @@ staticCaption(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 remindPasswordEmail 'Выслать пароль на этот email' (Contact u, STRING[200] to)  {
      LOCAL inlineFile = FILE (); 
      PRINT remindUserPass OBJECTS u=(u AS CustomUser) HTML TO inlineFile;
+     
+     LOCAL attachFile = FILE (); 
+     PRINT remindUserPass OBJECTS u=(u AS CustomUser) PDF TO attachFile;
+         
     EMAIL
 //    FROM 'luxsoft@adsl.by'
     SUBJECT 'Напоминание пароля для ' + email(u)
@@ -1011,9 +1015,7 @@ remindPasswordEmail 'Выслать пароль на этот email' (Contact u
     CC 'some@someserv.net'
 //    BCC 'luxsoft@adsl.by'
     INLINE inlineFile()
-    ATTACH PDF
-           NAME 'ATTACH: Напоминание пароля для ' + email(u)
-           remindUserPass OBJECTS u=(u AS CustomUser)
+    ATTACH attachFile() NAME 'ATTACH: Напоминание пароля для ' + email(u)
     ; }
 
 justSendEmail 'Просто выслать емэйл' (STRING[200] to)  { EMAIL
