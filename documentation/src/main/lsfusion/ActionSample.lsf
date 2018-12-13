@@ -308,7 +308,7 @@ exportSkus (Store store)  {
     EXPORT CSV NOHEADER NOESCAPE FROM id(Sku s), name(s), weight(s) WHERE in(store, s); // выгружает CSV без строки заголовков и без экранирования спецсимволов
     EXPORT FROM id(Sku s), name(s), weight(s) WHERE in(store, s) ORDER name(s) DESC; // выгружает JSON, сортируем по свойству name[Sku] в порядке убывания
     EXPORT FROM ff='HI'; // выгружает JSON {"ff":"HI"}, так как по умолчанию получает имя value, а платформа объект {"value":"HI"} автоматически преобразует в 
-    EXPORT FROM 'HI'; // выгружает JSON "HI", так как по умолчанию получает имя value, а платформа объект {"value":"HI"} автоматически преобразует в     
+    EXPORT FROM 'HI'; // выгружает JSON "HI", так как по умолчанию получает имя value, а платформа объект {"value":"HI"} автоматически преобразует в "HI"     
 }
 //#exportplain end
 
