@@ -38,6 +38,15 @@ messageF  { MESSAGE f(5); } // успешно выполнится
 
 g = GROUP SUM f(b);
 messageG  { MESSAGE g(); } // f(b) не NULL для бесконечного числа b, платформа выдаст ошибку
+
+FORM f
+    OBJECTS d=DATE
+;
+
+printFWithD { PRINT f OBJECTS d=currentDate(); } // успешно выполнится
+
+printFWithoutD { PRINT f; } // фильтра для дат нет, а d IS DATE не NULL для бесконечного числа d, платформа выдаст ошибку
+
 //#set end
 
 //#set2
