@@ -23,7 +23,7 @@ onStarted() + { // default for linux
     IF NOT baseDir() THEN
         baseDir() <- './box';
     IF NOT serverStartCmd() THEN
-        serverStartCmd() <- 'java -cp ".:../server.jar" lsfusion.server.logics.BusinessLogicsBootstrap'; // windows : -> ;
+        serverStartCmd() <- 'java -cp .:../server.jar lsfusion.server.logics.BusinessLogicsBootstrap'; // windows : -> ; no double quotes in linux
     IF NOT serverEncoding() THEN
         serverEncoding() <- 'UTF-8'; // for windows may be single-byte (for example cp1251)
     IF NOT minPort() THEN
@@ -84,7 +84,7 @@ deleteServer 'Удалить сервер' (Server server) {
 }
 
 runServer 'Запустить сервер' (Server server, TEXT code) {
-    NEWTHREAD NEWSESSION NEWSQL {
+    NEWSESSION NEWSQL NEWTHREAD {
         WRITE 'file://' + serverDir(server) + '/Main.lsf' FROM RAWFILE(code);
         runProcess(server, serverStartCmd(), serverDir(server), serverEncoding());
     }
@@ -92,6 +92,8 @@ runServer 'Запустить сервер' (Server server, TEXT code) {
 
 killServer 'Остановить сервер' (Server server) {
     killProcess(server);
+    
+    sleep(1000); // will wait a little bit to give process time to write all its text
 
     text(server, LONG answer) <- NULL;
     APPLY;

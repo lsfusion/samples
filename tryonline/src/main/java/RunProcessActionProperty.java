@@ -66,18 +66,18 @@ public class RunProcessActionProperty extends ScriptingActionProperty {
                     outStringBuilder = new StringBuilder();
                 }                    
             }
+            int exitValue = p.waitFor();
+            if(exitValue != 0) {
+                outStringBuilder.append("Process finished with error, exit code : ").append(exitValue).append('\n');
+
+                InputStream error = p.getErrorStream();
+                while ((bytesRead = error.read(b)) != -1)
+                    outStringBuilder.append(new String(b, 0, bytesRead, encoding));
+            }
+
             String outString = outStringBuilder.toString();
             if(!outString.isEmpty())
                 outResult(context, server, text, answerId++, outString);
-
-            int exitValue = p.exitValue();
-            if(exitValue != 0) {
-                InputStream error = p.getInputStream();
-                StringBuilder errorStringBuilder = new StringBuilder();
-                while ((bytesRead = error.read(b)) != -1)
-                    errorStringBuilder.append(new String(b, 0, bytesRead, encoding));
-                outResult(context, server, text, answerId, '\n' + "Process finished with error, exit code : " + exitValue + '\n' + errorStringBuilder.toString());
-            }
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
