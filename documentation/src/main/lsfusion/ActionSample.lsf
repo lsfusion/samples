@@ -714,24 +714,13 @@ readFiles()  {
   
     LOCAL importFile = FILE ();
  
-    //чтение из HTTP
-    READ 'http://lsfusion.org/file.xlsx' TO importFile;
-    //чтение из HTTPS
-    READ 'https://lsfusion.org/file.xlsx' TO importFile;
-    //чтение из HTTP с авторизацией
-    READ 'http://user:password@lsfusion.org/file.xlsx' TO importFile;
-    //чтение из HTTPS с авторизацией
-    READ 'https://user:password@lsfusion.org/file.xlsx' TO importFile;
     //чтение из FTP
     READ 'ftp://ftp.lsfusion.org/file.xlsx' TO importFile;
     //чтение из SFTP
     READ 'sftp://sftp.lsfusion.org/file.xlsx' TO importFile;
     //чтение из FILE
+    READ 'D://lsfusion/file.xlsx' TO importFile;
     READ 'file://D://lsfusion/file.xlsx' TO importFile;
-    //чтение из JDBC
-    READ 'jdbc://connectionString@query' TO importFile;
-    //чтение из MDB
-    READ 'mdb://path:table;where' TO importFile;
 }
 
 connectionString = DATA VARSTRING[100]();  
