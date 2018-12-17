@@ -644,15 +644,6 @@ FORM testChangeClass
     PROPERTIES NEWSESSION GRID changeAllAWhenCountAB(b), changeAllAWhenCount(b), DELETE(a), d=DELETE(a)
 ;
 
-// Email action
-// statement syntax:
-// EMAIL
-//  [FROM propertyExpression]
-//  SUBJECT propertyExpression
-//  (TO || CC || BCC) propertyExpression [ (TO || CC || BCC) propertyExpression ...]
-//  [(INLINE propertyExpression]
-//  [(ATTACH (PDF, DOCX, HTML, RTF) [NAME propertyExpression] formName OBJECTS obj1=propertyExpression1, ..., objN=propertyExpressionN) ...]
-
 // Confirm action
 // statement syntax:
 // CONFIRM propertyExpression
@@ -1002,8 +993,8 @@ name(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 staticCaption(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 
 remindPasswordEmail 'Выслать пароль на этот email' (Contact u, STRING[200] to)  {
-     LOCAL inlineFile = FILE (); 
-     PRINT remindUserPass OBJECTS u=(u AS CustomUser) HTML TO inlineFile;
+     LOCAL bodyFile = FILE (); 
+     PRINT remindUserPass OBJECTS u=(u AS CustomUser) HTML TO bodyFile;
      
      LOCAL attachFile = FILE (); 
      PRINT remindUserPass OBJECTS u=(u AS CustomUser) PDF TO attachFile;
@@ -1014,14 +1005,14 @@ remindPasswordEmail 'Выслать пароль на этот email' (Contact u
     TO (to IF to IS STRING[200])
     CC 'some@someserv.net'
 //    BCC 'luxsoft@adsl.by'
-    INLINE inlineFile()
+    BODY bodyFile()
     ATTACH attachFile() NAME 'ATTACH: Напоминание пароля для ' + email(u)
     ; }
 
 justSendEmail 'Просто выслать емэйл' (STRING[200] to)  { EMAIL
     SUBJECT 'Тема письма'
     TO (to IF to IS STRING[200])
-    INLINE '<font color=#FF0000 size=+3>big red text</font>'; }
+    BODY '<font color=#FF0000 size=+3>big red text</font>'; }
 
 FORM TestEmailForm 'Тест EMAIL'
     OBJECTS s 'Email:' =VARSTRING[100] PANEL, u=CustomUser

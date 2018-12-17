@@ -261,12 +261,12 @@ changeSku (OrderDetail d)  {
 
 //#email
 emailUserPassUser 'Напоминание пароля' (CustomUser user)  {
-    LOCAL inlineFile = FILE (); 
-    PRINT remindUserPass OBJECTS u = user HTML TO inlineFile;
+    LOCAL bodyFile = FILE (); 
+    PRINT remindUserPass OBJECTS u = user HTML TO bodyFile;
     EMAIL
     SUBJECT 'Напоминание пароля'
     TO email(user)
-    INLINE inlineFile();
+    BODY bodyFile();
 }
   
 justSendEmail 'Отправить письмо' ()  { 
