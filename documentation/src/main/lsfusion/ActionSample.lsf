@@ -275,7 +275,7 @@ justSendEmail 'Отправить письмо' ()  {
     FROM 'luxsoft@adsl.by'
     SUBJECT 'Тема письма'
     TO 'xxx@tut.by'
-    INLINE resultFile();
+    BODY resultFile();
 }
 //#email end
 
