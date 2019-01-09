@@ -286,8 +286,8 @@ pathes 'Кол-во путей' (a, b) = RECURSION 1 AND a IS Node AND b==a STEP
   
 // определяет на каком уровне находится child от parent, и null если не является потомком (тем самым это свойство можно использовать для определения всех child'ов)
 parent = DATA Group (Group);
-level 'Уровень' (Group child, Group parent) = RECURSION 1 AND child IS Group AND parent == child
-                                                                  STEP 1 AND parent == parent($parent);
+level 'Уровень' (Group child, Group parent) = RECURSION 1 IF child IS Group AND parent == child
+                                                                  STEP 1 IF parent == parent($parent);
  
 // числа Фибоначчи, свойство высчитывает все числа Фибоначи до значения to, (после будет возвращать null)
 fib(i, to) = RECURSION 1 IF (i==0 OR i==1) AND to IS INTEGER STEP 1 IF (i==$i+1 OR i==$i+2) AND i<to CYCLES IMPOSSIBLE;
