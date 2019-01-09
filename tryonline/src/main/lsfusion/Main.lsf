@@ -68,7 +68,7 @@ createServer 'Создать сервер' (Server server) {
                                                               'db.name='+dbName(server)+'\n'+
                                                               'db.user=postgres'+'\n'+
                                                               'db.password='+dbPassword()+'\n'+                                                              
-                                                              'rmi.registryPort='+port());
+                                                              'rmi.port='+port());
                                                               
 
 }
