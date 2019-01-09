@@ -282,7 +282,7 @@ edge = DATA BOOLEAN (Node, Node);
 iterate(i, from, to) = RECURSION i==from AND from IS INTEGER AND to IS INTEGER STEP i==$i+1 AND i<=to CYCLES IMPOSSIBLE;
   
 // считает количество различных путей от a до b в графе
-pathes 'Кол-во путей' (a, b) = RECURSION 1 AND a IS Node AND b==a STEP 1 AND edge(b, $b);
+pathes 'Кол-во путей' (a, b) = RECURSION 1 AND a IS Node AND b==a STEP 1 IF edge(b, $b);
   
 // определяет на каком уровне находится child от parent, и null если не является потомком (тем самым это свойство можно использовать для определения всех child'ов)
 parent = DATA Group (Group);
