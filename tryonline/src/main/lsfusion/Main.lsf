@@ -64,11 +64,11 @@ createServer 'Создать сервер' (Server server) {
     confDir() <- serverDir(server) + '/conf';
     mkdir(confDir());
 
-    WRITE 'file://' + confDir() + '/settings.properties' FROM RAWFILE('db.server=localhost'+'\n'+
-                                                              'db.name='+dbName(server)+'\n'+
-                                                              'db.user=postgres'+'\n'+
-                                                              'db.password='+dbPassword()+'\n'+                                                              
-                                                              'rmi.port='+port());
+    WRITE RAWFILE('db.server=localhost'+'\n'+
+                  'db.name='+dbName(server)+'\n'+
+                  'db.user=postgres'+'\n'+
+                  'db.password='+dbPassword()+'\n'+                                                              
+                  'rmi.port='+port()) TO 'file://' + confDir() + '/settings.properties';
                                                               
 
 }
@@ -85,7 +85,7 @@ deleteServer 'Удалить сервер' (Server server) {
 
 runServer 'Запустить сервер' (Server server, TEXT code) {
     NEWSESSION NEWSQL NEWTHREAD {
-        WRITE 'file://' + serverDir(server) + '/Main.lsf' FROM RAWFILE(code);
+        WRITE RAWFILE(code) TO 'file://' + serverDir(server) + '/Main.lsf';
         runProcess(server, serverStartCmd(), serverDir(server), serverEncoding());
     }
 }

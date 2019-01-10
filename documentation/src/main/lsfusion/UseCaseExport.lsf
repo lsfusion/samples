@@ -98,7 +98,7 @@ exportToCSV (DATE date) {
                     quantity(d), 
                     price(d) 
            WHERE date(order(d)) = date TO file;
-    WRITE CLIENT DIALOG 'orders' FROM file();
+    WRITE CLIENT DIALOG file() TO 'orders';
 }
 
 FORM exportParameters 'Параметры'

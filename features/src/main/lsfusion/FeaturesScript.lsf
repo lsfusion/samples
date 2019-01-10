@@ -2273,7 +2273,7 @@ path(Store s) = DATA STRING[100](Store);
 file() = DATA LOCAL FILE ();
 
 readA(Store s)  { READ path(s) TO file; }  
-writeA(Store s)  { WRITE path(s) + 'txt' FROM file(); } 
+writeA(Store s)  { WRITE file() TO path(s) + 'txt'; } 
 
 FORM TestReadWrite 'Тест READ/WRITE'
     OBJECTS s=Store 
@@ -3372,4 +3372,14 @@ DESIGN testABAggr {
 
 NAVIGATOR {
     NEW testABAggr BEFORE tst;
+    NEW ACTION ttt = testFormAction;
+}
+
+doSomething() {
+    resultString() <- 'x123';
+    encodedBase64() <- 'y321';
+}
+
+externalAction() {
+    //EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&someprm=$1' BODYURL 'otherprm=$2&andonemore=$3' PARAMS 1,2,'3';
 }

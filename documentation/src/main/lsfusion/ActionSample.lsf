@@ -833,9 +833,9 @@ iterateDates (DATE dateFrom, DATE dateTo)  {
 //#write
 loadAndWrite ()  { 
     INPUT f = FILE DO {
-        WRITE 'file:///home/user/loadedfile.csv' FROM f APPEND;
-        WRITE CLIENT '/home/user/loadedfile.txt' FROM f;
-        WRITE CLIENT DIALOG 'loadedfile' FROM f;
+        WRITE f TO 'file:///home/user/loadedfile.csv' APPEND;
+        WRITE CLIENT f TO '/home/user/loadedfile.txt';
+        WRITE CLIENT DIALOG f TO 'loadedfile';
     }
 }
 //#write end
