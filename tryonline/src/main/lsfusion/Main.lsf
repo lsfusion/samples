@@ -83,9 +83,12 @@ deleteServer 'Удалить сервер' (Server server) {
     unregisterPort(server);
 }
 
+code = DATA TEXT (Server);
+
 runServer 'Запустить сервер' (Server server, TEXT code) {
     NEWSESSION NEWSQL NEWTHREAD {
         WRITE RAWFILE(code) TO 'file://' + serverDir(server) + '/Main.lsf';
+        APPLY code(server) <- code;
         runProcess(server, serverStartCmd(), serverDir(server), serverEncoding());
     }
 }
@@ -160,7 +163,7 @@ getExamples(JSONFILE file) {
 
 FORM servers 'Сервера'
     OBJECTS s=Server
-    PROPERTIES (s) VALUE, port ON CHANGE { FOR LONG oldp = port(s) DO INPUT newp=oldp DO { server(oldp) <- NULL; server(newp) <- s; } ; }, NEW, EDIT, DELETE 
+    PROPERTIES (s) VALUE, code, port ON CHANGE { FOR LONG oldp = port(s) DO INPUT newp=oldp DO { server(oldp) <- NULL; server(newp) <- s; } ; }, NEW, EDIT, DELETE 
     PROPERTIES (s) GRID createServer, killServer, deleteServer 
     
     OBJECTS a 'Ответы' = LONG
