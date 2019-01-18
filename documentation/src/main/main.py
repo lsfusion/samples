@@ -299,6 +299,7 @@ def add_nbsp(text):
 @app.route("/habr", methods=['GET', 'POST'])
 def generate_habr_code():
     code = request.data
+    code = code.replace('<', '&lt').replace('>', '&gt')
 
     prefix = "<table><tr><td>"
     suffix = "</td></tr></table>"
