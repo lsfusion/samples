@@ -96,7 +96,7 @@ class LSFLexer(RegexLexer):
                     'EMAIL', 'END', 'ESCAPE', 'EQUAL', 'EVAL', 'EVENTID', 'EVENTS', 'EXCELFILE', 'EXCELLINK',
                     'EXCEPTLAST', 'EXCLUSIVE', 'EXEC', 'EXPORT', 'EXTEND', 'EXTERNAL', 'FALSE', 'FIELDS', 'FILE',
                     'FILTER', 'FILTERGROUP', 'FILTERS', 'FINALLY', 'FIRST', 'FIXED', 'FOLDER', 'FOOTER', 'FOR', 'FORCE',
-                    'FOREGROUND', 'FORM', 'FORMS', 'FORMULA', 'FROM', 'FULL', 'GET', 'GOAFTER', 'GRID', 'GROUP',
+                    'FOREGROUND', 'FORM', 'FORMEXTID', 'FORMS', 'FORMULA', 'FROM', 'FULL', 'GET', 'GOAFTER', 'GRID', 'GROUP',
                     'GROUPCHANGE', 'HALIGN', 'HEADER', 'HIDE', 'HIDESCROLLBARS', 'HIDETITLE', 'HINTNOUPDATE',
                     'HINTTABLE', 'HORIZONTAL', 'HTML', 'HTMLFILE', 'HTMLLINK', 'HTTP', 'IF', 'IMAGE', 'IMAGEFILE',
                     'IMAGELINK', 'IMPORT', 'IMPOSSIBLE', 'IN', 'INDEX', 'INDEXED', 'INIT', 'INITFILTER', 'INLINE',
