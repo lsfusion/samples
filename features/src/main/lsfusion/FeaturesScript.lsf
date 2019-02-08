@@ -992,7 +992,13 @@ setDefaultNames 'Задать имена по умолчанию' ()  {
 name(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 staticCaption(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 
-remindPasswordEmail 'Выслать пароль на этот email' (Contact u, STRING[200] to)  {
+FORM remindUserPass 'Напоминание логина'
+
+    OBJECTS u=CustomUser PANEL
+    PROPERTIES(u) READONLY login, name[Contact]
+;
+
+remindPasswordEmail 'Выслать логин на этот email' (Contact u, STRING[200] to)  {
      LOCAL bodyFile = FILE (); 
      PRINT remindUserPass OBJECTS u=(u AS CustomUser) HTML TO bodyFile;
      

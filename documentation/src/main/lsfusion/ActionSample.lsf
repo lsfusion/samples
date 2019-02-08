@@ -260,11 +260,16 @@ changeSku (OrderDetail d)  {
 //#dialog end
 
 //#email
-emailUserPassUser 'Напоминание пароля' (CustomUser user)  {
+FORM remindUserPass
+    OBJECTS u=CustomUser PANEL
+    PROPERTIES(u) READONLY login, name[Contact]
+;
+
+emailUserPassUser 'Напоминание логина' (CustomUser user)  {
     LOCAL bodyFile = FILE (); 
     PRINT remindUserPass OBJECTS u = user HTML TO bodyFile;
     EMAIL
-    SUBJECT 'Напоминание пароля'
+    SUBJECT 'Напоминание логина'
     TO email(user)
     BODY bodyFile();
 }
