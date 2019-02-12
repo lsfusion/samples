@@ -17,9 +17,8 @@ NAVIGATOR {
 //#sample1 end
 
 //#sample2
-description '{use.case.i18n.book.description}' (Book b) = name(b) + ', {use.case.i18n.book.price}' + price(b);
+description '{use.case.i18n.book.description}' (Book b) = VARSTRING[60] (name(b) + ', {use.case.i18n.book.price} : ' + price(b));
 EXTEND FORM books
     PROPERTIES(b) READONLY description
 ;
 //#sample2 end
-
