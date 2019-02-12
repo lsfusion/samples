@@ -1,4 +1,4 @@
-MODULE UseCaseI18n;
+MODULE UseCaseInternationalization;
 
 //#sample1
 CLASS Book '{use.case.i18n.book}';
