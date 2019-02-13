@@ -1,10 +1,16 @@
 MODULE UseCaseNameTest2;
 
-//#sample
 REQUIRE UseCaseNamePurchase, UseCaseNameSale;
 
-NAMESPACE Purchase;
+//#priority
+PRIORITY Purchase;
+//#priority end
 
+//#namespace
+NAMESPACE Purchase;
+//#namespace end
+
+//#sample
 messagePurchaseCount 'Вывести кол-во заказов на закупку' {
     MESSAGE GROUP SUM 1 IF o IS Order;
 }
