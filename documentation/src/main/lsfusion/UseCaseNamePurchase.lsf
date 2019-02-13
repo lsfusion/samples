@@ -1,6 +1,6 @@
+//#sample
 MODULE UseCaseNamePurchase;
 
-//#sample
 NAMESPACE Purchase;
 
 CLASS Order 'Заказ';
