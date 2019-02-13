@@ -1,0 +1,18 @@
+MODULE UseCaseNamePurchase;
+
+//#sample
+NAMESPACE Purchase;
+
+CLASS Order 'Заказ';
+date 'Дата' = DATA DATE (Order);
+number 'Номер' = DATA INTEGER (Order);
+  
+FORM orders 'Заказы на закупку'
+    OBJECTS o = Order
+    PROPERTIES(o) date, number
+;
+
+NAVIGATOR {
+    NEW orders;
+}
+//#sample end

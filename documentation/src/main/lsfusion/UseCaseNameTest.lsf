@@ -1,0 +1,19 @@
+MODULE UseCaseNameTest;
+
+//#sample
+REQUIRE UseCaseNamePurchase, UseCaseNameSale;
+
+NAMESPACE Test;
+
+messagePurchaseCount 'Вывести кол-во заказов на закупку' {
+    MESSAGE GROUP SUM 1 IF o IS Purchase.Order;
+}
+messageSaleCount 'Вывести кол-во заказов на продажу' {
+    MESSAGE GROUP SUM 1 IF o IS Sale.Order;
+}
+
+NAVIGATOR {
+    NEW ACTION messagePurchaseCount;
+    NEW ACTION messageSaleCount;
+}
+//#sample end
