@@ -214,7 +214,7 @@ changeStatus()  {
 //#changeclass end
 
 //#custom
-showOnMap 'Показать на карте'  INTERNAL  'lsfusion.utils.geo.ShowOnMapActionProperty' (DOUBLE, DOUBLE, MapProvider, STRING[100]);
+showOnMap 'Показать на карте'  INTERNAL  'lsfusion.utils.type.geo.ShowOnMapActionProperty' (DOUBLE, DOUBLE, MapProvider, STRING[100]);
 
 serviceDBMT 'Обслуживание БД (многопоточно, threadCount, timeout)'  INTERNAL  'lsfusion.server.logics.service.ServiceDBMultiThreadActionProperty' (INTEGER, INTEGER) NULL;
 
