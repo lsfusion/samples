@@ -4,12 +4,12 @@ import lsfusion.server.classes.ValueClass;
 import lsfusion.server.data.SQLHandledException;
 import lsfusion.server.logics.DataObject;
 import lsfusion.server.logics.ObjectValue;
-import lsfusion.server.logics.linear.LCP;
+import lsfusion.server.language.linear.LCP;
 import lsfusion.server.logics.property.ClassPropertyInterface;
 import lsfusion.server.logics.property.ExecutionContext;
-import lsfusion.server.logics.scripted.ScriptingActionProperty;
-import lsfusion.server.logics.scripted.ScriptingLogicsModule;
-import lsfusion.utils.utils.RunCommandClientAction;
+import lsfusion.server.language.ScriptingActionProperty;
+import lsfusion.server.language.ScriptingLogicsModule;
+import lsfusion.utils.admin.interpreter.RunCommandClientAction;
 
 import java.io.BufferedInputStream;
 import java.io.File;
