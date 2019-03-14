@@ -1,11 +1,11 @@
 package samples;
 
-import lsfusion.server.language.ScriptingActionProperty;
+import lsfusion.server.language.ScriptingAction;
 import lsfusion.server.language.ScriptingLogicsModule;
-import lsfusion.server.logics.property.ClassPropertyInterface;
-import lsfusion.server.logics.property.ExecutionContext;
+import lsfusion.server.logics.property.classes.ClassPropertyInterface;
+import lsfusion.server.logics.action.ExecutionContext;
 
-public class TestCustomActionProperty extends ScriptingActionProperty {
+public class TestCustomActionProperty extends ScriptingAction {
 
     public TestCustomActionProperty(ScriptingLogicsModule LM) {
         super(LM);

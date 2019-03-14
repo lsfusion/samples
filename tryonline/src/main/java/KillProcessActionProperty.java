@@ -1,21 +1,17 @@
 import com.google.common.base.Throwables;
-import lsfusion.server.classes.ValueClass;
+import lsfusion.server.language.ScriptingAction;
+import lsfusion.server.logics.classes.ValueClass;
 import lsfusion.server.data.SQLHandledException;
-import lsfusion.server.logics.DataObject;
-import lsfusion.server.language.linear.LCP;
-import lsfusion.server.logics.property.ClassPropertyInterface;
-import lsfusion.server.logics.property.ExecutionContext;
-import lsfusion.server.language.ScriptingActionProperty;
+import lsfusion.server.data.DataObject;
+import lsfusion.server.logics.property.classes.ClassPropertyInterface;
+import lsfusion.server.logics.action.ExecutionContext;
 import lsfusion.server.language.ScriptingLogicsModule;
 
-import java.io.File;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class KillProcessActionProperty extends ScriptingActionProperty {
+public class KillProcessActionProperty extends ScriptingAction {
     private final ClassPropertyInterface serverInterface;
 
     public KillProcessActionProperty(ScriptingLogicsModule LM, ValueClass... classes) {

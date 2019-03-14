@@ -1,27 +1,21 @@
 import com.google.common.base.Throwables;
-import lsfusion.interop.action.MessageClientAction;
-import lsfusion.server.classes.ValueClass;
+import lsfusion.server.language.linear.LP;
+import lsfusion.server.logics.classes.ValueClass;
 import lsfusion.server.data.SQLHandledException;
-import lsfusion.server.logics.DataObject;
-import lsfusion.server.logics.ObjectValue;
-import lsfusion.server.language.linear.LCP;
-import lsfusion.server.logics.property.ClassPropertyInterface;
-import lsfusion.server.logics.property.ExecutionContext;
-import lsfusion.server.language.ScriptingActionProperty;
+import lsfusion.server.data.DataObject;
+import lsfusion.server.logics.property.classes.ClassPropertyInterface;
+import lsfusion.server.logics.action.ExecutionContext;
+import lsfusion.server.language.ScriptingAction;
 import lsfusion.server.language.ScriptingLogicsModule;
-import lsfusion.utils.admin.interpreter.RunCommandClientAction;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
-public class RunProcessActionProperty extends ScriptingActionProperty {
+public class RunProcessActionProperty extends ScriptingAction {
     private final ClassPropertyInterface serverInterface;
     private final ClassPropertyInterface commandInterface;
     private final ClassPropertyInterface directoryInterface;
@@ -47,7 +41,7 @@ public class RunProcessActionProperty extends ScriptingActionProperty {
         String encoding = (String) context.getKeyValue(encodingInterface).getValue();
         
         try {
-            LCP<?> text = LM.findProperty("text[Server, LONG]");
+            LP<?> text = LM.findProperty("text[Server, LONG]");
 
             Process p = Runtime.getRuntime().exec(command, null, new File(directory));
             runningProcesses.put((Long) server.object, new WeakReference<>(p));
@@ -83,7 +77,7 @@ public class RunProcessActionProperty extends ScriptingActionProperty {
         }
     }
 
-    public void outResult(ExecutionContext<ClassPropertyInterface> context, DataObject server, LCP<?> text, long answerId, String outString) throws SQLException, SQLHandledException {
+    public void outResult(ExecutionContext<ClassPropertyInterface> context, DataObject server, LP<?> text, long answerId, String outString) throws SQLException, SQLHandledException {
         text.change(outString, context, server, new DataObject(answerId));
         context.applyException();
     }
