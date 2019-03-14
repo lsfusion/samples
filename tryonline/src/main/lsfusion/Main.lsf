@@ -113,7 +113,7 @@ startServer(JSONFILE file) {
             EXPORT JSON FROM server=server;
         }           
     }
-}
+} @@noauth;
 
 restartServer(JSONFILE file) {
     IMPORT JSON FROM file FIELDS () LONG server, TEXT code DO {
@@ -123,7 +123,7 @@ restartServer(JSONFILE file) {
             runServer(serverObject, code);
         }           
     }
-}
+} @@noauth;
 
 stopServer(JSONFILE file) {
     IMPORT JSON FROM file FIELDS () LONG server DO {
@@ -133,7 +133,7 @@ stopServer(JSONFILE file) {
             deleteServer(serverObject);
         }    
     }
-}
+} @@noauth;
 
 stopUnusedServers() {
     FOR dateStart(Server server) <= subtractSeconds(currentDateTime(), 60*30) DO {
@@ -157,7 +157,7 @@ getServerLog(JSONFILE file) {
                         text=(GROUP CONCAT newAnswers(LONG answer),'' ORDER answer);                          
         }
     }
-}
+} @@noauth;
 
 getExamples(JSONFILE file) {
     IMPORT JSON FROM file FIELDS () INTEGER mode DO {
@@ -174,7 +174,7 @@ getExamples(JSONFILE file) {
             
             EXPORT JSON FROM caption = replace(fileName(INTEGER i), '.lsf', ''), text = file(i) WHERE file(i);                          
     }
-}
+} @@noauth;
 
 FORM servers 'Сервера'
     OBJECTS s=Server
