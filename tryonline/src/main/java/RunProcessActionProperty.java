@@ -1,11 +1,11 @@
 import com.google.common.base.Throwables;
-import lsfusion.server.language.linear.LP;
+import lsfusion.server.language.property.LP;
 import lsfusion.server.logics.classes.ValueClass;
-import lsfusion.server.data.SQLHandledException;
-import lsfusion.server.data.DataObject;
+import lsfusion.server.data.sql.exception.SQLHandledException;
+import lsfusion.server.data.value.DataObject;
 import lsfusion.server.logics.property.classes.ClassPropertyInterface;
-import lsfusion.server.logics.action.ExecutionContext;
-import lsfusion.server.language.ScriptingAction;
+import lsfusion.server.logics.action.controller.context.ExecutionContext;
+import lsfusion.server.physics.dev.integration.internal.to.InternalAction;
 import lsfusion.server.language.ScriptingLogicsModule;
 
 import java.io.File;
@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class RunProcessActionProperty extends ScriptingAction {
+public class RunProcessActionProperty extends InternalAction {
     private final ClassPropertyInterface serverInterface;
     private final ClassPropertyInterface commandInterface;
     private final ClassPropertyInterface directoryInterface;
@@ -34,7 +34,7 @@ public class RunProcessActionProperty extends ScriptingAction {
     public static final ConcurrentHashMap<Long, WeakReference<Process>> runningProcesses = new ConcurrentHashMap<>();
 
     @Override
-    public void executeCustom(ExecutionContext<ClassPropertyInterface> context) throws SQLException, SQLHandledException {
+    public void executeInternal(ExecutionContext<ClassPropertyInterface> context) throws SQLException, SQLHandledException {
         String command = (String) context.getKeyValue(commandInterface).getValue();
         String directory = (String) context.getKeyValue(directoryInterface).getValue();
         DataObject server = (DataObject) context.getKeyValue(serverInterface);

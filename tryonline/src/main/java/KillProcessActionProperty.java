@@ -1,17 +1,17 @@
 import com.google.common.base.Throwables;
-import lsfusion.server.language.ScriptingAction;
+import lsfusion.server.physics.dev.integration.internal.to.InternalAction;
 import lsfusion.server.logics.classes.ValueClass;
-import lsfusion.server.data.SQLHandledException;
-import lsfusion.server.data.DataObject;
+import lsfusion.server.data.sql.exception.SQLHandledException;
+import lsfusion.server.data.value.DataObject;
 import lsfusion.server.logics.property.classes.ClassPropertyInterface;
-import lsfusion.server.logics.action.ExecutionContext;
+import lsfusion.server.logics.action.controller.context.ExecutionContext;
 import lsfusion.server.language.ScriptingLogicsModule;
 
 import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.Iterator;
 
-public class KillProcessActionProperty extends ScriptingAction {
+public class KillProcessActionProperty extends InternalAction {
     private final ClassPropertyInterface serverInterface;
 
     public KillProcessActionProperty(ScriptingLogicsModule LM, ValueClass... classes) {
@@ -22,7 +22,7 @@ public class KillProcessActionProperty extends ScriptingAction {
     }
 
     @Override
-    public void executeCustom(ExecutionContext<ClassPropertyInterface> context) throws SQLException, SQLHandledException {
+    public void executeInternal(ExecutionContext<ClassPropertyInterface> context) throws SQLException, SQLHandledException {
         DataObject server = (DataObject) context.getKeyValue(serverInterface);
 
         try {
