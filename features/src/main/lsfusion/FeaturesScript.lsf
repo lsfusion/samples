@@ -1296,6 +1296,8 @@ FORM TestColumnGroupObjects 'Тест групп в колонках (StoreSize/
 
 colorizeElementWithNumberGreaterFour(NavigatorElement element) = #5555ff IF number(element) > 4;
 
+stringEqualsAll(STRING[3] string) = string == STRING[3]('Все');
+
 FORM TestTree 'Тест дерева (элементы навигатора)'
     TREE forms e=NavigatorElement PARENT parent
     PROPERTIES(e) VALUE, caption, canonicalName, number BACKGROUND colorizeElementWithNumberGreaterFour(e)
