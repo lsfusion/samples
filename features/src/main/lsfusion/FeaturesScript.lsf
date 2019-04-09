@@ -126,7 +126,6 @@ storeCaption(StoreSize storeSize) = staticCaption(storeSize) IF storeSize IS Sto
 //                                                                                                 [ASON CHANGE propertyName]
 //                                                                                                 [ASON CHANGEWYS propertyName]
 //                                                                                                 [ASON EDIT propertyName]
-//                                                                                                 [FIXEDCHARWIDTH <int value>]
 //                                                                                                 [IMAGE 'name'] [CHANGEKEY '<key code>' [SHOW | HIDE]] [AUTOSET] [CONFIRM]
 //                                                                                                 [REGEXP '<expression>' ['<regExp message>']] [LOGGABLE] [ECHO] [INDEXED]
 //                                                                                                 [NONULL [DELETE] [APPLY | SESSION] [FORMS form1, ..., formN]]
@@ -3113,7 +3112,7 @@ NAVIGATOR {
 }
 
 GROUP tgr 'ggf';
-t(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 10 FIXED;
+t(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 10 NOFLEX;
 ta(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 50;
 tv(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 10;
 x(Class2 c1) = 5 IF c1 IS Class2 IN tgr;
