@@ -157,8 +157,8 @@ sboolean 'Boolean' (store) = DATA BOOLEAN (Store);
 stext 'Text' (store) = DATA TEXT (Store);
 srichtext 'RichText' (store) = DATA RICHTEXT (Store);
 srawrichtext 'RawRichText' (Store store) = TEXT(srichtext(store));
-sstring 'String' (store) = DATA BPSTRING[300] (Store);
-svarstring 'VarString (no rtrim)' (store) = DATA STRING[300] (Store);
+sbpstring 'BPString' (store) = DATA BPSTRING[300] (Store);
+sstring 'String (no rtrim)' (store) = DATA STRING[300] (Store);
 
 ssinteger 'Session Integer' (store) = DATA LOCAL INTEGER (Store);
 sslong 'Session Long' (store) = DATA LOCAL LONG (Store);
@@ -167,8 +167,8 @@ ssboolean 'Session Boolean' (store) = DATA LOCAL BOOLEAN (Store);
 sstext 'Session Text' (store) = DATA LOCAL TEXT (Store);
 ssrichtext 'Session RichText' (store) = DATA LOCAL RICHTEXT (Store);
 ssrawrichtext 'Session RawRichText' (Store store) = TEXT(srichtext(store));
-ssstring 'Session String' (store) = DATA LOCAL BPSTRING[300] (Store);
-ssvarstring 'Session VarString (no rtrim)' (store) = DATA LOCAL STRING[300] (Store);
+ssbpstring 'Session BPString' (store) = DATA LOCAL BPSTRING[300] (Store);
+ssstring 'Session String (no rtrim)' (store) = DATA LOCAL STRING[300] (Store);
 
 ainteger 'Integer' (article) = DATA INTEGER (Article);
 along 'Long' (article) = DATA LONG (Article);
@@ -1533,7 +1533,7 @@ DESIGN TestOnActions {
     }
 }
 
-textToInt 'string->integer' (Store store) = INTEGER(sstring(store));
+textToInt 'string->integer' (Store store) = INTEGER(sbpstring(store));
 longToString 'long->string' (Store store) = BPSTRING[15](slong(store));
 
 nameDate 'name:date' (Store store) = name(store) + ':' + sdate(store);
@@ -1544,7 +1544,7 @@ sumNumericInt 'numeric+integer' (Store store) = snumeric(store) + sinteger(store
 sumIntLong 'integer+long' (Store store) = sinteger(store) + slong(store) CHARWIDTH 25;
 sumStringBoolean 'name:boolean' (Store store) = name(store) + ':' + sboolean(store) CHARWIDTH 25;
 sumTextInteger 'text+integer' (Store store) = stext(store) + sinteger(store) CHARWIDTH 25;
-sumNameString 'name+string' (Store store) = name(store) + sstring(store) CHARWIDTH 25;
+sumNameString 'name+string' (Store store) = name(store) + sbpstring(store) CHARWIDTH 25;
 
 subDoubleInt 'double-integer' (Store store) = sdouble(store) - sinteger(store) CHARWIDTH 25;
 subDoubleNumeric 'double-numeric' (Store store) = sdouble(store) - snumeric(store) CHARWIDTH 25;
@@ -1556,19 +1556,19 @@ multDoubleNumeric 'double*numeric' (Store store) = sdouble(store) * snumeric(sto
 multNumericInt 'numeric*integer' (Store store) = snumeric(store) * sinteger(store) CHARWIDTH 25;
 multIntLong 'integer*long' (Store store) = sinteger(store) * slong(store) CHARWIDTH 25;
 
-concatNull(Store store) = name(store) + ', ' + sstring(store) + ', ' + slong(store);
-concatNotNull(Named store) = CONCAT ', ', name(store), sstring(store), slong(store);
-concatToText(Named store) = CONCAT ', ', stext(store), name(store), sstring(store), slong(store);
-concatToVar(Named store) = CONCAT ', ', name(store), sstring(store), slong(store), '<const>' IF store IS Store;
-concatVarNull(Store store) =  'name: ' + name(store) + '; long: ' + slong(store) + '; string: ' + sstring(store);
-concatVarNotNull(Named store) = CONCAT '', 'name: ' IF store IS Store, name(store), '; long: ' IF store IS Store, slong(store), '; string: ' IF store IS Store, sstring(store);
+concatNull(Store store) = name(store) + ', ' + sbpstring(store) + ', ' + slong(store);
+concatNotNull(Named store) = CONCAT ', ', name(store), sbpstring(store), slong(store);
+concatToText(Named store) = CONCAT ', ', stext(store), name(store), sbpstring(store), slong(store);
+concatToVar(Named store) = CONCAT ', ', name(store), sbpstring(store), slong(store), '<const>' IF store IS Store;
+concatVarNull(Store store) =  'name: ' + name(store) + '; long: ' + slong(store) + '; string: ' + sbpstring(store);
+concatVarNotNull(Named store) = CONCAT '', 'name: ' IF store IS Store, name(store), '; long: ' IF store IS Store, slong(store), '; string: ' IF store IS Store, sbpstring(store);
 
 //castToInt = INTEGER(sstring(s));
-castToNumeric = NUMERIC[10,3](sstring(Store s));
+castToNumeric = NUMERIC[10,3](sbpstring(Store s));
 
 FORM TestOperators 'Тест операторов CAST, CONCAT, "+-*"'
     OBJECTS s=Store
-    PROPERTIES(s) VALUE, name, stime, sdate, sinteger, slong, sdouble, snumeric, sstring, castToNumeric, svarstring, sboolean
+    PROPERTIES(s) VALUE, name, stime, sdate, sinteger, slong, sdouble, snumeric, sbpstring, castToNumeric, sstring, sboolean
     PROPERTIES(s) stext
     PROPERTIES(s) PANEL textToInt, longToString
     PROPERTIES(s) PANEL sumNameString, nameDate, sumDoubleInt, sumDoubleNumeric, sumNumericInt, sumIntLong, sumStringBoolean, sumTextInteger
@@ -1827,7 +1827,7 @@ DESIGN TestImage {
 FORM TestMargins 'Тест Margins'
     OBJECTS s=Store, a=Article
     PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(s) PANEL sinteger, sdouble, slong, sstring, snumeric, scolor
+    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric, scolor
     PROPERTIES(a) VALUE, name
 ;
 
@@ -1853,7 +1853,7 @@ DESIGN TestMargins {
 FORM TestToolbars 'Тест Toolbars'
     OBJECTS s=Store, a=Article
     PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(s) PANEL sinteger, sdouble, slong, sstring, snumeric, scolor
+    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric, scolor
     PROPERTIES(a) VALUE, name
 ;
 
@@ -1914,7 +1914,7 @@ DESIGN TestRichText {
 FORM TestLabelWidth 'Тест LabelWidth'
     OBJECTS s=Store
     PROPERTIES(s) VALUE, name, storeSizeName, stime, sdate, sdatetime
-    PROPERTIES(s) PANEL sinteger, sdouble, slong, sstring, snumeric, scolor
+    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric, scolor
 ;
 
 DESIGN TestLabelWidth {
@@ -1953,7 +1953,7 @@ substoreTitle = DATA BPSTRING[15] (SubStore);
 
 FORM wideModalForm
     OBJECTS s=Store PANEL 
-    PROPERTIES(s)  so=VALUE, sn=name, si=sinteger, sl=slong, snm=snumeric, ss=sstring
+    PROPERTIES(s)  so=VALUE, sn=name, si=sinteger, sl=slong, snm=snumeric, ss=sbpstring
 ;
 
 DESIGN wideModalForm {
@@ -2015,7 +2015,7 @@ sessionSstring = DATA LOCAL BPSTRING[30](Store);
 
 FORM TestSessionProps 'Тест передачи значений между сессиями'
     OBJECTS s = Store
-    PROPERTIES (s) VALUE, name, storeSizeCode, ssstring, NEW
+    PROPERTIES (s) VALUE, name, storeSizeCode, ssbpstring, NEW
 ;
 testActionInNewSession()  { 
     LOCAL addedStore = Store();
@@ -2024,7 +2024,7 @@ testActionInNewSession()  {
         NEW s = Store {
             DIALOG TestSessionProps OBJECTS s = s DO {
                 addedStore() <- s;
-                ssstring(s) <- '<value from new session>';
+                ssbpstring(s) <- '<value from new session>';
             }
         }
     }
@@ -2035,21 +2035,21 @@ testActionInNewSession()  {
 
 testSessionPropsInApply()  { 
     NEW s = Store {
-        ssstring(s) <- 'some value';
+        ssbpstring(s) <- 'some value';
         
-        MESSAGE 'Before: ' + ssstring(s);
+        MESSAGE 'Before: ' + ssbpstring(s);
         
-        APPLY NESTED (ssstring[Store]);
+        APPLY NESTED (ssbpstring[Store]);
         
-        MESSAGE 'After: ' + ssstring(s);
+        MESSAGE 'After: ' + ssbpstring(s);
     }
 };
 
 testNestedSession(Store s)  { 
-    ssstring(s) <- '<value from top session>';
+    ssbpstring(s) <- '<value from top session>';
     NESTEDSESSION {
         DIALOG TestSessionProps OBJECTS s = s DO {
-            ssstring(s) <- '<value from nested session>';
+            ssbpstring(s) <- '<value from nested session>';
             apply();
         }
     }
@@ -2108,7 +2108,7 @@ DESIGN TestHTMLInReports {
 testSessionIntegerProperty() = DATA LOCAL NESTED INTEGER();
 FORM TestKeepSessionProps 'Test LOCAL NESTED'
     OBJECTS s=Store
-    PROPERTIES(s) VALUE, name, ssstring, ssboolean, ssinteger
+    PROPERTIES(s) VALUE, name, ssbpstring, ssboolean, ssinteger
     PROPERTIES testSessionIntegerProperty()
 ;
 
