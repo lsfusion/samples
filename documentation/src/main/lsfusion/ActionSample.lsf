@@ -214,7 +214,7 @@ changeStatus()  {
 //#changeclass end
 
 //#custom
-showOnMap 'Показать на карте'  INTERNAL  'lsfusion.server.logics.classes.data.utils.geo.ShowOnMapAction' (DOUBLE, DOUBLE, MapProvider, STRING[100]);
+showOnMap 'Показать на карте'  INTERNAL  'lsfusion.server.logics.classes.data.utils.geo.ShowOnMapAction' (DOUBLE, DOUBLE, MapProvider, BPSTRING[100]);
 
 serviceDBMT 'Обслуживание БД (многопоточно, threadCount, timeout)'  INTERNAL  'lsfusion.server.physics.admin.service.action.ServiceDBMultiThreadAction' (INTEGER, INTEGER) NULL;
 
@@ -287,7 +287,7 @@ justSendEmail 'Отправить письмо' ()  {
 //#eval
 addProperty  { EVAL ACTION 'MESSAGE \'Hello World\''; }  // исходный код, состоящий из одной инструкции, задается строковой константой
   
-code 'Исходные код' = DATA STRING[2000] ();              // свойство, в которое пользователь может ввести исходный код
+code 'Исходные код' = DATA BPSTRING[2000] ();              // свойство, в которое пользователь может ввести исходный код
 execute 'Выполнить код'  { EVAL code(); }      // действие, выполняющее этот код
 //#eval end
 
@@ -434,13 +434,13 @@ import()  {
 
     LOCAL xlsFile = EXCELFILE ();
     
-    LOCAL field1 = STRING[50] (INTEGER);
-    LOCAL field2 = STRING[50] (INTEGER);
-    LOCAL field3 = STRING[50] (INTEGER);
-    LOCAL field4 = STRING[50] (INTEGER);
+    LOCAL field1 = BPSTRING[50] (INTEGER);
+    LOCAL field2 = BPSTRING[50] (INTEGER);
+    LOCAL field3 = BPSTRING[50] (INTEGER);
+    LOCAL field4 = BPSTRING[50] (INTEGER);
 
-    LOCAL headField1 = STRING[50] ();
-    LOCAL headField2 = STRING[50] ();
+    LOCAL headField1 = BPSTRING[50] ();
+    LOCAL headField2 = BPSTRING[50] ();
 
     INPUT f = EXCELFILE DO {     
         IMPORT XLS SHEET 2 FROM f TO field1 = C, field2, field3 = F, field4 = A;
@@ -456,7 +456,7 @@ import()  {
     
     LOCAL t = FILE ();
     EXTERNAL SQL 'jdbc:postgresql://localhost/test?user=postgres&password=12345' EXEC 'SELECT x.a,x.b,x.c,x.d FROM orders x WHERE x.id = $1;' PARAMS '4553' TO t;
-    IMPORT FROM t() FIELDS INTEGER a, DATE b, STRING[50] c, STRING[50] d DO        // импорт с опцией FIELDS
+    IMPORT FROM t() FIELDS INTEGER a, DATE b, BPSTRING[50] c, BPSTRING[50] d DO        // импорт с опцией FIELDS
         NEW o = Order {
             number(o) <- a;
             date(o) <- b;
@@ -483,7 +483,7 @@ import()  {
 //#importForm
 
 date = DATA DATE (INTEGER);
-sku = DATA STRING[50] (INTEGER); 
+sku = DATA BPSTRING[50] (INTEGER); 
 price = DATA NUMERIC[14,2] (INTEGER); 
 order = DATA INTEGER (INTEGER); 
 FORM import
@@ -665,7 +665,7 @@ testNewSession ()  {
     }
     // здесь новый объект класса Currency уже в базе данных
     
-    LOCAL local = STRING[10] (Currency);
+    LOCAL local = BPSTRING[10] (Currency);
     local(Currency c) <- 'Local';
     NEWSESSION {
         MESSAGE (GROUP SUM 1 IF local(Currency c) == 'Local'); // возвратит NULL
@@ -740,7 +740,7 @@ importXls 'Импортировать надбавки'()  {
     READ connectionString() + '@SELECT field1, field2 FROM myTable' TO importFile;
     
     LOCAL field1 = INTEGER (INTEGER);
-    LOCAL field2 = STRING[10] (INTEGER);
+    LOCAL field2 = BPSTRING[10] (INTEGER);
     IMPORT TABLE FROM importFile() TO field1, field2;
 }
 //#read end
@@ -800,7 +800,7 @@ testShow ()  {
 //#try
 tryToImport(FILE f)  { 
     TRY {
-        LOCAL a = STRING[10] (INTEGER);
+        LOCAL a = BPSTRING[10] (INTEGER);
          
         IMPORT XLS FROM f TO a = A;
     }

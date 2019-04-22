@@ -4,7 +4,7 @@ REQUIRE Sku;
   
 CLASS Barcode; // объявляем класс штрих-кода
  
-id = DATA STRING[13] (Barcode); // создаем свойство с номером штрих-кода
+id = DATA BPSTRING[13] (Barcode); // создаем свойство с номером штрих-кода
 sku = DATA Sku (Barcode); // создаем ссылку штрих-кода на sku
   
 EXTEND FORM sku // создаем форму Item

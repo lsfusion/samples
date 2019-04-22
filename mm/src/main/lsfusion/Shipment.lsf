@@ -17,7 +17,7 @@ index 'Номер строки' (ShipmentDetail d) =
 //#class end
 
 //#headerattributes
-number 'Номер накладной' = DATA STRING[10] (Shipment);
+number 'Номер накладной' = DATA BPSTRING[10] (Shipment);
 date 'Дата накладной' = DATA DATE (Shipment);
 
 customer 'Покупатель' = DATA LegalEntity (Shipment);

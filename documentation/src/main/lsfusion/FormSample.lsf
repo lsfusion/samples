@@ -118,7 +118,7 @@ CLASS Order;
 date = DATA DATE (Order);
 time = DATA TIME (Order);
 number = DATA INTEGER (Order);
-series = DATA STRING[2] (Order);
+series = DATA BPSTRING[2] (Order);
 
 note = DATA VARISTRING[255] (Order);
 

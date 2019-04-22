@@ -6,12 +6,12 @@ CLASS Server 'Сервер';
 processId = DATA LONG (Server);
 text 'Текст ответа' = DATA TEXT (Server, LONG);
 
-baseDir 'Директорий запуска' = DATA STRING[50] ();
-examplesDBDir 'Директорий примеров (СУБД)' = DATA STRING[50] ();
-examplesPlatformDir 'Директорий примеров (Платформа)' = DATA STRING[50] ();
-dbPassword 'Пароль к базе' = DATA STRING[50] () CHARWIDTH 10 NOFLEX; // for postgres user
+baseDir 'Директорий запуска' = DATA BPSTRING[50] ();
+examplesDBDir 'Директорий примеров (СУБД)' = DATA BPSTRING[50] ();
+examplesPlatformDir 'Директорий примеров (Платформа)' = DATA BPSTRING[50] ();
+dbPassword 'Пароль к базе' = DATA BPSTRING[50] () CHARWIDTH 10 NOFLEX; // for postgres user
 serverStartCmd 'Команда запуска сервера' = DATA VARSTRING[1000] (); // will be started from some basedir subfolder 
-serverEncoding 'Кодирока консоли' = DATA STRING[10] (); // server console output encoding
+serverEncoding 'Кодирока консоли' = DATA BPSTRING[10] (); // server console output encoding
 minPort 'Мин. порт' = DATA LONG (); 
 maxPort 'Макс. порт' = DATA LONG (); 
 

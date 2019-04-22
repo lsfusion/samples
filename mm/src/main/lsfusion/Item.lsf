@@ -6,7 +6,7 @@ MODULE Item;
 CLASS Item 'Товар';
 
 name 'Наименование' = DATA VARSTRING[100](Item) IN base;
-barcode 'Штрихкод' = DATA STRING[13](Item) IN base;
+barcode 'Штрихкод' = DATA BPSTRING[13](Item) IN base;
 //#class end
 
 //#price

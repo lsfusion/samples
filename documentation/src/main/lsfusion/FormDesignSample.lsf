@@ -2,8 +2,8 @@ MODULE FormDesignSample;
 
 CLASS myClass 'myClass';
 
-myProperty1 = DATA STRING[20] (myClass);
-myProperty2 = DATA STRING[20] (myClass);
+myProperty1 = DATA BPSTRING[20] (myClass);
+myProperty2 = DATA BPSTRING[20] (myClass);
 
 //#default
  

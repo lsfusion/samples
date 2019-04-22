@@ -113,7 +113,7 @@ name(Human h) = EXCLUSIVE 'Male' IF h IS Male, 'Female' IF h IS Female;
 
 //#formula
 round(number, digits) = FORMULA 'round(CAST(($1) as numeric),$2)';  // свойство с двумя параметрами: округляемым числом и количеством знаков после запятой
-toString15(str) = FORMULA STRING[15] 'CAST($1 AS character(15))';   // свойство, преобразовывающее значение, переданное в качестве аргумента, к строковому типу длиной в 15 символов. 
+toString15(str) = FORMULA BPSTRING[15] 'CAST($1 AS character(15))';   // свойство, преобразовывающее значение, переданное в качестве аргумента, к строковому типу длиной в 15 символов. 
 jumpWorkdays = FORMULA NULL DATE PG 'jumpWorkdays($1, $2, $3)', MS 'dbo.jumpWorkdays($1, $2, $3)'; // свойство с двумя различными реализациями для разных диалектов SQL
 //#formula end
 
@@ -160,9 +160,9 @@ g = DATA INTEGER (INTEGER, INTEGER);
 h = DATA INTEGER (INTEGER, INTEGER);
 c(a, b) = f(g(a, b), h(b, 3), a);
 
-count = DATA STRING[255] (INTEGER);
-name = DATA STRING[255] (INTEGER);
-formatted(INTEGER a, INTEGER b) = [FORMULA STRING[255] ' CAST($1 AS TEXT) || \' / \' || CAST($2 AS TEXT)'](count(a), name(b));
+count = DATA BPSTRING[255] (INTEGER);
+name = DATA BPSTRING[255] (INTEGER);
+formatted(INTEGER a, INTEGER b) = [FORMULA BPSTRING[255] ' CAST($1 AS TEXT) || \' / \' || CAST($2 AS TEXT)'](count(a), name(b));
 //#join1 end   
 
 //#join2
@@ -322,7 +322,7 @@ setNameX 'Добавить X к имени'()  {
 
 //#explicitcast
 itemCount = DATA INTEGER (Store);
-itemCountToString(s) = STRING[10](itemCount(s));
+itemCountToString(s) = BPSTRING[10](itemCount(s));
 
 barcode = DATA VARSTRING[15] (Item);
 longBarcode(Item i) = LONG(barcode(i));
@@ -352,7 +352,7 @@ createdUser (Order o) <- currentUser() WHEN SET(o IS Order);
 
 numerator = DATA Numerator (Order);
 number = DATA VARSTRING[28] (Order);
-series = DATA STRING[2] (Order);
+series = DATA BPSTRING[2] (Order);
 WHEN SETCHANGED(numerator(Order o)) AND
      NOT CHANGED(number(o)) AND
      NOT CHANGED(series(o))

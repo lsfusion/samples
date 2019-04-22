@@ -12,11 +12,11 @@ CLASS Employee;
 CLASS Company;
  
 // Объявление свойств 
-name(employee) = DATA STRING[100](Employee);
+name(employee) = DATA BPSTRING[100](Employee);
 age(employee) = DATA INTEGER(Employee);
 company(employee) = DATA Company(Employee);
   
-name(company) = DATA STRING[100](Company);
+name(company) = DATA BPSTRING[100](Company);
  
 // Объявление формы 
 FORM employeeForm

@@ -11,7 +11,7 @@ CLASS Team 'Команда';
 //#classteam end
 
 //#nameteam
-name 'Название команды' (team) = DATA STRING[30](Team) IN base;
+name 'Название команды' (team) = DATA BPSTRING[30](Team) IN base;
 //#nameteam end
 
 //#game

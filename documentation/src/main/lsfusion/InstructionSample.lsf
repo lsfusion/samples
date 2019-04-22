@@ -195,10 +195,10 @@ CLASS BClass : AClass;
 CLASS CClass : AClass;
 CLASS DClass : AClass;
 
-name(AClass a) = ABSTRACT STRING[50] (AClass);
-innerName(BClass b) = DATA STRING[50] (BClass);
-innerName(CClass c) = DATA STRING[50] (CClass);
-innerName(DClass d) = DATA STRING[50] (DClass);
+name(AClass a) = ABSTRACT BPSTRING[50] (AClass);
+innerName(BClass b) = DATA BPSTRING[50] (BClass);
+innerName(CClass c) = DATA BPSTRING[50] (CClass);
+innerName(DClass d) = DATA BPSTRING[50] (DClass);
 
 name(BClass b) = 'B' + innerName(b);
 name(CClass c) = 'C' + innerName(c);
@@ -243,7 +243,7 @@ testName (Human h) + WHEN name(h) == 'Bob' THEN {  MESSAGE 'I am Bob'; }
 
 //#meta
 META objectProperties(object, type, caption)
-    object##Name 'Имя'##caption = DATA STRING[100](###object); // делаем заглавной первую букву
+    object##Name 'Имя'##caption = DATA BPSTRING[100](###object); // делаем заглавной первую букву
     object##Type 'Тип'##caption = DATA type (###object);
     object##Value 'Стоимость'##caption = DATA INTEGER (###object);
 END
@@ -258,7 +258,7 @@ CLASS Book;
 @objectProperties(book, INTEGER, 'Книга');
 
 CLASS Flower;
-@objectProperties(flower, STRING[100], ); // если не передать параметр, то он будет пустым
+@objectProperties(flower, BPSTRING[100], ); // если не передать параметр, то он будет пустым
 
 CLASS Table;
 @objectProperties(table, NUMERIC[14,2]);

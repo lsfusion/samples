@@ -6,12 +6,12 @@ MODULE LegalEntity;
 CLASS LegalEntity 'Организация';
 
 name 'Наименование' = DATA VARSTRING[100](LegalEntity) IN base;
-address 'Адрес' = DATA STRING[150](LegalEntity) IN base;
-inn 'ИНН' = DATA STRING[9](LegalEntity) IN base;
+address 'Адрес' = DATA BPSTRING[150](LegalEntity) IN base;
+inn 'ИНН' = DATA BPSTRING[9](LegalEntity) IN base;
 //#class end
 
 //#inn
-legalEntityINN (STRING[9] inn) = GROUP AGGR LegalEntity legalEntity BY inn(legalEntity);
+legalEntityINN  (BPSTRING[9] inn) = GROUP AGGR LegalEntity legalEntity BY inn(legalEntity);
 //#inn end
 
 //#form

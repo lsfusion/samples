@@ -22,7 +22,7 @@ index 'Номер строки' (ReceiptDetail d) =
 //#index end
 
 //#headerattributes
-number 'Номер накладной' = DATA STRING[10] (Receipt);
+number 'Номер накладной' = DATA BPSTRING[10] (Receipt);
 date 'Дата накладной' = DATA DATE (Receipt);
 
 supplier 'Поставщик' = DATA LegalEntity (Receipt);

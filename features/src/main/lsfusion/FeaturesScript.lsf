@@ -138,7 +138,7 @@ storeCaption(StoreSize storeSize) = staticCaption(storeSize) IF storeSize IS Sto
 // Expression syntax:
 // DATA [LOCAL] returnClass ( [paramClass1, ..., paramClassN] )
 // If LOCAL modifier is specified, than local data property will be created.
-// Built-in types: INTEGER, LONG, DOUBLE, BOOLEAN, DATE, DATETIME, TEXT, STRING, ISTRING, 
+// Built-in types: INTEGER, LONG, DOUBLE, BOOLEAN, DATE, DATETIME, TEXT, BPSTRING, BPISTRING, 
 // TIME, WORDFILE, IMAGEFILE, PDFFILE, FILE, EXCELFILE, NUMERIC, COLOR, CSVFILE, HTMLFILE, JSONFILE, XMLFILE, TABLEFILE
 stime 'Время' (store) = DATA TIME (Store) IN base;
 sdate 'Дата' (store) = DATA DATE (Store) IN base;
@@ -157,7 +157,7 @@ sboolean 'Boolean' (store) = DATA BOOLEAN (Store);
 stext 'Text' (store) = DATA TEXT (Store);
 srichtext 'RichText' (store) = DATA RICHTEXT (Store);
 srawrichtext 'RawRichText' (Store store) = TEXT(srichtext(store));
-sstring 'String' (store) = DATA STRING[300] (Store);
+sstring 'String' (store) = DATA BPSTRING[300] (Store);
 svarstring 'VarString (no rtrim)' (store) = DATA VARSTRING[300] (Store);
 
 ssinteger 'Session Integer' (store) = DATA LOCAL INTEGER (Store);
@@ -167,7 +167,7 @@ ssboolean 'Session Boolean' (store) = DATA LOCAL BOOLEAN (Store);
 sstext 'Session Text' (store) = DATA LOCAL TEXT (Store);
 ssrichtext 'Session RichText' (store) = DATA LOCAL RICHTEXT (Store);
 ssrawrichtext 'Session RawRichText' (Store store) = TEXT(srichtext(store));
-ssstring 'Session String' (store) = DATA LOCAL STRING[300] (Store);
+ssstring 'Session String' (store) = DATA LOCAL BPSTRING[300] (Store);
 ssvarstring 'Session VarString (no rtrim)' (store) = DATA LOCAL VARSTRING[300] (Store);
 
 ainteger 'Integer' (article) = DATA INTEGER (Article);
@@ -185,7 +185,7 @@ quantity(document, article) = DATA DOUBLE (Document, Article) IN base;
 oq(document, article) = DATA DOUBLE (Document, Article) IN base;
 storeSize(store) = DATA StoreSize (Store);
 
-barcode 'Штрихкод' (article) = DATA STRING[15] (Article);
+barcode 'Штрихкод' (article) = DATA BPSTRING[15] (Article);
 barcodeToArticle (barcode) = GROUP AGGR Article article BY barcode(article);
 
 sessionObj() = DATA LOCAL Object ();
@@ -997,7 +997,7 @@ FORM remindUserPass 'Напоминание логина'
     PROPERTIES(u) READONLY login, name[Contact]
 ;
 
-remindPasswordEmail 'Выслать логин на этот email' (Contact u, STRING[200] to)  {
+remindPasswordEmail 'Выслать логин на этот email' (Contact u, BPSTRING[200] to)  {
      LOCAL bodyFile = FILE (); 
      PRINT remindUserPass OBJECTS u=(u AS CustomUser) HTML TO bodyFile;
      
@@ -1007,16 +1007,16 @@ remindPasswordEmail 'Выслать логин на этот email' (Contact u, 
     EMAIL
 //    FROM 'luxsoft@adsl.by'
     SUBJECT 'Напоминание пароля для ' + email(u)
-    TO (to IF to IS STRING[200])
+    TO (to IF to IS BPSTRING[200])
     CC 'some@someserv.net'
 //    BCC 'luxsoft@adsl.by'
     BODY bodyFile()
     ATTACH attachFile() NAME 'ATTACH: Напоминание пароля для ' + email(u)
     ; }
 
-justSendEmail 'Просто выслать емэйл' (STRING[200] to)  { EMAIL
+justSendEmail 'Просто выслать емэйл' (BPSTRING[200] to)  { EMAIL
     SUBJECT 'Тема письма'
-    TO (to IF to IS STRING[200])
+    TO (to IF to IS BPSTRING[200])
     BODY '<font color=#FF0000 size=+3>big red text</font>'; }
 
 FORM TestEmailForm 'Тест EMAIL'
@@ -1279,8 +1279,8 @@ FORM TestDataPropForm 'Тест дат'
 ;
 
 colorizeMatching (Store s, StoreSize ss) = scolor(s) IF storeSize(s) == ss;
-storeString (s, ss) = DATA STRING[10] (Store, StoreSize);
-storeString2 (s, ss) = DATA STRING[10] (Store, StoreSize);
+storeString (s, ss) = DATA BPSTRING[10] (Store, StoreSize);
+storeString2 (s, ss) = DATA BPSTRING[10] (Store, StoreSize);
 storeHeader (StoreSize ss) = 'storeSize: ' + sizeCode(ss);
 storeHeader2 (Store s, StoreSize ss) = OVERRIDE storeString(s, ss), 
                                                                name(ss) IF s IS Store AND ss IS StoreSize AND ss!=StoreSize.small;
@@ -1295,13 +1295,13 @@ FORM TestColumnGroupObjects 'Тест групп в колонках (StoreSize/
 
 colorizeElementWithNumberGreaterFour(NavigatorElement element) = #5555ff IF number(element) > 4;
 
-stringEqualsAll(STRING[3] string) = string == STRING[3]('Все');
+stringEqualsAll(BPSTRING[3] string) = string == BPSTRING[3]('Все');
 
 FORM TestTree 'Тест дерева (элементы навигатора)'
     TREE forms e=NavigatorElement PARENT parent
     PROPERTIES(e) VALUE, caption, canonicalName, number BACKGROUND colorizeElementWithNumberGreaterFour(e)
 
-    TREE forms2 a=STRING[3], e2=NavigatorElement PARENT parent
+    TREE forms2 a=BPSTRING[3], e2=NavigatorElement PARENT parent
     PROPERTIES(a) VALUE
     PROPERTIES(e2) VALUE, caption, canonicalName
 
@@ -1325,7 +1325,7 @@ DESIGN TestTree {
 showStores(ArticleGroup ag, Store s) = aginteger(ag) > 5 AND s IS Store;
 
 FORM TestExpandables 'Тест Expandables'
-    TREE groups a=STRING[3], ag=ArticleGroup PARENT parent, s=Store
+    TREE groups a=BPSTRING[3], ag=ArticleGroup PARENT parent, s=Store
     PROPERTIES(a) VALUE
     PROPERTIES(ag) VALUE, name, nameParent, aginteger
     PROPERTIES(s) VALUE, name, storeSizeCode, sinteger
@@ -1456,7 +1456,7 @@ onChangeStoreName()  {
 }
 
 onChangeSInteger(Store s)  { 
-    INPUT st=STRING[15] DO {
+    INPUT st=BPSTRING[15] DO {
         MESSAGE 'String: ' + st;
     
         sinteger(s) <- INTEGER(st);
@@ -1509,7 +1509,7 @@ testOnStringChange()  {
 }
 
 FORM TestOnActions 'Тест "ON actions"'
-    OBJECTS str=STRING[15] PANEL
+    OBJECTS str=BPSTRING[15] PANEL
     OBJECTS s=Store
     PROPERTIES(s) NEWSESSION VALUE,
                   name ON CHANGE onChangeStoreName(),
@@ -1534,7 +1534,7 @@ DESIGN TestOnActions {
 }
 
 textToInt 'string->integer' (Store store) = INTEGER(sstring(store));
-longToString 'long->string' (Store store) = STRING[15](slong(store));
+longToString 'long->string' (Store store) = BPSTRING[15](slong(store));
 
 nameDate 'name:date' (Store store) = name(store) + ':' + sdate(store);
 
@@ -1725,7 +1725,7 @@ DESIGN TestLayout {
     }
 }
 
-addDetailBarcode(Article article, STRING[15] barcode)  { 
+addDetailBarcode(Article article, BPSTRING[15] barcode)  { 
     LOCAL dialogBarcodeArticle = Article ();
     dialogBarcodeArticle() <- barcodeToArticle(barcode);
 
@@ -1739,10 +1739,10 @@ addDetailBarcode(Article article, STRING[15] barcode)  {
 };
 
 changeAddDetailInputBarcode(Article article)  { 
-    INPUT st = STRING[15] DO
+    INPUT st = BPSTRING[15] DO
         addDetailBarcode(article, st);
 };
-addDetailInputBarcode 'Ввод штрихкода :' (article) = DATA LOCAL STRING[15] (Article) TOOLBAR CHANGEKEY 'F4' EVENTID 'SCANNER'
+addDetailInputBarcode 'Ввод штрихкода :' (article) = DATA LOCAL BPSTRING[15] (Article) TOOLBAR CHANGEKEY 'F4' EVENTID 'SCANNER'
                                                                             ON CHANGE { changeAddDetailInputBarcode(article); }
 FORM TestRequest 'Тест RequestInput'
     OBJECTS s=Store PANEL, a=Article
@@ -1935,7 +1935,7 @@ FORM TestShowIfInTreeAndContainers 'Тест ShowIf (tree & containers)'
     OBJECTS s=Store
     PROPERTIES(s) VALUE, name, storeSizeCode
 
-    TREE groups a=STRING[3], ag=ArticleGroup PARENT parent
+    TREE groups a=BPSTRING[3], ag=ArticleGroup PARENT parent
     PROPERTIES(a) SHOWIF storeIsBig(s) VALUE
     PROPERTIES(ag) SHOWIF storeIsBig(s) VALUE, name, nameParent, DELETE GRID
 
@@ -1949,7 +1949,7 @@ DESIGN TestShowIfInTreeAndContainers {
 }
 
 
-substoreTitle = DATA STRING[15] (SubStore);
+substoreTitle = DATA BPSTRING[15] (SubStore);
 
 FORM wideModalForm
     OBJECTS s=Store PANEL 
@@ -2011,7 +2011,7 @@ FORM TestDisappearingActon 'Тест исчезающей кнопки' AUTOREFR
     FILTERS objectClass(s) == objectClass(ss)
 ;
 
-sessionSstring = DATA LOCAL STRING[30](Store);
+sessionSstring = DATA LOCAL BPSTRING[30](Store);
 
 FORM TestSessionProps 'Тест передачи значений между сессиями'
     OBJECTS s = Store
@@ -2275,7 +2275,7 @@ FORM TestActionDebugger 'Тест ActionDebugger'
 
 //path() = 'file:///C:/temp.txt';
 
-path(Store s) = DATA STRING[100](Store);
+path(Store s) = DATA BPSTRING[100](Store);
 
 file() = DATA LOCAL FILE ();
 
@@ -3083,8 +3083,8 @@ NAVIGATOR {
 
 CLASS Class1 'Class1';   
 CLASS Class2 'Class2';
-name = DATA STRING[50](Class1);
-name = DATA STRING[50](Class2);
+name = DATA BPSTRING[50](Class1);
+name = DATA BPSTRING[50](Class2);
 
 FORM test3 'testForm-3'
     OBJECTS c1=Class1, c2=Class2
@@ -3156,8 +3156,8 @@ DESIGN x {
     }
 }
 
-tst = DATA LOCAL STRING[10] ();
-tst = DATA LOCAL STRING[10] (INTEGER);
+tst = DATA LOCAL BPSTRING[10] ();
+tst = DATA LOCAL BPSTRING[10] (INTEGER);
 vtst = DATA LOCAL VARSTRING[10] ();
 vtst = DATA LOCAL VARSTRING[10] (INTEGER);
 tst2 = DATA LOCAL VARSTRING[10] ();
