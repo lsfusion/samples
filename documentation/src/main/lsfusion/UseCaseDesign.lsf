@@ -2,7 +2,7 @@ MODULE DesignUseCase;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[100] (Book);
+name 'Наименование' = DATA ISTRING[100] (Book);
   
 CLASS Order 'Заказ';
 date 'Дата' = DATA DATE (Order);
@@ -64,7 +64,7 @@ DESIGN orders {
 
 //#sample2
 CLASS Customer 'Покупатель';
-name 'Наименование' = DATA VARISTRING[100] (Customer);
+name 'Наименование' = DATA ISTRING[100] (Customer);
   
 customer 'Покупатель' = DATA Customer (Order);
 nameCustomer 'Покупатель' (Order o) = name(customer(o));

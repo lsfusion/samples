@@ -3,7 +3,7 @@ MODULE UseCaseNumerating;
 //#numbermaster
 CLASS Book 'Книга';
 number 'Номер' = DATA INTEGER (Book) IN id;
-name 'Название' = DATA VARISTRING[50] (Book) IN id;
+name 'Название' = DATA ISTRING[50] (Book) IN id;
 //#numbermaster end
 
 //#numberaggr
@@ -25,7 +25,7 @@ WHEN SET(Book b IS Book) AND NOT number(b) DO {
 
 //#numerator
 CLASS Numerator 'Нумератор';
-name 'Наименование' = DATA VARISTRING[50] (Numerator) IN id;
+name 'Наименование' = DATA ISTRING[50] (Numerator) IN id;
 
 value = DATA INTEGER (Numerator);
 //#numerator end

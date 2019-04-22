@@ -2,7 +2,7 @@ MODULE MyBook;
   
 REQUIRE Book;
   
-name = DATA VARSTRING[100] (Book); // добавляем к товару некоторое свойство name
+name = DATA STRING[100] (Book); // добавляем к товару некоторое свойство name
 overCopy (Book s, Book d) + { 
     name(d) <- name(s); // подключаем к действию копирования товара копирование созданного свойства
 }

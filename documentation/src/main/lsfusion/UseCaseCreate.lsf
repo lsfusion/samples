@@ -2,7 +2,7 @@ MODULE UseCaseCreate;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book) IN id;
+name 'Наименование' = DATA ISTRING[50] (Book) IN id;
 price 'Цена' = DATA NUMERIC[14,2] (Book); 
 
 FORM book 'Книга'

@@ -10,7 +10,7 @@ baseDir 'Директорий запуска' = DATA BPSTRING[50] ();
 examplesDBDir 'Директорий примеров (СУБД)' = DATA BPSTRING[50] ();
 examplesPlatformDir 'Директорий примеров (Платформа)' = DATA BPSTRING[50] ();
 dbPassword 'Пароль к базе' = DATA BPSTRING[50] () CHARWIDTH 10 NOFLEX; // for postgres user
-serverStartCmd 'Команда запуска сервера' = DATA VARSTRING[1000] (); // will be started from some basedir subfolder 
+serverStartCmd 'Команда запуска сервера' = DATA STRING[1000] (); // will be started from some basedir subfolder 
 serverEncoding 'Кодирока консоли' = DATA BPSTRING[10] (); // server console output encoding
 minPort 'Мин. порт' = DATA LONG (); 
 maxPort 'Макс. порт' = DATA LONG (); 
@@ -161,7 +161,7 @@ getServerLog(JSONFILE file) {
 
 getExamples(JSONFILE file) {
     IMPORT JSON FROM file FIELDS () INTEGER mode DO {
-            LOCAL directory = VARSTRING[50] ();
+            LOCAL directory = STRING[50] ();
             directory() <- IF mode = 1 THEN examplesDBDir() ELSE examplesPlatformDir();
             listFiles(directory()); 
             

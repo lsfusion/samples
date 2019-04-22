@@ -2,16 +2,16 @@ MODULE UseCaseDependentProperties;
 
 //#sample1
 CLASS Country 'Страна';
-name 'Имя' = DATA VARISTRING[100] (Country) IN id;
+name 'Имя' = DATA ISTRING[100] (Country) IN id;
 
 CLASS Region 'Регион';
-name 'Имя' = DATA VARISTRING[100] (Region) IN id;
+name 'Имя' = DATA ISTRING[100] (Region) IN id;
 
 country 'Страна' = DATA Country (Region) NONULL DELETE;
 nameCountry 'Страна' (Region r)= name(country(r)) IN id;
 
 CLASS City 'Город';
-name 'Имя' = DATA VARISTRING[100] (City);
+name 'Имя' = DATA ISTRING[100] (City);
 
 country 'Страна' = DATA Country (City) NONULL DELETE;
 nameCountry (City c) = name(country(c));

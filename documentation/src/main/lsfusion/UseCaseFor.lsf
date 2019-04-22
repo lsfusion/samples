@@ -4,7 +4,7 @@ REQUIRE Utils;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book);
+name 'Наименование' = DATA ISTRING[50] (Book);
 //#sample1 end
 
 //#solution1

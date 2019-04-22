@@ -2,8 +2,8 @@ MODULE UseCaseFormProperties;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book) IN id;
-genre 'Жанр' = DATA VARISTRING[30] (Book) IN id;
+name 'Наименование' = DATA ISTRING[50] (Book) IN id;
+genre 'Жанр' = DATA ISTRING[30] (Book) IN id;
 
 price 'Цена' = DATA NUMERIC[12,2] (Book) IN id;
 

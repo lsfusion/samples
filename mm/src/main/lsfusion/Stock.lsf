@@ -5,7 +5,7 @@ MODULE Stock;
 //#class
 CLASS Stock 'Склад';
 
-name 'Наименование' = DATA VARSTRING[100] (Stock) IN base;
+name 'Наименование' = DATA STRING[100] (Stock) IN base;
 address 'Адрес' = DATA BPSTRING[150] (Stock) IN base;
 //#class end
 

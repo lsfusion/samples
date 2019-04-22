@@ -4,10 +4,10 @@ MODULE UseCaseReports;
 NAMESPACE Sample;
 
 CLASS Category 'Категория';
-name 'Наименование' = DATA VARISTRING[50] (Category) IN id;
+name 'Наименование' = DATA ISTRING[50] (Category) IN id;
 
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[100] (Book) IN id;
+name 'Наименование' = DATA ISTRING[100] (Book) IN id;
 
 category 'Категория' = DATA Category (Book) AUTOSET;
 nameCategory 'Категория' (Book b) = name(category(b)) IN id;
@@ -55,7 +55,7 @@ EXTEND FORM books
 //#sample2
 CLASS Invoice 'Счет';
 date 'Дата' = DATA DATE (Invoice);
-number 'Номер' = DATA VARSTRING[10] (Invoice);
+number 'Номер' = DATA STRING[10] (Invoice);
   
 CLASS InvoiceDetail 'Строка счета';
 invoice 'Счет' = DATA Invoice (InvoiceDetail) NONULL DELETE;
@@ -103,7 +103,7 @@ EXTEND FORM invoices
 
 //#sample3
 CLASS Customer 'Покупатель';
-name 'Наименование' = DATA VARISTRING[50] (Customer) IN id;
+name 'Наименование' = DATA ISTRING[50] (Customer) IN id;
 
 FORM customers 'Покупатели'
     OBJECTS c = Customer
@@ -122,7 +122,7 @@ EXTEND FORM invoice PROPERTIES(i) nameCustomer;
 
 CLASS Order 'Заказ';
 date 'Дата' = DATA DATE (Order);
-number 'Номер' = DATA VARSTRING[10] (Order);
+number 'Номер' = DATA STRING[10] (Order);
 
 customer 'Покупатель' = DATA Customer (Order);
 nameCustomer 'Покупатель' (Order o) = name(customer(o));

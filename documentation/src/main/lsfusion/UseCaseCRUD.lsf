@@ -20,7 +20,7 @@ FORM types 'Список типов'
 
 //#sample2
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[30] (Book) IN id;
+name 'Наименование' = DATA ISTRING[30] (Book) IN id;
 //#sample2 end
 
 //#solution2
@@ -46,7 +46,7 @@ NAVIGATOR {
 
 //#sample3
 CLASS Genre 'Жанр';
-name 'Наименование' = DATA VARISTRING[30] (Genre);
+name 'Наименование' = DATA ISTRING[30] (Genre);
 //#sample3 end
 
 //#solution3

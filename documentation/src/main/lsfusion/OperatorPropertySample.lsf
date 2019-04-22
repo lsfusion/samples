@@ -56,7 +56,7 @@ recentActive() = ACTIVE TAB tabbedForm.recent;
 
 //#case
 CLASS Color;
-id = DATA VARSTRING[100] (Color);
+id = DATA STRING[100] (Color);
 
 background 'Цвет' (Color c) = CASE
     WHEN id(c) == 'Black' THEN RGB(0,0,0)
@@ -74,19 +74,19 @@ id (TypeExecEnv type) = CASE EXCLUSIVE
 
 //#class
 CLASS A;
-a = ABSTRACT CASE VARSTRING[100] (A);
+a = ABSTRACT CASE STRING[100] (A);
 
 CLASS B : A;
-b = DATA VARSTRING[100] (B);
+b = DATA STRING[100] (B);
 
 a(B b) += WHEN CLASS(b(b)) THEN b(b); // равносильно WHEN b IS B THEN b(b)
 //#class end
 
 //#concat
 CLASS Person;
-firstName = DATA VARSTRING[100] (Person);
-middleName = DATA VARSTRING[100] (Person);
-lastName = DATA VARSTRING[100] (Person);
+firstName = DATA STRING[100] (Person);
+middleName = DATA STRING[100] (Person);
+lastName = DATA STRING[100] (Person);
 
 fullName(Person p) = CONCAT ' ', firstName(p), middleName(p), lastName(p);     // если какая-то часть имени не задана, то эта часть будет пропущена вместе с пробелом
 //#concat end
@@ -124,19 +124,19 @@ hostGoals = DATA INTEGER (Game);
 hostTeam = DATA Team (Game); 
 hostGoalsScored(team) = GROUP SUM hostGoals(Game game) BY hostTeam(game);
 
-name = DATA VARSTRING[100] (Country);
-countryName = GROUP AGGR Country country WHERE country IS Country BY name(country); // получается свойство (VARSTRING[100]) -> Country
+name = DATA STRING[100] (Country);
+countryName = GROUP AGGR Country country WHERE country IS Country BY name(country); // получается свойство (STRING[100]) -> Country
 
 CLASS Book;
 CLASS Tag;
-name = DATA VARSTRING[100] (Tag);
+name = DATA STRING[100] (Tag);
 in = DATA BOOLEAN (Book, Tag);
 
 tags(Book b) = GROUP CONCAT name(Tag t) IF in(b, t), ', ' ORDER name(t), t;
 //#group end
 
 //#if
-name = DATA VARSTRING[100] (Book);
+name = DATA STRING[100] (Book);
 hasName (Book b) = TRUE IF name(b);
 
 background (Book b) = RGB(224, 255, 128) IF b IS Book;
@@ -303,7 +303,7 @@ stringStruct() = STRUCT(1, 'two', 3.0);
 
 //#groupobject
 CLASS Store;
-name = DATA VARSTRING[100] (Store);
+name = DATA STRING[100] (Store);
 
 FORM stores
     OBJECTS s = Store
@@ -324,7 +324,7 @@ setNameX 'Добавить X к имени'()  {
 itemCount = DATA INTEGER (Store);
 itemCountToString(s) = BPSTRING[10](itemCount(s));
 
-barcode = DATA VARSTRING[15] (Item);
+barcode = DATA STRING[15] (Item);
 longBarcode(Item i) = LONG(barcode(i));
 //#explicitcast end
 
@@ -351,7 +351,7 @@ createdUser = DATA CustomUser (Order);
 createdUser (Order o) <- currentUser() WHEN SET(o IS Order);
 
 numerator = DATA Numerator (Order);
-number = DATA VARSTRING[28] (Order);
+number = DATA STRING[28] (Order);
 series = DATA BPSTRING[2] (Order);
 WHEN SETCHANGED(numerator(Order o)) AND
      NOT CHANGED(number(o)) AND

@@ -5,7 +5,7 @@ REQUIRE Employee, Project;
 CLASS Category 'Категория';
 TABLE category (Category);
 
-name 'Название' = DATA VARSTRING[50] (Category) CHARWIDTH 15;
+name 'Название' = DATA STRING[50] (Category) CHARWIDTH 15;
 rate 'Ставка, руб.' = DATA NUMERIC[14,2] (Category);
 
 FORM category 'Категория'

@@ -2,7 +2,7 @@ MODULE InputUseCase;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[100] (Book);
+name 'Наименование' = DATA ISTRING[100] (Book);
  
 FORM books
      OBJECTS b = Book
@@ -15,7 +15,7 @@ NAVIGATOR {
 
 //#solution1
 changeName(Book b)  { 
-     INPUT s = VARISTRING[100] // вводим VARISTRING[100] "в параметр" s (автоматически оборачивается в REQUEST, то есть доступны групповая корректировки, PASTE и т.п.)
+     INPUT s = ISTRING[100] // вводим ISTRING[100] "в параметр" s (автоматически оборачивается в REQUEST, то есть доступны групповая корректировки, PASTE и т.п.)
                      DO // проверка на requestCanceled
                           name(b) <- s;
 }
@@ -27,7 +27,7 @@ EXTEND FORM books
 
 //#sample2
 CLASS Genre 'Жанр';
-name 'Наименование' = DATA VARISTRING[100] (Genre);
+name 'Наименование' = DATA ISTRING[100] (Genre);
  
 genre 'Жанр' = DATA Genre (Book);
 isForbidden 'Запрет' = DATA BOOLEAN (Book);
@@ -37,7 +37,7 @@ book 'Книга' = DATA Book (Order);
 nameBook 'Наименование книги' (Order o) = name(book(o));
 
 date 'Дата' = DATA DATE (Order);
-number 'Номер' = DATA VARSTRING[100] (Order);
+number 'Номер' = DATA STRING[100] (Order);
 
 CONSTRAINT isForbidden(book(Order o)) 
     CHECKED BY book MESSAGE 'Запрещено выбирать эту книгу';

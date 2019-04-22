@@ -4,7 +4,7 @@ MODULE UseCaseDBModel;
 CLASS Animal 'Животное';
 TABLE animal(Animal);
 
-name 'Наименование' = DATA VARSTRING[50] (Animal);
+name 'Наименование' = DATA STRING[50] (Animal);
 //#sample1 end
 
 //#sample2

@@ -37,7 +37,7 @@ WHEN LOCAL (CHANGED(quantity(OrderDetail d)) OR CHANGED(price(d)))
 
 //#sample3
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book);
+name 'Наименование' = DATA ISTRING[50] (Book);
 price 'Цена' = DATA NUMERIC[14,2] (Book);
 
 book 'Книга' = DATA Book (OrderDetail);

@@ -9,7 +9,7 @@ GROUP local 'Локальные свойства'; // Родительской �
 
 //#on
 CLASS Sku;
-name = DATA VARSTRING[100] (Sku);
+name = DATA STRING[100] (Sku);
 
 ON {
     LOCAL changedName = BOOLEAN (Sku);
@@ -22,7 +22,7 @@ ON {
 CLASS Order;
 
 CLASS Customer;
-name = DATA VARSTRING[50] (Customer);
+name = DATA STRING[50] (Customer);
 
 customer = DATA Customer (Order);
 discount = DATA NUMERIC[6,2] (Order); 
@@ -35,7 +35,7 @@ ON LOCAL {
 
 //#when
 CLASS Stock;
-name = DATA VARSTRING[50] (Stock);
+name = DATA STRING[50] (Stock);
 
 balance = DATA INTEGER (Sku, Stock);
 
@@ -69,7 +69,7 @@ sum(OrderDetail d) <- quantity(d) * price(d) WHEN CHANGED(quantity(d)) OR CHANGE
 CONSTRAINT balance(Sku s, Stock st) < 0 
     MESSAGE 'Остаток не может быть отрицательным для ' + (GROUP CONCAT 'Товар : ' + name(Sku ss) + ' Склад : ' + name(Stock sst), '\n' IF SET(balance(ss, sst) < 0));
 
-barcode = DATA VARSTRING[15] (Sku);
+barcode = DATA STRING[15] (Sku);
 // "эмуляция" политики безопасности
 CONSTRAINT DROPCHANGED(barcode(Sku s)) AND name(currentUser()) != 'admin' MESSAGE 'Изменять штрих-код для уже созданного товара разрешено только администратору';
 
@@ -233,7 +233,7 @@ onStarted () + {
 // сначала выполниться 1е действие, потом 2е действие
 
 CLASS Human;
-name = DATA VARSTRING[100] (Human);
+name = DATA STRING[100] (Human);
 
 testName  ABSTRACT CASE ( Human);
 
@@ -286,8 +286,8 @@ INDEX name(Sku s), price(s, DATE d), d;
 //#index end
 
 //#before
-changeName(Sku s, VARSTRING[100] name)  { name(s) <- name; }
-BEFORE changeName(Sku s, VARSTRING[100] name) DO MESSAGE 'Changing user name'; // Сообщение будет показано перед каждым вызовом changeName
+changeName(Sku s, STRING[100] name)  { name(s) <- name; }
+BEFORE changeName(Sku s, STRING[100] name) DO MESSAGE 'Changing user name'; // Сообщение будет показано перед каждым вызовом changeName
 //#before end
 
 //#after

@@ -6,7 +6,7 @@ REQUIRE Time;
 CLASS Order 'Заказ';
   
 CLASS Customer 'Покупатель';
-name = DATA VARISTRING[50] (Customer);
+name = DATA ISTRING[50] (Customer);
   
 date 'Дата' = DATA DATE (Order);
   
@@ -34,7 +34,7 @@ EXTEND FORM order
 
 //#sample2
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book);
+name 'Наименование' = DATA ISTRING[50] (Book);
 price 'Текущая цена' (Book b) = DATA NUMERIC[14,2] (Book);
   
 CLASS OrderDetail 'Строка заказа';

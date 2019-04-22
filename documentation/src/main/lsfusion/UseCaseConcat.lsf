@@ -3,7 +3,7 @@ MODULE UseCaseConcat;
 //#sample1
 CLASS Book 'Книга';
 CLASS Tag 'Тэг';
-name 'Наименование' = DATA VARISTRING[10] (Tag);
+name 'Наименование' = DATA ISTRING[10] (Tag);
   
 in 'Вкл' = DATA BOOLEAN (Tag, Book);
 //#sample1 end
@@ -16,7 +16,7 @@ tags 'Тэги' (Book b) = GROUP CONCAT name(Tag t) IF in(t, b), ',' ORDER name(
 CLASS Category 'Категория';
   
 CLASS Author 'Автор';
-name 'Автор' = DATA VARISTRING[20] (Author);
+name 'Автор' = DATA ISTRING[20] (Author);
   
 category 'Категория' = DATA Category (Book);
 author 'Автор' = DATA Author (Book);

@@ -10,7 +10,7 @@ hours 'Часов' (Project p, DATE d) = GROUP SUM hours(TimeEntry e) BY project
 hours 'Часов (всего)' (Project p, DATE dFrom, DATE dTo) = 
     GROUP SUM hours(TimeEntry e) IF dFrom <= dateStart(e) AND dTo >= dateStart(e) BY project(e); 
 
-header (DATE d) = VARSTRING[20] (d AS DATE);
+header (DATE d) = STRING[20] (d AS DATE);
 
 FORM projects 'По проектам'
     OBJECTS dates = (dFrom = DATE, dTo = DATE) PANEL

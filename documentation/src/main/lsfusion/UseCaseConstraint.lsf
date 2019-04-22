@@ -4,7 +4,7 @@ REQUIRE Time;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book) IN id;
+name 'Наименование' = DATA ISTRING[50] (Book) IN id;
 price 'Цена' = DATA NUMERIC[14,2] (Book);
 //#sample1 end
 
@@ -52,7 +52,7 @@ CONSTRAINT price(OrderDetail d) > price(book(d)) * 1.1
 
 //#sample5
 CLASS Customer 'Покупатель';
-name 'Имя' = DATA VARISTRING[100] (Customer);
+name 'Имя' = DATA ISTRING[100] (Customer);
 
 in 'Вкл' = DATA BOOLEAN (Customer, Book);
 

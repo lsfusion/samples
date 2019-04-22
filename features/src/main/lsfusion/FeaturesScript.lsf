@@ -28,7 +28,7 @@ GROUP sampleGroup : System.base; // явная квалификация имен
 // [: baseClass1 [, baseClass2, ..., baseClassN]];
 
 CLASS ABSTRACT Named 'Объект с именем' ;
-name(obj) = DATA VARSTRING[100] (Named) IN id;
+name(obj) = DATA STRING[100] (Named) IN id;
 
 CLASS EmptyClass;
 CLASS Article 'Товар' : Named;
@@ -70,7 +70,7 @@ isLeaf 'Лист' (ArticleGroup articleGroup) = articleGroup IS ArticleGroup AND
 
 isParentLeaf (ArticleGroup child, ArticleGroup parent) = isParent(child, parent) AND isLeaf(child);
 
-canonicalName 'Полное имя' (ArticleGroup articleGroup) = VARSTRING[255](
+canonicalName 'Полное имя' (ArticleGroup articleGroup) = STRING[255](
                        (GROUP CONCAT nameArticle(ArticleGroup parent), ' / ' ORDER DESC level(articleGroup, parent)))
                        CHARWIDTH 50 MATERIALIZED;
 
@@ -158,7 +158,7 @@ stext 'Text' (store) = DATA TEXT (Store);
 srichtext 'RichText' (store) = DATA RICHTEXT (Store);
 srawrichtext 'RawRichText' (Store store) = TEXT(srichtext(store));
 sstring 'String' (store) = DATA BPSTRING[300] (Store);
-svarstring 'VarString (no rtrim)' (store) = DATA VARSTRING[300] (Store);
+svarstring 'VarString (no rtrim)' (store) = DATA STRING[300] (Store);
 
 ssinteger 'Session Integer' (store) = DATA LOCAL INTEGER (Store);
 sslong 'Session Long' (store) = DATA LOCAL LONG (Store);
@@ -168,7 +168,7 @@ sstext 'Session Text' (store) = DATA LOCAL TEXT (Store);
 ssrichtext 'Session RichText' (store) = DATA LOCAL RICHTEXT (Store);
 ssrawrichtext 'Session RawRichText' (Store store) = TEXT(srichtext(store));
 ssstring 'Session String' (store) = DATA LOCAL BPSTRING[300] (Store);
-ssvarstring 'Session VarString (no rtrim)' (store) = DATA LOCAL VARSTRING[300] (Store);
+ssvarstring 'Session VarString (no rtrim)' (store) = DATA LOCAL STRING[300] (Store);
 
 ainteger 'Integer' (article) = DATA INTEGER (Article);
 along 'Long' (article) = DATA LONG (Article);
@@ -771,15 +771,15 @@ storeNameDocument(QuantityString s) = storeName(document(s));
 nameArticle(QuantityString s) = name(article(s));
 
 importNumber = DATA INTEGER (INTEGER);
-importName = DATA VARSTRING[100] (INTEGER); 
+importName = DATA STRING[100] (INTEGER); 
 
 importFile = DATA LOCAL FILE ();
 memoFile = DATA LOCAL FILE ();
 
 sheetNumber = DATA INTEGER ();
 
-kgrmat = DATA VARSTRING[100] (INTEGER); 
-polnaim = DATA VARSTRING[100] (INTEGER);
+kgrmat = DATA STRING[100] (INTEGER); 
+polnaim = DATA STRING[100] (INTEGER);
 
 importAction()  { 
     READ 'file://c:/sprgrm.dbf' TO importFile;
@@ -955,7 +955,7 @@ testAction 'Показать "По документам" 3 раза'()  {
 };
 
 FORM testModalForm 'Тестовая форма'
-    OBJECTS article=Article, i 'Новое имя товара ("Товар %N%"):' =INTEGER PANEL, store=Store, s 'Новое имя склада:' =VARSTRING[50] PANEL
+    OBJECTS article=Article, i 'Новое имя товара ("Товар %N%"):' =INTEGER PANEL, store=Store, s 'Новое имя склада:' =STRING[50] PANEL
     PROPERTIES name(article), name(store), VALUE(s), VALUE(i)
 ;
 
@@ -1020,7 +1020,7 @@ justSendEmail 'Просто выслать емэйл' (BPSTRING[200] to)  { EMA
     BODY '<font color=#FF0000 size=+3>big red text</font>'; }
 
 FORM TestEmailForm 'Тест EMAIL'
-    OBJECTS s 'Email:' =VARSTRING[100] PANEL, u=CustomUser
+    OBJECTS s 'Email:' =STRING[100] PANEL, u=CustomUser
     PROPERTIES VALUE(s), login(u), email(u), NEW(u), remindPasswordEmail(u, s) DRAW s, justSendEmail(s)
 ;
 
@@ -2152,9 +2152,9 @@ tstCustom  INTERNAL  'samples.TestCustomActionProperty' ();
 
 //testFile = DATA LOCAL FILE ();
 //testFile2 = DATA LOCAL FILE ();
-//str1 = DATA LOCAL VARSTRING[100] (Store);
-//str2 = DATA LOCAL VARSTRING[100] (Store);
-//str3 = DATA LOCAL VARSTRING[100] (Store);
+//str1 = DATA LOCAL STRING[100] (Store);
+//str2 = DATA LOCAL STRING[100] (Store);
+//str3 = DATA LOCAL STRING[100] (Store);
 //externalDB = EXTERNAL DB 'jdbc:($1)://($2)/eqs?user=root&password=' EXEC 'select ($3), date from history' TO testFile;
 //externalHTTP = EXTERNAL HTTP 'https://www.gastronom.ru/($1)/images/20170418/b7568ebc.jpg' TO testFile, testFile2;
 //
@@ -2886,10 +2886,10 @@ FORM InputC
 ;
 
 CLASS ABSTRACT A0;
-a = ABSTRACT VALUE VARSTRING[30] (A0) IN base;
+a = ABSTRACT VALUE STRING[30] (A0) IN base;
 
 CLASS A1 : A0;
-a1 = DATA VARSTRING[30] (A1);
+a1 = DATA STRING[30] (A1);
 a(A1 a1) += a1(a1);
 FORM TFA1 'TEST 1'
     OBJECTS a1=A1 PANEL
@@ -2900,7 +2900,7 @@ FORM TFA1 'TEST 1'
 //edit(A1 a1) + {  SHOW TFA1 OBJECTS a1=a1; }
 
 CLASS A2 : A0;
-a2 = DATA VARSTRING[30] (A2);
+a2 = DATA STRING[30] (A2);
 a(A2 a2) += a2(a2);
 FORM TFA2 'TEST 2'
     OBJECTS a2=A2 PANEL
@@ -2911,7 +2911,7 @@ FORM TFA2 'TEST 2'
 //edit(A2 a2) + {  SHOW TFA2 OBJECTS a2=a2; }
 
 CLASS A3 : A0;
-a3 = DATA VARSTRING[30] (A3);
+a3 = DATA STRING[30] (A3);
 a(A3 a3) += a3(a3);
 FORM TFA3 'TEST 3'
     OBJECTS a3=A3 PANEL
@@ -3019,8 +3019,8 @@ testImport (FILE cf)  {
     APPLY; 
 }
 
-name = DATA VARSTRING[100] (INTEGER);
-barcode = DATA VARSTRING[100] (INTEGER);
+name = DATA STRING[100] (INTEGER);
+barcode = DATA STRING[100] (INTEGER);
 
 FORM articlesTest
     OBJECTS a = INTEGER
@@ -3158,10 +3158,10 @@ DESIGN x {
 
 tst = DATA LOCAL BPSTRING[10] ();
 tst = DATA LOCAL BPSTRING[10] (INTEGER);
-vtst = DATA LOCAL VARSTRING[10] ();
-vtst = DATA LOCAL VARSTRING[10] (INTEGER);
-tst2 = DATA LOCAL VARSTRING[10] ();
-vtst2 = DATA LOCAL VARSTRING[10] ();
+vtst = DATA LOCAL STRING[10] ();
+vtst = DATA LOCAL STRING[10] (INTEGER);
+tst2 = DATA LOCAL STRING[10] ();
+vtst2 = DATA LOCAL STRING[10] ();
 
 testStrings()  { 
     tst() <- 'dfd     ';
@@ -3274,10 +3274,10 @@ xa = DATA XA (XADetail)
             NONULL 
             DELETE 
             INDEXED AGGR;
-name = DATA VARISTRING[100] (XA);
+name = DATA ISTRING[100] (XA);
 createXB = DATA BOOLEAN (XA);
 createXB(XADetail ad) = createXB(xa(ad)) MATERIALIZED;
-name = DATA VARISTRING[100] (XADetail);
+name = DATA ISTRING[100] (XADetail);
 
 TABLE xa (XA);
 TABLE xad (XADetail);
@@ -3286,14 +3286,14 @@ CLASS XBC;
 CLASS XBCDetail;
 
 CLASS XB 'XB' : XBC;
-name = DATA VARISTRING[100] (XB);
+name = DATA ISTRING[100] (XB);
 CLASS XBDetail 'XBDetail' : XBCDetail;
-name = DATA VARISTRING[100] (XBDetail);
+name = DATA ISTRING[100] (XBDetail);
 
 CLASS XC 'XC' : XBC;
-name = DATA VARISTRING[100] (XC);
+name = DATA ISTRING[100] (XC);
 CLASS XCDetail 'XBDetail' : XBCDetail;
-name = DATA VARISTRING[100] (XCDetail);
+name = DATA ISTRING[100] (XCDetail);
 
 TABLE xbc (XBCDetail);
 TABLE xbcd (XBCDetail);
@@ -3311,7 +3311,7 @@ xc(XCDetail xbd) = xc(xa(xADetail(xbd)));
 
 CLASS XADetailLog 'Log';
 xa = DATA XA (XADetailLog);
-name = DATA VARISTRING[100] (XADetailLog);
+name = DATA ISTRING[100] (XADetailLog);
 WHEN DROPPED(XADetail d IS XADetail) DO  
     NEW l = XADetailLog{
         xa(l) <- PREV(xa(d));

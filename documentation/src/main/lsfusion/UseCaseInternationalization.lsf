@@ -3,8 +3,8 @@ MODULE UseCaseInternationalization;
 //#sample1
 CLASS Book '{use.case.i18n.book}';
 
-name '{use.case.i18n.book.name}' = DATA VARSTRING[40] (Book);
-price '{use.case.i18n.book.price}' = DATA VARSTRING[40] (Book);
+name '{use.case.i18n.book.name}' = DATA STRING[40] (Book);
+price '{use.case.i18n.book.price}' = DATA STRING[40] (Book);
 
 FORM books '{use.case.i18n.books}'
     OBJECTS b = Book
@@ -17,7 +17,7 @@ NAVIGATOR {
 //#sample1 end
 
 //#sample2
-description '{use.case.i18n.book.description}' (Book b) = VARSTRING[60] (name(b) + ', {use.case.i18n.book.price} : ' + price(b));
+description '{use.case.i18n.book.description}' (Book b) = STRING[60] (name(b) + ', {use.case.i18n.book.price} : ' + price(b));
 EXTEND FORM books
     PROPERTIES(b) READONLY description
 ;

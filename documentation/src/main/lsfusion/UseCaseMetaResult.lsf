@@ -4,7 +4,7 @@ MODULE UseCaseMetaResult;
 CLASS Book 'Книга';
 TABLE book(Book);
 
-name 'Наименование' = DATA VARISTRING[100] (Book);
+name 'Наименование' = DATA ISTRING[100] (Book);
 
 FORM book 'Книга'
     OBJECTS b = Book PANEL
@@ -28,7 +28,7 @@ NAVIGATOR {
 CLASS Magazine 'Журнал';
 TABLE magazine(Magazine);
 
-name 'Наименование' = DATA VARISTRING[100] (Magazine);
+name 'Наименование' = DATA ISTRING[100] (Magazine);
 
 FORM magazine 'Журнал'
     OBJECTS m = Magazine PANEL
@@ -51,7 +51,7 @@ NAVIGATOR {
 //#usedefineobject end
 
 //#extenddefineobject
-genre 'Жанр' = DATA VARISTRING[20] (Book);
+genre 'Жанр' = DATA ISTRING[20] (Book);
 EXTEND FORM book PROPERTIES(b) genre; 
 EXTEND FORM books PROPERTIES(b) genre;
 //#extenddefineobject end

@@ -11,12 +11,12 @@ loadImage 'Загрузить изображение'  ABSTRACT ( Item);
 
 //#action
 CLASS Currency;
-name = DATA VARSTRING[30] (Currency);
+name = DATA STRING[30] (Currency);
 code = DATA INTEGER (Currency);
 
 CLASS Order;
 currency = DATA Currency (Order);
-customer = DATA VARSTRING[100] (Order);
+customer = DATA STRING[100] (Order);
 copy 'Копировать' (Order old)  { 
     NEW new = Order {                                   // создается действие, состоящее из последовательного выполнения двух действий
         currency(new) <- currency(old);                 // точка с запятой указывается после каждого оператора
@@ -24,7 +24,7 @@ copy 'Копировать' (Order old)  {
     }                                                   // в этой строке точка с запятой не ставится, потому что оператор заканчивается на }
 }
  
-loadDefaultCurrency(VARISTRING[30] name, INTEGER code)  { 
+loadDefaultCurrency(ISTRING[30] name, INTEGER code)  { 
     NEW c = Currency {
         name(c) <- name;
         code(c) <- code;
@@ -46,7 +46,7 @@ CLASS Task;
 run 'Выполнить'  ABSTRACT ( Task);                           // ABSTRACT MULTI EXCLUSIVE
 
 CLASS Task1 : Task;
-name = DATA VARSTRING[100] (Task);
+name = DATA STRING[100] (Task);
 run (Task1 t) + { 
     MESSAGE 'Run Task1 ' + name(t);
 }
@@ -94,15 +94,15 @@ testAction()  {
 }
 
 CLASS ReceiptDetail;
-barcode = DATA VARSTRING[30] (ReceiptDetail);
-quantity = DATA VARSTRING[30] (ReceiptDetail);
+barcode = DATA STRING[30] (ReceiptDetail);
+quantity = DATA STRING[30] (ReceiptDetail);
 
 FORM POS
     OBJECTS d = ReceiptDetail
     PROPERTIES(d) barcode, quantityGrid = quantity
 ;
 
-createReceiptDetail 'Добавить строку продажи'(VARSTRING[30] barcode)  { 
+createReceiptDetail 'Добавить строку продажи'(STRING[30] barcode)  { 
     NEW d = ReceiptDetail {
         barcode(d) <- barcode;
         ACTIVATE PROPERTY POS.quantityGrid;
@@ -303,7 +303,7 @@ runImport(OrderDetail d)  { importData(sku(d), order(d)); } // объявлен�
 //#exportplain
 CLASS Store;
 
-name = DATA VARSTRING[20] (Sku);
+name = DATA STRING[20] (Sku);
 weight = DATA NUMERIC[10,2] (Sku);
 
 in = DATA BOOLEAN (Store, Sku);
@@ -334,8 +334,8 @@ exportSku (Store store)  {
 }
 //#export end
 
-name = DATA VARSTRING[30] (Article);
-barcode = DATA VARSTRING[30] (Article);
+name = DATA STRING[30] (Article);
+barcode = DATA STRING[30] (Article);
 price = DATA INTEGER (Article);
 
 //#external
@@ -357,7 +357,7 @@ externalSQL ()  {
     
     // для всех товаров с полученными штрих-кодами записываем цены
     LOCAL price = INTEGER (INTEGER);
-    LOCAL barcode = VARSTRING[30] (INTEGER);
+    LOCAL barcode = STRING[30] (INTEGER);
     IMPORT FROM exportFile() TO price=pc,barcode=brc;
     FOR barcode(Article a) = barcode(INTEGER i) DO 
         price(a) <- price(i);
@@ -369,7 +369,7 @@ externalLSF()  {
 //#external end
 
 //#for
-name = DATA VARSTRING[100] (Store);
+name = DATA STRING[100] (Store);
 
 testFor  { 
     LOCAL sum = INTEGER ();
@@ -514,7 +514,7 @@ importForm()  {
 
 //#input
 changeCustomer (Order o)  { 
-    INPUT s = VARSTRING[100] DO {
+    INPUT s = STRING[100] DO {
         customer(o) <- s;
         IF s THEN
             MESSAGE 'Customer changed to ' + s;
@@ -536,14 +536,14 @@ testFile  {
 //#input end
 
 FORM customers
-    OBJECTS c = VARSTRING[100]
+    OBJECTS c = STRING[100]
     FILTERS [GROUP SUM 1 BY customer(Order o)](c)
 ;
 
 //#request
 
 requestCustomer (Order o)  { 
-    LOCAL resultValue = VARSTRING[100] ();
+    LOCAL resultValue = STRING[100] ();
     REQUEST {
         ASK 'Choose from list?' DO
             DIALOG customers OBJECTS c = resultValue() CHANGE;
@@ -645,7 +645,7 @@ testExecutor  {
         FOR id(Sku s) DO {
             NEWTHREAD {
                 NEWSESSION {
-                    name(s) <- VARSTRING[20](id(s)); // записываем в наименование код в 10 потоков
+                    name(s) <- STRING[20](id(s)); // записываем в наименование код в 10 потоков
                     APPLY;
                 }
             }
@@ -714,7 +714,7 @@ print (Order o)  {
     PRINT printOrder OBJECTS o = o DOCX TO file;
     open(file()); 
     
-    LOCAL sheetName = VARSTRING[255]();
+    LOCAL sheetName = STRING[255]();
     sheetName() <- 'enctypted';
     PRINT printOrder OBJECTS o = o XLS SHEET sheetName PASSWORD 'pass';
 }
@@ -734,7 +734,7 @@ readFiles()  {
     READ 'file://D://lsfusion/file.xlsx' TO importFile;
 }
 
-connectionString = DATA VARSTRING[100]();  
+connectionString = DATA STRING[100]();  
 importXls 'Импортировать надбавки'()  { 
     LOCAL importFile = FILE ();
     READ connectionString() + '@SELECT field1, field2 FROM myTable' TO importFile;

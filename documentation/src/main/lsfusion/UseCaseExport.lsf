@@ -4,15 +4,15 @@ MODULE UseCaseExport;
 REQUIRE Time;
 
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[100] (Book) IN id;
+name 'Наименование' = DATA ISTRING[100] (Book) IN id;
 
 CLASS Customer 'Покупатель';
-name 'Наименование' = DATA VARISTRING[50] (Customer) IN id;
-address 'Адрес' = DATA VARISTRING[50] (Customer) IN base;
+name 'Наименование' = DATA ISTRING[50] (Customer) IN id;
+address 'Адрес' = DATA ISTRING[50] (Customer) IN base;
 
 CLASS Order 'Заказ';
 date 'Дата' = DATA DATE (Order);
-number 'Номер' = DATA VARSTRING[10] (Order);
+number 'Номер' = DATA STRING[10] (Order);
 
 customer 'Покупатель' = DATA Customer (Order);
 nameCustomer 'Покупатель' (Order o) = name(customer(o));

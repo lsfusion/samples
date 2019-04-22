@@ -2,10 +2,10 @@ MODULE UseCaseTree;
 
 //#sample1
 CLASS Category 'Категория';
-name 'Наименование' = DATA VARISTRING[50] (Category);
+name 'Наименование' = DATA ISTRING[50] (Category);
 
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book);
+name 'Наименование' = DATA ISTRING[50] (Book);
 category 'Категория' = DATA Category (Book);
 //#sample1 end
 

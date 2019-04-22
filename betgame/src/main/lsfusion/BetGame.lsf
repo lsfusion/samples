@@ -3,7 +3,7 @@ MODULE WorldCup2014;
 REQUIRE Authentication, Time;
 
 CLASS Team 'Команда';
-name 'Название' = DATA VARISTRING[50] (Team) IN id;
+name 'Название' = DATA ISTRING[50] (Team) IN id;
 
 FORM team 'Команда'
     OBJECTS t = Team PANEL

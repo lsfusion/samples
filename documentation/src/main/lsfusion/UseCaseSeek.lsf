@@ -4,10 +4,10 @@ MODULE UseCaseSeek;
 REQUIRE Time;
 
 CLASS Category 'Категория';
-name 'Наименование' = DATA VARISTRING[50] (Category) IN id;
+name 'Наименование' = DATA ISTRING[50] (Category) IN id;
 
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book) IN id;
+name 'Наименование' = DATA ISTRING[50] (Book) IN id;
 
 category 'Категория' = DATA Category (Book) NONULL;
 nameCategory 'Категория' (Book b) = name(category(b));
@@ -53,7 +53,7 @@ EXTEND FORM books
 
 //#sample2
 CLASS Customer 'Покупатель';
-name 'Наименование' = DATA VARISTRING[50] (Customer) IN id;
+name 'Наименование' = DATA ISTRING[50] (Customer) IN id;
 
 price 'Цена' = DATA NUMERIC[14,2] (Customer, Book);
 

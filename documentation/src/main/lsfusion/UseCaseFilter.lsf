@@ -2,10 +2,10 @@ MODULE UseCaseFilter;
 
 //#sample1
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[100] (Book);
+name 'Наименование' = DATA ISTRING[100] (Book);
   
 CLASS Stock 'Склад';
-name 'Наименование' = DATA VARISTRING[100] (Stock);
+name 'Наименование' = DATA ISTRING[100] (Stock);
   
 balance 'Остаток' = DATA INTEGER (Book, Stock); // для примера сделано первичным свойством, хотя обычно оно вычисляемое
 //#sample1 end
@@ -48,7 +48,7 @@ FORM onStockLocal 'Остатки'
 
 //#sample3
 CLASS Customer 'Покупатель';
-name 'Наименование' = DATA VARISTRING[100] (Customer);
+name 'Наименование' = DATA ISTRING[100] (Customer);
   
 CLASS Order 'Заказ';
 date 'Дата' = DATA DATE (Order);

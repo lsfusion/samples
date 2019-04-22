@@ -4,7 +4,7 @@ MODULE UseCaseNew;
 CLASS Order 'Заказ';
   
 CLASS Customer 'Покупатель';
-name = DATA VARISTRING[50] (Customer);
+name = DATA ISTRING[50] (Customer);
   
 date 'Дата' = DATA DATE (Order);
   
@@ -23,7 +23,7 @@ copyOrder 'Копировать' (Order o)  {
 
 //#sample2
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book);
+name 'Наименование' = DATA ISTRING[50] (Book);
   
 CLASS OrderDetail 'Строка заказа';
 order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;

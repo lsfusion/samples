@@ -4,7 +4,7 @@ MODULE UseCaseDelete;
 CLASS Order 'Заказ';
 
 CLASS Book 'Книга';
-name 'Наименование' = DATA VARISTRING[50] (Book);
+name 'Наименование' = DATA ISTRING[50] (Book);
   
 CLASS OrderDetail 'Строка заказа';
 order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;

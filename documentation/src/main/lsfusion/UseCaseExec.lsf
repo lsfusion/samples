@@ -3,13 +3,13 @@ MODULE UseCaseExec;
 //#sample1
 CLASS Category 'Категория';
 
-name 'Наименование' = DATA VARISTRING[50] (Category);
+name 'Наименование' = DATA ISTRING[50] (Category);
 id 'Код' = DATA INTEGER (Category);
 saleDate 'Дата начала продаж' = DATA DATE (Category);
 //#sample1 end
 
 //#solution1
-createCategory 'Создать категорию' (VARISTRING[50] name, INTEGER id, DATE saleDate)  { 
+createCategory 'Создать категорию' (ISTRING[50] name, INTEGER id, DATE saleDate)  { 
     NEW c = Category {
         name(c) <- name;
         id(c) <- id;

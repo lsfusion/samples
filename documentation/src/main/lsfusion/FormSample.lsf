@@ -62,7 +62,7 @@ FORM shipments 'Поставки'
 ;
   
 // Объявляем форму, которая будет отображать обороты по товару за заданный интервал
-name = DATA VARSTRING[100] (Item);
+name = DATA STRING[100] (Item);
 revenue = DATA NUMERIC[16,2] (Item, DATE, DATE);
 
 FORM revenues 'Обороты по товарам'
@@ -75,12 +75,12 @@ FORM revenues 'Обороты по товарам'
 
 //#tree
 CLASS SkuGroup;
-name = DATA VARISTRING[100] (SkuGroup);
+name = DATA ISTRING[100] (SkuGroup);
 active = DATA BOOLEAN (SkuGroup);
 parent = DATA SkuGroup (SkuGroup) AUTOSET;
 
 CLASS Sku;
-name = DATA VARISTRING[100] (Sku);
+name = DATA ISTRING[100] (Sku);
 skuGroup = DATA SkuGroup (Sku);
 
   
@@ -95,13 +95,13 @@ FORM skus 'Sku'
 ;
  
 CLASS Group1;
-name = DATA VARSTRING[100] (Group1);
+name = DATA STRING[100] (Group1);
 
 CLASS Group2;
-name = DATA VARSTRING[100] (Group2);
+name = DATA STRING[100] (Group2);
 
 CLASS Group3;
-name = DATA VARSTRING[100] (Group3);
+name = DATA STRING[100] (Group3);
 
 in = DATA BOOLEAN (Group1, Group2);
 in = DATA BOOLEAN (Group2, Group3);
@@ -120,7 +120,7 @@ time = DATA TIME (Order);
 number = DATA INTEGER (Order);
 series = DATA BPSTRING[2] (Order);
 
-note = DATA VARISTRING[255] (Order);
+note = DATA ISTRING[255] (Order);
 
 CLASS OrderDetail;
 order = DATA Order (OrderDetail) NONULL DELETE;
@@ -161,7 +161,7 @@ onStock = DATA NUMERIC[10,2] (Sku);
 ordered = DATA NUMERIC[10,2] (Sku);
 
 CLASS Customer;
-name = DATA VARISTRING[100] (Customer);
+name = DATA ISTRING[100] (Customer);
 FORM customers
     OBJECTS c = Customer
     PROPERTIES(c) READONLY name
@@ -174,7 +174,7 @@ nameCustomer (Order o) = name(customer(o));
 customer(OrderDetail d) = customer(order(d));
 
 CLASS Region;
-name = DATA VARSTRING[100] (Region); 
+name = DATA STRING[100] (Region); 
 
 region = DATA Region (Customer);
 
@@ -246,11 +246,11 @@ FORM orderReport 'Продажи по складам'
 
 //#filters
 CLASS Stock;
-name = DATA VARISTRING[100] (Stock);
+name = DATA ISTRING[100] (Stock);
 region = DATA Region (Stock);
 
 CLASS Group;
-name = DATA VARISTRING[100] (Group);
+name = DATA ISTRING[100] (Group);
 
 group = DATA Group(Sku);
 nameGroup (Sku s) = name(group(s));
@@ -348,7 +348,7 @@ EXTEND FORM POS // добавляем свойство через расшире
 
 //#view
 // делаем форму печати ценника для товара
-labelFile = DATA VARSTRING[100] (Item);
+labelFile = DATA STRING[100] (Item);
 printLabelFile (Item i)= OVERRIDE labelFile(i), 'MyModule_printLabel_i.jrxml' IF i IS Item;
 FORM printLabel 'Печать ценника'
     OBJECTS i = Item               // добавляем товар, для которого будет печататься ценник
@@ -414,7 +414,7 @@ DESIGN order {
 
 //#extendform
 CLASS ItemGroup;
-name = DATA VARISTRING[100] (ItemGroup);
+name = DATA ISTRING[100] (ItemGroup);
 
 itemGroup = DATA ItemGroup (Item);
 
