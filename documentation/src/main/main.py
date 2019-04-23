@@ -83,7 +83,7 @@ class LSFLexer(RegexLexer):
             (r"\b\d+\.\d*(?:D|d)?\b", Number.Float),    # NUMERIC, DOUBLE
             (r"\b\d+(?:l|L)?\b", Number.Integer),       # INTEGER, LONG
             (r"#[0-9A-Fa-f]{6}", Number.Integer),       # COLOR
-            (words(('INTEGER', 'DOUBLE', 'LONG', 'BOOLEAN', 'DATE', 'DATETIME', 'TEXT', 'BPSTRING', 'BPISTRING',
+            (words(('INTEGER', 'DOUBLE', 'LONG', 'BOOLEAN', 'DATE', 'DATETIME', 'TEXT', 'STRING', 'ISTRING',
                     'BPISTRING', 'BPSTRING', 'TIME', 'RICHTEXT',
                     'ABSTRACT', 'ACTION', 'ACTIVE', 'ACTIVATE', 'NEW', 'AFTER', 'AGGR', 'ALL', 'AND', 'APPEND', 'APPLY',
                     'AS', 'ASON', 'ASYNCUPDATE', 'ATTACH', 'ATTR', 'AUTO', 'AUTOREFRESH', 'AUTOSET', 'BACKGROUND',
