@@ -66,6 +66,8 @@ createServer 'Создать сервер' (Server server) {
     confDir() <- serverDir(server) + '/conf';
     mkdir(confDir());
 
+    copy(baseDir() + '/log4j.xml', 'file://' + serverDir(server) + '/log4j.xml');
+
     WRITE RAWFILE('db.server=localhost'+'\n'+
                   'db.name='+dbName(server)+'\n'+
                   'db.user=postgres'+'\n'+
