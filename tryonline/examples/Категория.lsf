@@ -1,7 +1,5 @@
 MODULE Category;
 
-REQUIRE Employee, Project;
-
 CLASS Category 'Категория';
 TABLE category (Category);
 
@@ -27,48 +25,3 @@ FORM dialogCategory 'Выбор категории'
     
     LIST Category OBJECT c
 ;
-
-NAVIGATOR {
-    masterData {
-        NEW categories;
-    }
-}
-
-category 'Категория' = DATA Category (Employee);
-nameCategory 'Категория' (Employee e) = name(category(e));
-
-EXTEND FORM employee
-    PROPERTIES(e) nameCategory
-;
-
-EXTEND FORM employees
-    PROPERTIES(e) READONLYIF isReadonly() nameCategory
-;
-
-hoursMonthly 'Часов в абонентской плате' = DATA NUMERIC[14,2] (Project);
-sumMonthly 'Сумма абонентской платы' = DATA NUMERIC[14,2] (Project);
-
-TABLE project(Project, Category);
-dataRate 'Ставка, руб.' = DATA NUMERIC[14,2] (Project, Category);
-rate 'Ставка, руб.' (Project p, Category cc) = OVERRIDE dataRate(p, cc), (rate(cc) IF p IS Project); 
-
-EXTEND FORM customer
-    PROPERTIES(p) PANEL hoursMonthly, sumMonthly
-
-    OBJECTS cc = Category
-    PROPERTIES name(cc) READONLY, rate(p, cc) BACKGROUND dataRate(p, cc)
-;
-
-DESIGN customer {
-    tabPane {
-        NEW rates {
-            caption = 'Оплата';
-            NEW header {
-                type = CONTAINERH;
-                MOVE PROPERTY(hoursMonthly(p));
-                MOVE PROPERTY(sumMonthly(p));
-            }
-            MOVE BOX(cc);
-        }
-    }
-}

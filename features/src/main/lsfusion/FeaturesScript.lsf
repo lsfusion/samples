@@ -76,7 +76,7 @@ canonicalName 'Полное имя' (ArticleGroup articleGroup) = STRING[255](
 
 FORM parents
     TREE skuTree sg = ArticleGroup PARENT parent
-    PROPERTIES nameArticle(sg), NEW(sg), DELETE(sg)
+    PROPERTIES(sg) nameArticle, EDIT, NEWEDIT, nnn = NEW, DELETE  
 
     OBJECTS p=ArticleGroup
     PROPERTIES (p) nameArticle, nameParent, childNumber, descendantNumber, isLeaf, canonicalName, NEW, DELETE GRID
@@ -423,7 +423,7 @@ PROPERTIES() testFormAction, testFormActionAUTO, testFormActionXLS, testFormActi
              testMessageAction, testMessageActionNW
 ;
 
-storeSizeCode 'Размер склада (код)' (Store s) = sizeCode(storeSize(s));
+storeSizeCode 'Размер склада (код)' (Store s) = sizeCode(storeSize(s)) CHARWIDTH 50;
 
 // Partition property
 // SUM, PREV partition property
@@ -520,9 +520,9 @@ foobar(Store store, Article article) = [ x*x + y](foo(store, article), bar(store
 baz(Store store, Article article) = bar(store, article) > bar2(store, article) IN base;
 baz2 = foo(Store s, Article a) >= 15 == foo2(s, a) >= 15;
 
-storeIsHuge(Store store) = storeSize(store) == StoreSize.huge;                        // static object
-storeIsBig(Store store) = storeSize(store) == StoreSize.big;
-storeIsMedium(Store store) = storeSize(store) == StoreSize.medium;
+storeIsHuge(Store store) = storeSize(store) == StoreSize.huge CHARWIDTH 50 FLEX;                        // static object
+storeIsBig(Store store) = storeSize(store) == StoreSize.big CHARWIDTH 50 NOFLEX;
+storeIsMedium(Store store) = storeSize(store) == StoreSize.medium CHARWIDTH 50;
 storeIsSmall(Store store) = storeSize(store) == StoreSize.small;
 storeIsHuge2(Store store) = (storeSize(store) == StoreSize.huge) == TRUE;
 
@@ -862,9 +862,9 @@ okMessage()  {
 FORM documentArticle 'По документам (caption)' 
 
 // GroupObjects list syntax:
-// OBJECTS object definition | [groupAlias=] (object1 definition, ..., objectN definition) [INIT | FIXED] [PANEL | GRID] [PAGESIZE <int value>],
+// OBJECTS object definition | [groupAlias=] (object1 definition, ..., objectN definition) [INIT | NOFLEX] [PANEL | GRID] [PAGESIZE <int value>],
 //         ...
-//         object definition | [groupAlias=] (object1 definition, ..., objectN definition) [INIT | FIXED] [PANEL | GRID] [PAGESIZE <int value>]
+//         object definition | [groupAlias=] (object1 definition, ..., objectN definition) [INIT | NOFLEX] [PANEL | GRID] [PAGESIZE <int value>]
 
 // Object definition syntax:
 // [alias=] className ['<caption>'] [ON CHANGE action]
@@ -1014,7 +1014,7 @@ remindPasswordEmail 'Выслать логин на этот email' (Contact u, 
     ATTACH attachFile() NAME 'ATTACH: Напоминание пароля для ' + email(u)
     ; }
 
-justSendEmail 'Просто выслать емэйл' (BPSTRING[200] to)  { EMAIL
+justSendEmail 'Просто выслать емэйл'  (BPSTRING[200] to)  { EMAIL
     SUBJECT 'Тема письма'
     TO (to IF to IS BPSTRING[200])
     BODY '<font color=#FF0000 size=+3>big red text</font>'; }
@@ -1041,7 +1041,12 @@ savef(Store s)  { INPUT =simage(s) CHANGE; }
 //        name(s) <- 'X' + name(s);
 //}
 
-sss = storeSizeName(Store s);
+sssFixed = storeSizeName(Store s) CHARWIDTH 51 NOFLEX;
+sss = storeSizeName(Store s);// CHARWIDTH 51;
+
+dataStringFixed = DATA STRING[100] (Store) CHARWIDTH 52 NOFLEX;
+dataStringFlex = DATA STRING[100] (Store) CHARWIDTH 52 FLEX;
+dataString = DATA STRING[100] (Store) CHARWIDTH 50;
 
 FORM storeArticle 'По складам'
     OBJECTS s=Store 
@@ -1054,7 +1059,7 @@ FORM storeArticle 'По складам'
     PROPERTIES DRAW s  setDefaultNames(), copyNameToArticles(s), copyStoreNameToArticle(s, a), copyStoreNameToArticleError(s, a), createNewStore(), showDocumentArticleModalForm(), showTestModalForm() TOOLBAR, testRequestInput(s) TOOLBAR
 //    PROPERTIES() countF, setNameX
     PROPERTIES(s, a) SHOWIF storeIsHuge(s) incomeQuantity2, outcomeQuantity2, lastQuantity
-    PROPERTIES(s) GRID storeSizeName, sss READONLY,  ssc1=storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi=simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData, tstDestruct
+    PROPERTIES(s) GRID storeSizeName, dataString, dataStringFixed, dataStringFlex, sss, sssFixed, ssc1=storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi=simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData, tstDestruct
     PROPERTIES(s, a) incomeQuantity, onlyIncomeQuantity, outcomeQuantity, foo, foo2 SHOWIF storeIsHuge(s), bar, foobar HEADER name(a), bar2, baz, baz2, balanceQuantity, testUnion HEADER name(s), testPartition, testFormula
     PROPERTIES currentTime(), allNames()
     FILTERGROUP filters1
@@ -1295,13 +1300,13 @@ FORM TestColumnGroupObjects 'Тест групп в колонках (StoreSize/
 
 colorizeElementWithNumberGreaterFour(NavigatorElement element) = #5555ff IF number(element) > 4;
 
-stringEqualsAll(BPSTRING[3] string) = string == BPSTRING[3]('Все');
+stringEqualsAll (BPSTRING[3] string) = string == BPSTRING[3]('Все');
 
 FORM TestTree 'Тест дерева (элементы навигатора)'
     TREE forms e=NavigatorElement PARENT parent
     PROPERTIES(e) VALUE, caption, canonicalName, number BACKGROUND colorizeElementWithNumberGreaterFour(e)
 
-    TREE forms2 a=BPSTRING[3], e2=NavigatorElement PARENT parent
+    TREE forms2 a =BPSTRING[3], e2=NavigatorElement PARENT parent
     PROPERTIES(a) VALUE
     PROPERTIES(e2) VALUE, caption, canonicalName
 
@@ -1325,7 +1330,7 @@ DESIGN TestTree {
 showStores(ArticleGroup ag, Store s) = aginteger(ag) > 5 AND s IS Store;
 
 FORM TestExpandables 'Тест Expandables'
-    TREE groups a=BPSTRING[3], ag=ArticleGroup PARENT parent, s=Store
+    TREE groups a =BPSTRING[3], ag=ArticleGroup PARENT parent, s=Store
     PROPERTIES(a) VALUE
     PROPERTIES(ag) VALUE, name, nameParent, aginteger
     PROPERTIES(s) VALUE, name, storeSizeCode, sinteger
@@ -1456,7 +1461,7 @@ onChangeStoreName()  {
 }
 
 onChangeSInteger(Store s)  { 
-    INPUT st=BPSTRING[15] DO {
+    INPUT st =BPSTRING[15] DO {
         MESSAGE 'String: ' + st;
     
         sinteger(s) <- INTEGER(st);
@@ -1509,7 +1514,7 @@ testOnStringChange()  {
 }
 
 FORM TestOnActions 'Тест "ON actions"'
-    OBJECTS str=BPSTRING[15] PANEL
+    OBJECTS str =BPSTRING[15] PANEL
     OBJECTS s=Store
     PROPERTIES(s) NEWSESSION VALUE,
                   name ON CHANGE onChangeStoreName(),
@@ -1935,7 +1940,7 @@ FORM TestShowIfInTreeAndContainers 'Тест ShowIf (tree & containers)'
     OBJECTS s=Store
     PROPERTIES(s) VALUE, name, storeSizeCode
 
-    TREE groups a=BPSTRING[3], ag=ArticleGroup PARENT parent
+    TREE groups a =BPSTRING[3], ag=ArticleGroup PARENT parent
     PROPERTIES(a) SHOWIF storeIsBig(s) VALUE
     PROPERTIES(ag) SHOWIF storeIsBig(s) VALUE, name, nameParent, DELETE GRID
 
@@ -2469,6 +2474,9 @@ FORM newTestForm 'Test Exception'
  OBJECTS x = Newtest
  PROPERTIES(x) NEW, newtf, ottf, testChange GRID
 ;
+
+EXTEND FORM newTestForm
+    OBJECTS y = Newtest;
 
 
 NAVIGATOR {
@@ -3191,16 +3199,16 @@ testStrings()  {
     vtst() <- tst(2);
     vtst(a) <- vtst() WHERE a=2;
 
-    MESSAGE 'FIXED + : ' + tst(1) + ',' + tst(2);
+    MESSAGE 'NOFLEX + : ' + tst(1) + ',' + tst(2);
     MESSAGE 'VAR + : ' + vtst(1) + ',' + vtst(2);
-    MESSAGE 'FIXED CONCAT : ' + CONCAT ',',tst(1),tst(2);
+    MESSAGE 'NOFLEX CONCAT : ' + CONCAT ',',tst(1),tst(2);
     MESSAGE 'VAR CONCAT : ' + CONCAT ',',vtst(1),vtst(1);
     
-    MESSAGE 'FIXED GROUPC : ' + (GROUP CONCAT tst(a),',');
+    MESSAGE 'NOFLEX GROUPC : ' + (GROUP CONCAT tst(a),',');
     MESSAGE 'VAR GROUPC : ' + (GROUP CONCAT vtst(a),',');
 }
 NAVIGATOR {
-    NEW ACTION a = testStrings;
+    NEW ACTION testStrings;
 }
 
 
@@ -3213,10 +3221,11 @@ tstexp()  {
 	f(INTEGER a) <- 6 WHERE a=2;
 	
 	LOCAL xml = FILE ();
-	LOCAL dbf = FILE ();	
-	EXPORT XML FROM f(INTEGER a) TO xml;
-	EXPORT DBF FROM f(INTEGER a) TO dbf;
-	EXPORT FROM 5, xml(), dbf();
+	//LOCAL dbf = FILE ();	
+	EXPORT XML FROM xxx = f(INTEGER a) TO xml;
+	open(xml());
+	//EXPORT DBF FROM f(INTEGER a) TO dbf;
+	//EXPORT FROM 5, xml(), dbf();
 
 //	EXPORT XML FROM a=incomeQuantity(Store s,Article a), b=Features.name(a), c=barcode(a), d=Features.name(a), s=Features.name(s) WHERE incomeQuantity(s, a);	
 //	test(5);
@@ -3247,6 +3256,41 @@ FORM tst
     PROPERTIES (a) aboolean
     PROPERTIES () tstdt, tstdtm, tsttime
 ;
+
+integerAG = DATA INTEGER(Article, ArticleGroup);
+integerAGPanel = DATA INTEGER(Article, ArticleGroup);
+
+FORM tst2
+    OBJECTS df = DATE PANEL 
+    PROPERTIES Date = VALUE(df)
+    OBJECTS g = ArticleGroup
+    PROPERTIES (g) naaame = name
+    OBJECTS a = Article
+    PROPERTIES (a) tstBool = aboolean, tstLong = along SHOWIF aboolean(a)
+    PROPERTIES(a, g) integerAG DRAW g, integerAGPanel PANEL
+    PROPERTIES () tstDate = tstdt, tstDateTime = tstdtm, tstTime = tsttime
+;
+
+
+CLASS Item;
+id = DATA STRING[100] (Item);
+name = DATA STRING[100] (Item);
+
+CLASS ItemDetail;
+id = DATA STRING[100] (ItemDetail);
+name = DATA STRING[100] (ItemDetail);
+item = DATA Item (ItemDetail);
+
+FORM tst3
+    //OBJECTS dt = DATE PANEL 
+    //PROPERTIES date = VALUE(dt)
+    OBJECTS i = Item
+    PROPERTIES (i) idItem = id, nameItem = name, NEW, DELETE
+    OBJECTS d = ItemDetail
+    PROPERTIES (d) idItemDetail = id, nameItemDetail = name SHOWIF id(item(d)), NEW, DELETE
+    FILTERS item(d) == i, id(i), id(d)
+;
+
 
 NAVIGATOR {
     NEW tst BEFORE storeArticle;
@@ -3326,67 +3370,148 @@ CLASS YesNoMaybe {
 
 ask = DATA YesNoMaybe (XA);
 
-FORM testABAggr
-    OBJECTS xa = XA
-    OBJECTS xad = XADetail
-    PROPERTIES name(xa), name(xad)
-    PROPERTIES (xa) NEW, VALUE SELECTOR, DELETE, createXB 
-    PROPERTIES =ask(xa)
-    PROPERTIES (xad) NEW, DELETE
-    
-    FILTERS xa(xad) = xa
-    
-    OBJECTS xadl = XADetailLog
-    PROPERTIES (xadl) xa, name
+//FORM testABAggr
+//    OBJECTS xa = XA
+//    OBJECTS xad = XADetail
+//    PROPERTIES name(xa), name(xad)
+//    PROPERTIES (xa) NEW, VALUE SELECTOR, DELETE, createXB 
+//    PROPERTIES =ask(xa)
+//    PROPERTIES (xad) NEW, DELETE
+//
+//    FILTERS xa(xad) = xa
+//
+//    OBJECTS xadl = XADetailLog
+//    PROPERTIES (xadl) xa, name
+//
+//    OBJECTS xb = XB
+//    OBJECTS xbd = XBDetail
+//    PROPERTIES name(xb), name(xbd), =name(xb(xbd))
+//    PROPERTIES (xb) NEW, DELETE
+//    PROPERTIES (xbd) NEW, DELETE
+//
+//    OBJECTS xc = XC
+//    OBJECTS xcd = XCDetail
+//    PROPERTIES name(xc), name(xcd), =name(xc(xcd))
+//    PROPERTIES (xc) NEW, DELETE
+//    PROPERTIES (xcd) NEW, DELETE
+//;
+//
+//DESIGN testABAggr {
+//    OBJECTS {
+//        NEW common {
+//            type = CONTAINERH;
+//            fill = 1;
+//            NEW leftp {
+//                MOVE BOX(xa);
+//                MOVE BOX(xad);
+//                MOVE BOX(xadl);
+//                fill = 1;
+//            }
+//            NEW rightp {
+//                MOVE BOX(xb);
+//                MOVE BOX(xbd);
+//                fill = 1;
+//            }
+//            NEW rightc {
+//                MOVE BOX(xc);
+//                MOVE BOX(xcd);
+//                fill = 1;
+//            }
+//        }    
+//    }
+//}
 
-    OBJECTS xb = XB
-    OBJECTS xbd = XBDetail
-    PROPERTIES name(xb), name(xbd), =name(xb(xbd))
-    PROPERTIES (xb) NEW, DELETE
-    PROPERTIES (xbd) NEW, DELETE
+actionXXX {
+    htmlLinkInTab(HTMLLINK('https://luxsoft.by/'));
+}
 
-    OBJECTS xc = XC
-    OBJECTS xcd = XCDetail
-    PROPERTIES name(xc), name(xcd), =name(xc(xcd))
-    PROPERTIES (xc) NEW, DELETE
-    PROPERTIES (xcd) NEW, DELETE
-;
+testABAggr {
 
-DESIGN testABAggr {
-    OBJECTS {
-        NEW common {
-            type = CONTAINERH;
-            fill = 1;
-            NEW leftp {
-                MOVE BOX(xa);
-                MOVE BOX(xad);
-                MOVE BOX(xadl);
-                fill = 1;
-            }
-            NEW rightp {
-                MOVE BOX(xb);
-                MOVE BOX(xbd);
-                fill = 1;
-            }
-            NEW rightc {
-                MOVE BOX(xc);
-                MOVE BOX(xcd);
-                fill = 1;
-            }
-        }    
-    }
 }
 
 NAVIGATOR {
     NEW testABAggr BEFORE tst;
-    NEW ACTION ttt = testFormAction;
+//    NEW FORM testABAggr BEFORE tst;
+    MOVE testABAggr;
+    MOVE testABAggr;
+    NEW ACTION testFormAction;
+    NEW ACTION xxx = actionXXX;
+    MOVE testFormAction;
 }
 
-doSomething() {
-    resultString() <- 'x123';
-    encodedBase64() <- 'y321';
+doSomething(STRING[100] p1, STRING[100] p2) {
+    resultString() <- p1;
 }
 
 externalAction() {
-    //EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&someprm=$1' BODYURL 'otherprm=$2&andonemore=$3' PARAMS 1,2,'3';
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' PARAMS '1','2';
+}
+
+action () {
+    LOCAL headers = TEXT(STRING[100]);
+    LOCAL header = TEXT();
+    LOCAL headers = TEXT(INTEGER);
+    headers(TEXT h) <- 'xxx' WHERE h = 'h1';
+    headers(TEXT h) <- 'yyy' WHERE h = 'h2';
+    
+    LOCAL cookies = TEXT(STRING[100]);
+    cookies(TEXT c) <- '12345' WHERE c = 'c1';
+    cookies(TEXT c) <- '09876' WHERE c = 'c2';
+    
+	LOCAL headersTo = TEXT (TEXT);
+	LOCAL cookiesTo = TEXT (TEXT);
+//    EXTERNAL HTTP 'https://en.wikipedia.org/wiki/File:Example.jpg' HEADERS headers[TEXT] COOKIES cookies[TEXT] HEADERSTO headersTo COOKIESTO cookiesTo;
+	MESSAGE headersTo('Content-language');
+	MESSAGE cookiesTo('c1');
+IF failedHttp() THEN MESSAGE 'Alarm!'; ELSE MESSAGE 'OK';
+}
+
+
+
+GROUP declaration EXTID 'gd:GoodsDeclaration';
+GROUP shipment EXTID 'cacdo:DeclarationGoodsShipmentDetails';//: declaration;
+order = DATA LOCAL INTEGER (INTEGER);
+
+
+FORM importDT
+    OBJECTS d = INTEGER EXTID 'cacdo:DeclarationGoodsItemDetails' IN shipment
+    PROPERTIES(d) order EXTID 'casdo:ConsignmentItemOrdinal'
+;
+
+run () {
+    INPUT f = FILE DO {
+        IMPORT importDT XML FROM f;
+        MESSAGE 'count=' + (GROUP SUM 1 IF order(INTEGER i));
+    }
+}
+
+resourcePath() = 'e:/work/2/assets/';
+getResourse(STRING[100] na) {
+    READ 'file:' + resourcePath() + na TO exportFile;
+}
+
+
+GROUP bodyS EXTID 'S:Body';
+GROUP getDocumentsResponse EXTID 'GetDocumentsResponse' : bodyS;
+GROUP getDocumentsResult EXTID 'GetDocumentsResult' : getDocumentsResponse;
+
+succesful = DATA LOCAL NESTED BOOLEAN();
+message = DATA LOCAL NESTED TEXT();
+errorCode = DATA LOCAL NESTED INTEGER();
+
+FORM documentsResult 
+   PROPERTIES() IN getDocumentsResult succesful EXTID 'Succesful',
+                                      message EXTID 'Message',
+                                      errorCode EXTID 'ErrorCode'
+;
+
+
+str1 = DATA STRING[200] ();
+str2 = DATA STRING[200] ();
+
+FORM testForm222
+PROPERTIES() str1, str2;
+
+NAVIGATOR {
+    NEW testForm222;
 }

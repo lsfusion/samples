@@ -26,6 +26,8 @@ onStarted() + { // default for linux
         serverStartCmd() <- 'java -cp .:../server.jar lsfusion.server.logics.BusinessLogicsBootstrap'; // windows : -> ; no double quotes in linux
     IF NOT serverEncoding() THEN
         serverEncoding() <- 'UTF-8'; // for windows may be single-byte (for example cp1251)
+    IF NOT dbPassword() THEN
+        dbPassword() <- '11111';    
     IF NOT minPort() THEN
         minPort() <- 10000;
     IF NOT maxPort() THEN
