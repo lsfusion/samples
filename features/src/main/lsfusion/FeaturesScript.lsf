@@ -980,16 +980,16 @@ setDefaultNames 'Задать имена по умолчанию' ()  {
     FOR Article a IS Article DO {
         name(a) <- 'Товар ' + a;
     }
-    FOR Store s IS Store DO {
-        staticCaption(s) <- 'Склад ' + s;
-    }
-    FOR Article a IS Article DO {
-        staticCaption(a) <- 'Товар ' + a;
-    }
+//    FOR Store s IS Store DO {
+//        staticCaption(s) <- 'Склад ' + s;
+//    }
+//    FOR Article a IS Article DO {
+//        staticCaption(a) <- 'Товар ' + a;
+//    }
 };
 
 name(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
-staticCaption(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
+//staticCaption(Store s) <- 'Склад ' + s WHEN SET(s IS Store);
 
 FORM remindUserPass 'Напоминание логина'
 
