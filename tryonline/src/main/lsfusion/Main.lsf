@@ -201,12 +201,14 @@ getExamples(JSONFILE file) {
             text() <- TEXT(CSVFILE(readFile()));
             IF mode = 1 THEN { // removing header from db samples
                 LOCAL pos = INTEGER ();
-                FOR run = '//removeheader\n' DO {
+                FOR run = '//REMOVE' DO {
+                    text() <- regexpReplace(text(), '//removeheader.*\\n', run, 'n'); // we need \\n to match \n itself
                     pos() <- strpos(text(), run);
                     IF pos() > 0 THEN
-                        text() <- substrFrom(text(), pos());                    
+                        text() <- substrFrom(text(), pos()+length(run));                    
                 }                    
-            }
+            } ELSE // removing //#
+                text() <- regexpReplace(text(), '//#.*\\n', '', 'ng');
             file(ex) <- text();
         }
         EXPORT JSON FROM caption = caption(Example ex), text = file(ex) WHERE file(ex);                          
