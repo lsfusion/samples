@@ -4,5 +4,6 @@ REQUIRE Item;
 
 //removeheader
 run() {
-    EXPORT FROM upper(name(Item i)), barcode(i), salePrice(i) WHERE (name(i) LIKE '%а%' OR salePrice(i) > 10);
+    EXPORT FROM item = upper(name(Item i)), barcode(i), salePrice(i)
+        WHERE (name(i) LIKE '%а%' OR salePrice(i) > 10); // по умолчанию записывает результат в exportFile, а свойства export* являются результатами HTTP запроса по умолчанию
 }
