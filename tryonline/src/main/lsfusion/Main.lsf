@@ -163,23 +163,6 @@ getServerLog(JSONFILE file) {
     }
 } @@noauth;
 
-getExamples(JSONFILE file) {
-    IMPORT JSON FROM file FIELDS () INTEGER mode DO {
-            LOCAL directory = STRING[50] ();
-            directory() <- IF mode = 1 THEN examplesDBDir() ELSE examplesPlatformDir();
-            listFiles(directory()); 
-            
-            LOCAL file = TEXT (INTEGER);
-            FOR endsWith(fileName(INTEGER i), '.lsf') AND NOT fileIsDirectory(i) DO {
-                READ directory() + '/' + fileName(i);
-                fileToString(readFile(), 'UTF-8');
-                file(i) <- resultString();
-            }
-            
-            EXPORT JSON FROM caption = replace(fileName(INTEGER i), '.lsf', ''), text = file(i) WHERE file(i);                          
-    }
-} @@noauth;
-
 FORM servers 'Сервера'
     OBJECTS s=Server
     PROPERTIES (s) VALUE, code, dateStart, port ON CHANGE { FOR LONG oldp = port(s) DO INPUT newp=oldp DO { server(oldp) <- NULL; server(newp) <- s; } ; }, NEW, EDIT, DELETE 
@@ -188,8 +171,44 @@ FORM servers 'Сервера'
     OBJECTS a 'Ответы' = LONG
     PROPERTIES VALUE(a), text(s, a)
     FILTERS text(s, a)
-; 
+;
 
 NAVIGATOR {
     NEW servers;
 } 
+
+CLASS Example;
+caption 'Заголовок' = DATA STRING (Example);
+path 'Путь' = DATA STRING (Example);
+mode 'Режим' = DATA INTEGER (Example);
+
+FORM examples 'Примеры'
+    OBJECTS e = Example
+    PROPERTIES (e) caption, path, mode, NEW, DELETE
+;
+
+NAVIGATOR {
+    NEW examples;
+} 
+
+getExamples(JSONFILE file) {
+    IMPORT JSON FROM file FIELDS () INTEGER mode DO {
+        LOCAL file = TEXT (Example);
+        FOR mode(Example ex) = mode DO {
+            READ path(ex);
+
+            LOCAL text = TEXT ();
+            text() <- TEXT(CSVFILE(readFile()));
+            IF mode = 1 THEN { // removing header from db samples
+                LOCAL pos = INTEGER ();
+                FOR run = 'run()' DO {
+                    pos() <- strpos(text(), run);
+                    IF pos() > 0 THEN
+                        text() <- substrFrom(text(), pos());                    
+                }                    
+            }
+            file(ex) <- text();
+        }
+        EXPORT JSON FROM caption = caption(Example ex), text = file(ex) WHERE file(ex);                          
+    }
+} @@noauth;
