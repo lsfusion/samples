@@ -201,7 +201,7 @@ getExamples(JSONFILE file) {
             text() <- TEXT(CSVFILE(readFile()));
             IF mode = 1 THEN { // removing header from db samples
                 LOCAL pos = INTEGER ();
-                FOR run = 'run()' DO {
+                FOR run = '//removeheader\n' DO {
                     pos() <- strpos(text(), run);
                     IF pos() > 0 THEN
                         text() <- substrFrom(text(), pos());                    

@@ -1,0 +1,8 @@
+MODULE ExportItems;
+
+REQUIRE Item;
+
+//removeheader
+run() {
+    EXPORT FROM upper(name(Item i)), barcode(i), salePrice(i) WHERE (name(i) LIKE '%а%' OR salePrice(i) > 10);
+}

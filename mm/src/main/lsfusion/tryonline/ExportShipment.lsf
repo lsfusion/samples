@@ -1,0 +1,19 @@
+MODULE ExportShipment;
+
+REQUIRE Shipment;
+
+//removeheader
+FORM shipment
+    OBJECTS number=STRING // параметр формы, заданный номер
+    OBJECTS s=Shipment // накладная
+    FILTERS number(s) = number // накладная с заданным номером 
+    PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // выгружаем дату, имя покупателя (с именем customer) и имя склада (с именем stock)
+    OBJECTS sd=ShipmentDetail // строки накладной     
+    FILTERS shipment(sd) = s // строки накладной из накладной
+    PROPERTIES (sd) index, item = nameItem, price, quantity // выгружаем дату, имя товара (с именем item), количество, цену
+    PROPERTIES sum = (quantity(sd) * price(sd)) // выгружаем кол-во * цену (с именем sum)    
+;
+
+run() {
+    EXPORT shipment OBJECTS number = '12345'; // выгружаем накладную с номером 12345
+}
