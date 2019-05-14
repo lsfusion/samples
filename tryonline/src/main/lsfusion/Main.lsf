@@ -221,9 +221,9 @@ getExamples(JSONFILE file) {
             LOCAL text = TEXT ();
             text() <- readedText();
             IF mode != 0 THEN {
-                FOR p = exPath(ex, LONG l) DO {
+                FOR p = exPath(ex, LONG l) ORDER l DO {
                     readPathToText(p, TRUE);
-                    text() <- text() + readedText(); 
+                    text() <- text() + '\n' + readedText(); 
                 }
                 // removing other tags from text
                 text() <- regexpReplace(text(), '//#.*(\\n)?', '', 'ng');
