@@ -1,8 +1,8 @@
+//#header
 MODULE ExportShipment;
 
 REQUIRE Shipment;
-
-//removeheader
+//#header end
 FORM shipment
     OBJECTS s=Shipment // накладная
     PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // выгружаем дату, имя покупателя (с именем customer) и имя склада (с именем stock)
@@ -12,7 +12,6 @@ FORM shipment
     PROPERTIES sum = (quantity(sd) * price(sd)) // выгружаем кол-во * цену (с именем sum)    
 ;
 
-shipmentByNumber = GROUP MAX Shipment s BY number(s); // находит накладную с заданным номером
 run() {
-    EXPORT shipment OBJECTS s = shipmentByNumber('12345'); // выгружаем накладную с номером 12345
+    EXPORT shipment OBJECTS s = (GROUP MAX Shipment s IF number(s) = '12345'); // выгружаем накладную с номером 12345
 }

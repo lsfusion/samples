@@ -1,3 +1,4 @@
+//#header
 //#module
 MODULE Receipt;
 //#module end
@@ -5,6 +6,7 @@ MODULE Receipt;
 //#require
 REQUIRE Stock, Item, LegalEntity;
 //#require end
+//#header end
 
 //#class
 CLASS Receipt 'Приходная накладная';

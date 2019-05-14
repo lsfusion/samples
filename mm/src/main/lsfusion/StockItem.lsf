@@ -1,3 +1,4 @@
+//#header
 //#module
 MODULE StockItem;
 //#module end
@@ -5,6 +6,7 @@ MODULE StockItem;
 //#require
 REQUIRE Shipment, Receipt;
 //#require end
+//#header end
 
 //#properties
 receivedQuantity 'Суммарный приход' (Item i, Stock s) = GROUP SUM quantity(ReceiptDetail d) BY item(d), stock(receipt(d));

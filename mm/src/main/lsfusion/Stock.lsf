@@ -1,6 +1,8 @@
+//#header
 //#module
 MODULE Stock;
 //#module end
+//#header end
 
 //#class
 CLASS Stock 'Склад';

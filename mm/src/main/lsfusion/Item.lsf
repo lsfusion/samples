@@ -1,6 +1,8 @@
+//#header
 //#module
 MODULE Item;
 //#module end
+//#header end
 
 //#class
 CLASS Item 'Товар';
