@@ -49,7 +49,7 @@ FORM shipment 'Расходная накладная'
 
 	OBJECTS d=ShipmentDetail
 	PROPERTIES(d) nameItem, quantity, price, sum READONLY, NEW, DELETE GRID
-	FILTERS shipment(d) == s
+	FILTERS shipment(d) = s
 
 	EDIT Shipment OBJECT s
 ;
@@ -63,6 +63,6 @@ FORM shipments 'Расходные накладные'
 
 	OBJECTS d=ShipmentDetail
 	PROPERTIES(d) READONLY nameItem, quantity, price, sum
-	FILTERS shipment(d) == s
+	FILTERS shipment(d) = s
 ;
 //#formlist end

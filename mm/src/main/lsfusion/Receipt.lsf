@@ -50,7 +50,7 @@ FORM receipt 'Приходная накладная'
 
 	OBJECTS d=ReceiptDetail
 	PROPERTIES(d) index, nameItem, quantity, price, sum READONLY, NEW, DELETE GRID
-	FILTERS receipt(d) == r
+	FILTERS receipt(d) = r
 
 	EDIT Receipt OBJECT r
 ;
@@ -64,6 +64,6 @@ FORM receipts 'Приходные накладные'
 
 	OBJECTS d=ReceiptDetail
 	PROPERTIES(d) READONLY index, nameItem, quantity, price, sum
-	FILTERS receipt(d) == r
+	FILTERS receipt(d) = r
 ;
 //#formlist end

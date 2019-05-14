@@ -11,7 +11,7 @@ CLASS Team 'Команда';
 //#classteam end
 
 //#nameteam
-name 'Название команды' (team) = DATA BPSTRING[30](Team) IN base;
+name 'Название команды' (team) = DATA STRING[30] (Team) IN base;
 //#nameteam end
 
 //#game
@@ -25,7 +25,7 @@ guestTeamName 'Гости' (Game game) = name(guestTeam(game));
 //#game end
 
 //#constrainthostguest
-CONSTRAINT hostTeam(Game team) == guestTeam(team) CHECKED BY hostTeam[Game], guestTeam[Game] MESSAGE 'Хозяйская и гостевая команды должны быть разными';
+CONSTRAINT hostTeam(Game team) = guestTeam(team) CHECKED BY hostTeam[Game], guestTeam[Game] MESSAGE 'Хозяйская и гостевая команды должны быть разными';
 //#constrainthostguest end
 
 //#goals
@@ -34,7 +34,7 @@ guestGoals 'Г голы' = DATA INTEGER (Game);
 //#goals end
 
 //#constraintgoals
-CONSTRAINT hostGoals(Game game) == guestGoals(game) MESSAGE 'Игра не может закончиться вничью';
+CONSTRAINT hostGoals(Game game) = guestGoals(game) MESSAGE 'Игра не может закончиться вничью';
 //#constraintgoals end
 
 //#gamewinner
@@ -74,8 +74,8 @@ CONSTRAINT ((hostGoals(Game game) (-) guestGoals(game)) < 2 AND (hostGoals(game)
 //#gameresultset end
 
 //#gamesplayed
-hostGamesPlayed(team) = GROUP SUM 1 BY hostTeam(Game game);
-guestGamesPlayed(team) = GROUP SUM 1 BY guestTeam(Game game);
+hostGamesPlayed = GROUP SUM 1 BY hostTeam(Game game);
+guestGamesPlayed = GROUP SUM 1 BY guestTeam(Game game);
 gamesPlayed 'И' (Team team) = hostGamesPlayed(team) (+) guestGamesPlayed(team);
 //#gamesplayed end
 
@@ -100,12 +100,12 @@ points 'Очки' (Team team) = gamesWon(team) * 3 + (gamesWonSO(team) + gamesWo
 //#points end
 
 //#goalsresult
-hostGoalsScored(team) = GROUP SUM hostGoals(Game game) BY hostTeam(game);
-guestGoalsScored(team) = GROUP SUM guestGoals(Game game) BY guestTeam(game);
+hostGoalsScored = GROUP SUM hostGoals(Game game) BY hostTeam(game);
+guestGoalsScored = GROUP SUM guestGoals(Game game) BY guestTeam(game);
 goalsScored 'Кол-во забитых голов' (Team team) = OVERRIDE hostGoalsScored(team) (+) guestGoalsScored(team), 0 IF team IS Team;
 
-hostGoalsConceded(team) = GROUP SUM guestGoals(Game game) BY hostTeam(game);
-guestGoalsConceded(team) = GROUP SUM hostGoals(Game game) BY guestTeam(game);
+hostGoalsConceded = GROUP SUM guestGoals(Game game) BY hostTeam(game);
+guestGoalsConceded = GROUP SUM hostGoals(Game game) BY guestTeam(game);
 goalsConceded 'Кол-во пропущенных голов' (Team team) = OVERRIDE hostGoalsConceded(team) (+) guestGoalsConceded(team), 0 IF team IS Team;
 //#goalsresult end
 
