@@ -187,7 +187,7 @@ exPath 'Путь' = DATA STRING (Example, LONG);
 FORM examples 'Примеры'
     OBJECTS e = Example
     PROPERTIES (e) caption, path, mode, order, NEW, DELETE
-    ORDER order(e)
+    ORDER mode(e), order(e)
     OBJECTS i = INTEGER
     FILTERS iterate(i, 1, 10)
     PROPERTIES exPath(e, i); 
@@ -217,7 +217,7 @@ readPathToText(STRING path, BOOLEAN removeHeader) {
 getExamples(JSONFILE file) {
     IMPORT JSON FROM file FIELDS () INTEGER mode DO {
         LOCAL file = TEXT (Example);
-        FOR mode(Example ex) = mode ORDER order(ex) DO {
+        FOR mode(Example ex) = mode DO {
             readPathToText(path(ex), mode = 0);
             
             LOCAL text = TEXT ();
@@ -232,6 +232,6 @@ getExamples(JSONFILE file) {
             }
             file(ex) <- text();
         }
-        EXPORT JSON FROM caption = caption(Example ex), text = file(ex) WHERE file(ex);                          
+        EXPORT JSON FROM caption = caption(Example ex), text = file(ex) WHERE file(ex) ORDER order(ex);                          
     }
 } @@noauth;

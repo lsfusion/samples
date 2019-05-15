@@ -1,5 +1,6 @@
+//#header
 MODULE HelloWorld;
-
+//#header end
 run() {
     exportString() <- 'Hello world!'; // свойства export* являются результатами HTTP запроса по умолчанию
     

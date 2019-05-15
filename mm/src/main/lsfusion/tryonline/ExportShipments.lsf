@@ -3,7 +3,6 @@ MODULE ExportShipments;
 
 REQUIRE Shipment;
 //#header end
-
 FORM shipment
     OBJECTS dFrom=DATE, dTo=DATE
     OBJECTS s=Shipment // накладная
@@ -15,5 +14,5 @@ FORM shipment
 ;
 
 run() {
-    EXPORT shipment OBJECTS dFrom = 2017_08_26, dTo = 2017_08_28; // выгружаем накладнуы с номером 12345
+    EXPORT shipment OBJECTS dFrom = 2019_02_20, dTo = 2019_04_28; // выгружаем накладные в заданном периоде
 }
