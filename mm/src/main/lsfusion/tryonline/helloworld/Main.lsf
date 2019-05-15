@@ -1,0 +1,14 @@
+MODULE Main;
+
+showHelloWorld 'Показать сообщение' () {
+    MESSAGE 'Hello world!';
+}
+
+FORM formHelloWorld 'Форма'
+    PROPERTIES 'Сообщение' = 'Hello world!';
+;
+
+NAVIGATOR {
+    NEW showHelloWorld;
+    NEW formHelloWorld;
+}

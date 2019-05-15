@@ -4,7 +4,7 @@ MODULE ImportShipments;
 REQUIRE Shipment;
 //#header end
 
-// для примитивных данных, по которым нужно найти объекты в системе
+// для импорта примитивных данных, для которых нужно найти объекты в системе
 inn = DATA LOCAL BPSTRING[9] (Shipment);
 barcode = DATA LOCAL BPSTRING[13] (ShipmentDetail);
 
@@ -18,18 +18,18 @@ FORM shipments
 
 run() {
     FOR jsonFile = JSONFILE('\{ shipments : [ ' + // jsonFile должен / может передаваться в параметре run, {} надо escape'ить так как фигурные скобки используются в интернационализации
-                ' \{number : "13423", date : "01.01.2019", inn : "2", detail : [\{ barcode : "141", quantity : 5, price : 10 \}, \{ barcode : "545", quantity : 2, price : 11 \}] \}' + 
-                ' \{number : "12445", date : "01.01.2019", inn : "1", detail : [\{ barcode : "13", quantity : 1, price : 22 \}] \} ]\}')
+                ' \{number : "13423", date : "01.01.2019", inn : "2", detail : [\{ barcode : "141", quantity : 5, price : 10 \}, \{ barcode : "545", quantity : 2, price : 11 \}] \},' + 
+                ' \{number : "12445", date : "01.02.2019", inn : "1", detail : [\{ barcode : "13", quantity : 1, price : 22 \}] \} ]\}')
                  DO {
         IMPORT shipments FROM jsonFile; // тип импорта автоматически определяется из типа файла
         FOR BPSTRING[9] inn = inn(Shipment s) DO { // для всех принятых inn
             customer(s) <- legalEntityINN(inn); // в поставку записываем клиента с принятым INN
-            stock(s) <- GROUP MAX st AS Stock; // запишем произвольный склад (с максимальным id) 
+            stock(s) <- GROUP MAX st AS Stock; // запишем какой-нибудь склад (с максимальным id) 
         }        
         FOR barcode(Item item) = barcode(ShipmentDetail sd) DO // еще один способ связать примитивные данные с объектными
             item(sd) <- item;
             
         APPLY;
-        exportString() <- IF canceled() THEN applyMessage() ELSE 'Накладная принята успешно';
+        exportString() <- IF canceled() THEN applyMessage() ELSE 'Накладная записана успешно';
    }
 }
