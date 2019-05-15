@@ -1,0 +1,8 @@
+MODULE HelloWorld;
+
+run() {
+    exportString() <- 'Hello world!'; // свойства export* являются результатами HTTP запроса по умолчанию
+    
+    // альтернативный способ
+    // EXPORT FROM 'Hello world!'; // по умолчанию экспортирует в JSON и записывает результат как JSONFILE в exportFile 
+}

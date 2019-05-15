@@ -181,11 +181,13 @@ CLASS Example;
 caption 'Заголовок' = DATA STRING (Example);
 path 'Путь' = DATA STRING (Example);
 mode 'Режим' = DATA INTEGER (Example);
+order 'Порядок' = DATA INTEGER (Example);
 exPath 'Путь' = DATA STRING (Example, LONG); 
 
 FORM examples 'Примеры'
     OBJECTS e = Example
-    PROPERTIES (e) caption, path, mode, NEW, DELETE
+    PROPERTIES (e) caption, path, mode, order, NEW, DELETE
+    ORDER order(e)
     OBJECTS i = INTEGER
     FILTERS iterate(i, 1, 10)
     PROPERTIES exPath(e, i); 
@@ -215,7 +217,7 @@ readPathToText(STRING path, BOOLEAN removeHeader) {
 getExamples(JSONFILE file) {
     IMPORT JSON FROM file FIELDS () INTEGER mode DO {
         LOCAL file = TEXT (Example);
-        FOR mode(Example ex) = mode DO {
+        FOR mode(Example ex) = mode ORDER order(ex) DO {
             readPathToText(path(ex), mode = 0);
             
             LOCAL text = TEXT ();

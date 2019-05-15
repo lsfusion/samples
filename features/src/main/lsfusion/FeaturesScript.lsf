@@ -2151,7 +2151,7 @@ x = DATA INTEGER (A)
 CONSTRAINT f(A a) > g(a) MESSAGE 'Forbidden';
 f(A a) => g(a) RESOLVE LEFT;
         
-tstCustom  INTERNAL  'samples.TestCustomActionProperty' ();
+//tstCustom  INTERNAL  'samples.TestCustomActionProperty' ();
 
 //EXTERNAL examples
 
@@ -2177,8 +2177,8 @@ tstCustom  INTERNAL  'samples.TestCustomActionProperty' ();
 //    externalDB(str1(s),str2(s), str3(s));
 //}
 
-WHEN f(A a) < g(a) DO
-    tstCustom();
+//WHEN f(A a) < g(a) DO
+//    tstCustom();
 
 jss() = DATA INTEGER ();
 debuggableAction(Store s)  { 
@@ -2192,7 +2192,7 @@ debuggableAction(Store s)  {
         NEW a = A {
         }
         
-        tstCustom();
+//        tstCustom();
     
         apply();
         cancel();

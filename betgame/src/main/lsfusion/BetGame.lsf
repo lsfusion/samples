@@ -60,12 +60,12 @@ currentHomeScore 'Ставка (хозяева)' (Match m) = homeScore(m, curren
 currentAwayScore 'Ставка (гости)' (Match m) = awayScore(m, currentUser());
 
 changeCurrentHomeScore (Match m)  { 
-    FOR CustomUser u == currentUser() DO
+    FOR CustomUser u = currentUser() DO
         INPUT =homeScore(m, u) CHANGE;
 }
 
 changeCurrentAwayScore (Match m)  { 
-    FOR CustomUser u == currentUser() DO
+    FOR CustomUser u = currentUser() DO
         INPUT =awayScore(m, u) CHANGE;
 }
 

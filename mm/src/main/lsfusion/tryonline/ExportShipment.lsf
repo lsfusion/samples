@@ -3,12 +3,17 @@ MODULE ExportShipment;
 
 REQUIRE Shipment;
 //#header end
+
+GROUP money;
+
 FORM shipment
     OBJECTS s=Shipment // накладная
     PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // выгружаем дату, имя покупателя (с именем customer) и имя склада (с именем stock)
+    PROPERTIES IN money total = (GROUP SUM ShipmentDetail d IF shipment(d)=s) // выгружаем общую сумму накладной в теге money
     OBJECTS sd=ShipmentDetail // строки накладной     
     FILTERS shipment(sd) = s // строки накладной из накладной
-    PROPERTIES (sd) index, item = nameItem, price, quantity // выгружаем дату, имя товара (с именем item), количество, цену
+    PROPERTIES (sd) index, item = nameItem // выгружаем номер, имя товара (с именем item)
+    PROPERTIES (sd) IN money price, quantity // выгружаем количество, цену в теге money
     PROPERTIES sum = (quantity(sd) * price(sd)) // выгружаем кол-во * цену (с именем sum)    
 ;
 
