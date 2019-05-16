@@ -1,0 +1,26 @@
+//#header
+MODULE SessionOperations;
+
+REQUIRE Shipment, Time;
+//#header end
+sum = GROUP SUM sum(ShipmentDetail sd) BY shipment(sd); 
+
+run() {
+    FOR price(ShipmentDetail sd) > 10 DO { // для всех строк накладных с ценой больше 10 изменим ее на 15, а количество уменьшим на 5
+        price(sd) <- 15;
+        quantity(sd) <- 5;
+    }
+    LOCAL NESTED s = STRING(); // так как s - NESTED, она будет видна в NEWSESSION и не обнулятся при APPLY
+    s() <- ''; 
+    
+    FOR CHANGED(sum(Shipment s)) DO { // для всех накладных у которых изменилась сумма (в результате верхних изменений)
+        NEWSESSION {
+            s() <- s() + number(s) + ' : ' + sum(s) + '\n'; // добавим в вывод сумму инвойса (без учета верхних изменений)  
+            date(s) <- sum(date(s), 1); // увеличим дату инвойса на 1                     
+            APPLY;   
+        }
+    }
+    
+    exportString() <- s();
+    // изменения в сессии не сохраняются, соответственно видны не будут
+}

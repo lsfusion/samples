@@ -3,7 +3,6 @@ MODULE ImportShipments;
 
 REQUIRE Shipment;
 //#header end
-
 // для импорта примитивных данных, для которых нужно найти объекты в системе
 inn = DATA LOCAL BPSTRING[9] (Shipment);
 barcode = DATA LOCAL BPSTRING[13] (ShipmentDetail);

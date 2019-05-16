@@ -1,0 +1,13 @@
+//#header
+MODULE SetOperations;
+
+REQUIRE Shipment;
+//#header end
+// порядковый номер строки по возрастанию цены в накладной
+priceIndex = PARTITION SUM 1 ORDER price(ShipmentDetail sd) BY shipment(sd);
+// сумма первых N строк для накладной, оператор GROUP в SQL-стиле 
+topSum = GROUP SUM price(ShipmentDetail sd) * quantity(sd) IF priceIndex(sd) < N BY shipment(sd), N;
+
+run() {
+    exportNumeric() <- topSum((GROUP MAX Shipment s IF number(s) = '12345'), 3); // выводим первые 3 записи , оператор GROUP в функциональном стиле
+}
