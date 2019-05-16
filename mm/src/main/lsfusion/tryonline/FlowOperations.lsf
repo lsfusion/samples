@@ -6,15 +6,15 @@ REQUIRE Shipment;
 run() {
     LOCAL marked = BOOLEAN (ShipmentDetail); // пометки отмеченных строк накладной
     FOR number(shipment(ShipmentDetail sd)) = '12345' DO { // для строк накладной
-        IF price(sd) > 10 THEN 
-            marked(sd) <- TRUE;
-            
         IF price(sd) > 20 THEN
             BREAK; 
+
+		IF price(sd) >= 10 THEN 
+            marked(sd) <- TRUE;
     }
     
-    IF (GROUP SUM 1 IF marked(ShipmentDetail sd)) > 2 THEN // количество отмеченных строк накладной > 2
-        exportString() <- GROUP CONCAT ',', name(item(ShipmentDetail sd)) IF marked(sd); // возвращаем имена товаров отмеченных строк накладной через запятую 
-
-    exportString() <- 'Слишком мало позиций'; 
+    IF (GROUP SUM 1 IF marked(ShipmentDetail sd)) >= 2 THEN // количество отмеченных строк накладной >= 2
+        exportString() <- GROUP CONCAT name(item(ShipmentDetail sd)) IF marked(sd),','; // возвращаем имена товаров отмеченных строк накладной через запятую 
+	ELSE
+    	exportString() <- 'Слишком мало позиций'; 
 }

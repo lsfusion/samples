@@ -15,6 +15,5 @@ FORM shipment
 ;
 
 run() {
-    PRINT shipment OBJECTS s = (GROUP MAX Shipment s IF number(s) = '12345'); // печатаем накладную с номером 12345
+    PRINT shipment OBJECTS s = (GROUP MAX Shipment s IF number(s) = '12345') XLS TO exportFile; // печатаем накладную с номером 12345
 }
-
