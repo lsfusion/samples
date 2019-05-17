@@ -1,3 +1,5 @@
 //#header
+//#module
 MODULE Main;
+//#module end
 //#header end

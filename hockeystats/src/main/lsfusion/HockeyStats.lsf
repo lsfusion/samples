@@ -1,7 +1,6 @@
 //#module
 MODULE HockeyStats;
 //#module end
-
 //#require 
 REQUIRE System;
 //#require end

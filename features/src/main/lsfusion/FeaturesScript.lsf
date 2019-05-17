@@ -5,8 +5,9 @@
 // [PRIORITY namespace1, ..., namespaceK;]
 // [NAMESPACE namespaceName;]
 
+//#module
 MODULE Features;
-
+//#module end
 REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler;
 
 /////////// GROUP STATEMENT ////////////

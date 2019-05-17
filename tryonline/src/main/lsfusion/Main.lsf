@@ -72,6 +72,7 @@ createServer 'Создать сервер' (Server server) {
                   'db.name='+dbName(server)+'\n'+
                   'db.user=postgres'+'\n'+
                   'db.password='+dbPassword()+'\n'+                                                              
+                  'logics.topModule=Main\n'+                                                              
                   'rmi.port='+port()) TO 'file://' + confDir() + '/settings.properties';
                                                               
 
@@ -92,7 +93,7 @@ dateStart = DATA DATETIME (Server);
 
 runServer 'Запустить сервер' (Server server, TEXT code) {
     NEWSESSION NEWSQL NEWTHREAD {
-        WRITE RAWFILE(code) TO 'file://' + serverDir(server) + '/Main.lsf';
+        WRITE RAWFILE('MODULE Main; ' + code) TO 'file://' + serverDir(server) + '/Main.lsf';
         APPLY { code(server) <- code; dateStart(server) <- currentDateTime(); }
         runProcess(server, serverStartCmd(), serverDir(server), serverEncoding());
     }
@@ -199,36 +200,41 @@ NAVIGATOR {
 
 readedText = DATA LOCAL TEXT ();
 
-readPathToText(STRING path, BOOLEAN removeHeader) {
+removeTextBeforeBlockEnd(STRING block) {
+    LOCAL pos = INTEGER ();
+    FOR run = 'DFKRJKJSIEIJKDFJI' DO {
+        readedText() <- regexpReplace(readedText(), '//#'+block+' end.*\\n', run, 'n'); // we need \\n to match \n itself
+        pos() <- strpos(readedText(), run);
+        IF pos() > 0 THEN
+            readedText() <- substrFrom(readedText(), pos()+length(run));                    
+    }                    
+}
+
+readPathToText(STRING path) {
     READ path;
     readedText() <- TEXT(CSVFILE(readFile()));
-    
-    IF removeHeader THEN {
-        LOCAL pos = INTEGER ();
-        FOR run = 'DFKRJKJSIEIJKDFJI' DO {
-            readedText() <- regexpReplace(readedText(), '//#header end.*\\n', run, 'n'); // we need \\n to match \n itself
-            pos() <- strpos(readedText(), run);
-            IF pos() > 0 THEN
-                readedText() <- substrFrom(readedText(), pos()+length(run));                    
-        }                    
-    }
 }
 
 getExamples(JSONFILE file) {
     IMPORT JSON FROM file FIELDS () INTEGER mode DO {
         LOCAL file = TEXT (Example);
         FOR mode(Example ex) = mode DO {
-            readPathToText(path(ex), mode = 0);
+            readPathToText(path(ex));
             
             LOCAL text = TEXT ();
-            text() <- readedText();
             IF mode != 0 THEN {
+                removeTextBeforeBlockEnd('module');
+                text() <- readedText();
                 FOR p = exPath(ex, LONG l) ORDER l DO {
-                    readPathToText(p, TRUE);
+                    readPathToText(p);
+                    removeTextBeforeBlockEnd('header');
                     text() <- text() + '\n' + readedText(); 
                 }
                 // removing other tags from text
                 text() <- regexpReplace(text(), '//#.*(\\n)?', '', 'ng');
+            } ELSE {
+                removeTextBeforeBlockEnd('header');
+                text() <- readedText();
             }
             file(ex) <- text();
         }
