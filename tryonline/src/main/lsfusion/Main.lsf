@@ -72,7 +72,8 @@ createServer 'Создать сервер' (Server server) {
                   'db.name='+dbName(server)+'\n'+
                   'db.user=postgres'+'\n'+
                   'db.password='+dbPassword()+'\n'+                                                              
-                  'logics.topModule=Main\n'+                                                              
+                  'logics.topModule=Main\n'+
+                  'settings.enableUI=2\n'+                                                              
                   'rmi.port='+port()) TO 'file://' + confDir() + '/settings.properties';
                                                               
 
