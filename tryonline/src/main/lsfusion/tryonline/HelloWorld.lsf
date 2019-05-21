@@ -1,5 +1,5 @@
 //#module
-MODULE Main;
+MODULE HelloWorld;
 //#module end
 showHelloWorld 'Показать сообщение' () {
     MESSAGE 'Hello world!';
