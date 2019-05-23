@@ -11,7 +11,7 @@ examplesDBDir 'Директорий примеров (СУБД)' = DATA BPSTRING
 examplesPlatformDir 'Директорий примеров (Платформа)' = DATA BPSTRING[50] ();
 dbPassword 'Пароль к базе' = DATA BPSTRING[50] () CHARWIDTH 10 NOFLEX; // for postgres user
 serverStartCmd 'Команда запуска сервера' = DATA STRING[1000] (); // will be started from some basedir subfolder 
-serverEncoding 'Кодирока консоли' = DATA BPSTRING[10] (); // server console output encoding
+serverEncoding 'Кодировка консоли' = DATA BPSTRING[10] (); // server console output encoding
 minPort 'Мин. порт' = DATA LONG (); 
 maxPort 'Макс. порт' = DATA LONG (); 
 
@@ -23,7 +23,7 @@ onStarted() + { // default for linux
     IF NOT baseDir() THEN
         baseDir() <- './box';
     IF NOT serverStartCmd() THEN
-        serverStartCmd() <- 'java -cp .:../server.jar lsfusion.server.logics.BusinessLogicsBootstrap'; // windows : -> ; no double quotes in linux
+        serverStartCmd() <- 'java -Dlsfusion.server.lightstart=true -cp .:../server.jar lsfusion.server.logics.BusinessLogicsBootstrap'; // windows : -> ; no double quotes in linux
     IF NOT serverEncoding() THEN
         serverEncoding() <- 'UTF-8'; // for windows may be single-byte (for example cp1251)
     IF NOT dbPassword() THEN
