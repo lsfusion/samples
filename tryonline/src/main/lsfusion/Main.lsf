@@ -116,7 +116,7 @@ startServer(JSONFILE file) {
             APPLY;
             createServer(server);
             runServer(server, code);
-            EXPORT JSON FROM server=server;
+            EXPORT JSON FROM server=server, port=port(server);
         }           
     }
 } @@noauth;
