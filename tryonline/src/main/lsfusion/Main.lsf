@@ -122,24 +122,21 @@ startServer(JSONFILE file) {
 } @@noauth;
 
 restartServer(JSONFILE file) {
-    IMPORT JSON FROM file FIELDS () LONG server, TEXT code, INTEGER mode DO {
+    IMPORT JSON FROM file FIELDS () LONG server, TEXT code DO {
         FOR LONG(Server serverObject AS Server) = server DO {
-            IF mode == 0 THEN {
-                killServer(serverObject);
-            }
+            killServer(serverObject);
+           
             runServer(serverObject, code);
         }           
     }
 } @@noauth;
 
 stopServer(JSONFILE file) {
-    IMPORT JSON FROM file FIELDS () LONG server, INTEGER mode DO {
+    IMPORT JSON FROM file FIELDS () LONG server DO {
         FOR LONG(Server serverObject AS Server) = server DO {
             killServer(serverObject);
             
-            IF mode == 0 THEN {
-                deleteServer(serverObject);
-            }
+            deleteServer(serverObject);
         }    
     }
 } @@noauth;
