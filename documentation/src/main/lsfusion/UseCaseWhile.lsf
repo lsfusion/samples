@@ -75,7 +75,7 @@ calculateIntegral (DATE dFrom, DATE dTo)  {
 
     WHILE date() <= dTo DO {
         cumBalance(Book b) <- cumBalance(b) (+) balance(b); //
-        balance(Book b) <- balance(b) (+) [ GROUP SUM quantity(Ledger l) BY book(l), date(l)](date());
+        balance(Book b) <- balance(b) (+) [ GROUP SUM quantity(Ledger l) BY book(l), date(l)](b, date());
         date() <- sum(date(), 1);
     }
     
