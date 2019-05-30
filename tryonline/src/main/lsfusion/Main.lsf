@@ -1,6 +1,6 @@
 MODULE Main;
 
-REQUIRE Service, Utils, SchedulerDefaultData;
+REQUIRE SystemEvents, Service, Utils, SchedulerDefaultData;
 
 CLASS Server 'Сервер';
 processId = DATA LONG (Server);
