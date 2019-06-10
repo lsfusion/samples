@@ -13,7 +13,7 @@ FORM shipment
     FILTERS shipment(sd) = s // строки накладной из накладной
     PROPERTIES (sd) index, item = nameItem // выгружаем номер, имя товара (с именем item)
     PROPERTIES (sd) IN money price, quantity // выгружаем количество, цену в теге money
-    PROPERTIES sum = (quantity(sd) * price(sd)) // выгружаем кол-во * цену (с именем sum)    
+    PROPERTIES sum = quantity(sd) * price(sd) // выгружаем кол-во * цену (с именем sum)    
 ;
 
 run() {
