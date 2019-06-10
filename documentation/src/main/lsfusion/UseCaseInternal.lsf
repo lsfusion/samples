@@ -1,0 +1,28 @@
+MODULE UseCaseInternal;
+
+//#solution1
+ip = DATA LOCAL TEXT();
+getIPJava INTERNAL 'GetIP';
+showIPJava 'Показать имя компьютера (Java)' {
+    getIPJava();
+    MESSAGE ip();
+}
+
+getIPFusion INTERNAL <{  
+    try {
+        findProperty("ip").change(InetAddress.getLocalHost().toString(), context);
+    } catch (UnknownHostException | ScriptingErrorLog.SemanticErrorException ignored) {}        
+}>;
+showIPFusion 'Показать имя компьютера (Fusion)' {
+    getIPFusion();
+    MESSAGE ip();
+}
+
+FORM info 'Информация'
+    PROPERTIES() showIPJava, showIPFusion
+;
+
+NAVIGATOR {
+    NEW info;
+}
+//#solution1 end
