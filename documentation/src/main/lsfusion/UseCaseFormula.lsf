@@ -16,7 +16,7 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1
-toISO = FORMULA STRING[8] 'to_char(($1),\'YYYYMMDD\')';
+toISO = FORMULA STRING[8] 'to_char(($1),\'YYYY-MM-DD\')';
 
 exportToCSV 'Экспорт в CSV' () {
     LOCAL file = FILE ();
