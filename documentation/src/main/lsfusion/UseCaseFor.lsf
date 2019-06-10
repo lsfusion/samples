@@ -5,14 +5,26 @@ REQUIRE Utils;
 //#sample1
 CLASS Book 'Книга';
 name 'Наименование' = DATA ISTRING[50] (Book);
+
+FORM books 'Книги'
+    OBJECTS b = Book
+    PROPERTIES(b) name, NEW, DELETE
+;
+
+NAVIGATOR {
+    NEW books;
+}
 //#sample1 end
 
 //#solution1
 findNemo 'Найти книгу' ()  { 
-    FOR isSubstring(name(Book b), 'Nemo')  == 1 DO {
+    FOR isSubstring(name(Book b), 'Nemo') DO {
         MESSAGE 'Найдена книга ' + name(b) + ' с внутренним кодом ' + b;
     } 
 }
+EXTEND FORM books
+    PROPERTIES() findNemo
+;
 //#solution1 end
 
 //#solution2
@@ -29,6 +41,10 @@ add100Books 'Добавить 100 книг' ()  {
         }
     }
 }
+
+EXTEND FORM books
+    PROPERTIES() add100Books
+;
 //#solution2 end
 
 //#sample3
