@@ -17,9 +17,9 @@ public class CalculateGCD extends InternalAction {
 
     @Override
     protected void executeInternal(ExecutionContext<ClassPropertyInterface> context) throws SQLException, SQLHandledException {
-        BigInteger b1 = BigInteger.valueOf((Integer)getParam(0, context));
-        BigInteger b2 = BigInteger.valueOf((Integer)getParam(1, context));
-        BigInteger gcd = b1.gcd(b2);
+        BigInteger a = BigInteger.valueOf((Integer)getParam(0, context));
+        BigInteger b = BigInteger.valueOf((Integer)getParam(1, context));
+        BigInteger gcd = a.gcd(b);
         try {
             findProperty("gcd[]").change(gcd.intValue(), context);
         } catch (ScriptingErrorLog.SemanticErrorException ignored) {

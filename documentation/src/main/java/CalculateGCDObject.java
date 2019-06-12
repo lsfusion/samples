@@ -20,9 +20,9 @@ public class CalculateGCDObject extends InternalAction {
     protected void executeInternal(ExecutionContext<ClassPropertyInterface> context) throws SQLException, SQLHandledException {
         try {
             DataObject calculation = (DataObject)getParamValue(0, context);
-            BigInteger b1 = BigInteger.valueOf((Integer)findProperty("a").read(context, calculation));
-            BigInteger b2 = BigInteger.valueOf((Integer)findProperty("b").read(context, calculation));
-            BigInteger gcd = b1.gcd(b2);
+            BigInteger a = BigInteger.valueOf((Integer)findProperty("a").read(context, calculation));
+            BigInteger b = BigInteger.valueOf((Integer)findProperty("b").read(context, calculation));
+            BigInteger gcd = a.gcd(b);
             findProperty("gcd[Calculation]").change(gcd.intValue(), context, calculation);
         } catch (ScriptingErrorLog.SemanticErrorException ignored) {
         }
