@@ -58,7 +58,7 @@ EXTEND FORM orders
 //#solution2 end
 
 //#solution3
-onlyDigits = FORMULA NULL BOOLEAN 'CASE WHEN trim($1) ~ \'^[0-9]*$\' THEN TRUE ELSE NULL END';
+onlyDigits = FORMULA NULL BOOLEAN 'CASE WHEN trim($1) ~ \'^[0-9]*$\' THEN 1 ELSE NULL END';
 
 EXTEND FORM orders
     PROPERTIES 'Только цифры' = onlyDigits(number(o))
