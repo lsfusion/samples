@@ -10,6 +10,8 @@ MODULE Features;
 //#module end
 REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler;
 
+NAMESPACE Features;
+
 /////////// GROUP STATEMENT ////////////
 
 // Syntax:
