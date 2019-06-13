@@ -94,7 +94,7 @@ dateStart = DATA DATETIME (Server);
 
 runServer 'Запустить сервер' (Server server, TEXT code) {
     NEWSESSION NEWSQL NEWTHREAD {
-        WRITE RAWFILE('MODULE Main; ' + code) TO 'file://' + serverDir(server) + '/Main.lsf';
+        WRITE RAWFILE(TEXTFILE('MODULE Main; ' + code)) TO 'file://' + serverDir(server) + '/Main.lsf';
         APPLY { code(server) <- code; dateStart(server) <- currentDateTime(); }
         runProcess(server, serverStartCmd(), serverDir(server), serverEncoding());
     }
