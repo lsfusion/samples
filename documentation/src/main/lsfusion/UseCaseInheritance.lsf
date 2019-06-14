@@ -63,12 +63,14 @@ NAVIGATOR {
 //#receiptbatch
 CLASS ReceiptBatch 'Партия на основе поступления';
 batch (Receipt receipt) = AGGR ReceiptBatch WHERE posted(receipt);
+//#receiptbatch end
 
+//#receiptbatchextend
 EXTEND CLASS ReceiptBatch : Batch;
 date(ReceiptBatch rb) += date(receipt(rb));
 item(ReceiptBatch rb) += item(receipt(rb));
 type(ReceiptBatch rb) += 'Поступление' IF rb IS ReceiptBatch;
-//#receiptbatch end
+//#receiptbatchextend end
 
 //#productionbatch
 CLASS ProductionBatch 'Партия на основе производства';
