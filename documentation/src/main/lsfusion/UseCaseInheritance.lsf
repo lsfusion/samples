@@ -81,3 +81,23 @@ date(ProductionBatch rb) += date(production(rb));
 item(ProductionBatch rb) += item(production(rb));
 type(ProductionBatch rb) += 'Производство' IF rb IS ProductionBatch;
 //#productionbatch end
+
+//#userbatch
+CLASS UserBatch 'Партия, созданная пользователем вручную';
+date 'Дата' = DATA DATE (UserBatch) IN id;
+item 'Товар' = DATA Item (UserBatch);
+nameItem 'Товар' (UserBatch b) = name(item(b));
+
+FORM userBatches 'Партии (ручные)'
+    OBJECTS b = UserBatch
+    PROPERTIES(b) date, nameItem, NEW, DELETE
+;
+
+NAVIGATOR {
+    NEW userBatches;
+}
+
+EXTEND CLASS UserBatch : Batch;
+date(UserBatch ub) += date(ub);
+item(UserBatch ub) += item(ub);
+type(UserBatch ub) += 'Ручные' IF ub IS UserBatch;
