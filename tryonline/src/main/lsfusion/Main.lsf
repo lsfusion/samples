@@ -23,7 +23,7 @@ onStarted() + { // default for linux
     IF NOT baseDir() THEN
         baseDir() <- './box';
     IF NOT serverStartCmd() THEN
-        serverStartCmd() <- 'java -Dlsfusion.server.lightstart=true -cp .:../server.jar lsfusion.server.logics.BusinessLogicsBootstrap'; // windows : -> ; no double quotes in linux
+        serverStartCmd() <- 'java -Dlsfusion.server.lightstart=true -Dlsfusion.server.devmode=true -cp .:../server.jar lsfusion.server.logics.BusinessLogicsBootstrap'; // windows : -> ; no double quotes in linux
     IF NOT serverEncoding() THEN
         serverEncoding() <- 'UTF-8'; // for windows may be single-byte (for example cp1251)
     IF NOT dbPassword() THEN
@@ -73,7 +73,6 @@ createServer 'Создать сервер' (Server server) {
                   'db.user=postgres'+'\n'+
                   'db.password='+dbPassword()+'\n'+                                                              
                   'logics.topModule=Main\n'+
-                  'settings.enableUI=2\n'+                                                              
                   'rmi.port='+port()) TO 'file://' + confDir() + '/settings.properties';
                                                               
 
