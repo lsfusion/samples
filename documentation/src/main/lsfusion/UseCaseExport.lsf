@@ -10,6 +10,9 @@ CLASS Customer 'Покупатель';
 name 'Наименование' = DATA ISTRING[50] (Customer) IN id;
 address 'Адрес' = DATA ISTRING[50] (Customer) IN base;
 
+CLASS Currency 'Валюта';
+name 'Наименование' = DATA ISTRING[50] (Currency) IN id;  
+
 CLASS Order 'Заказ';
 date 'Дата' = DATA DATE (Order);
 number 'Номер' = DATA STRING[10] (Order);
@@ -26,12 +29,15 @@ nameBook 'Книга' (OrderDetail d) = name(book(d));
 quantity 'Количество' = DATA INTEGER (OrderDetail);
 price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
 
+currency 'Валюта' = DATA Currency (OrderDetail);
+nameCurrency 'Валюта' (OrderDetail d) = name(currency(d)); 
+
 FORM order 'Заказ'
     OBJECTS o = Order PANEL
     PROPERTIES(o) date, number, nameCustomer
     
     OBJECTS d = OrderDetail
-    PROPERTIES(d) nameBook, quantity, price, NEW, DELETE
+    PROPERTIES(d) nameBook, quantity, nameCurrency, price, NEW, DELETE
     FILTERS order(d) == o
     
     EDIT Order OBJECT o
@@ -54,6 +60,8 @@ GROUP Customer : Info;
 
 GROUP Specification;
 
+GROUP price;
+
 FORM Order
     PROPERTIES timeStamp = currentDateTime() ATTR
 
@@ -64,7 +72,8 @@ FORM Order
     PROPERTIES IN Specification count = [GROUP SUM 1 BY order(OrderDetail d)](order) ATTR 
      
     OBJECTS Detail = OrderDetail IN Specification 
-    PROPERTIES(Detail) nameBook, quantity, price
+    PROPERTIES(Detail) nameBook, quantity,
+                       nameCurrency IN price EXTID 'currency' ATTR, price IN price EXTID 'value'
     FILTERS order(Detail) = order
 ;
 
