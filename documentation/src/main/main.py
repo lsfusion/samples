@@ -306,8 +306,8 @@ def generate_habr_code():
     code = request.data
     code = code.replace('<', '&lt;').replace('>', '&gt;')
 
-    prefix = "<table><tr><td>"
-    suffix = "</td></tr></table>"
+    prefix = "<table><tr><td><code>"
+    suffix = "</code></td></tr></table>"
 
     formatter = OldHtmlFormatter(style=HabrLSFStyle)
     html = highlight(code, LSFLexer(), formatter)
