@@ -5,7 +5,8 @@ CLASS Document;
 
 // объявляем форму Документы
 FORM documents 'Документы'
-    OBJECTS d = Document // Добавляем один объект класса Document
+    OBJECTS d = Document // Добавляем один объект класса Document, по этому имени объект будет доступен в операторах DESIGN, SHOW, EXPORT, DIALOG и др.
+
     
     // ... добавляем свойства и фильтры на форму 
 
