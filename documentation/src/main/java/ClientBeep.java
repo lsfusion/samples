@@ -13,7 +13,7 @@ public class ClientBeep implements ClientAction {
     }
 
     @Override
-    public Object dispatch(ClientActionDispatcher dispatcher) throws IOException {
+    public Object dispatch(ClientActionDispatcher dispatcher) {
         for (int i = 0; i < times; i++) {
             try {
                 Thread.sleep(1000);

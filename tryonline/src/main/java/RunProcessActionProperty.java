@@ -34,7 +34,7 @@ public class RunProcessActionProperty extends InternalAction {
     public static final ConcurrentHashMap<Long, WeakReference<Process>> runningProcesses = new ConcurrentHashMap<>();
 
     @Override
-    public void executeInternal(ExecutionContext<ClassPropertyInterface> context) throws SQLException, SQLHandledException {
+    public void executeInternal(ExecutionContext<ClassPropertyInterface> context) {
         String command = (String) context.getKeyValue(commandInterface).getValue();
         String directory = (String) context.getKeyValue(directoryInterface).getValue();
         DataObject server = (DataObject) context.getKeyValue(serverInterface);

@@ -22,7 +22,7 @@ public class KillProcessActionProperty extends InternalAction {
     }
 
     @Override
-    public void executeInternal(ExecutionContext<ClassPropertyInterface> context) throws SQLException, SQLHandledException {
+    public void executeInternal(ExecutionContext<ClassPropertyInterface> context) {
         DataObject server = (DataObject) context.getKeyValue(serverInterface);
 
         try {
