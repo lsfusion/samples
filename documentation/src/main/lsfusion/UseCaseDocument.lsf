@@ -101,12 +101,14 @@ EXTEND FORM order
 ;
 
 DESIGN order {
-    NEW pane AFTER BOX(o) { // создаем контейнер после заголовка заказа
-        fill = 1;
-        type = TABBED;
-        MOVE BOX(d);
-        MOVE BOX(b) {
-            caption = 'Подбор';
+    OBJECTS {
+        NEW pane { // создаем контейнер после заголовка заказа
+            fill = 1;
+            type = TABBED;
+            MOVE BOX(d);
+            MOVE BOX(b) {
+                caption = 'Подбор';
+            }
         }
     }
 }
