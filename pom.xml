@@ -15,6 +15,7 @@
         <module>mm</module>
         <module>documentation</module>
         <module>tryonline</module>
+        <module>euroleague</module>
     </modules>
 
     <!--<scm>-->

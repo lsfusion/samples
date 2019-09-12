@@ -1,0 +1,207 @@
+MODULE Master;
+
+META defineMasterObject(object, caption, captions, nameLength)
+    CLASS ###object caption;
+    
+    id 'Код' = DATA INTEGER (###object);
+    object (INTEGER id) = GROUP AGGR ###object o BY id(o);
+    
+    name 'Имя' = DATA ISTRING (###object) CHARWIDTH nameLength;
+    object (ISTRING name) = GROUP AGGR ###object o BY name(o);
+    
+    FORM object caption
+        OBJECTS o = ###object PANEL
+        PROPERTIES(o) id, name
+        
+        EDIT ###object OBJECT o
+    ;
+    
+    FORM object##s captions
+        OBJECTS o = ###object
+        PROPERTIES(o) READONLY id, name
+        PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+    ;
+    
+    FORM dialog###object##s captions
+        OBJECTS o = ###object
+        PROPERTIES(o) READONLY id, name
+        
+        LIST ###object OBJECT o
+    ;
+    
+    NAVIGATOR {
+        NEW object##s;
+    }
+END
+
+@defineMasterObject(tournament, 'Турнир', 'Турниры', 20){
+    CLASS Tournament 'Турнир';
+    
+    id 'Код' = DATA INTEGER (Tournament);
+    tournament (INTEGER id) = GROUP AGGR Tournament o BY id(o);
+    
+    name 'Имя' = DATA ISTRING (Tournament) CHARWIDTH 20;
+    tournament (ISTRING name) = GROUP AGGR Tournament o BY name(o);
+    
+    FORM tournament 'Турнир'
+        OBJECTS o = Tournament PANEL
+        PROPERTIES(o) id, name
+        
+        EDIT Tournament OBJECT o
+    ;
+    
+    FORM tournaments 'Турниры'
+        OBJECTS o = Tournament
+        PROPERTIES(o) READONLY id, name
+        PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+    ;
+    
+    FORM dialogTournaments 'Турниры'
+        OBJECTS o = Tournament
+        PROPERTIES(o) READONLY id, name
+        
+        LIST Tournament OBJECT o
+    ;
+    
+    NAVIGATOR {
+        NEW tournaments;
+    }
+};
+@defineMasterObject(season, 'Сезон', 'Сезоны', 5){
+    CLASS Season 'Сезон';
+    
+    id 'Код' = DATA INTEGER (Season);
+    season (INTEGER id) = GROUP AGGR Season o BY id(o);
+    
+    name 'Имя' = DATA ISTRING (Season) CHARWIDTH 5;
+    season (ISTRING name) = GROUP AGGR Season o BY name(o);
+    
+    FORM season 'Сезон'
+        OBJECTS o = Season PANEL
+        PROPERTIES(o) id, name
+        
+        EDIT Season OBJECT o
+    ;
+    
+    FORM seasons 'Сезоны'
+        OBJECTS o = Season
+        PROPERTIES(o) READONLY id, name
+        PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+    ;
+    
+    FORM dialogSeasons 'Сезоны'
+        OBJECTS o = Season
+        PROPERTIES(o) READONLY id, name
+        
+        LIST Season OBJECT o
+    ;
+    
+    NAVIGATOR {
+        NEW seasons;
+    }
+};
+@defineMasterObject(round, 'Раунд', 'Раунды', 15){
+    CLASS Round 'Раунд';
+    
+    id 'Код' = DATA INTEGER (Round);
+    round (INTEGER id) = GROUP AGGR Round o BY id(o);
+    
+    name 'Имя' = DATA ISTRING (Round) CHARWIDTH 15;
+    round (ISTRING name) = GROUP AGGR Round o BY name(o);
+    
+    FORM round 'Раунд'
+        OBJECTS o = Round PANEL
+        PROPERTIES(o) id, name
+        
+        EDIT Round OBJECT o
+    ;
+    
+    FORM rounds 'Раунды'
+        OBJECTS o = Round
+        PROPERTIES(o) READONLY id, name
+        PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+    ;
+    
+    FORM dialogRounds 'Раунды'
+        OBJECTS o = Round
+        PROPERTIES(o) READONLY id, name
+        
+        LIST Round OBJECT o
+    ;
+    
+    NAVIGATOR {
+        NEW rounds;
+    }
+};
+@defineMasterObject(country, 'Страна', 'Страны', 10){
+    CLASS Country 'Страна';
+    
+    id 'Код' = DATA INTEGER (Country);
+    country (INTEGER id) = GROUP AGGR Country o BY id(o);
+    
+    name 'Имя' = DATA ISTRING (Country) CHARWIDTH 10;
+    country (ISTRING name) = GROUP AGGR Country o BY name(o);
+    
+    FORM country 'Страна'
+        OBJECTS o = Country PANEL
+        PROPERTIES(o) id, name
+        
+        EDIT Country OBJECT o
+    ;
+    
+    FORM countrys 'Страны'
+        OBJECTS o = Country
+        PROPERTIES(o) READONLY id, name
+        PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+    ;
+    
+    FORM dialogCountrys 'Страны'
+        OBJECTS o = Country
+        PROPERTIES(o) READONLY id, name
+        
+        LIST Country OBJECT o
+    ;
+    
+    NAVIGATOR {
+        NEW countrys;
+    }
+};
+@defineMasterObject(team, 'Клуб', 'Клубы', 20){
+    CLASS Team 'Клуб';
+    
+    id 'Код' = DATA INTEGER (Team);
+    team (INTEGER id) = GROUP AGGR Team o BY id(o);
+    
+    name 'Имя' = DATA ISTRING (Team) CHARWIDTH 20;
+    team (ISTRING name) = GROUP AGGR Team o BY name(o);
+    
+    FORM team 'Клуб'
+        OBJECTS o = Team PANEL
+        PROPERTIES(o) id, name
+        
+        EDIT Team OBJECT o
+    ;
+    
+    FORM teams 'Клубы'
+        OBJECTS o = Team
+        PROPERTIES(o) READONLY id, name
+        PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+    ;
+    
+    FORM dialogTeams 'Клубы'
+        OBJECTS o = Team
+        PROPERTIES(o) READONLY id, name
+        
+        LIST Team OBJECT o
+    ;
+    
+    NAVIGATOR {
+        NEW teams;
+    }
+};
+
+country = DATA Country (Team);
+nameCountry 'Страна' (Team t) = name(country(t));
+
+EXTEND FORM team PROPERTIES(o) nameCountry;
+EXTEND FORM teams PROPERTIES(o) READONLY nameCountry;

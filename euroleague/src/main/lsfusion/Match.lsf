@@ -1,0 +1,51 @@
+MODULE Match;
+
+REQUIRE League;
+
+CLASS Match 'Матч';
+
+id 'Код' = DATA INTEGER (Match);
+match (INTEGER id) = GROUP AGGR Match o BY id(o);
+
+dateTime 'Время' = DATA DATETIME (Match);  
+
+league = DATA League (Match);
+
+tournament (Match m) = tournament(league(m));
+nameTournament 'Турнир' (Match m) = name(tournament(m));  
+
+season(Match m) = season(league(m));
+nameSeason 'Сезон' (Match m) = name(season(m));  
+
+round = DATA Round (Match);
+nameRound 'Раунд' (Match m) = name(round(m));
+
+homeTeam = DATA Team (Match);
+nameHomeTeam 'Хозяева' (Match m) = name(homeTeam(m));
+
+awayTeam = DATA Team (Match);
+nameAwayTeam 'Гости' (Match m) = name(awayTeam(m));
+
+goalsHome 'Голы (хозяева)' = DATA INTEGER (Match);
+goalsAway 'Голы (гости)' = DATA INTEGER (Match);
+
+FORM match 'Матч'
+    OBJECTS o = Match PANEL
+    PROPERTIES(o) id, dateTime, nameTournament, nameSeason, nameRound, 
+                  nameHomeTeam, goalsHome, goalsAway, nameAwayTeam
+    
+    EDIT Match OBJECT o
+;
+
+FORM matches 'Матчи'
+    OBJECTS o = Match
+    PROPERTIES(o) READONLY id, dateTime, nameTournament, nameSeason, nameRound, 
+                           nameHomeTeam, goalsHome, goalsAway, nameAwayTeam
+    PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
+
+    LIST Match OBJECT o
+;
+
+NAVIGATOR {
+    NEW matches;
+}

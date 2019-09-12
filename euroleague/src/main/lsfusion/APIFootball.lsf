@@ -1,0 +1,154 @@
+MODULE APIFootball;
+
+REQUIRE Main, Time;
+
+host = 'api-football-v1.p.rapidapi.com';
+key 'Ключ к API Football' = DATA STRING () CHARWIDTH 50;
+
+url = 'https://' + host() + '/v2';
+
+headers(TEXT name) = CASE
+    WHEN name = 'x-rapidapi-host' THEN host()
+    WHEN name = 'x-rapidapi-key' THEN key();
+
+EXTEND FORM leagues
+    PROPERTIES() key DRAW o TOOLBAR
+;
+
+GROUP api;
+
+tournamentName = DATA LOCAL STRING(INTEGER);
+seasonName = DATA LOCAL STRING(INTEGER);
+leagueId = DATA LOCAL INTEGER(INTEGER);
+
+FORM importLeagues
+    OBJECTS leagues = INTEGER IN api
+    PROPERTIES(leagues) name = tournamentName, season = seasonName, league_id = leagueId
+;
+
+importLeagues 'Импортировать лиги' () {
+    LOCAL result = FILE();
+    EXTERNAL HTTP GET url() + '/leagues' HEADERS headers TO result;
+    
+    IMPORT importLeagues JSON FROM result();
+    FOR [GROUP SUM 1 BY tournamentName(INTEGER i)](STRING tn) AND NOT tournament(tn) DO NEW t = Tournament {
+        name(t) <- tn;
+    } 
+    FOR [GROUP SUM 1 BY seasonName(INTEGER i)](STRING sn) AND NOT season(sn) DO NEW s = Season {
+        name(s) <- sn;
+    } 
+
+    FOR leagueId(INTEGER i) AND NOT league(leagueId(i)) DO NEW l = League {
+        id(l) <- leagueId(i);
+        tournament(l) <- tournament(tournamentName(i));
+        season(l) <- season(seasonName(i));
+    } 
+}
+
+EXTEND FORM leagues
+    PROPERTIES() importLeagues DRAW o TOOLBAR
+;
+
+// Импорт клубов
+teamId = DATA LOCAL INTEGER(INTEGER);
+teamName = DATA LOCAL STRING(INTEGER);
+countryName = DATA LOCAL STRING(INTEGER);
+
+FORM importTeams
+    OBJECTS teams = INTEGER IN api
+    PROPERTIES(teams) team_id = teamId, name = teamName, country = countryName
+;
+
+importTeams 'Импортировать клубы' (League l) {
+    LOCAL result = FILE();
+    EXTERNAL HTTP GET url() + '/teams/league/' + id(l) HEADERS headers TO result;
+
+    IMPORT importTeams JSON FROM result();
+    FOR [GROUP SUM 1 BY countryName(INTEGER i)](STRING cn) AND NOT country(cn) DO NEW c = Country {
+        name(c) <- cn;
+    }
+
+    FOR teamId(INTEGER i) AND NOT team(teamId(i)) DO NEW t = Team {
+        id(t) <- teamId(i);
+        name(t) <- teamName(i);
+        country(t) <- country(countryName(i));
+    }
+}
+
+// Импорт матчей
+
+matchId = DATA LOCAL INTEGER(INTEGER);
+dateTime = DATA LOCAL STRING(INTEGER); 
+roundName = DATA LOCAL STRING(INTEGER);
+
+GROUP homeTeam;
+homeTeamId = DATA LOCAL INTEGER (INTEGER);
+
+GROUP awayTeam;
+awayTeamId = DATA LOCAL INTEGER (INTEGER);
+
+goalsHome = DATA LOCAL INTEGER (INTEGER);
+goalsAway = DATA LOCAL INTEGER (INTEGER);
+
+FORM importMatches
+    OBJECTS fixtures = INTEGER IN api
+    PROPERTIES(fixtures) fixture_id = matchId, league_id = leagueId, event_date = dateTime, round = roundName,  
+                         homeTeamId IN homeTeam EXTID 'team_id',
+                         awayTeamId IN awayTeam EXTID 'team_id',
+                         goalsHomeTeam = goalsHome, goalsAwayTeam = goalsAway
+;
+
+importMatches 'Импортировать матчи' (League l) {
+    LOCAL result = FILE();
+    EXTERNAL HTTP GET url() + '/fixtures/league/' + id(l) HEADERS headers TO result;
+
+    IMPORT importMatches JSON FROM result();
+    FOR [GROUP SUM 1 BY awayTeamId(INTEGER i)](INTEGER id) AND NOT team(id) DO {
+        MESSAGE 'Не найдена домашний клуб с кодом ' + id;
+        RETURN;
+    }
+
+    FOR [GROUP SUM 1 BY awayTeamId(INTEGER i)](INTEGER id) AND NOT team(id) DO {
+        MESSAGE 'Не найдена гостевой клуб с кодом ' + id;
+        RETURN;
+    }
+
+    FOR [GROUP SUM 1 BY roundName(INTEGER i)](STRING rn) AND NOT round(rn) DO NEW r = Round {
+        name(r) <- rn;
+    }
+
+    FOR matchId(INTEGER i) AND NOT match(matchId(i)) DO NEW m = Match {
+        id(m) <- matchId(i);
+        dateTime(m) <- toDateTimeFormat(left(dateTime(i),19), 'yyyy-MM-ddThh24:mi:ss');
+        league(m) <- league(leagueId(i));
+        round(m) <- round(roundName(i));
+        homeTeam(m) <- team(homeTeamId(i));
+        awayTeam(m) <- team(awayTeamId(i));
+        goalsHome(m) <- goalsHome(i);
+        goalsAway(m) <- goalsAway(i);
+    } 
+}
+
+EXTEND FORM leagues
+    OBJECTS t = Team
+    PROPERTIES(t) READONLY id, name
+    
+    PROPERTIES importTeams(o) DRAW t TOOLBAR
+
+    OBJECTS m = Match
+    PROPERTIES(m) READONLY id, dateTime, nameRound, nameHomeTeam, goalsHome, goalsAway, nameAwayTeam
+    FILTERS league(m) = o
+     
+    PROPERTIES importMatches(o) DRAW m TOOLBAR
+;
+
+DESIGN leagues {
+    OBJECTS {
+        NEW leagueDetails {
+            fill = 2;
+            type = SPLITH;
+            MOVE BOX(t);
+            MOVE BOX(m);
+        }
+    }
+}
