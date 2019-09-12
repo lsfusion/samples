@@ -3,7 +3,7 @@ MODULE HockeyStats;
 //#module end
 // описание логики : https://documentation.lsfusion.org/pages/viewpage.action?pageId=2228240
 //#require 
-REQUIRE System, Messenger;
+REQUIRE System, Telegram, Viber, Skype;
 //#require end
 
 //#classteam
