@@ -1,6 +1,12 @@
+//#header
+//#module
 MODULE Main;
+//#module end
 
+//#require
 REQUIRE Match, Utils;
+//#require end
+//#header end
 
 // Команды
 

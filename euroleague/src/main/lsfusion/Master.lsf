@@ -1,4 +1,8 @@
+//#header
+//#module
 MODULE Master;
+//#module end
+//#header end
 
 META defineMasterObject(object, caption, captions, nameLength)
     CLASS ###object caption;

@@ -1,6 +1,12 @@
+//#header
+//#module
 MODULE League;
+//#module end
 
+//#require
 REQUIRE Master;
+//#require end
+//#header end
 
 CLASS League 'Лига';
 
