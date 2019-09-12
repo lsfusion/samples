@@ -4,6 +4,8 @@ MODULE Master;
 //#module end
 //#header end
 
+REQUIRE Utils, Time;
+
 META defineMasterObject(object, caption, captions, nameLength)
     CLASS ###object caption;
     
