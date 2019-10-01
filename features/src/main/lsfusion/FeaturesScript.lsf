@@ -901,13 +901,12 @@ FORM documentArticle 'По документам (caption)'
 
 // Events list syntax:
 // EVENTS
-// ON (INIT | APPLY (BEFORE | AFTER) | OK | CANCEL | CLOSE | DROP | QUERYOK | QUERYCLOSE) action1,
+// ON (INIT | APPLY (BEFORE | AFTER) | OK | CANCEL | CLOSE | DROP | QUERYCLOSE) action1,
 // ...
-// ON (INIT | APPLY (BEFORE | AFTER) | OK | CANCEL | CLOSE | DROP | QUERYOK | QUERYCLOSE) actionN
+// ON (INIT | APPLY (BEFORE | AFTER) | OK | CANCEL | CLOSE | DROP | QUERYCLOSE) actionN
     EVENTS
         ON CANCEL cancledMessage(),
-        ON APPLY BEFORE appliedMessage(),
-        ON QUERYOK okMessage()
+        ON APPLY BEFORE appliedMessage()
 ;
 
 // Hints list syntax:
