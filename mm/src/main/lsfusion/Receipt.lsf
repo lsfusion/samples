@@ -35,7 +35,7 @@ nameStock 'Наименование склада' (Receipt r) = name(stock(r));
 //#headerattributes end
 
 //#detailattributes
-item 'Товар' (receiptDetail) = DATA Item (ReceiptDetail);
+item 'Товар' = DATA Item (ReceiptDetail);
 nameItem 'Наименование товара' (ReceiptDetail d) = name(item(d));
 
 quantity 'Количество' = DATA NUMERIC[16,4] (ReceiptDetail);
