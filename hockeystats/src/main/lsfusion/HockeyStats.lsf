@@ -11,7 +11,7 @@ CLASS Team 'Команда';
 //#classteam end
 
 //#nameteam
-name 'Название команды' (team) = DATA STRING[30] (Team) IN base;
+name 'Название команды' = DATA STRING[30] (Team) IN base;
 //#nameteam end
 
 //#game
@@ -25,7 +25,7 @@ guestTeamName 'Гости' (Game game) = name(guestTeam(game));
 //#game end
 
 //#constrainthostguest
-CONSTRAINT hostTeam(Game team) = guestTeam(team) CHECKED BY hostTeam[Game], guestTeam[Game] MESSAGE 'Хозяйская и гостевая команды должны быть разными';
+CONSTRAINT hostTeam(Game team) = guestTeam(team) CHECKED BY hostTeam, guestTeam MESSAGE 'Хозяйская и гостевая команды должны быть разными';
 //#constrainthostguest end
 
 //#goals
@@ -63,14 +63,17 @@ resultName 'Имя' (GameResult game) = staticCaption(game) IF game IS GameResul
 
 //#gameresult
 userResult = DATA GameResult (Game);
-result (Game game) = OVERRIDE userResult(game), (GameResult.win IF ((hostGoals(game) (-) guestGoals(game)) > 1 OR (guestGoals(game) (-) hostGoals(game)) > 1));
+result (Game game) = OVERRIDE userResult(game), 
+    (GameResult.win IF ((hostGoals(game) (-) guestGoals(game)) > 1 OR (guestGoals(game) (-) hostGoals(game)) > 1));
 resultName 'Р/И' (Game game) = resultName(result(game));
 
-CONSTRAINT ((hostGoals(Game game) (-) guestGoals(game)) > 1 OR (hostGoals(game) (-) guestGoals(game)) < -1) AND userResult(game) MESSAGE 'Результат игры определен автоматически';
+CONSTRAINT ((hostGoals(Game game) (-) guestGoals(game)) > 1 OR (hostGoals(game) (-) guestGoals(game)) < -1) AND userResult(game) 
+    MESSAGE 'Результат игры определен автоматически';
 //#gameresult end
 
 //#gameresultset
-CONSTRAINT ((hostGoals(Game game) (-) guestGoals(game)) < 2 AND (hostGoals(game) (-) guestGoals(game)) > -2) AND NOT userResult(game) MESSAGE 'Укажите результат игры';
+CONSTRAINT ((hostGoals(Game game) (-) guestGoals(game)) < 2 AND (hostGoals(game) (-) guestGoals(game)) > -2) AND NOT userResult(game) 
+    MESSAGE 'Укажите результат игры';
 //#gameresultset end
 
 //#gamesplayed
