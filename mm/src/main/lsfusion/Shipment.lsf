@@ -30,7 +30,7 @@ nameStock 'Наименование склада' (Shipment s) = name(stock(s));
 //#headerattributes end
 
 //#detailattributes
-item 'Товар' (shipmentDetail) = DATA Item (ShipmentDetail);
+item 'Товар' = DATA Item (ShipmentDetail);
 nameItem 'Наименование товара' (ShipmentDetail d) = name(item(d));
 
 quantity 'Количество' = DATA NUMERIC[16,4](ShipmentDetail);
@@ -44,10 +44,10 @@ price(ShipmentDetail d) <- salePrice(item(d)) WHEN CHANGED(item(d));
 
 //#formedit
 FORM shipment 'Расходная накладная'
-	OBJECTS s=Shipment PANEL
+	OBJECTS s = Shipment PANEL
 	PROPERTIES(s) number, date, nameCustomer, nameStock
 
-	OBJECTS d=ShipmentDetail
+	OBJECTS d = ShipmentDetail
 	PROPERTIES(d) nameItem, quantity, price, sum READONLY, NEW, DELETE GRID
 	FILTERS shipment(d) = s
 
@@ -57,11 +57,11 @@ FORM shipment 'Расходная накладная'
 
 //#formlist
 FORM shipments 'Расходные накладные'
-	OBJECTS s=Shipment
+	OBJECTS s = Shipment
 	PROPERTIES(s) READONLY number, date, nameCustomer, nameStock
 	PROPERTIES(s) NEWSESSION NEW, EDIT, DELETE 
 
-	OBJECTS d=ShipmentDetail
+	OBJECTS d = ShipmentDetail
 	PROPERTIES(d) READONLY nameItem, quantity, price, sum
 	FILTERS shipment(d) = s
 ;

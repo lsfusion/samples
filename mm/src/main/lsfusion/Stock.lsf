@@ -13,7 +13,7 @@ address 'Адрес' = DATA STRING[150] (Stock) IN base;
 
 //#form
 FORM stocks 'Склады'
-	OBJECTS s=Stock
+	OBJECTS s = Stock
 	PROPERTIES(s) name, address, NEW, DELETE
 ;
 //#form end

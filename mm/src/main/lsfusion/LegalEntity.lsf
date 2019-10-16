@@ -18,7 +18,7 @@ legalEntityINN = GROUP AGGR LegalEntity legalEntity BY inn(legalEntity);
 
 //#form
 FORM legalEntities 'Организации'
-	OBJECTS l=LegalEntity
+	OBJECTS l = LegalEntity
 	PROPERTIES(l) name, inn, address, NEW, DELETE
 ;
 //#form end

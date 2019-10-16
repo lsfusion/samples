@@ -17,7 +17,7 @@ salePrice 'Оптовая цена' = DATA NUMERIC[17,2](Item) IN base;
 
 //#form
 FORM items 'Товары'
-	OBJECTS i=Item
+	OBJECTS i = Item
 	PROPERTIES(i) name, barcode, salePrice, NEW, DELETE
 ;
 //#form end
