@@ -119,14 +119,14 @@ place 'Место' (Team team) = PARTITION SUM 1 ORDER DESC points(team), gamesW
 
 //#formgame
 FORM MainForm 'Турнирная таблица'
-    OBJECTS game=Game
+    OBJECTS game = Game
     PROPERTIES(game) date, hostTeamName, hostGoals, guestGoals, guestTeamName, resultName, NEW, DELETE
 ;
 //#formgame end
 
 //#formteam
 EXTEND FORM MainForm
-    OBJECTS team=Team
+    OBJECTS team = Team
     PROPERTIES(team) place, name, gamesPlayed, gamesWon, gamesWonOT, gamesWonSO,
                      gamesLostSO, gamesLostOT, gamesLost, goalsScored, goalsConceded, points, NEW, DELETE
     ORDER place(team)
@@ -135,8 +135,10 @@ EXTEND FORM MainForm
 
 //#formsingle
 FORM MainFormSingle 'Турнирная таблица'
-    OBJECTS game=Game, team=Team
+    OBJECTS game = Game
     PROPERTIES(game) date, hostTeamName, hostGoals, guestGoals, guestTeamName, resultName, NEW, DELETE
+    
+    OBJECTS team = Team
     PROPERTIES(team) place, name, gamesPlayed, gamesWon, gamesWonOT, gamesWonSO,
                      gamesLostSO, gamesLostOT, gamesLost, goalsScored, goalsConceded, points, NEW, DELETE
     ORDER place(team)
