@@ -149,7 +149,7 @@ $ cd lsfusion-samples
 $ docker-compose up -d
 ```
 
-3. откройте каталог проекта в `IntelliJ IDEA`
+3. откройте каталог проекта в `IntelliJ IDEA`, разрешите maven'у открыть pom.xml и синхронизировать зависимости
 4. выберите конфигурацию с примером. Например, `lsFusion server: hockeystats` (Run \ Edit configurations...)
 5. запустите эту конфигурацию (Run \ Run 'lsFusion server: hockeystats')
 6. запустите клиента:
