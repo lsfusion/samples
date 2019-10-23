@@ -102,7 +102,6 @@ wget --quiet -O - https://download.lsfusion.org/apt/GPG-KEY-lsfusion | sudo apt-
 
 # Install lsFusion repo
 sudo apt-add-repository "deb https://download.lsfusion.org/apt all main"
-sudo apt update
 
 # Install lsFusion server and client
 sudo apt install -y lsfusion2-client
