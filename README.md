@@ -16,20 +16,21 @@
 а дальше работаете только внутри [IntelliJ IDEA].
 
 Причем проект устроен так, что вам не нужно изучать и использовать maven-команды,
-достаточно запускать конфигурации нужного вам модуля в [IntelliJ IDEA].
+достаточно запускать конфигурации нужных вам модулей в [IntelliJ IDEA].
 
 Оглавление:
 
-* [lsFusion в браузере](#lsFusion-в-браузере)
+* [Web-клиент lsFusion](#Web-клиент-lsFusion)
   * [Необходимо установить (prerequisites)](#Необходимо-установить-prerequisites)
   * [Как запустить lsFusion в браузере](#Как-запустить-lsFusion-в-браузере)
-  * [Как запустить pgadmin в браузере](#Как-запустить-pgadmin-в-браузере)
 * [Desktop-клиент lsFusion](#Desktop-клиент-lsFusion)
   * [Необходимо установить (prerequisites) для desktop-клиента](#Необходимо-установить-prerequisites-для-desktop-клиента)
   * [Как запустить desktop-клиент](#Как-запустить-desktop-клиент)
-* [Дополнительно: Docker plugin для IntelliJ IDEA](#Дополнительно-Docker-plugin-для-IntelliJ-IDEA)
+* [Дополнительно](#Дополнительно)
+  * [Docker plugin для IntelliJ IDEA](#Docker-plugin-для-IntelliJ-IDEA)
+  * [Как запустить pgadmin в браузере](#Как-запустить-pgadmin-в-браузере)
 
-## [lsFusion] в браузере
+## Web-клиент [lsFusion]
 
 ### Необходимо установить (prerequisites)
 
@@ -89,41 +90,12 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
 
    * разрешите maven'у открыть pom.xml и синхронизировать зависимости
    * обязательно дождитесь пока maven загрузит все зависимости
-   * иногда приходится делать повторную команду на синхрониацию зависимостей - нажмите `Reimport All Maven Projects` в окне Maven
+   * иногда приходится делать повторную команду на синхрониацию зависимостей - нажмите `Reimport All Maven Projects` в окне `Maven`
    * перед первым билдом укажите Project SDK, который предпочитаете (File \ Project Structure \ Project Settings \ Project \ Project SDK)
     
 1. выберите конфигурацию с примером. Например, `lsFusion server: hockeystats` (Run \ Edit configurations...)
 1. запустите эту конфигурацию (Run \ Run 'lsFusion server: hockeystats')
 1. откройте в браузере страницу по адресу `http://localhost:8080`
-
-## Как запустить [pgadmin] в браузере
-
-Прежде всего склонируйте проект на свой компьютер:
-
-```
-$ git clone https://github.com/mazzy-ax/lsfusion-samples.git
-```
-
-Затем:
-
-1. войдите в каталог проекта `lsfusion-samples`
-1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
-
-    ```
-    $ cd lsfusion-samples
-    $ docker-compose up -d
-    ```
-
-1. откройте в браузере страницу по адресу `http://localhost:5050`
-1. в первый раз `pgadmin` спросит email и пароль администратора pgadmin
-
-   * введите email: `pgadmin4@pgadmin.org`
-   * введите пароль: `11111`
-   
-1. в первый раз `pgadmin` автоматически добавит сервер с базой данных и попросит пароль администратора `postgres`
-
-   * введите пароль: `11111`
-   * если хотите, установите галочку `Save password`
 
 ## Desktop-клиент [lsFusion]
 
@@ -216,13 +188,24 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
     $ docker-compose up -d
     ```
 
+1. откройте каталог проекта в `IntelliJ IDEA`
+
+   * разрешите maven'у открыть pom.xml и синхронизировать зависимости
+   * обязательно дождитесь пока maven загрузит все зависимости
+   * иногда приходится делать повторную команду на синхрониацию зависимостей - нажмите `Reimport All Maven Projects` в окне `Maven`
+   * перед первым билдом укажите Project SDK, который предпочитаете (File \ Project Structure \ Project Settings \ Project \ Project SDK)
+    
+1. выберите конфигурацию с примером. Например, `lsFusion server: hockeystats` (Run \ Edit configurations...)
+1. запустите эту конфигурацию (Run \ Run 'lsFusion server: hockeystats')
 1. запустите desktop-клиент:
 
    * если у вас установлен `IceTea Web Control`, то кликните на jnlp-ссылку, которая появится в конце build-лога в информационном окне `Run`
    * или запустите `jar-файл` с desktop-клиентом lsFusion
 
 
-## Дополнительно: Docker plugin для [IntelliJ IDEA]
+## Дополнительно
+
+### Docker plugin для [IntelliJ IDEA]
 
 [Docker plugin](https://plugins.jetbrains.com/plugin/7724-docker/) позволяет работать с докером непосредственно из [IntelliJ IDEA].
 Плагин уже включен в `Ultimate edition`. В `IDEA Community edition` его нужно установить.
@@ -236,3 +219,32 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
   * найдите плагин `Docker` и нажмите `Install`
     
   </details>
+
+## Как запустить [pgadmin] в браузере
+
+Прежде всего склонируйте проект на свой компьютер:
+
+```
+$ git clone https://github.com/mazzy-ax/lsfusion-samples.git
+```
+
+Затем:
+
+1. войдите в каталог проекта `lsfusion-samples`
+1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
+
+    ```
+    $ cd lsfusion-samples
+    $ docker-compose up -d
+    ```
+
+1. откройте в браузере страницу по адресу `http://localhost:5050`
+1. в первый раз `pgadmin` спросит email и пароль администратора pgadmin
+
+   * введите email: `pgadmin4@pgadmin.org`
+   * введите пароль: `11111`
+   
+1. в первый раз `pgadmin` автоматически добавит сервер с базой данных и попросит пароль администратора `postgres`
+
+   * введите пароль: `11111`
+   * если хотите, установите галочку `Save password`
