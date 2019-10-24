@@ -1,11 +1,22 @@
 FROM openjdk:8
 
-COPY lsfusion.list /etc/apt/sources.list.d/
-ADD  https://download.lsfusion.org/apt/GPG-KEY-lsfusion /tmp/
+RUN set -eux; \
+# enable https repository
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+            apt-transport-https \
+            ca-certificates \
+            ; \
+# install lsfusion2-client from the private repository
+    wget --quiet -O - https://download.lsfusion.org/apt/GPG-KEY-lsfusion | apt-key add -; \
+    echo deb https://download.lsfusion.org/apt all main > /etc/apt/sources.list.d/lsfusion.list; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+            lsfusion2-client \
+            ; \
+# cleanup
+    rm -rf /var/lib/apt/lists/*;
 
-#RUN apt-key add /tmp/GPG-KEY-lsfusion \
-#    && rm /tmp/GPG-KEY-lsfusion
-#    && apt-get update \
-#    && apt-get install -y --no-install-recommends lsfusion2-client
+EXPOSE 8080
 
-EXPOSE 80
+CMD /usr/share/lsfusion2-client/bin/catalina.sh run
