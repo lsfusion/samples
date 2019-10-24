@@ -101,7 +101,7 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
 $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
 ```
 
-Далее:
+Затем:
 
 1. войдите в каталог проекта `lsfusion-samples`
 1. запустите команду `docker-compose` чтобы запустить сервер базы данных
