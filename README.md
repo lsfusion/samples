@@ -5,6 +5,7 @@
 [lsFusion]:https://lsfusion.org/
 [docpage]:https://documentation.lsfusion.org/pages/viewpage.action?pageId=2228236
 [IntelliJ IDEA]:https://www.jetbrains.com/idea/
+[pgadmin]:https://www.pgadmin.org/
 
 <img alt="logo" src="https://lsfusion.org/themes/lsfusion/assets/images/i-logo-lsfusion.svg" align="right">
 
@@ -16,6 +17,8 @@
 
 Причем проект устроен так, что вам не нужно изучать и использовать maven-команды,
 достаточно переключать и запускать конфигурации в [IntelliJ IDEA].
+
+Оглавление:
 
 * [lsFusion в браузере](#lsFusion-в-браузере)
   * [Необходимо установить (prerequisites)](#Необходимо-установить-prerequisites)
@@ -75,7 +78,7 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
 Затем:
 
 1. войдите в каталог проекта `lsfusion-samples`
-1. запустите команду `docker-compose` чтобы запустить сервер базы данных и `lsFusion-client`
+1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
 
     ```
     $ cd lsfusion-samples
@@ -93,7 +96,7 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
 1. запустите эту конфигурацию (Run \ Run 'lsFusion server: hockeystats')
 1. откройте в браузере страницу по адресу `http://localhost:8080`
 
-## Как запустить pgadmin в браузере
+## Как запустить [pgadmin] в браузере
 
 Прежде всего склонируйте проект на свой компьютер:
 
@@ -104,7 +107,13 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
 Затем:
 
 1. войдите в каталог проекта `lsfusion-samples`
-1. запустите команду `docker-compose` чтобы запустить сервер базы данных
+1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
+
+    ```
+    $ cd lsfusion-samples
+    $ docker-compose up -d
+    ```
+
 1. откройте в браузере страницу по адресу `http://localhost:5050`
 1. в первый раз `pgadmin` спросит email и пароль администратора pgadmin
 
@@ -136,9 +145,7 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
     
   </details>
 
-* (опционально) [Docker plugin](https://plugins.jetbrains.com/plugin/7724-docker/) для [IntelliJ IDEA]
-
-* [java](https://www.java.com), 1.8 или более поздние версии
+* [java](https://www.java.com) 8+
 
   <details>
   <summary>
@@ -153,18 +160,20 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
     
   </details>
     
-* (опционально) `IceTea Web Control` для запуска desktop-клиента [lsFusion] по jnlp-ссылке
+* (опционально) [IceTea Web Control](https://icedtea.classpath.org/wiki/IcedTea-Web) для запуска desktop-клиента [lsFusion] по jnlp-ссылке
 
   <details>
   <summary>
   Примечание:
   </summary>
 
-  [IceTea Web Control](https://icedtea.classpath.org/wiki/IcedTea-Web) &mdash; это проект, который позволяет запускать
+  `IceTea Web Control` &mdash; это проект, который позволяет запускать
   Java-апплеты при помощи jnlp-ссылок.
 
-  Когда билд `lsFusion` модуля подходит к концу, в log пишется jnlp-ссылка
+  Когда билд модуля [lsFusion] подходит к концу, в log пишется jnlp-ссылка
   на desktop-клиента. Если нажать на нее, то `IceTea Web Control` автоматически запустит desktop-клиент.
+  
+  Если не установить `IceTea Web Control`, то desktop-клиент придется запускать вручную.
 
   </details>
 
@@ -181,16 +190,13 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
     ```
     ICEDTEA_WEB_PLUGIN_SPLASH=none
     ICEDTEA_WEB_SPLASH=none
-    ```   
-
-  Если не установить `IceTea Web Control`, то desktop-клиент придется запускать вручную.
+    ```
 
   </details>
 
 * (опционально) `jar-файл` с desktop-клиентом [lsFusion]
 
-  Desktop-клиент `lsFusion` версии 2.1 можно скачать по ссылке: <https://download.lsfusion.org/java/lsfusion-client-2.1.war>.
-  Остальные версии клиента можно найти по ссылке: <https://download.lsfusion.org/java/>
+  Desktop-клиент `lsFusion` версии 2.1 можно скачать по ссылке: <https://download.lsfusion.org/java/lsfusion-client-2.1.war>
 
 ### Как запустить desktop-клиент
 
@@ -203,10 +209,16 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
 Затем:
 
 1. войдите в каталог проекта `lsfusion-samples`
-1. запустите команду `docker-compose` чтобы запустить сервер базы данных
+1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
+
+    ```
+    $ cd lsfusion-samples
+    $ docker-compose up -d
+    ```
+
 1. запустите desktop-клиент:
 
-   * если у вас установлен `IceTea Web Control`, то кликните на jnlp-ссылку, которая появится в конце лога в информационном окне `Run`
+   * если у вас установлен `IceTea Web Control`, то кликните на jnlp-ссылку, которая появится в конце build-лога в информационном окне `Run`
    * или запустите `jar-файл` с desktop-клиентом lsFusion
 
 
