@@ -2,21 +2,23 @@ version: '3.0'
 
 services:
   db:
-    image: postgres
+    build:
+      context: .docker/postgres
+      dockerfile: Dockerfile
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 11111
     volumes:
       - postgres:${PGDATA:-/var/lib/postgresql/data}
-    ports:
-      - "5432:5432"
     networks:
       - postgres
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+    ports:
+      - "5432:5432"
 
   pgadmin:
-    image: dpage/pgadmin4
+    build:
+      context: .docker/pgadmin4
+      dockerfile: Dockerfile
     depends_on:
       - db
     environment:
@@ -24,11 +26,20 @@ services:
       PGADMIN_DEFAULT_PASSWORD: 11111
     volumes:
       - pgadmin:/root/.pgadmin
-      - ./servers.json:/pgadmin4/servers.json
-    ports:
-      - "${PGADMIN_PORT:-5050}:80"
     networks:
       - postgres
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+
+  web:
+    build:
+      context: .docker/lsfusion2-client
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    network_mode: host
+    ports:
+      - "8080:80"
 
 networks:
   postgres:
