@@ -95,7 +95,7 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
     
 1. выберите конфигурацию с примером. Например, `lsFusion server: hockeystats` (Run \ Edit configurations...)
 1. запустите эту конфигурацию (Run \ Run 'lsFusion server: hockeystats')
-1. откройте в браузере страницу по адресу `http://localhost:8080`
+1. откройте в браузере страницу по адресу <http://localhost:8080>
 
 ## Desktop-клиент [lsFusion]
 
@@ -238,8 +238,8 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
     $ docker-compose up -d
     ```
 
-1. откройте в браузере страницу по адресу `http://localhost:5050`
-1. в первый раз `pgadmin` спросит email и пароль администратора pgadmin
+1. откройте в браузере страницу по адресу <http://localhost:5050>
+1. в первый раз [pgadmin] спросит email и пароль администратора.
 
    * введите email: `pgadmin4@pgadmin.org`
    * введите пароль: `11111`
