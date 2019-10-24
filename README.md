@@ -220,7 +220,7 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
     
   </details>
 
-## Как запустить [pgadmin] в браузере
+### Как запустить [pgadmin] в браузере
 
 Прежде всего склонируйте проект на свой компьютер:
 
