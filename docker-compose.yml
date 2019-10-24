@@ -38,8 +38,6 @@ services:
     depends_on:
       - db
     network_mode: host
-    ports:
-      - "8080:8080"
 
 networks:
   postgres:
