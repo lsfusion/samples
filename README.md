@@ -45,7 +45,7 @@
 
 ## Linux
 
-В Linux нужно выполнить [несколько шагов](https://documentation.lsfusion.org/pages/viewpage.action?pageId=57738076),
+В Linux можно выполнить [несколько шагов](https://documentation.lsfusion.org/pages/viewpage.action?pageId=57738076),
 чтобы установить необходимое для промышленной эксплуатации. 
  
 Данный проект предназначен для тех, кто начинает изучать [lsfusion]. Поэтому проект содержит `docker-compose.yml`,
