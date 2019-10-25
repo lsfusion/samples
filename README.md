@@ -21,10 +21,10 @@
 Оглавление:
 
 * [Web-клиент lsFusion](#Web-клиент-lsFusion)
-  * [Необходимо установить (prerequisites)](#Необходимо-установить-prerequisites)
+  * [Необходимо установить](#Необходимо-установить)
   * [Как запустить lsFusion в браузере](#Как-запустить-lsFusion-в-браузере)
 * [Desktop-клиент lsFusion](#Desktop-клиент-lsFusion)
-  * [Необходимо установить (prerequisites) для desktop-клиента](#Необходимо-установить-prerequisites-для-desktop-клиента)
+  * [Необходимо установить для desktop-клиента](#Необходимо-установить-для-desktop-клиента)
   * [Как запустить desktop-клиент](#Как-запустить-desktop-клиент)
 * [Дополнительно](#Дополнительно)
   * [Docker plugin для IntelliJ IDEA](#Docker-plugin-для-IntelliJ-IDEA)
@@ -32,7 +32,7 @@
 
 ## Web-клиент [lsFusion]
 
-### Необходимо установить (prerequisites)
+### Необходимо установить
 
 Предполагается, что вы уже установили на свой компьютер:
 
@@ -99,7 +99,7 @@ $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
 
 ## Desktop-клиент [lsFusion]
 
-### Необходимо установить (prerequisites) для desktop-клиента
+### Необходимо установить для desktop-клиента
 
 * [git](https://git-scm.com/download/)
 * [docker](https://docs.docker.com/install/)
