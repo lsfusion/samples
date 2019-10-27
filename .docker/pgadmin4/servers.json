@@ -6,7 +6,7 @@
       "Group": "Servers",
       "Port": 5432,
       "Username": "postgres",
-      "Host": "lsfusionsamples_db_1",
+      "Host": "dbhost",
       "SSLMode": "prefer",
       "MaintenanceDB": "postgres"
     }

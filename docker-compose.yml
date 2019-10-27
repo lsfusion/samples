@@ -11,7 +11,9 @@ services:
     volumes:
       - postgres:${PGDATA:-/var/lib/postgresql/data}
     networks:
-      - postgres
+      postgres:
+        aliases:
+          - dbhost
     ports:
       - "5432:5432"
 
