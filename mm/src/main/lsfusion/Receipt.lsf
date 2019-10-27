@@ -30,7 +30,7 @@ date 'Дата накладной' = DATA DATE (Receipt);
 supplier 'Поставщик' = DATA LegalEntity (Receipt);
 nameSupplier 'Наименование поставщика' (Receipt r) = name(supplier(r));
 
-stock 'Склад' = DATA Stock(Receipt);
+stock 'Склад' = DATA Stock (Receipt);
 nameStock 'Наименование склада' (Receipt r) = name(stock(r));
 //#headerattributes end
 
@@ -45,10 +45,10 @@ sum 'Сумма поставщика' (ReceiptDetail d) = quantity(d) * price(d)
 
 //#formedit
 FORM receipt 'Приходная накладная'
-	OBJECTS r=Receipt PANEL
+	OBJECTS r = Receipt PANEL
 	PROPERTIES(r) number, date, nameSupplier, nameStock
 
-	OBJECTS d=ReceiptDetail
+	OBJECTS d = ReceiptDetail
 	PROPERTIES(d) index, nameItem, quantity, price, sum READONLY, NEW, DELETE GRID
 	FILTERS receipt(d) = r
 
@@ -58,11 +58,11 @@ FORM receipt 'Приходная накладная'
 
 //#formlist
 FORM receipts 'Приходные накладные'
-	OBJECTS r=Receipt
+	OBJECTS r = Receipt
 	PROPERTIES(r) READONLY number, date, nameSupplier, nameStock
 	PROPERTIES(r) NEWSESSION NEW, EDIT, DELETE 
 
-	OBJECTS d=ReceiptDetail
+	OBJECTS d = ReceiptDetail
 	PROPERTIES(d) READONLY index, nameItem, quantity, price, sum
 	FILTERS receipt(d) = r
 ;
