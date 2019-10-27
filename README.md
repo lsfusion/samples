@@ -15,8 +15,8 @@
 Примеры для демонстрации возможностей платформы [lsFusion]. Описание [здесь][docpage]. 
 
 Проект [lsfusion-samples][project] должен упростить жизнь тем, кто только начал знакомиться с [lsFusion].
-Предполагается, что перед началом работы с примерами вы запускаете сервисы одной командой `docker-compose`,
-а дальше работаете только внутри [IntelliJ IDEA].
+Для Windows разработан специальный установщик, который установит все необходимое.
+В в Linux можно разверуть и запустить необходимые сервисы одной командой `docker-compose up -d`.
 
 Причем проект устроен так, что вам не нужно изучать и использовать maven-команды,
 достаточно запускать конфигурации нужных вам модулей в [IntelliJ IDEA].
@@ -38,20 +38,20 @@
 В Windows используйте специальный [установщик](https://documentation.lsfusion.org/pages/viewpage.action?pageId=57738076),
 который автоматически установит все необходимое для работы с демонстрационными примерами и создаст иконки для запуска.
 
-Скачайте и распакуйте ZIP-файл из проекта [lsfusion-samples][project] в каталог на своем компьютере,
-откройте этот каталог в [IntelliJ IDEA], выберите интерсную вам конфигурацию и запустите ее в [IntelliJ IDEA].
+Скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта [lsfusion-samples][project]
+в каталог на своем компьютере, откройте этот каталог в [IntelliJ IDEA],
+выберите интерсную вам конфигурацию и запустите ее в [IntelliJ IDEA].
 
 Щелкните мышкой на иконку desktop-клиента или откройте в браузере страницу по адресу <http://localhost:8080>.  
 
 ## Linux
 
-В Linux можно выполнить [несколько шагов](https://documentation.lsfusion.org/pages/viewpage.action?pageId=57738076),
-чтобы установить необходимое для промышленной эксплуатации. 
- 
 Данный проект предназначен для тех, кто начинает изучать [lsfusion]. Поэтому проект содержит `docker-compose.yml`,
 который значительно упрощает установку [lsFusion] на Linux.
 
-Примечание: данный проект тестировался на Ubuntu 16.04, 18.04, 19.04 и на Debian 10.1.
+Примечание 1: Чтобы установить [lsFusion] для промышленной эксплуатации, нужно выполнить [несколько шагов](https://documentation.lsfusion.org/pages/viewpage.action?pageId=57738076).
+
+Примечание 2: Данный проект тестировался на Ubuntu 16.04, 18.04, 19.04 и на Debian 10.1.
 
 ### Необходимо установить
 
@@ -112,16 +112,16 @@
 
   <details>
   <summary>
-  Примечания:
+  Как установить:
   </summary>
   
-  1. Для работы с демонстрационными примерами достаточно установить `Community Edition`
-  1. На Ubuntu `IDEA Community Edition` можно найти в штатной утилите `Ubuntu software`
-     или установить безо всяких заморочек через `snap`:
+  Для работы с демонстрационными примерами достаточно установить `Community Edition`.
+  В Ubuntu `IDEA Community Edition` можно найти в штатной утилите `Ubuntu software`
+  или установить безо всяких заморочек через `snap`:
 
-     ```
-     sudo snap install intellij-idea-community --classic 
-     ```
+    ```
+    sudo snap install intellij-idea-community --classic 
+    ```
      
   </details>
      
@@ -139,7 +139,7 @@
 
 ### Как запустить [lsFusion] в браузере
 
-1. скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта
+1. скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта [lsfusion-samples][project]
    или склонируйте проект на свой компьютер:
 
     ```
@@ -147,10 +147,14 @@
     ```
 
 1. войдите в каталог проекта `lsfusion-samples`
-1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
 
     ```
     $ cd lsfusion-samples
+    ```
+
+1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
+
+    ```
     $ docker-compose up -d
     ```
 
@@ -176,7 +180,7 @@
   Примечание:
   </summary>
     
-  в `Ubuntu` достаточно выполнить команду:
+  В `Ubuntu` достаточно выполнить команду:
     
     ```
     sudo apt install default-jdk
@@ -191,11 +195,10 @@
   Как установить:
   </summary>
 
-  `IcedTea Web Control` &mdash; это проект, который позволяет запускать
-  java-апплеты при помощи jnlp-ссылок.
+  `IcedTea Web Control` &mdash; это проект, который позволяет запускать java-апплеты при помощи jnlp-ссылок.
   
   Инструкции по установке можно найти на сайте проекта [IcedTea Web Control](https://icedtea.classpath.org/wiki/IcedTea-Web).
-  На Ubuntu можно найти и установить в штатной утилите `Ubuntu software` или командой:
+  В Ubuntu можно найти и установить в штатной утилите `Ubuntu software` или командой:
   
     ```
     sudo apt update
@@ -226,13 +229,17 @@
 
   * Скачайте desktop-клиент [lsFusion] версии 2.1 по ссылке: <https://download.lsfusion.org/java/lsfusion-client-2.1.jar>
   * Войдите в каталог, куда скачали файл, и выполните команду `java -jar lsfusion-client-2.1.jar`
-  * Чтобы скачанный файл можно было запускать щелчком мышки, сделайте скачанный файл исполняемым (executable) командой `chmod +x lsfusion-client-2.1.jar`
+  * Чтобы скачанный файл можно было запускать щелчком мышки, сделайте скачанный файл исполняемым (executable) командой:
+
+    ```
+    `chmod +x lsfusion-client-2.1.jar`
+    ```
 
   </details>
 
 ### Как запустить desktop-клиент
 
-1. скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта
+1. скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта [lsfusion-samples][project]
    или склонируйте проект на свой компьютер:
 
     ```
@@ -240,10 +247,14 @@
     ```
 
 1. войдите в каталог проекта `lsfusion-samples`
-1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
 
     ```
     $ cd lsfusion-samples
+    ```
+
+1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
+
+    ```
     $ docker-compose up -d
     ```
 
@@ -258,7 +269,7 @@
 1. запустите эту конфигурацию (Run \ Run 'lsFusion server: hockeystats')
 1. запустите desktop-клиент:
 
-   * если у вас установлен `IceTea Web Control`, то кликните на jnlp-ссылку, которая появится в конце build-лога в информационном окне `Run`
+   * если у вас установлен `IcedTea Web Control`, то кликните на jnlp-ссылку, которая появится в конце build-лога в информационном окне `Run`
    * или запустите `jar-файл` с desktop-клиентом lsFusion
 
 
@@ -289,10 +300,14 @@
     ```
 
 1. войдите в каталог проекта `lsfusion-samples`
-1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
 
     ```
     $ cd lsfusion-samples
+    ```
+
+1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
+
+    ```
     $ docker-compose up -d
     ```
 
