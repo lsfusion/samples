@@ -1,0 +1,50 @@
+version: '3.0'
+
+services:
+  db:
+    build:
+      context: .docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 11111
+    volumes:
+      - postgres:${PGDATA:-/var/lib/postgresql/data}
+    networks:
+      postgres:
+        aliases:
+          - dbhost
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    build:
+      context: .docker/pgadmin4
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: 11111
+    volumes:
+      - pgadmin:/root/.pgadmin
+    networks:
+      - postgres
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+
+  web:
+    build:
+      context: .docker/lsfusion2-client
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    network_mode: host
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:

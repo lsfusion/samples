@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Comment": "Predefined postgreSQL server for pgadmin4",
+      "Name": "lsFusion Samples",
+      "Group": "Servers",
+      "Port": 5432,
+      "Username": "postgres",
+      "Host": "dbhost",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres"
+    }
+  }
+}
