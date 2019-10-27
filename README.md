@@ -49,17 +49,65 @@
 чтобы установить необходимое для промышленной эксплуатации. 
  
 Данный проект предназначен для тех, кто начинает изучать [lsfusion]. Поэтому проект содержит `docker-compose.yml`,
-который значительно упрощает установку [lsFusion] в Linux на компьютер разработчика.
+который значительно упрощает установку [lsFusion] на Linux.
 
-Примечание: данный проект тестировался на Ubuntu 18.04.
+Примечание: данный проект тестировался на Ubuntu 16.04, 18.04, 19.04 и на Debian 10.1.
 
 ### Необходимо установить
 
 Прежде всего, вам нужно установить базовые вещи:
 
-* [git]
-* [docker]
-* [docker-compose]
+* [docker] и [docker-compose]
+
+  <details>
+  <summary>
+  Как установить:
+  </summary>
+  
+  На Ubuntu можно установить командами:
+  
+  ```
+  # docker
+  
+  sudo apt-get update
+  
+  sudo apt-get install \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      gnupg-agent \
+      software-properties-common
+  
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  
+  sudo add-apt-repository \
+     "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+     $(lsb_release -cs) \
+     stable"
+  
+  sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io
+  
+  sudo usermod -aG docker $USER
+  
+  # docker-compose 1.24.1
+  
+  sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  
+  sudo chmod +x /usr/local/bin/docker-compose
+  ``` 
+  
+  Причечание 1: Обратите внимание, что на момент создания этого README,
+  на сайте [docker-compose] приведены команды для установки версии 1.24.1.
+  Обязательно посмотрите на процедуру установки по ссылкам [docker] и [docker-compose].
+  
+  Примечание 2: На странице с инструкцией по установке [docker], разработчики вежливо сообщают, что 
+  не рекомендуют использовать старые версии докера, и начинают инструкцию с команд деинсталляции старых версий.
+  Обратите внимание, что, что на момент создания этого README, команда `sudo apt install docker docker-compose`
+  устанавливает именно старые версии докера.
+  Обязательно посмотрите на процедуру установки по ссылкам [docker] и [docker-compose].
+   
+  </details>
+
 * [IntelliJ IDEA]
 
   <details>
@@ -91,7 +139,8 @@
 
 ### Как запустить [lsFusion] в браузере
 
-1. склонируйте проект на свой компьютер
+1. скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта
+   или склонируйте проект на свой компьютер:
 
     ```
     $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
@@ -135,34 +184,31 @@
     
   </details>
     
-* (опционально) [IceTea Web Control](https://icedtea.classpath.org/wiki/IcedTea-Web) для запуска desktop-клиента [lsFusion] по jnlp-ссылке
-
-  <details>
-  <summary>
-  Примечание:
-  </summary>
-
-  `IceTea Web Control` &mdash; это проект, который позволяет запускать
-  Java-апплеты при помощи jnlp-ссылок.
-
-  В [IntelliJ IDEA] выберите интересную вам конфигурацию и запустите выполнение.
-  [IntelliJ IDEA] начнет компиляцию и build модуля [lsFusion].
-  Когда билд модуля подходит к концу, в log пишется jnlp-ссылка
-  на desktop-клиента. Если нажать на нее, то `IceTea Web Control` автоматически запустит desktop-клиент.
-  
-  Если не установить `IceTea Web Control`, то desktop-клиент придется запускать вручную.
-
-  </details>
+* (опционально) [IcedTea Web Control](https://icedtea.classpath.org/wiki/IcedTea-Web) для запуска desktop-клиента [lsFusion] по jnlp-ссылке
 
   <details>
   <summary>
   Как установить:
   </summary>
 
-  Инструкции по установке можно найти на сайте проекта [IceTea Web Control](https://icedtea.classpath.org/wiki/IcedTea-Web).
-  На Ubuntu можно найти и установить в штатной утилите `Ubuntu software`. 
+  `IcedTea Web Control` &mdash; это проект, который позволяет запускать
+  java-апплеты при помощи jnlp-ссылок.
+  
+  Инструкции по установке можно найти на сайте проекта [IcedTea Web Control](https://icedtea.classpath.org/wiki/IcedTea-Web).
+  На Ubuntu можно найти и установить в штатной утилите `Ubuntu software` или командой:
+  
+    ```
+    sudo apt update
+    sudo apt install icedtea-netx
+    ``` 
 
-  Вы можете убрать назойливый splash, задав переменные окружения:
+  Примечание 1: В [IntelliJ IDEA] выберите интересную вам конфигурацию и запустите Build.
+  [IntelliJ IDEA] начнет компиляцию и build модуля [lsFusion]. Когда билд модуля подходит к концу, в log пишется jnlp-ссылка
+  на desktop-клиента. Если нажать на нее, то `IceTea Web Control` автоматически запустит desktop-клиент.
+  
+  Если не установить `IcedTea Web Control`, то desktop-клиент придется запускать вручную.
+
+  Примечание 2: Вы можете убрать назойливый splash, установив переменные окружения:
 
     ```
     ICEDTEA_WEB_PLUGIN_SPLASH=none
@@ -179,14 +225,15 @@
   </summary>
 
   * Скачайте desktop-клиент [lsFusion] версии 2.1 по ссылке: <https://download.lsfusion.org/java/lsfusion-client-2.1.jar>
-  * Войдите в каталог, куда сачали файл, и выполните команду `java -jar lsfusion-client-2.1.jar`
+  * Войдите в каталог, куда скачали файл, и выполните команду `java -jar lsfusion-client-2.1.jar`
   * Чтобы скачанный файл можно было запускать щелчком мышки, сделайте скачанный файл исполняемым (executable) командой `chmod +x lsfusion-client-2.1.jar`
 
   </details>
 
 ### Как запустить desktop-клиент
 
-1. склонируйте проект на свой компьютер:
+1. скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта
+   или склонируйте проект на свой компьютер:
 
     ```
     $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
@@ -202,7 +249,7 @@
 
 1. откройте каталог проекта в `IntelliJ IDEA`
 
-   * разрешите maven'у открыть pom.xml и синхронизировать зависимости
+   * разрешите maven'у открыть `pom.xml` и синхронизировать зависимости
    * обязательно дождитесь пока maven загрузит все зависимости
    * иногда приходится делать повторную команду на синхрониацию зависимостей - нажмите `Reimport All Maven Projects` в окне `Maven`
    * перед первым билдом укажите Project SDK, который предпочитаете (File \ Project Structure \ Project Settings \ Project \ Project SDK)
@@ -234,13 +281,12 @@
 
 ### Как запустить [pgadmin] в браузере
 
-Прежде всего склонируйте проект на свой компьютер:
+1. скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта
+   или склонируйте проект на свой компьютер:
 
-```
-$ git clone https://github.com/mazzy-ax/lsfusion-samples.git
-```
-
-Затем:
+    ```
+    $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
+    ```
 
 1. войдите в каталог проекта `lsfusion-samples`
 1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
