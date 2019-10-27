@@ -5,8 +5,8 @@
 [lsFusion]:https://lsfusion.org/
 [docpage]:https://documentation.lsfusion.org/pages/viewpage.action?pageId=2228236
 [git]:https://git-scm.com/download/
-[docker]:https://docs.docker.com/install/
-[docker-compose]:https://docs.docker.com/compose/install/
+[docker]:https://docs.docker.com/
+[docker-compose]:https://docs.docker.com/compose/
 [IntelliJ IDEA]:https://www.jetbrains.com/idea/
 [pgadmin]:https://www.pgadmin.org/
 
@@ -19,7 +19,7 @@
 * для Windows разработан специальный установщик, который установит все необходимое.
 * в Linux можно разверуть и запустить необходимые сервисы одной командой `docker-compose up -d`.
 
-Причем проект устроен так, что вам не нужно изучать и использовать maven-команды,
+Проект устроен так, что вам не нужно изучать и использовать maven-команды,
 достаточно запускать конфигурации нужных вам модулей в [IntelliJ IDEA].
 
 Оглавление:
@@ -65,7 +65,7 @@
   Как установить:
   </summary>
   
-  На Ubuntu можно установить командами:
+  В Ubuntu можно установить командами:
   
   ```
   # docker
@@ -100,10 +100,10 @@
   Разработчики [docker] вежливо сообщают, что не рекомендуют использовать старые версии докера,
   и начинают инструкцию с команд деинсталляции старых версий.
   На момент создания этого README, команда `sudo apt install docker docker-compose` устанавливает именно старые версии докера.
-  Установите так, как написано по ссылке [docker].
+  Установите так, как написано по ссылке <https://docs.docker.com/install>.
    
   Причечание: на момент создания этого README, по ссылке [docker-compose] приведены команды для установки `docker-compose` версии 1.24.1.
-  Обязательно посмотрите на процедуру правильной установки по ссылке [docker-compose].
+  Обязательно посмотрите на процедуру правильной установки по ссылке <https://docs.docker.com/compose/install/>.
   
   </details>
 
@@ -145,13 +145,13 @@
     $ git clone https://github.com/mazzy-ax/lsfusion-samples.git
     ```
 
-1. войдите в каталог проекта `lsfusion-samples`
+1. войдите в каталог проекта
 
     ```
     $ cd lsfusion-samples
     ```
 
-1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
+1. выполните команду `docker-compose up -d`, чтобы запустить сервер базы данных и `lsFusion-client`
 
     ```
     $ docker-compose up -d
@@ -251,7 +251,7 @@
     $ cd lsfusion-samples
     ```
 
-1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
+1. выполните команду `docker-compose up -d`, чтобы запустить сервер базы данных и `lsFusion-client`
 
     ```
     $ docker-compose up -d
@@ -304,7 +304,7 @@
     $ cd lsfusion-samples
     ```
 
-1. выполните команду `docker-compose up -d` чтобы запустить сервер базы данных и `lsFusion-client`
+1. выполните команду `docker-compose up -d`, чтобы запустить сервер базы данных и `lsFusion-client`
 
     ```
     $ docker-compose up -d
