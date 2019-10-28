@@ -1,0 +1,33 @@
+MODULE InstallLog;
+
+REQUIRE Time;
+
+CLASS InstallLog;
+date = DATA DATETIME (InstallLog);
+installLog = DATA TEXT (InstallLog);
+configureLog = DATA TEXT (InstallLog);
+
+saveInstallLog(FILE file) {
+    LOCAL installLog = TEXT();   
+    LOCAL configureLog = TEXT();
+    IMPORT JSON FROM file AS FILE TO() installLog, configureLog;   
+    
+    NEW log = InstallLog {
+        date(log) <- currentDateTime();
+        installLog(log) <- installLog();
+        configureLog(log) <- configureLog();
+        
+        APPLY;
+    }
+} @@noauth;
+
+FORM installLog 'Журнал инсталляций'
+    OBJECTS log = InstallLog
+    PROPERTIES(log) date, installLog, configureLog
+;
+
+NAVIGATOR {
+    logs {
+        NEW installLog;
+    }
+}
