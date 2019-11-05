@@ -47,7 +47,7 @@ overMarkup 'Надбавка перегруженная' (Book b) = OVERRIDE mar
 
 //#block8
 FORM markups 'Надбавки'
-    TREE categories c = Category PARENT parent
+    TREE categories c = Category PARENT parent(c)
     PROPERTIES(c) name READONLY, markup, overMarkup
     PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE
     

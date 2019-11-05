@@ -86,7 +86,7 @@ skuGroup = DATA SkuGroup (Sku);
 
   
 FORM skus 'Sku'
-    TREE groupTree g=SkuGroup PARENT parent
+    TREE groupTree g=SkuGroup PARENT parent(g)
     PROPERTIES READONLY name(g)
     FILTERS active(g)
     

@@ -78,7 +78,7 @@ canonicalName 'Полное имя' (ArticleGroup articleGroup) = STRING[255](
                        CHARWIDTH 50 MATERIALIZED;
 
 FORM parents
-    TREE skuTree sg = ArticleGroup PARENT parent
+    TREE skuTree sg = ArticleGroup PARENT parent(sg)
     PROPERTIES(sg) nameArticle, EDIT, NEWEDIT, nnn = NEW, DELETE  
 
     OBJECTS p=ArticleGroup
@@ -1053,7 +1053,7 @@ dataString = DATA STRING[100] (Store) CHARWIDTH 50;
 FORM storeArticle 'По складам'
     OBJECTS s=Store 
     
-    TREE skuTree sg = ArticleGroup PARENT parent
+    TREE skuTree sg = ArticleGroup PARENT parent(sg)
     PROPERTIES READONLY nameArticle(sg)
 
     OBJECTS a=Article
@@ -1305,10 +1305,10 @@ colorizeElementWithNumberGreaterFour(NavigatorElement element) = #5555ff IF numb
 stringEqualsAll (BPSTRING[3] string) = string == BPSTRING[3]('Все');
 
 FORM TestTree 'Тест дерева (элементы навигатора)'
-    TREE forms e=NavigatorElement PARENT parent
+    TREE forms e=NavigatorElement PARENT parent(e)
     PROPERTIES(e) VALUE, caption, canonicalName, number BACKGROUND colorizeElementWithNumberGreaterFour(e)
 
-    TREE forms2 a =BPSTRING[3], e2=NavigatorElement PARENT parent
+    TREE forms2 a =BPSTRING[3], e2=NavigatorElement PARENT parent(e2)
     PROPERTIES(a) VALUE
     PROPERTIES(e2) VALUE, caption, canonicalName
 
@@ -1332,7 +1332,7 @@ DESIGN TestTree {
 showStores(ArticleGroup ag, Store s) = aginteger(ag) > 5 AND s IS Store;
 
 FORM TestExpandables 'Тест Expandables'
-    TREE groups a =BPSTRING[3], ag=ArticleGroup PARENT parent, s=Store
+    TREE groups a =BPSTRING[3], ag=ArticleGroup PARENT parent(ag), s=Store
     PROPERTIES(a) VALUE
     PROPERTIES(ag) VALUE, name, nameParent, aginteger
     PROPERTIES(s) VALUE, name, storeSizeCode, sinteger
@@ -1430,7 +1430,7 @@ FORM TestReadOnlyIf 'Тест read-only'
     PROPERTIES(a) READONLYIF isReadOnly() VALUE, name
     PROPERTIES(s, a) READONLYIF isReadOnly() incomeQuantity, outcomeQuantity
 
-    TREE elements e=NavigatorElement PARENT parent
+    TREE elements e=NavigatorElement PARENT parent(e)
     PROPERTIES(e) READONLYIF isReadOnly() caption, canonicalName, number, permit, forbid;
 ;
 
@@ -1942,7 +1942,7 @@ FORM TestShowIfInTreeAndContainers 'Тест ShowIf (tree & containers)'
     OBJECTS s=Store
     PROPERTIES(s) VALUE, name, storeSizeCode
 
-    TREE groups a =BPSTRING[3], ag=ArticleGroup PARENT parent
+    TREE groups a =BPSTRING[3], ag=ArticleGroup PARENT parent(ag)
     PROPERTIES(a) SHOWIF storeIsBig(s) VALUE
     PROPERTIES(ag) SHOWIF storeIsBig(s) VALUE, name, nameParent, DELETE GRID
 
