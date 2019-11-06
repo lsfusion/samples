@@ -7,10 +7,10 @@ date = DATA DATETIME (InstallLog);
 installLog = DATA TEXT (InstallLog);
 configureLog = DATA TEXT (InstallLog);
 
-saveInstallLog(FILE file) {
+saveInstallLog(STRING fileString) {
     LOCAL installLog = TEXT();   
     LOCAL configureLog = TEXT();
-    IMPORT JSON FROM file AS FILE TO() installLog, configureLog;   
+    IMPORT JSON FROM JSONFILE(fileString) TO() installLog, configureLog;   
     
     NEW log = InstallLog {
         date(log) <- currentDateTime();
