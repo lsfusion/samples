@@ -23,7 +23,7 @@ saveInstallLog(STRING fileString) {
 
 FORM installLog 'Журнал инсталляций'
     OBJECTS log = InstallLog
-    PROPERTIES(log) date, installLog, configureLog
+    PROPERTIES(log) READONLY date, installLog, configureLog
 ;
 
 NAVIGATOR {
