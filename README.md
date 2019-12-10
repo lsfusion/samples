@@ -90,9 +90,9 @@
   
   sudo usermod -aG docker $USER
   
-  # docker-compose 1.24.1
+  # docker-compose 1.25.0
   
-  sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   
   sudo chmod +x /usr/local/bin/docker-compose
   ``` 
@@ -102,7 +102,7 @@
   На момент создания этого README, команда `sudo apt install docker docker-compose` устанавливает именно старые версии докера.
   Установите так, как написано по ссылке <https://docs.docker.com/install>.
    
-  Причечание: на момент создания этого README, по ссылке [docker-compose] приведены команды для установки `docker-compose` версии 1.24.1.
+  Причечание: на момент создания этого README, по ссылке [docker-compose] приведены команды для установки `docker-compose` версии 1.25.0.
   Обязательно посмотрите на процедуру правильной установки по ссылке <https://docs.docker.com/compose/install/>.
   
   </details>
@@ -226,12 +226,12 @@
   Как использовать:
   </summary>
 
-  * Скачайте desktop-клиент [lsFusion] версии 2.1 по ссылке: <https://download.lsfusion.org/java/lsfusion-client-2.1.jar>
-  * Войдите в каталог, куда скачали файл, и выполните команду `java -jar lsfusion-client-2.1.jar`
+  * Скачайте desktop-клиент [lsFusion] версии 2.2 по ссылке: <https://download.lsfusion.org/java/lsfusion-client-2.2.jar>
+  * Войдите в каталог, куда скачали файл, и выполните команду `java -jar lsfusion-client-2.2.jar`
   * Чтобы скачанный файл можно было запускать щелчком мышки, сделайте скачанный файл исполняемым (executable) командой:
 
     ```
-    `chmod +x lsfusion-client-2.1.jar`
+    `chmod +x lsfusion-client-2.2.jar`
     ```
 
   </details>
