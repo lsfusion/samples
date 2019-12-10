@@ -23,7 +23,7 @@ parent 'Родитель' = DATA Category (Category);
 
 //#solution2
 FORM categories 'Категории'
-    TREE categories c = Category PARENT parent
+    TREE categories c = Category PARENT parent(c)
     PROPERTIES(c) name
 ;
 //#solution2 end
@@ -33,7 +33,7 @@ level 'Уровень' (Category child, Category parent) = RECURSION 1l IF child
                                                                  STEP 2l IF parent == parent($parent) MATERIALIZED;
 
 FORM categoryBooks 'Книги по категориям'
-    TREE categories c = Category PARENT parent
+    TREE categories c = Category PARENT parent(c)
     PROPERTIES(c) name
 
     OBJECTS b = Book
