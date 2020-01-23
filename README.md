@@ -90,9 +90,9 @@
   
   sudo usermod -aG docker $USER
   
-  # docker-compose 1.25.1
+  # docker-compose 1.25.3
   
-  sudo curl -L "https://github.com/docker/compose/releases/download/1.25.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo curl -L "https://github.com/docker/compose/releases/download/1.25.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   
   sudo chmod +x /usr/local/bin/docker-compose
   ``` 
@@ -102,7 +102,7 @@
   На момент создания этого README, команда `sudo apt install docker docker-compose` устанавливает именно старые версии докера.
   Установите так, как написано по ссылке <https://docs.docker.com/install>.
    
-  Причечание: на момент создания этого README, по ссылке [docker-compose] приведены команды для установки `docker-compose` версии 1.25.1.
+  Причечание: на момент создания этого README, по ссылке [docker-compose] приведены команды для установки `docker-compose` версии 1.25.3.
   Обязательно посмотрите на процедуру правильной установки по ссылке <https://docs.docker.com/compose/install/>.
   
   </details>
