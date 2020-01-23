@@ -28,8 +28,8 @@
 * [Linux](#Linux)
   * [Необходимо установить](#Необходимо-установить)
   * [Как запустить lsFusion в браузере](#Как-запустить-lsFusion-в-браузере)
-  * [Необходимо установить для desktop-клиента lsFusion](#Необходимо-установить-для-desktop-клиента-lsFusion)
-  * [Как запустить desktop-клиент](#Как-запустить-desktop-клиент)
+  * [Необходимо установить для desktop-клиента lsFusion](#Необходимо-установить-для-desktop---клиента-lsFusion)
+  * [Как запустить desktop-клиент](#Как-запустить-desktop---клиент)
 * [Дополнительно для Linux](#Дополнительно-для-Linux)
   * [Docker plugin для IntelliJ IDEA](#Docker-plugin-для-IntelliJ-IDEA)
   * [Как запустить pgadmin в браузере](#Как-запустить-pgadmin-в-браузере)
@@ -52,7 +52,7 @@
 
 Примечание 1: Чтобы установить [lsFusion] для промышленной эксплуатации, нужно выполнить [несколько шагов](https://documentation.lsfusion.org/pages/viewpage.action?pageId=57738076).
 
-Примечание 2: Данный проект тестировался на Ubuntu 16.04, 18.04, 19.04 и на Debian 10.1.
+Примечание 2: Данный проект тестировался на Ubuntu 16.04, 18.04, 19.04, 19.10 и на Debian 10.1.
 
 ### Необходимо установить
 
@@ -90,9 +90,9 @@
   
   sudo usermod -aG docker $USER
   
-  # docker-compose 1.25.0
+  # docker-compose 1.25.1
   
-  sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo curl -L "https://github.com/docker/compose/releases/download/1.25.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   
   sudo chmod +x /usr/local/bin/docker-compose
   ``` 
@@ -102,7 +102,7 @@
   На момент создания этого README, команда `sudo apt install docker docker-compose` устанавливает именно старые версии докера.
   Установите так, как написано по ссылке <https://docs.docker.com/install>.
    
-  Причечание: на момент создания этого README, по ссылке [docker-compose] приведены команды для установки `docker-compose` версии 1.25.0.
+  Причечание: на момент создания этого README, по ссылке [docker-compose] приведены команды для установки `docker-compose` версии 1.25.1.
   Обязательно посмотрите на процедуру правильной установки по ссылке <https://docs.docker.com/compose/install/>.
   
   </details>
@@ -136,7 +136,7 @@
     
   </details>
 
-### Как запустить [lsFusion] в браузере
+### Как запустить lsFusion в браузере
 
 1. скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта [lsfusion-samples][project]
    или склонируйте проект на свой компьютер:
@@ -168,7 +168,7 @@
 1. запустите эту конфигурацию (Run \ Run 'lsFusion server: hockeystats')
 1. откройте в браузере страницу по адресу <http://localhost:8080>
 
-### Необходимо установить для desktop-клиента [lsFusion]
+### Необходимо установить для desktop-клиента lsFusion
 
 * установите ПО из раздела [Необходимо установить](#Необходимо-установить)
 
@@ -226,12 +226,12 @@
   Как использовать:
   </summary>
 
-  * Скачайте desktop-клиент [lsFusion] версии 2.2 по ссылке: <https://download.lsfusion.org/java/lsfusion-client-2.2.jar>
-  * Войдите в каталог, куда скачали файл, и выполните команду `java -jar lsfusion-client-2.2.jar`
+  * Скачайте desktop-клиент [lsFusion] версии 2.3 по ссылке: <https://download.lsfusion.org/java/lsfusion-client-2.3.jar>
+  * Войдите в каталог, куда скачали файл, и выполните команду `java -jar lsfusion-client-2.3.jar`
   * Чтобы скачанный файл можно было запускать щелчком мышки, сделайте скачанный файл исполняемым (executable) командой:
 
     ```
-    `chmod +x lsfusion-client-2.2.jar`
+    `chmod +x lsfusion-client-2.3.jar`
     ```
 
   </details>
@@ -274,7 +274,7 @@
 
 ## Дополнительно для Linux
 
-### Docker plugin для [IntelliJ IDEA]
+### Docker plugin для IntelliJ IDEA
 
 [Docker plugin](https://plugins.jetbrains.com/plugin/7724-docker/) позволяет работать с докером непосредственно из [IntelliJ IDEA].
 Плагин уже включен в `Ultimate edition`. В `IDEA Community edition` его нужно установить.
@@ -289,7 +289,7 @@
     
   </details>
 
-### Как запустить [pgadmin] в браузере
+### Как запустить pgadmin в браузере
 
 1. скачайте и распакуйте [ZIP-архив](https://github.com/mazzy-ax/lsfusion-samples/archive/master.zip) проекта
    или склонируйте проект на свой компьютер:

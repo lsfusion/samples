@@ -1,5 +1,7 @@
 FROM openjdk:8
 
+ENV JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+
 RUN set -eux; \
 # enable https repository
     apt-get update; \
@@ -7,7 +9,7 @@ RUN set -eux; \
             apt-transport-https \
             ca-certificates \
             ; \
-# install lsfusion2-client from the private repository
+# install lsfusion client from the private repository
     wget --quiet -O - https://download.lsfusion.org/apt/GPG-KEY-lsfusion | apt-key add -; \
     echo deb https://download.lsfusion.org/apt all main > /etc/apt/sources.list.d/lsfusion.list; \
     apt-get update; \
