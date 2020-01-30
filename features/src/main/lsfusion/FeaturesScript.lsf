@@ -1431,7 +1431,7 @@ FORM TestReadOnlyIf 'Тест read-only'
     PROPERTIES(s, a) READONLYIF isReadOnly() incomeQuantity, outcomeQuantity
 
     TREE elements e=NavigatorElement PARENT parent(e)
-    PROPERTIES(e) READONLYIF isReadOnly() caption, canonicalName, number, permit, forbid;
+    PROPERTIES(e) READONLYIF isReadOnly() caption, canonicalName, number, captionPermission;
 ;
 
 DESIGN TestReadOnlyIf {
