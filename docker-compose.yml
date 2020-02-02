@@ -35,7 +35,7 @@ services:
 
   web:
     build:
-      context: .docker/lsfusion2-client
+      context: .docker/lsfusion-client
       dockerfile: Dockerfile
     depends_on:
       - db

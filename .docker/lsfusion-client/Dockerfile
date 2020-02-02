@@ -14,11 +14,11 @@ RUN set -eux; \
     echo deb https://download.lsfusion.org/apt all main > /etc/apt/sources.list.d/lsfusion.list; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-            lsfusion2-client \
+            lsfusion3-client \
             ; \
 # cleanup
     rm -rf /var/lib/apt/lists/*;
 
 EXPOSE 8080
 
-CMD /usr/share/lsfusion2-client/bin/catalina.sh run
+CMD /usr/share/lsfusion3-client/bin/catalina.sh run
