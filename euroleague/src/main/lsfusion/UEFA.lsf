@@ -75,7 +75,7 @@ FORM countryCoefficientUEFA 'Коэффициент стран UEFA'
                            goalsAway BACKGROUND goalsHome(m) < goalsAway(m), 
                            nameAwayTeam
     FILTERS played(t, m)
-    ORDER dateTime(m) DESC
+    ORDERS dateTime(m) DESC
 ;
 
 DESIGN countryCoefficientUEFA {
