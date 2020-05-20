@@ -188,7 +188,7 @@ exPath 'Путь' = DATA STRING (Example, LONG);
 FORM examples 'Примеры'
     OBJECTS e = Example
     PROPERTIES (e) caption, path, mode, order, NEW, DELETE
-    ORDER mode(e), order(e)
+    ORDERS mode(e), order(e)
     OBJECTS i = INTEGER
     FILTERS iterate(i, 1, 10)
     PROPERTIES exPath(e, i); 

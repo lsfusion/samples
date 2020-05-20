@@ -139,7 +139,7 @@ FORM standings 'Таблица'
     PROPERTIES(m, c) READONLY BACKGROUND backgroundScore() points, score 
     PROPERTIES(m, c) READONLY BACKGROUND backgroundBet() startedHomeScore, startedAwayScore
 
-    ORDER score(c) DESC 
+    ORDERS score(c) DESC 
 ;
 
 NAVIGATOR {

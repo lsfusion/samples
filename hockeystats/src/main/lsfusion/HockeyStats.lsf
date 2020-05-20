@@ -129,7 +129,7 @@ EXTEND FORM MainForm
     OBJECTS team = Team
     PROPERTIES(team) place, name, gamesPlayed, gamesWon, gamesWonOT, gamesWonSO,
                      gamesLostSO, gamesLostOT, gamesLost, goalsScored, goalsConceded, points, NEW, DELETE
-    ORDER place(team)
+    ORDERS place(team)
 ;
 //#formteam end
 
@@ -141,7 +141,7 @@ FORM MainFormSingle 'Турнирная таблица'
     OBJECTS team = Team
     PROPERTIES(team) place, name, gamesPlayed, gamesWon, gamesWonOT, gamesWonSO,
                      gamesLostSO, gamesLostOT, gamesLost, goalsScored, goalsConceded, points, NEW, DELETE
-    ORDER place(team)
+    ORDERS place(team)
 ;
 //#formsingle end
 

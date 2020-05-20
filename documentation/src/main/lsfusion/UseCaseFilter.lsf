@@ -17,7 +17,7 @@ FORM onStockObject 'Остатки'
   
     OBJECTS b = Book
     PROPERTIES READONLY name(b), balance(b, s)
-    ORDER name(b)
+    ORDERS name(b)
   
     // Вариант 1
     FILTERS balance(b, s)
@@ -40,7 +40,7 @@ FORM onStockLocal 'Остатки'
   
     OBJECTS sb = (s = Stock, b = Book)
     PROPERTIES READONLY name(s), name(b), balance(b, s)
-    ORDER name(s), name(b)
+    ORDERS name(s), name(b)
   
     FILTERS s == filterStock() OR NOT filterStock()
 ;
@@ -69,7 +69,7 @@ FORM orders 'Заказы'
   
     OBJECTS o = Order
     PROPERTIES(o) READONLY do = date, nameCustomer
-    ORDER do DESC
+    ORDERS do DESC
     FILTERS date(o) >= dateFrom, date(o) <= dateTo,
             customer(o) == filterCustomer() OR NOT filterCustomer()
 ;
