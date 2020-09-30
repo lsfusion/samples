@@ -1,0 +1,64 @@
+//#module
+MODULE Map;
+//#module end
+
+REQUIRE EvalScript, Geo;
+
+CLASS Element;
+CLASS Point : Element;
+CLASS Area : Element;
+
+latitude = DATA DOUBLE (Point);
+longitude = DATA DOUBLE (Point);
+latitude(Point pt) <- 48.8601975346 WHEN SET(pt IS Point);
+longitude(Point pt) <- 2.3435211182 WHEN SET(pt IS Point);
+
+name = DATA STRING (Element);
+name(Element pt) <- (CASE WHEN pt IS Point THEN 'Точка' ELSE 'Полигон') + ' ' + LONG(pt) WHEN SET(pt IS Element);
+
+polygon = DATA STRING (Area);
+polygon(Area a) <- '48.885488755596874 2.266616821289063,48.83941303819501 2.2714233398437504,48.81635927146624 2.338027954101563,48.823140892101684 2.4060058593750004,48.869683240775785 2.4183654785156254,48.90354608612111 2.355194091796875' WHEN SET (a IS Area); // minsk
+
+isInAnyArea(Point pt) = GROUP SUM 1 IF isPointInPolygon(latitude(pt), longitude(pt), polygon(Area area));
+
+FORM map 'Карта'
+    OBJECTS o = Element MAP
+    PROPERTIES (o) longitude, latitude, polygon, name PANEL
+    PROPERTIES color = RGB(255, 0, 0) IF isInAnyArea(o), inParis '' = 'I am ' + (CASE WHEN isInAnyArea(o) THEN '' ELSE 'not ') + 'in Paris. Drag me' SHOWIF o IS Point PANEL 
+    PROPERTIES (o) 'Добавить точку' = NEW[Point], 'Добавить область' = NEW[Area], DELETE
+;
+
+DESIGN map {
+    GRID(o) {
+        NEW popup {
+            MOVE PROPERTY (name(o));
+            MOVE PROPERTY (inParis);
+        }          
+    }
+}
+
+postgisCreated = DATA BOOLEAN ();
+onStarted() + {
+    IF NOT postgisCreated() THEN {
+    	EXTERNAL SQL 'LOCAL' EXEC 'CREATE EXTENSION postgis';
+    	postgisCreated() <- TRUE;
+    }
+}
+
+CLASS Event;
+
+date = DATA DATE (Event);
+date(Event e) <- currentDate() WHEN SET(e IS Event);
+
+name = DATA STRING (Event);
+name(Event e) <- 'Событие' + ' ' + LONG(e) WHEN SET(e IS Event);
+
+FORM calendar 'Календарь'
+    OBJECTS e = Event CALENDAR
+    PROPERTIES (e) date, name, NEW, DELETE
+;
+
+NAVIGATOR {
+    NEW map;
+    NEW calendar;
+}
