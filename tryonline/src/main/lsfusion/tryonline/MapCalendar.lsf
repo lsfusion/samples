@@ -2,7 +2,7 @@
 MODULE Map;
 //#module end
 
-REQUIRE EvalScript, Geo;
+REQUIRE Geo;
 
 CLASS Element;
 CLASS Point : Element;
