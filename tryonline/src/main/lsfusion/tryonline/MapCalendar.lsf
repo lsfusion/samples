@@ -2,7 +2,7 @@
 MODULE Map;
 //#module end
 
-REQUIRE Geo;
+REQUIRE Geo, SystemEvents;
 
 CLASS Element;
 CLASS Point : Element;
