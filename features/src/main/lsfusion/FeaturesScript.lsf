@@ -1156,7 +1156,7 @@ DESIGN storeArticle {
 
     PROPERTY(foo(s, a)) {
         focusable = FALSE;
-        panelCaptionAbove = TRUE;
+        panelCaptionVertical = TRUE;
     }
 
     PROPERTY(aname) {
@@ -1725,8 +1725,8 @@ DESIGN TestLayout {
                 caption = 'Поровну';
                 type = CONTAINERH;
                 alignment = STRETCH;
-                MOVE PROPERTY(st7) { caption='short'; fill = 1; panelCaptionAbove=TRUE; }  
-                MOVE PROPERTY(st8) { caption='this caption is much loooooonger than the first one'; fill = 1; panelCaptionAbove=TRUE; }
+                MOVE PROPERTY(st7) { caption='short'; fill = 1; panelCaptionVertical=TRUE; }  
+                MOVE PROPERTY(st8) { caption='this caption is much loooooonger than the first one'; fill = 1; panelCaptionVertical=TRUE; }
             }
         }
     }
@@ -1907,11 +1907,11 @@ DESIGN TestRichText {
             fill = 1;
             
             MOVE PROPERTY(s1) {
-                panelCaptionAbove = TRUE;
+                panelCaptionVertical = TRUE;
                 fill = 1;
             }
             MOVE PROPERTY(sr1) {
-                panelCaptionAbove = TRUE;
+                panelCaptionVertical = TRUE;
                 fill = 1;
             }
         }
@@ -2105,7 +2105,7 @@ DESIGN TestHTMLInReports {
         NEW richBox BEFORE TOOLBARBOX {
             fill = 1;
             MOVE PROPERTY(sr) {
-                panelCaptionAbove = TRUE;
+                panelCaptionVertical = TRUE;
                 fill = 1;
             }
         }
@@ -2732,9 +2732,9 @@ DESIGN TestScroll {
                     NEW scrollerInScroller {
                         type = SCROLL;
                         size = (500, 70);
-                        MOVE PROPERTY(text1()) { autoSize = TRUE; panelCaptionAbove = TRUE; fill = 1; };
+                        MOVE PROPERTY(text1()) { autoSize = TRUE; panelCaptionVertical = TRUE; fill = 1; };
                     }
-                    MOVE PROPERTY(text2()) {autoSize = TRUE; panelCaptionAbove = TRUE; fill = 1;};
+                    MOVE PROPERTY(text2()) {autoSize = TRUE; panelCaptionVertical = TRUE; fill = 1;};
                 }
                 MOVE BOX(t2);
                 MOVE BOX(t3);
@@ -2751,9 +2751,9 @@ DESIGN TestScroll {
                 NEW scrollerInNoScroller {
                     type = SCROLL;
                     size = (500, 100);
-                    MOVE PROPERTY(text3()) {autoSize = TRUE; panelCaptionAbove = TRUE; fill = 1; };
+                    MOVE PROPERTY(text3()) {autoSize = TRUE; panelCaptionVertical = TRUE; fill = 1; };
                 }
-                MOVE PROPERTY(text4()) {panelCaptionAbove = TRUE; fill = 1;};
+                MOVE PROPERTY(text4()) {panelCaptionVertical = TRUE; fill = 1;};
             }
             MOVE BOX(t12);
             MOVE BOX(t13);
