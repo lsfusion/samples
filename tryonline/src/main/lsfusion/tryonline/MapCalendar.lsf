@@ -23,17 +23,16 @@ isInAnyArea(Point pt) = GROUP SUM 1 IF isPointInPolygon(latitude(pt), longitude(
 
 FORM map 'Карта'
     OBJECTS o = Element MAP
-    PROPERTIES (o) longitude, latitude, polygon, name PANEL
-    PROPERTIES color = RGB(255, 0, 0) IF isInAnyArea(o), inParis '' = 'I am ' + (CASE WHEN isInAnyArea(o) THEN '' ELSE 'not ') + 'in Paris. Drag me' SHOWIF o IS Point PANEL 
+    PROPERTIES (o) longitude, latitude, polygon
+    PROPERTIES name = name(o) IF o IS Point, color = RGB(255, 0, 0) IF isInAnyArea(o) 
+    PROPERTIES SHOWIF o IS Point namePopup = name(o) PANEL, inParis '' = 'I am ' + (CASE WHEN isInAnyArea(o) THEN '' ELSE 'not ') + 'in Paris. Drag me' PANEL 
     PROPERTIES (o) 'Добавить точку' = NEW[Point], 'Добавить область' = NEW[Area], DELETE
 ;
 
 DESIGN map {
-    GRID(o) {
-        NEW popup {
-            MOVE PROPERTY (name(o));
-            MOVE PROPERTY (inParis);
-        }          
+    GRID(o) { // popup container
+        MOVE PROPERTY (namePopup);
+        MOVE PROPERTY (inParis);
     }
 }
 
