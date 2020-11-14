@@ -19,7 +19,7 @@ EXTEND FORM orderForm
 //#resultmeta1 end
 
 //#resultmeta2
-DocumentName 'Имя документа' = DATA BPSTRING[100](Document);
-DocumentType 'Тип документа' = DATA Type (Document);
-DocumentValue 'Стоимость документа' = DATA INTEGER (Document);
+DocumentName 'Document name' = DATA BPSTRING[100](Document);
+DocumentType 'Document type' = DATA Type (Document);
+DocumentValue 'Document cost' = DATA INTEGER (Document);
 //#resultmeta2 end

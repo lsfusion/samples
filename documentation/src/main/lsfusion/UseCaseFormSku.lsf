@@ -1,20 +1,20 @@
 MODULE Sku;
   
-CLASS Sku; // объявляем класс Sku
+CLASS Sku; // declaring class Sku
  
-name 'Наименование' = DATA BPSTRING[100] (Sku); // создаем ему свойство имя
+name 'Name' = DATA BPSTRING[100] (Sku); // creating a name property for it
   
-FORM sku 'Sku' // создаем форму Item
-    OBJECTS s = Sku PANEL // добавляем объект товар и делаем, чтобы на ней отображался ровно один экземпляр
-    PROPERTIES(s) name // добавляем свойство имени товара на форму
+FORM sku 'Sku' // creating the Item form
+    OBJECTS s = Sku PANEL // adding a product object and making it display exactly one copy
+    PROPERTIES(s) name // adding the product name property to the form
     
     EDIT Sku OBJECT s;
 ;
   
 DESIGN sku {
-    NEW skuDetails AFTER BOX(s) { // создаем новый контейнер в стандартный контейнер сразу после i.box
-                                  // этот контейнер будет панелью закладок, в который можно будет добавлять закладки со свойствами товара
+    NEW skuDetails AFTER BOX(s) { // creating a new container in a standard container right after i.box
+                                  // this container will be the tab panel, where tabs with product properties can be added
         type = TABBED;
-        fill = 1; // пусть расширяется на всю форму
+        fill = 1; // let it expand to the whole form
     }
 }

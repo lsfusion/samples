@@ -2,7 +2,6 @@
 # Reference: https://www.perl.org/books/library.html
 use warnings;
 use strict;
-use utf8;
 
 # Prepare repo of translated sourcecodes
 # Checkout to commit of the translation snapshot

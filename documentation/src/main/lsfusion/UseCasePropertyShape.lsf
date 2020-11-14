@@ -2,16 +2,16 @@ MODULE Shape;
 
 //#shape
 CLASS ABSTRACT Shape;
-square 'Площадь' = ABSTRACT DOUBLE (Shape);
+square 'Area' = ABSTRACT DOUBLE (Shape);
 //#shape end
 
 //#concrete
 CLASS Rectangle : Shape;
-width 'Ширина' = DATA DOUBLE (Rectangle);
-height 'Высота' = DATA DOUBLE (Rectangle);
+width 'Width' = DATA DOUBLE (Rectangle);
+height 'Height' = DATA DOUBLE (Rectangle);
   
 CLASS Circle : Shape;
-radius 'Радиус окружности' = DATA DOUBLE (Circle);
+radius 'Circle radius' = DATA DOUBLE (Circle);
 //#concrete end
 
 //#extendsimple
@@ -20,7 +20,7 @@ square(circle) += radius(circle) * radius(circle) * 3.14;
 //#extendsimple end
 
 //#extendover
-overSquareCircle 'Перегруженная площадь' = ABSTRACT DOUBLE (Circle);
+overSquareCircle 'Overridden area' = ABSTRACT DOUBLE (Circle);
 square(circle) += OVERRIDE overSquareCircle(circle), (radius(circle) * radius(circle) * 3.14);
 //#extendover end
 

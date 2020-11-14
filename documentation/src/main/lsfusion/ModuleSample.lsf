@@ -1,9 +1,9 @@
-MODULE EmployeeExample;	 	// Задаем имя модуля
+MODULE EmployeeExample;	 	// Defining the module name
 
-REQUIRE System, Utils;	 	// Перечисляем модули, от которых зависит модуль Employee
-NAMESPACE Employee;		 	// Задаем пространство имен
+REQUIRE System, Utils;	 	// Listing the modules that the Employee module depends on
+NAMESPACE Employee;		 	// Setting the namespace
  
-CLASS Employee 'Сотрудник';	// Создаем класс
-CLASS Position 'Должность'; // Создаем еще один класс
+CLASS Employee 'Employee';	// Creating a class
+CLASS Position 'Position'; // Creating another class
  
-employeePosition(employee) = DATA Position (Employee); // Создаем свойство
+employeePosition(employee) = DATA Position (Employee); // Creating property

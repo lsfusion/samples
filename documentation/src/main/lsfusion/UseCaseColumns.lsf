@@ -3,17 +3,17 @@ MODULE UseCaseColumns;
 REQUIRE Utils;
 
 //#sample1
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[50] (Book) IN id;
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[50] (Book) IN id;
 
-CLASS Customer 'Покупатель';
-name 'Наименование' = DATA ISTRING[50] (Customer) IN id;
+CLASS Customer 'Customer';
+name 'Name' = DATA ISTRING[50] (Customer) IN id;
 
-price 'Цена' = DATA NUMERIC[14,2] (Book, Customer);
+price 'Price' = DATA NUMERIC[14,2] (Book, Customer);
 //#sample1 end
 
 //#solution1
-FORM prices 'Цены'
+FORM prices 'Prices'
     OBJECTS c = Customer
     
     OBJECTS b = Book
@@ -22,16 +22,16 @@ FORM prices 'Цены'
 //#solution1 end
 
 //#sample2
-gracePeriod 'Отсрочка, дней' = DATA INTEGER (Book, Customer); 
+gracePeriod 'Delay, days' = DATA INTEGER (Book, Customer); 
 //#sample2 end
 
 //#solution2
-selected 'Отм' = DATA BOOLEAN (Customer);
+selected 'Mark' = DATA BOOLEAN (Customer);
 
-headerName 'Заголовок цены' (Customer c) = name(c) + ': Цена';
-headerGrace 'Заголовок отсрочки' (Customer c) = name(c) + ': Отсрочка, дней';
+headerName 'Price header' (Customer c) = name(c) + ': Price';
+headerGrace 'Dealy header' (Customer c) = name(c) + ': Delay, days';
 
-FORM pricesAndGracePeriods 'Цены и отсрочки'
+FORM pricesAndGracePeriods 'Prices and delays'
     OBJECTS s = Customer
     PROPERTIES selected(s), name(s) READONLY
     
@@ -55,12 +55,12 @@ DESIGN pricesAndGracePeriods {
 //#solution2 end
 
 //#solution3
-in 'Вкл' = DATA BOOLEAN (INTEGER, INTEGER);
+in 'On' = DATA BOOLEAN (INTEGER, INTEGER);
 
-row 'Заголовок ряда' (INTEGER r) = 'Ряд ' + (r AS INTEGER);
-column 'Заголовок колонки' (INTEGER c) = 'Колонка ' + (c AS INTEGER);
+row 'Row header' (INTEGER r) = 'Row ' + (r AS INTEGER);
+column 'Column header' (INTEGER c) = 'Column ' + (c AS INTEGER);
 
-FORM matrix 'Матрица'
+FORM matrix 'Matrix'
     OBJECTS m = (rows = INTEGER, columns = INTEGER) PANEL
     PROPERTIES rs = VALUE(rows), cs = VALUE(columns)
     
@@ -74,7 +74,7 @@ FORM matrix 'Матрица'
 ;
 
 DESIGN matrix {
-    PROPERTY(rs) { caption = 'Кол-во рядов'; }
-    PROPERTY(cs) { caption = 'Кол-во колонок'; }
+    PROPERTY(rs) { caption = 'Number of rows'; }
+    PROPERTY(cs) { caption = 'Number of columns'; }
 }
 //#solution3 end

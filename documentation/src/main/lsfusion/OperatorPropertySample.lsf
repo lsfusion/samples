@@ -12,7 +12,7 @@ CLASS Letter;
 attachment1 = DATA FILE (Letter);
 attachment2 = DATA FILE (Letter);
 letterAttachments (Letter l) = STRUCT(attachment1(l), attachment2(l));
-secondAttachment(Letter l) = letterAttachments(l)[2]; // возвращает attachment2
+secondAttachment(Letter l) = letterAttachments(l)[2]; // returns attachment2
 //#brackets end
 
 //#abstract
@@ -20,15 +20,15 @@ CLASS Invoice;
 CLASS InvoiceDetail;
 CLASS Range;
 
-rateChargeExchange(invoice) = ABSTRACT NUMERIC[14,6] (Invoice);             // В данном случае создается ABSTRACT MULTI EXCLUSIVE
-backgroundSku 'Цвет' (d) = ABSTRACT CASE FULL COLOR (InvoiceDetail); // В данном случае создается ABSTRACT CASE OVERRIDE LAST, и если будут
-                                                                            // подходить несколько реализаций, то вычислена будет первая из них
-overVAT = ABSTRACT VALUE OVERRIDE FIRST Range (InvoiceDetail);          // Здесь же будет вычислена последняя из подходящих реализаций
+rateChargeExchange(invoice) = ABSTRACT NUMERIC[14,6] (Invoice);             // In this case, ABSTRACT MULTI EXCLUSIVE is created
+backgroundSku 'Color' (d) = ABSTRACT CASE FULL COLOR (InvoiceDetail); // In this case, ABSTRACT CASE OVERRIDE LAST is created, and if there are
+                                                                            // several suitable implementations, the first of them will be calculated
+overVAT = ABSTRACT VALUE OVERRIDE FIRST Range (InvoiceDetail);          // The last matching implementation will be calculated here
 //#abstract end
 
 //#activetab
-//Форма с двумя закладками
-FORM tabbedForm 'Форма с табами'
+//Form with two tabs
+FORM tabbedForm 'Tabbed form'
     OBJECTS u = CustomUser
     PROPERTIES(u) name
      
@@ -40,17 +40,17 @@ DESIGN tabbedForm {
     NEW tabPane FIRST {
         type = TABBED;
         NEW contacts {
-            caption = 'Контакты';
+            caption = 'Contacts';
             MOVE BOX(u);
         }
         NEW recent {
-            caption = 'Последние';
+            caption = 'Recent';
             MOVE BOX(c);
         }       
     }          
 }
   
-//Активна ли закладка 'Последние'
+//If the 'Recent' tab is active
 recentActive() = ACTIVE TAB tabbedForm.recent;
 //#activetab end
 
@@ -58,7 +58,7 @@ recentActive() = ACTIVE TAB tabbedForm.recent;
 CLASS Color;
 id = DATA STRING[100] (Color);
 
-background 'Цвет' (Color c) = CASE
+background 'Color' (Color c) = CASE
     WHEN id(c) == 'Black' THEN RGB(0,0,0)
     WHEN id(c) == 'Red' THEN RGB(255,0,0)
     WHEN id(c) == 'Green' THEN RGB(0,255,0)
@@ -79,7 +79,7 @@ a = ABSTRACT CASE STRING[100] (A);
 CLASS B : A;
 b = DATA STRING[100] (B);
 
-a(B b) += WHEN CLASS(b(b)) THEN b(b); // равносильно WHEN b IS B THEN b(b)
+a(B b) += WHEN CLASS(b(b)) THEN b(b); // is equivalent to WHEN b IS B THEN b(b)
 //#class end
 
 //#concat
@@ -88,7 +88,7 @@ firstName = DATA STRING[100] (Person);
 middleName = DATA STRING[100] (Person);
 lastName = DATA STRING[100] (Person);
 
-fullName(Person p) = CONCAT ' ', firstName(p), middleName(p), lastName(p);     // если какая-то часть имени не задана, то эта часть будет пропущена вместе с пробелом
+fullName(Person p) = CONCAT ' ', firstName(p), middleName(p), lastName(p);     // if some part of the name is not specified, then this part will be skipped along with a space
 //#concat end
 
 //#data
@@ -100,7 +100,7 @@ isDayOff = DATA BOOLEAN (Country, DATE);
 //#data end
 
 //#exclusive
-background 'Цвет' (INTEGER i) = EXCLUSIVE RGB(255,238,165) IF i <= 5,
+background 'Color' (INTEGER i) = EXCLUSIVE RGB(255,238,165) IF i <= 5,
                                                    RGB(255,160,160) IF i > 5;
                                                    
 CLASS Human;
@@ -112,9 +112,9 @@ name(Human h) = EXCLUSIVE 'Male' IF h IS Male, 'Female' IF h IS Female;
 //#exclusive end
 
 //#formula
-round(number, digits) = FORMULA 'round(CAST(($1) as numeric),$2)';  // свойство с двумя параметрами: округляемым числом и количеством знаков после запятой
-toString15(str) = FORMULA BPSTRING[15] 'CAST($1 AS character(15))';   // свойство, преобразовывающее значение, переданное в качестве аргумента, к строковому типу длиной в 15 символов. 
-jumpWorkdays = FORMULA NULL DATE PG 'jumpWorkdays($1, $2, $3)', MS 'dbo.jumpWorkdays($1, $2, $3)'; // свойство с двумя различными реализациями для разных диалектов SQL
+round(number, digits) = FORMULA 'round(CAST(($1) as numeric),$2)';  // a property with two parameters: a rounded number and the number of decimal places
+toString15(str) = FORMULA BPSTRING[15] 'CAST($1 AS character(15))';   // a property that converts the value passed as an argument to a 15-character string. 
+jumpWorkdays = FORMULA NULL DATE PG 'jumpWorkdays($1, $2, $3)', MS 'dbo.jumpWorkdays($1, $2, $3)'; // a property with two different implementations for different SQL dialects
 //#formula end
 
 //#group
@@ -125,7 +125,7 @@ hostTeam = DATA Team (Game);
 hostGoalsScored(team) = GROUP SUM hostGoals(Game game) BY hostTeam(game);
 
 name = DATA STRING[100] (Country);
-countryName = GROUP AGGR Country country WHERE country IS Country BY name(country); // получается свойство (STRING[100]) -> Country
+countryName = GROUP AGGR Country country WHERE country IS Country BY name(country); // property (STRING[100]) -> Country is obtained
 
 CLASS Book;
 CLASS Tag;
@@ -149,7 +149,7 @@ price1 = DATA NUMERIC[10,2] (Book);
 price2 = DATA NUMERIC[10,2] (Book);
 maxPrice (Book b) = IF price1(b) > price2(b) THEN price1(b) ELSE price2(b);
   
-sex (Human h) = IF h IS Male THEN 'Male' ELSE ('Female' IF h IS Female); // если h будет другого класса, то будет NULL
+sex (Human h) = IF h IS Male THEN 'Male' ELSE ('Female' IF h IS Female); // if h is of another class, it will be NULL
   
 isDifferent(a, b) = IF a != b THEN TRUE;
 //#ifthen end
@@ -172,7 +172,7 @@ cathetus2 = DATA DOUBLE(Triangle);
 
 hypotenuseSq(triangle) = cathetus1(triangle)*cathetus1(triangle) + cathetus2(triangle)*cathetus2(triangle);
   
-hypotenuseSq2(triangle) = [ x*x + y*y](cathetus1(triangle), cathetus2(triangle)); // аналогичное свойство, заданное с помощью композиции
+hypotenuseSq2(triangle) = [ x*x + y*y](cathetus1(triangle), cathetus2(triangle)); // a similar property set using composition
 //#join2 end
 
 //#max
@@ -181,7 +181,7 @@ date2 = DATA DATE(INTEGER);
 maxDate (INTEGER i) = MAX date1(i), date2(i);
 
 balance = DATA INTEGER (Item);
-outcome 'Остаток (неотрицательный)' (Item i) = MAX balance(i), 0;
+outcome 'Balance (non-negative)' (Item i) = MAX balance(i), 0;
 //#max end
 
 //#min
@@ -216,35 +216,35 @@ notNullDate (INTEGER i) = OVERRIDE date(i), 2010_01_01;
 //#override end
 
 //#partition
-// определяет место команды в конференции
+// determines the place of the team in the conference
 CLASS Conference;
 conference = DATA Conference (Team);
 points = DATA INTEGER (Team);
 gamesWon = DATA INTEGER (Team);
-place 'Место' (Team team) = PARTITION SUM 1 ORDER DESC points(team), gamesWon(team) BY conference(team);
+place 'Place' (Team team) = PARTITION SUM 1 ORDER DESC points(team), gamesWon(team) BY conference(team);
   
-// строим порядковые индексы объектов в базе по возрастанию их внутренних идентификаторов (то есть в порядке создания)
-index 'Номер' (Object o) = PARTITION SUM 1 IF o IS Object ORDER o;
+// building ordinal indexes of objects in the database in ascending order of their internal IDs (i.e., in the order of creation)
+index 'Number' (Object o) = PARTITION SUM 1 IF o IS Object ORDER o;
   
-// находит команду, следующую в турнирной таблице по конференции
+// finds the team next in the conference standings
 prevTeam (Team team) = PARTITION PREV team ORDER place(team), team BY conference(team);
   
-// пример пропорционального распределения
+// proportional distribution example
 CLASS Order;
-transportSum 'Транспортные расходы' = DATA NUMERIC[10,2] (Order);
+transportSum 'Freight costs' = DATA NUMERIC[10,2] (Order);
 
 CLASS OrderDetail;
 order = DATA Order (OrderDetail) NONULL DELETE;
 sum = DATA NUMERIC[14,2] (OrderDetail);
 
-transportSum 'Транспортные расходы по строке' (OrderDetail d) = PARTITION UNGROUP transportSum
+transportSum 'Freight costs by line' (OrderDetail d) = PARTITION UNGROUP transportSum
                                     PROPORTION STRICT ROUND(2) sum(d)
                                     ORDER d
                                     BY order(d);
  
-// пример распределения с лимитами
-discountSum 'Скидка' = DATA NUMERIC[10,2] (Order);
-discountSum 'Скидка по строке' (OrderDetail d) =
+// example of distribution with limits
+discountSum 'Discount' = DATA NUMERIC[10,2] (Order);
+discountSum 'Discount by line' (OrderDetail d) =
     PARTITION UNGROUP discountSum
                 LIMIT STRICT sum(d)
                 ORDER sum(d), d
@@ -254,7 +254,7 @@ discountSum 'Скидка по строке' (OrderDetail d) =
 
 //#prev
 f = DATA INTEGER (A);
-// выдает по очереди все изменения f(a) в сессии
+// outputs all changes f(a) in the session one by one
 messageFChanges  { 
     FOR CHANGED(f(A a)) DO
         MESSAGE 'In this session f(a) changed from ' + PREV(f(a)) + ' TO ' + f(a);
@@ -265,9 +265,9 @@ date = DATA DATE (Document);
 
 CLASS Article;
 price = DATA NUMERIC[14,2] (Document, Article);
-// записать в цену документа, последнюю использованную цену в БД
-// PREV важен чтобы не учитывалась цены введенные в этом документе
-// это особенно важно, если последняя использованная цена будет материализованной, тогда платформа сможет просто считать это значение из таблицы
+// write in the price of the document the last used price in the database
+// PREV is important to ignore the prices entered in this document
+// this is especially important if the last used price is materialized, then the platform can simply read this value from the table
 setPrice  { 
     price(Document d, Article a) <- PREV((GROUP LAST price(d, a) ORDER date(d), d));
 }
@@ -277,18 +277,18 @@ setPrice  {
 CLASS Node;
 edge = DATA BOOLEAN (Node, Node);
 
-// итерация по integer от from к to (это свойство по умолчанию входит в модуль System)
+// iteration over an integer from 'from' to 'to' (this property is by default included in the System module)
 iterate(i, from, to) = RECURSION i==from AND from IS INTEGER AND to IS INTEGER STEP i==$i+1 AND i<=to CYCLES IMPOSSIBLE;
   
-// считает количество различных путей от a до b в графе
-pathes 'Кол-во путей' (a, b) = RECURSION 1 AND a IS Node AND b==a STEP 1 IF edge(b, $b);
+// counts the number of different paths from a to b in the graph
+pathes 'Number of paths' (a, b) = RECURSION 1 AND a IS Node AND b==a STEP 1 IF edge(b, $b);
   
-// определяет на каком уровне находится child от parent, и null если не является потомком (тем самым это свойство можно использовать для определения всех child'ов)
+// defines at what level child is from parent, and null if it is not a child (thus this property can be used to define all children)
 parent = DATA Group (Group);
-level 'Уровень' (Group child, Group parent) = RECURSION 1 IF child IS Group AND parent == child
+level 'Level' (Group child, Group parent) = RECURSION 1 IF child IS Group AND parent == child
                                                                   STEP 1 IF parent == parent($parent);
  
-// числа Фибоначчи, свойство высчитывает все числа Фибоначи до значения to, (после будет возвращать null)
+// Fibonacci numbers, the property calculates all Fibonacci numbers up to the value to, (afterwards it will return null)
 fib(i, to) = RECURSION 1 IF (i==0 OR i==1) AND to IS INTEGER STEP 1 IF (i==$i+1 OR i==$i+2) AND i<to CYCLES IMPOSSIBLE;
 //#recursion1 end
 
@@ -308,9 +308,9 @@ name = DATA STRING[100] (Store);
 FORM stores
     OBJECTS s = Store
 ;
-countF 'Кол-во фильтр. складов' = GROUP SUM 1 IF [ VIEW stores.s](Store s);
-orderF 'Порядок в группе объектов' (Store s) = PARTITION SUM 1 IF [ FILTER stores.s](s) ORDER [ ORDER stores.s](s), s;
-setNameX 'Добавить X к имени'()  { 
+countF 'Number of filtered warehouses' = GROUP SUM 1 IF [ VIEW stores.s](Store s);
+orderF 'Order in an object group' (Store s) = PARTITION SUM 1 IF [ FILTER stores.s](s) ORDER [ ORDER stores.s](s), s;
+setNameX 'Add X to name'()  { 
     LOCAL k = INTEGER ();
     k() <- 0;
     FOR [ FILTER stores.s](Store s) ORDER [ ORDER stores.s](s) DO {

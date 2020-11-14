@@ -1,12 +1,12 @@
 MODULE StaticObjectSample;
 
 //#default
-CLASS Direction 'Направление'
+CLASS Direction 'Direction'
 {
-    north 'Север',
-    east 'Восток',
-    south 'Юг',
-    west 'Запад'   
+    north 'North',
+    east 'East',
+    south 'South',
+    west 'West'   
 }
   
 direction = DATA Direction ();
@@ -16,8 +16,8 @@ showDirection  {
     MESSAGE staticCaption(direction());
 }
   
-// создаем форму по выбору объекта класса Direction
-FORM directions 'Направления'
+// creating a form by choosing an object of Direction class
+FORM directions 'Directions'
     OBJECTS d = Direction
     PROPERTIES(d) READONLY staticCaption
     

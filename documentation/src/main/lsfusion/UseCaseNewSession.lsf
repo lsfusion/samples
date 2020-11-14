@@ -1,10 +1,10 @@
 MODULE UseCaseNewSession;
 
 //#sample1
-CLASS Order 'Заказ';
+CLASS Order 'Order';
 
-isPosted 'Проведен' = DATA BOOLEAN (Order);
-number 'Номер' = DATA INTEGER (Order);
+isPosted 'Completed' = DATA BOOLEAN (Order);
+number 'Number' = DATA INTEGER (Order);
 
 FORM orders
     OBJECTS o = Order
@@ -13,7 +13,7 @@ FORM orders
 //#sample1 end
 
 //#solution1
-post 'Провести' (Order o)  { 
+post 'Complete' (Order o)  { 
     NEWSESSION {
         isPosted(o) <- TRUE;
         APPLY;
@@ -45,26 +45,26 @@ newOrder ()  {
 }
 
 EXTEND FORM orders
-    // Вариант 1
+    // Option 1
     PROPERTIES() newOrder DRAW o TOOLBAR
     
-    // Вариант 2
+    // Option 2
     PROPERTIES(o) NEWSESSION NEW
 ;
 //#solution2 end
 
 //#sample3
-selected 'Отм' = DATA LOCAL BOOLEAN (Order);
+selected 'Mark' = DATA LOCAL BOOLEAN (Order);
 EXTEND FORM orders
     PROPERTIES(o) selected
 ;
 //#sample3 end
 
 //#solution3
-deleteSelectedOrders 'Удалить отмеченные заказы' ()  { 
+deleteSelectedOrders 'Delete marked orders' ()  { 
     NEWSESSION NESTED(selected) {
         DELETE Order o WHERE selected(o);
-        ASK 'Вы собираетесь удалить ' + (GROUP SUM 1 IF DROPPED(Order o)) + ' заказов. Продолжить ?' DO {
+        ASK 'You are about to delete ' + (GROUP SUM 1 IF DROPPED (Order o)) + ' orders. Continue?' DO {
             APPLY;
         }
     }
@@ -76,24 +76,24 @@ EXTEND FORM orders
 //#solution3 end
 
 //#sample4
-CLASS Payment 'Платеж';
+CLASS Payment 'Payment';
 
-date 'Дата' = DATA DATE (Payment);
-sum 'Сумма' = DATA NUMERIC[14,2] (Payment);
+date 'Date' = DATA DATE (Payment);
+sum 'Amount' = DATA NUMERIC[14,2] (Payment);
 
-order 'Заказ' = DATA Order (Payment);
+order 'Order' = DATA Order (Payment);
 //#sample4 end
 
 //#solution4
-FORM orderPayments 'Платежи по заказу'
-    OBJECTS o = Order PANEL // Не добавляем свойств, чтобы этот объект не был вообще виден на форме
+FORM orderPayments 'Order payments'
+    OBJECTS o = Order PANEL // Not adding properties so that this object is not visible on the form at all
     
     OBJECTS p = Payment
     PROPERTIES(p) date, sum, NEW, DELETE
     FILTERS order(p) == o
 ;
 
-editPayments 'Редактировать платежи' (Order o)  { 
+editPayments 'Edit payments' (Order o)  { 
     NESTEDSESSION {
         SHOW orderPayments OBJECTS o = o;
     }

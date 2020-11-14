@@ -3,11 +3,11 @@ MODULE UseCaseNamePurchase;
 
 NAMESPACE Purchase;
 
-CLASS Order 'Заказ';
-date 'Дата' = DATA DATE (Order);
-number 'Номер' = DATA INTEGER (Order);
+CLASS Order 'Order';
+date 'Date' = DATA DATE (Order);
+number 'Number' = DATA INTEGER (Order);
   
-FORM orders 'Заказы на закупку'
+FORM orders 'Purchase orders'
     OBJECTS o = Order
     PROPERTIES(o) date, number
 ;

@@ -1,42 +1,42 @@
 MODULE UseCasePartition;
 
 //#sample1
-CLASS Order 'Заказ';
-CLASS OrderDetail 'Строка заказа';
+CLASS Order 'Order';
+CLASS OrderDetail 'Order line';
   
-order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
+order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
 //#sample1 end
 
 //#solution1
-index 'Номер строки' (OrderDetail d) = PARTITION SUM 1 ORDER d BY order(d) CHARWIDTH 4;
+index 'Line number' (OrderDetail d) = PARTITION SUM 1 ORDER d BY order(d) CHARWIDTH 4;
 //#solution1 end
 
 //#sample2
-date 'Дата' = DATA DATE (Order);
+date 'Date' = DATA DATE (Order);
   
-CLASS Customer 'Покупатель';
-customer 'Покупатель' = DATA Customer (Order);
+CLASS Customer 'Customer';
+customer 'Customer' = DATA Customer (Order);
 //#sample2 end
 
 //#solution2
-prevOrderDate 'Предыдущий заказ' (Order o) = PARTITION PREV date(o) ORDER date(o), o BY customer(o);
+prevOrderDate 'Previous order' (Order o) = PARTITION PREV date(o) ORDER date(o), o BY customer(o);
 //#solution2 end
 
 //#sample3
-CLASS Book 'Книга';
+CLASS Book 'Book';
   
-CLASS Batch 'Партия';
-book 'Книга' = DATA Book (Batch);
-date 'Дата прихода' = DATA DATE (Batch);
+CLASS Batch 'Batch';
+book 'Book' = DATA Book (Batch);
+date 'Arrival date' = DATA DATE (Batch);
   
-CLASS Stock 'Склад';
-currentBalance 'Остаток' = DATA INTEGER (Batch, Stock); // Остаток сделан первичным для примера. Обычно это вычисляемое свойство.
+CLASS Stock 'Warehouse';
+currentBalance 'Balance' = DATA INTEGER (Batch, Stock); // The balance is made data for the example. This is usually a calculated property.
 //#sample3 end
 
 //#solution3
 quantity = DATA LOCAL INTEGER (Book);
   
-quantityFIFO 'Кол-во по партии FIFO' (Batch b, Stock s) = PARTITION UNGROUP quantity
+quantityFIFO 'Quantity by FIFO batch' (Batch b, Stock s) = PARTITION UNGROUP quantity
                                                                     LIMIT STRICT currentBalance(b, s)
                                                                     ORDER date(b), b
                                                                     BY book(b);

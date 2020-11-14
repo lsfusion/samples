@@ -2,20 +2,20 @@ MODULE Barcode;
  
 REQUIRE Sku;
   
-CLASS Barcode; // объявляем класс штрих-кода
+CLASS Barcode; // declaring a barcode class
  
-id = DATA BPSTRING[13] (Barcode); // создаем свойство с номером штрих-кода
-sku = DATA Sku (Barcode); // создаем ссылку штрих-кода на sku
+id = DATA BPSTRING[13] (Barcode); // creating a property with a barcode number
+sku = DATA Sku (Barcode); // creating a barcode link to sku
   
-EXTEND FORM sku // создаем форму Item
-    OBJECTS b = Barcode // добавляем объект штрих-кодов
-    PROPERTIES(b) id // добавляем номер штрих-кода в таблицу штрих-кодов
-    PROPERTIES(b) NEW, DELETE // добавляем действия по созданию и удалению штрих-кодов
-    FILTERS sku(b) == s // делаем, чтобы показывались только штрих-коды этого sku
+EXTEND FORM sku // creating the Item form
+    OBJECTS b = Barcode // adding the barcode object
+    PROPERTIES(b) id // adding the barcode number to the barcode table
+    PROPERTIES(b) NEW, DELETE // adding actions to create and delete barcodes
+    FILTERS sku(b) == s // making that only barcodes of this sku are displayed
 ;
   
-DESIGN sku { // расширяем дизайн формы Item
+DESIGN sku { // expanding the design of the Item form
     skuDetails {
-        MOVE BOX(b); // делаем контейнер, в котором находится все, что касается штрих-кодов, закладкой в предварительно созданной панели закладок
+        MOVE BOX(b); // making a container, which contains everything related to barcodes, by a tab in the previously created tab panel
     }
 }

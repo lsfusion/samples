@@ -1,30 +1,30 @@
-// Заголовок модуля
+// Module caption
 MODULE LanguageExample;
 
 REQUIRE System;
 
 NAMESPACE Example;
   
-// Тело модуля
+// Module body
   
-// Объявление классов 
+// Classes declaration 
 CLASS Employee;
 CLASS Company;
  
-// Объявление свойств 
+// Properties declaration 
 name(employee) = DATA BPSTRING[100](Employee);
 age(employee) = DATA INTEGER(Employee);
 company(employee) = DATA Company(Employee);
   
 name(company) = DATA BPSTRING[100](Company);
  
-// Объявление формы 
+// Form declaration 
 FORM employeeForm
     OBJECTS e = Employee
     PROPERTIES(e) name, age, company
 ; 
  
-// Добавление формы в навигатор 
+// Adding a form to the navigator 
 NAVIGATOR {
     NEW employeeForm;
 }

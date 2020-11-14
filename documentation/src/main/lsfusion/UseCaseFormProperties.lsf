@@ -1,13 +1,13 @@
 MODULE UseCaseFormProperties;
 
 //#sample1
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[50] (Book) IN id;
-genre 'Жанр' = DATA ISTRING[30] (Book) IN id;
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[50] (Book) IN id;
+genre 'Genre' = DATA ISTRING[30] (Book) IN id;
 
-price 'Цена' = DATA NUMERIC[12,2] (Book) IN id;
+price 'Price' = DATA NUMERIC[12,2] (Book) IN id;
 
-FORM books 'Книги'
+FORM books 'Books'
     OBJECTS b = Book
     PROPERTIES(b) READONLY name, genre, price
     PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
@@ -19,8 +19,8 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1
-filtered 'Книга отфильтрована' (Book b) = FILTER books.b; 
-filteredCount 'Кол-во книг' = GROUP SUM 1 IF filtered(Book b);
+filtered 'Book filtered' (Book b) = FILTER books.b; 
+filteredCount 'Number of books' = GROUP SUM 1 IF filtered(Book b);
 
 EXTEND FORM books
     PROPERTIES() READONLY filteredCount DRAW b TOOLBAR
@@ -28,7 +28,7 @@ EXTEND FORM books
 //#solution1 end
 
 //#solution2
-index 'Порядок' (Book b) = PARTITION SUM 1 IF filtered(b) ORDER [ ORDER books.b](b); 
+index 'Order' (Book b) = PARTITION SUM 1 IF filtered(b) ORDER [ ORDER books.b](b); 
 
 EXTEND FORM books
     PROPERTIES(b) index

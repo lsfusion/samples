@@ -4,17 +4,17 @@ MODULE FlowOperations;
 REQUIRE Shipment, StockItem;
 //#header end
 run() {
-    LOCAL shippedTo = BOOLEAN (Item, LegalEntity); // пометки отмеченных товаров / покупателей
-    FOR currentBalance(Item i, Stock s) > 10 ORDER DESC name(i) DO { // для товаров / складов с остатком > 10 в порядке имен товаров
-        FOR stock(shipment(ShipmentDetail sd)) = s AND item(sd) = i DO // для всех строк накладных с этим товаром складом
-            shippedTo(i, LegalEntity l) <- TRUE WHERE l = customer(shipment(sd)); // скомпилируется в shippedTo(i, LegalEntity l) <- (GROUP MAX TRUE IF stock(shipment(ShipmentDetail sd)) = s AND item(sd) = i AND l=customer(shipment(sd)));
+    LOCAL shippedTo = BOOLEAN (Item, LegalEntity); // tagging marked products/customers
+    FOR currentBalance(Item i, Stock s) > 10 ORDER DESC name(i) DO { // for products/warehouses with a balance > 10 in the order of product names
+        FOR stock(shipment(ShipmentDetail sd)) = s AND item(sd) = i DO // for all shipment lines with this item in the warehouse
+            shippedTo(i, LegalEntity l) <- TRUE WHERE l = customer(shipment(sd)); // will be compiled to shippedTo(i, LegalEntity l) <- (GROUP MAX TRUE IF stock(shipment(ShipmentDetail sd)) = s AND item(sd) = i AND l=customer(shipment(sd)));
             
         IF salePrice(i) > 6 THEN
             BREAK; 
     }
     
-    IF (GROUP SUM 1 IF shippedTo(Item i, LegalEntity l)) >= 2 THEN // количество позиций >= 2
-        exportString() <- GROUP CONCAT name(Item i) + ' -> ' + name(LegalEntity l) IF shippedTo(i, l),',\n'; // возвращаем имена товаров / покупателей через запятую с переводом строки 
+    IF (GROUP SUM 1 IF shippedTo(Item i, LegalEntity l)) >= 2 THEN // number of positions >= 2
+        exportString() <- GROUP CONCAT name(Item i) + ' -> ' + name(LegalEntity l) IF shippedTo(i, l),',\n'; // returning product/customer names separated by commas with newlines 
 	ELSE
-    	exportString() <- 'Слишком мало позиций'; 
+    	exportString() <- 'Too few positions'; 
 }

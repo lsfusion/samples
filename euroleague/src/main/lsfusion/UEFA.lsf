@@ -8,7 +8,7 @@ REQUIRE Match, Utils;
 //#require end
 //#header end
 
-// Команды
+// Teams
 
 isCL (Tournament t) = name(t) = 'Champions League';
 isEL (Tournament t) = name(t) = 'Europa League';
@@ -21,30 +21,30 @@ won (Team t, Match m) = (homeTeam(m) = t AND goalsHome(m) > goalsAway(m)) OR (aw
 draw (Team t, Match m) = played(t, m) AND goalsHome(m) = goalsAway(m);
 
 dataMatchCoeff = DATA NUMERIC[10,1] (Round);
-matchCoeff 'Коэффициент матчей' (Round r) = OVERRIDE dataMatchCoeff(r), 1.0;
+matchCoeff 'Match odds' (Round r) = OVERRIDE dataMatchCoeff(r), 1.0;
 
-wonPoints 'Очки за победы' (Season s, Team t) = 
+wonPoints 'Points for victories' (Season s, Team t) = 
     GROUP SUM 2 * matchCoeff(round(Match m)) IF won(t, m) AND season(m) = s AND isUL(m);
-drawPoints 'Очки за ничью' (Season s, Team t) = 
+drawPoints 'Points for a draw' (Season s, Team t) = 
     GROUP SUM 1 * matchCoeff(round(Match m)) IF draw(t, m) AND season(m) = s AND isUL(m);
-matchPoints 'Очки за матчи' (Season s, Team t) = wonPoints(s, t) (+) drawPoints(s, t) MATERIALIZED;
+matchPoints 'Points for matches' (Season s, Team t) = wonPoints(s, t) (+) drawPoints(s, t) MATERIALIZED;
 
-played 'Играл' (Season s, Tournament t, Round r, Team tm) = 
+played 'Played' (Season s, Tournament t, Round r, Team tm) = 
     GROUP SUM 1 IF played(tm, Match m) AND round(m) = r AND tournament(m) = t AND season(m) = s;
     
-bonusPoints 'Бонус за проход' = DATA NUMERIC[10,1] (Tournament, Round);
-bonusPoints 'Бонусные очки' (Season s, Team tm) = GROUP SUM bonusPoints(Tournament t, Round r) IF played(s, t, r, tm) MATERIALIZED;
+bonusPoints 'Pass bonus' = DATA NUMERIC[10,1] (Tournament, Round);
+bonusPoints 'Bonus points' (Season s, Team tm) = GROUP SUM bonusPoints(Tournament t, Round r) IF played(s, t, r, tm) MATERIALIZED;
 
-points 'Очки' (Season s, Team tm) = matchPoints(s, tm) (+) bonusPoints(s, tm);
+points 'Points' (Season s, Team tm) = matchPoints(s, tm) (+) bonusPoints(s, tm);
 
-matchesUL 'Матчей в еврокубках' (Season s, Team t) = GROUP SUM 1 IF played(t, Match m) AND season(m) = s AND isUL(m);
+matchesUL 'Matches in European competition' (Season s, Team t) = GROUP SUM 1 IF played(t, Match m) AND season(m) = s AND isUL(m);
  
-teams 'Клубов' (Season s, Country c) = GROUP SUM 1 IF matchesUL(s, Team t) AND country(t) = c;
-totalPoints 'Очки (всего)' (Season s, Country c) = GROUP SUM points(s, Team t) IF country(t) = c;
-points 'Очки' (Season s, Country c) = trunc(NUMERIC[13,4](totalPoints(s, c)) / teams(s, c), 3);
+teams 'Clubs' (Season s, Country c) = GROUP SUM 1 IF matchesUL(s, Team t) AND country(t) = c;
+totalPoints 'Points (total)' (Season s, Country c) = GROUP SUM points(s, Team t) IF country(t) = c;
+points 'Points' (Season s, Country c) = trunc(NUMERIC[13,4](totalPoints(s, c)) / teams(s, c), 3);
 
-index 'Индекс' (Season s) = PARTITION SUM 1 IF s IS Season ORDER DESC s;
-rating 'Рейтинг' (Country c) = GROUP SUM points(Season s, c) IF index(s) <= 5;
+index 'Index' (Season s) = PARTITION SUM 1 IF s IS Season ORDER DESC s;
+rating 'Rating' (Country c) = GROUP SUM points(Season s, c) IF index(s) <= 5;
 
 matches (Tournament t, Round r) = GROUP SUM 1 IF tournament(Match m) = t AND round(m) = r; 
 
@@ -54,19 +54,19 @@ EXTEND FORM tournament
     FILTERS matches(o, r)
 ;
  
-FORM countryCoefficientUEFA 'Коэффициент стран UEFA'
+FORM countryCoefficientUEFA 'UEFA country odds'
     OBJECTS s = Season
     FILTERS index(s) <= 5
     
     OBJECTS c = Country
     PROPERTIES(c) READONLY name, rating
-    PROPERTIES(s, c) COLUMNS (s) points HEADER 'Очки : ' + name(s), teams HEADER 'Клубы : ' + name(s)
+    PROPERTIES(s, c) COLUMNS (s) points HEADER 'Points: ' + name(s), teams HEADER 'Clubs: ' + name(s)
     
     OBJECTS t = Team
     PROPERTIES(t) READONLY nameCountry, name 
     PROPERTIES(s,t) COLUMNS (s) HEADER name(s) points BACKGROUND matchesUL(s, t)
     FILTERGROUP country
-        FILTER 'По стране' country(t) = c DEFAULT
+        FILTER 'By country' country(t) = c DEFAULT
         
     OBJECTS m = Match
     PROPERTIES(m) READONLY dateTime, nameTournament, nameSeason, nameRound, 

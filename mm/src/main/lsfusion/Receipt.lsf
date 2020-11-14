@@ -9,42 +9,42 @@ REQUIRE Stock, Item, LegalEntity;
 //#header end
 
 //#class
-CLASS Receipt 'Приходная накладная';
-CLASS ReceiptDetail 'Строка приходной накладной';
+CLASS Receipt 'Receipt';
+CLASS ReceiptDetail 'Receipt line';
 //#class end
 
 //#documentref
-receipt 'Документ строки' = DATA Receipt (ReceiptDetail) NONULL DELETE;
+receipt 'Line document' = DATA Receipt (ReceiptDetail) NONULL DELETE;
 //#documentref end
 
 //#index
-index 'Номер строки' (ReceiptDetail d) =
+index 'Line number' (ReceiptDetail d) =
         PARTITION SUM 1 IF d IS ReceiptDetail
         ORDER d BY receipt(d);
 //#index end
 
 //#headerattributes
-number 'Номер накладной' = DATA BPSTRING[10] (Receipt);
-date 'Дата накладной' = DATA DATE (Receipt);
+number 'Receipt number' = DATA BPSTRING[10] (Receipt);
+date 'Receipt date' = DATA DATE (Receipt);
 
-supplier 'Поставщик' = DATA LegalEntity (Receipt);
-nameSupplier 'Наименование поставщика' (Receipt r) = name(supplier(r));
+supplier 'Supplier' = DATA LegalEntity (Receipt);
+nameSupplier 'Supplier name' (Receipt r) = name(supplier(r));
 
-stock 'Склад' = DATA Stock (Receipt);
-nameStock 'Наименование склада' (Receipt r) = name(stock(r));
+stock 'Warehouse' = DATA Stock (Receipt);
+nameStock 'Warehouse name' (Receipt r) = name(stock(r));
 //#headerattributes end
 
 //#detailattributes
-item 'Товар' = DATA Item (ReceiptDetail);
-nameItem 'Наименование товара' (ReceiptDetail d) = name(item(d));
+item 'Product' = DATA Item (ReceiptDetail);
+nameItem 'Product name' (ReceiptDetail d) = name(item(d));
 
-quantity 'Количество' = DATA NUMERIC[16,4] (ReceiptDetail);
-price 'Цена поставщика' = DATA NUMERIC[17,2] (ReceiptDetail);
-sum 'Сумма поставщика' (ReceiptDetail d) = quantity(d) * price(d);
+quantity 'Quantity' = DATA NUMERIC[16,4] (ReceiptDetail);
+price 'Supplier price' = DATA NUMERIC[17,2] (ReceiptDetail);
+sum 'Supplier amount' (ReceiptDetail d) = quantity(d) * price(d);
 //#detailattributes end
 
 //#formedit
-FORM receipt 'Приходная накладная'
+FORM receipt 'Receipt'
 	OBJECTS r = Receipt PANEL
 	PROPERTIES(r) number, date, nameSupplier, nameStock
 
@@ -57,7 +57,7 @@ FORM receipt 'Приходная накладная'
 //#formedit end
 
 //#formlist
-FORM receipts 'Приходные накладные'
+FORM receipts 'Receipts'
 	OBJECTS r = Receipt
 	PROPERTIES(r) READONLY number, date, nameSupplier, nameStock
 	PROPERTIES(r) NEWSESSION NEW, EDIT, DELETE 

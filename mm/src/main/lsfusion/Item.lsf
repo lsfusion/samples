@@ -5,18 +5,18 @@ MODULE Item;
 //#header end
 
 //#class
-CLASS Item 'Товар';
+CLASS Item 'Product';
 
-name 'Наименование' = DATA STRING[100](Item) IN base;
-barcode 'Штрихкод' = DATA BPSTRING[13](Item) IN base;
+name 'Name' = DATA STRING[100](Item) IN base;
+barcode 'Barcode' = DATA BPSTRING[13](Item) IN base;
 //#class end
 
 //#price
-salePrice 'Оптовая цена' = DATA NUMERIC[17,2](Item) IN base;
+salePrice 'Wholesale price' = DATA NUMERIC[17,2](Item) IN base;
 //#price end
 
 //#form
-FORM items 'Товары'
+FORM items 'Products'
 	OBJECTS i = Item
 	PROPERTIES(i) name, barcode, salePrice, NEW, DELETE
 ;

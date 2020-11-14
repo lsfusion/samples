@@ -1,42 +1,42 @@
 MODULE UseCaseMMA;
 
 //#sample1
-CLASS Book 'Книга';
+CLASS Book 'Book';
   
-id 'Номер' = DATA INTEGER (Book);
+id 'Number' = DATA INTEGER (Book);
 //#sample1 end
 
 //#solution1
-maxId 'Максимальный номер' () = GROUP MAX id(Book b);
+maxId 'Maximum number' () = GROUP MAX id(Book b);
 //#solution1 end
 
 //#solution2
-// Вариант 1
-book1 'Книга' (INTEGER i) = GROUP MAX Book b BY id(b);
+// Option 1
+book1 'Book' (INTEGER i) = GROUP MAX Book b BY id(b);
   
-// Вариант 2
-book2 'Книга' (INTEGER i) = GROUP AGGR Book b BY id(b);
+// Option 2
+book2 'Book' (INTEGER i) = GROUP AGGR Book b BY id(b);
 //#solution2 end
 
 //#sample3
-CLASS Category 'Категория';
+CLASS Category 'Category';
   
-category 'Категория' = DATA Category (Book);
-price 'Цена' = DATA NUMERIC[10,2] (Book);
+category 'Category' = DATA Category (Book);
+price 'Price' = DATA NUMERIC[10,2] (Book);
 //#sample3 end
 
 //#solution3
-minPrice 'Максимальный номер' (Category c) = GROUP MIN price(Book b) BY category(b);
+minPrice 'Maximum number' (Category c) = GROUP MIN price(Book b) BY category(b);
 //#solution3 end
 
 //#sample4
-CLASS Shipment 'Отгрузка';
-CLASS ShipmentDetail 'Строка отгрузки';
-shipment 'Отгрузка' = DATA Shipment (ShipmentDetail) NONULL DELETE;
+CLASS Shipment 'Shipment';
+CLASS ShipmentDetail 'Shipment line';
+shipment 'Shipment' = DATA Shipment (ShipmentDetail) NONULL DELETE;
   
-book 'Книга' = DATA Book (ShipmentDetail);
+book 'Book' = DATA Book (ShipmentDetail);
 //#sample4 end
 
 //#solution4
-shipmentDetail 'Строка отгрузки' (Shipment s, Book b) = GROUP MAX ShipmentDetail d BY shipment(d), book(d);
+shipmentDetail 'Shipment line' (Shipment s, Book b) = GROUP MAX ShipmentDetail d BY shipment(d), book(d);
 //#solution4 end

@@ -5,14 +5,14 @@ MODULE Stock;
 //#header end
 
 //#class
-CLASS Stock 'Склад';
+CLASS Stock 'Warehouse';
 
-name 'Наименование' = DATA STRING[100] (Stock) IN base;
-address 'Адрес' = DATA STRING[150] (Stock) IN base;
+name 'Name' = DATA STRING[100] (Stock) IN base;
+address 'Address' = DATA STRING[150] (Stock) IN base;
 //#class end
 
 //#form
-FORM stocks 'Склады'
+FORM stocks 'Warehouses'
 	OBJECTS s = Stock
 	PROPERTIES(s) name, address, NEW, DELETE
 ;

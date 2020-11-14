@@ -1,4 +1,4 @@
 MODULE MB;
 
-CLASS B; // объявляем класс B
-b = DATA BPSTRING[10] (B); // объявляем первичное свойство b для класса B
+CLASS B; // declaring class B
+b = DATA BPSTRING[10] (B); // declaring the data property b for class B

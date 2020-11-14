@@ -1,9 +1,9 @@
 MODULE UseCaseInheritance;
 
 //#item
-CLASS Item 'Товар';
-name 'Имя' = DATA ISTRING[50] (Item) IN id;
-FORM items 'Товары'
+CLASS Item 'Product';
+name 'Name' = DATA ISTRING[50] (Item) IN id;
+FORM items 'Products'
     OBJECTS i = Item
     PROPERTIES(i) name, NEW, DELETE
 ;
@@ -13,13 +13,13 @@ NAVIGATOR {
 //#item end
 
 //#receipt
-CLASS Receipt 'Поступление';
-date 'Дата' = DATA DATE (Receipt) IN id;
-item 'Товар' = DATA Item (Receipt);
-nameItem 'Товар' (Receipt r) = name(item(r)) IN id;
-posted 'Проведен' = DATA BOOLEAN (Receipt);
+CLASS Receipt 'Arrival';
+date 'Date' = DATA DATE (Receipt) IN id;
+item 'Product' = DATA Item (Receipt);
+nameItem 'Product' (Receipt r) = name(item(r)) IN id;
+posted 'Completed' = DATA BOOLEAN (Receipt);
 
-FORM receipts 'Поступления'
+FORM receipts 'Arrivals'
     OBJECTS r = Receipt
     PROPERTIES(r) date, nameItem, posted, NEW, DELETE
 ;
@@ -29,13 +29,13 @@ NAVIGATOR {
 //#receipt end
 
 //#production
-CLASS Production 'Производство';
-date 'Дата' = DATA DATE (Production) IN id;
-item 'Товар' = DATA Item (Production);
-nameItem 'Товар' (Production p) = name(item(p)) IN id;
-posted 'Проведен' = DATA BOOLEAN (Production);
+CLASS Production 'Production';
+date 'Date' = DATA DATE (Production) IN id;
+item 'Product' = DATA Item (Production);
+nameItem 'Product' (Production p) = name(item(p)) IN id;
+posted 'Completed' = DATA BOOLEAN (Production);
 
-FORM productions 'Производства'
+FORM productions 'Production'
     OBJECTS p = Production
     PROPERTIES(p) date, nameItem, posted, NEW, DELETE
 ;
@@ -45,13 +45,13 @@ NAVIGATOR {
 //#production end
 
 //#batch
-CLASS ABSTRACT Batch 'Партия';
-date 'Дата' = ABSTRACT DATE (Batch) IN id;
-item 'Товар' = ABSTRACT Item (Batch);
-nameItem 'Товар' (Batch b) = name(item(b));
-type 'Тип' = ABSTRACT STRING[30] (Batch);
+CLASS ABSTRACT Batch 'Batch';
+date 'Date' = ABSTRACT DATE (Batch) IN id;
+item 'Product' = ABSTRACT Item (Batch);
+nameItem 'Product' (Batch b) = name(item(b));
+type 'Type' = ABSTRACT STRING[30] (Batch);
 
-FORM batches 'Партии'
+FORM batches 'Batches'
     OBJECTS b = Batch
     PROPERTIES(b) READONLY date, nameItem, type, objectClassName 
 ;
@@ -61,7 +61,7 @@ NAVIGATOR {
 //#batch end
 
 //#receiptbatch
-CLASS ReceiptBatch 'Партия на основе поступления';
+CLASS ReceiptBatch 'Arrival based batch';
 batch (Receipt receipt) = AGGR ReceiptBatch WHERE posted(receipt);
 //#receiptbatch end
 
@@ -69,26 +69,26 @@ batch (Receipt receipt) = AGGR ReceiptBatch WHERE posted(receipt);
 EXTEND CLASS ReceiptBatch : Batch;
 date(ReceiptBatch rb) += date(receipt(rb));
 item(ReceiptBatch rb) += item(receipt(rb));
-type(ReceiptBatch rb) += 'Поступление' IF rb IS ReceiptBatch;
+type(ReceiptBatch rb) += 'Arrival' IF rb IS ReceiptBatch;
 //#receiptbatchextend end
 
 //#productionbatch
-CLASS ProductionBatch 'Партия на основе производства';
+CLASS ProductionBatch 'Production based batch';
 batch (Production production) = AGGR ProductionBatch WHERE posted(production);
 
 EXTEND CLASS ProductionBatch : Batch;
 date(ProductionBatch rb) += date(production(rb));
 item(ProductionBatch rb) += item(production(rb));
-type(ProductionBatch rb) += 'Производство' IF rb IS ProductionBatch;
+type(ProductionBatch rb) += 'Production' IF rb IS ProductionBatch;
 //#productionbatch end
 
 //#userbatch
-CLASS UserBatch 'Партия, созданная пользователем вручную';
-date 'Дата' = DATA DATE (UserBatch) IN id;
-item 'Товар' = DATA Item (UserBatch);
-nameItem 'Товар' (UserBatch b) = name(item(b));
+CLASS UserBatch 'Manually created batch';
+date 'Date' = DATA DATE (UserBatch) IN id;
+item 'Product' = DATA Item (UserBatch);
+nameItem 'Product' (UserBatch b) = name(item(b));
 
-FORM userBatches 'Партии (ручные)'
+FORM userBatches 'Batches (manual)'
     OBJECTS b = UserBatch
     PROPERTIES(b) date, nameItem, NEW, DELETE
 ;
@@ -100,4 +100,4 @@ NAVIGATOR {
 EXTEND CLASS UserBatch : Batch;
 date(UserBatch ub) += date(ub);
 item(UserBatch ub) += item(ub);
-type(UserBatch ub) += 'Ручные' IF ub IS UserBatch;
+type(UserBatch ub) += 'Manual' IF ub IS UserBatch;

@@ -3,8 +3,8 @@ MODULE InstructionSample;
 REQUIRE Authentication;
 
 //#group
-GROUP base : root; // Заголовком этой группы будет 'base'
-GROUP local 'Локальные свойства'; // Родительской группой local будет являться System.private
+GROUP base : root; // The caption of this group will be 'base'
+GROUP local 'Local properties'; // The parent group of local will be System.private
 //#group end
 
 //#on
@@ -39,9 +39,9 @@ name = DATA STRING[50] (Stock);
 
 balance = DATA INTEGER (Sku, Stock);
 
-// отправить email, когда остаток в результате применения изменений сессии стал меньше 0
+// send an email when the balance is less than 0 as a result of applying session changes
 WHEN balance(Sku s, Stock st) < 0 DO
-      EMAIL SUBJECT 'Остаток стал отрицательным по товару ' + name(s) + ' на складе ' + name(st);
+      EMAIL SUBJECT 'The balance has become negative for the item ' + name(s) + ' in the warehouse ' + name(st);
 
 CLASS OrderDetail;
 order = DATA Order (OrderDetail) NONULL DELETE;
@@ -52,7 +52,7 @@ WHEN LOCAL CHANGED(customer(Order o)) AND name(customer(o)) == 'Best customer' D
 //#when end
 
 //#setwhen
-// при добавлении клиента, по умолчанию, предоставить ему заданную скидку
+// when adding a client, by default, give him the specified discount
 defaultDiscount = DATA NUMERIC[6,2] ();
 discount = DATA NUMERIC[6,2] (Customer);
 discount(Customer c) <- defaultDiscount() WHEN SET(c IS Customer);
@@ -65,25 +65,25 @@ sum(OrderDetail d) <- quantity(d) * price(d) WHEN CHANGED(quantity(d)) OR CHANGE
 //#setwhen end
 
 //#constraint
-// остаток не меньше 0
+// balance not less than 0
 CONSTRAINT balance(Sku s, Stock st) < 0 
-    MESSAGE 'Остаток не может быть отрицательным для ' + (GROUP CONCAT 'Товар : ' + name(Sku ss) + ' Склад : ' + name(Stock sst), '\n' IF SET(balance(ss, sst) < 0));
+    MESSAGE 'The balance cannot be negative for ' + (GROUP CONCAT 'Product: ' + name(Sku ss) + ' Warehouse: ' + name(Stock sst), '\n' IF SET(balance(ss, sst) < 0));
 
 barcode = DATA STRING[15] (Sku);
-// "эмуляция" политики безопасности
-CONSTRAINT DROPCHANGED(barcode(Sku s)) AND name(currentUser()) != 'admin' MESSAGE 'Изменять штрих-код для уже созданного товара разрешено только администратору';
+// "emulation" security policy
+CONSTRAINT DROPCHANGED(barcode(Sku s)) AND name(currentUser()) != 'admin' MESSAGE 'Only the administrator is allowed to change the barcode for an already created product';
 
 sku = DATA Sku (OrderDetail);
 in = DATA BOOLEAN (Sku, Customer);
 
 CONSTRAINT sku(OrderDetail d) AND NOT in(sku(d), customer(order(d)))
-    CHECKED BY sku[OrderDetail] // будет применяться фильтр по доступным sku при выборе товара для строки заказа
-    MESSAGE 'В заказе выбран недоступный пользователю товар для выбранного покупателя';
+    CHECKED BY sku[OrderDetail] // a filter by available sku when selecting an item for an order line will be applied
+    MESSAGE 'In the order, a product unavailable to the user is selected for the selected customer';
 //#constraint end
 
 //#means
 is(Sku s) = s IS Sku;
-// для товара должны быть заданы штрих-код и наименование
+// the product must have a barcode and name specified
 is(Sku s) => barcode(s);
 is(Sku s) => name(s);
  
@@ -92,11 +92,11 @@ CLASS Invoice;
 CLASS InvoiceLine;
 invoice = DATA Invoice (InvoiceLine);
 is(InvoiceLine l) = l IS InvoiceLine; 
-// для строки документа должен быть задан документ, и при удалении документа, чтобы удалялись строки этого документа
+// for a document line, a document must be specified, and when deleting a document, the lines of this document should be deleted
 is(InvoiceLine l) => invoice(l) RESOLVE RIGHT;
-// равносильно объявлению document = DATA Invoice (InvoiceLine) NONULL DELETE;
+// is equivalent to declaring document = DATA Invoice (InvoiceLine) NONULL DELETE;
   
-// агрегация для f(a,b) создавать объект класса x, у которого свойство a(x) равняется a, а свойство b(x) равняется b
+// aggregation for f(a, b) create an object of class x, whose property a(x) equals a, and property b(x) equals b
 CLASS A;
 CLASS B;
 f = DATA BOOLEAN (A, B);
@@ -111,19 +111,19 @@ is(X x) => f(a(x), b(x)) RESOLVE RIGHT;
 //#means end
 
 //#class
-CLASS ABSTRACT Document; // Заголовком этого класса будет 'Document'
-CLASS IncomeDocument 'Приход' : Document;
-CLASS OutcomeDocument 'Расход' : Document;
+CLASS ABSTRACT Document; // The caption of this class will be 'Document'
+CLASS IncomeDocument 'Income' : Document;
+CLASS OutcomeDocument 'Expenses' : Document;
  
 CLASS Person;
 CLASS Worker;
-CLASS Musician : Person, Worker; // множественное наследование
+CLASS Musician : Person, Worker; // multiple inheritance
  
-CLASS Barcode 'Штрих-код'; // Родительским классом Barcode будет класс System.Object
+CLASS Barcode 'Barcode'; // The parent class of Barcode will be the System.Object class
  
 CLASS PrintOrientation {
-    portrait 'Книжная',
-    landscape 'Альбомная'
+    portrait 'Portrait',
+    landscape 'Landscape'
 }
 //#class end
 
@@ -136,35 +136,35 @@ hello()  { MESSAGE 'Hello world'; }
 hi()  { MESSAGE 'Hi'; }
 
 NAVIGATOR {
-    NEW FOLDER catalogs 'Справочники' WINDOW toolbar { // создаем новую папку навигатора и делаем, чтобы все ее потомки отображались в окно с вертикальным тулбаром
-        NEW items; // создаем в папке элемент-форму для формы items, имя элемента по умолчанию равняется имени формы 
+    NEW FOLDER catalogs 'Directories' WINDOW toolbar { // creating a new navigator folder and making all its descendants appear in a window with a vertical toolbar
+        NEW items; // creating a form element for the items form in the folder, the default element name is the form name 
     }
-    catalogs {  // инструкция редактирования элемента навигатора
-        NEW FORM stocksNavigator 'Склады' = stocks; // создаем элемент-форму stocksNavigator для формы stocls и добавляем в папку catalogs последним элементом
-        NEW legalEntities AFTER items; // создаем элемент-форму с именем legalEntities в папку catalogs непосредственно за элементом items
+    catalogs {  // navigator element editing instruction
+        NEW FORM stocksNavigator 'Warehouses' = stocks; // creating a stocksNavigator form element for the stocks form and adding the last element to the catalogs folder
+        NEW legalEntities AFTER items; // creating a form element named legalEntities in the catalogs folder right after the items element
         NEW shipments;
     }
-    NEW FOLDER documents 'Документы' WINDOW toolbar { // создаем еще одну папку, элементы которой будут также отображаться в окно с вертикальным тулбаром
-                                                      // сами папки будут отображаться в окне root, и при выборе одной из них в окне с вертикальным 
-                                                      // тулбаром будут показаны потомки именно этой папки
-        NEW ACTION hi;   // создаем элемент-действие
-        NEW ACTION h=hello;   // создаем элемент-действие
-        MOVE shipments BEFORE h; // инструкция перемещения элемента shipments из папки catalogs в папку document перед элементом hello     
+    NEW FOLDER documents 'Documents' WINDOW toolbar { // creating another folder, the elements of which will also be displayed in a window with a vertical toolbar
+                                                      // the folders themselves will be displayed in the root window, and when the user selects one of them in a window with a vertical 
+                                                      // toolbar the descendants of this particular folder will be shown
+        NEW ACTION hi;   // creating an action element
+        NEW ACTION h=hello;   // creating an action element
+        MOVE shipments BEFORE h; // an instruction to move the shipments element from the catalogs folder to the document folder before the hello element     
     }
 }
 //#navigator end
 
 //#window
-// cоздание системных окон в модуле System
-WINDOW root 'Корень' TOOLBAR HIDETITLE HIDESCROLLBARS HORIZONTAL POSITION(0, 0, 100, 6);
-WINDOW toolbar 'Тулбар' TOOLBAR HIDETITLE VERTICAL POSITION(0, 6, 20, 64);
-WINDOW tree 'Дерево' TOOLBAR HIDETITLE POSITION(0, 6, 20, 64);
+// creating system windows in the System module
+WINDOW root 'Root' TOOLBAR HIDETITLE HIDESCROLLBARS HORIZONTAL POSITION(0, 0, 100, 6);
+WINDOW toolbar 'Toolbar' TOOLBAR HIDETITLE VERTICAL POSITION(0, 6, 20, 64);
+WINDOW tree 'Tree' TOOLBAR HIDETITLE POSITION(0, 6, 20, 64);
   
-// меню без скроллбаров под окном root
+// menu without scrollbars under the root window
 WINDOW menu MENU HIDESCROLLBARS DRAWROOT POSITION(20, 6, 80, 4);
   
-// горизонтальный тулбар внизу рабочего стола, в котором все кнопки будут выравниваться по центру, а текст выравниваться вверх
-// в этот тулбар можно, например, помещать формы для быстрого открытия
+// a horizontal toolbar at the bottom of the desktop, in which all buttons will be centered and text will be aligned up
+// in this toolbar, for example, it is possible to place forms for quick opening
 WINDOW hotforms TOOLBAR HORIZONTAL VALIGN(CENTER) TEXTVALIGN(START) BOTTOM; 
 //#window end
 
@@ -177,15 +177,15 @@ CLASS ABSTRACT Shape;
 CLASS Box : Shape;
 
 CLASS Quadrilateral;
-EXTEND CLASS Box : Quadrilateral; // Добавляем наследование
+EXTEND CLASS Box : Quadrilateral; // Adding inheritance
 
 CLASS ShapeType {
-	point 'Точка',
-	segment 'Отрезок'
+	point 'Dot',
+	segment 'Line segment'
 } 
  
-EXTEND CLASS ShapeType { // Добавляем статический объект
-	circle 'Окружность'
+EXTEND CLASS ShapeType { // Adding a static object
+	circle 'Circle'
 }
 //#extendclass end
 
@@ -204,7 +204,7 @@ name(BClass b) = 'B' + innerName(b);
 name(CClass c) = 'C' + innerName(c);
  
 name[AClass](BClass b) += name(b);
-name(CClass c) += name(c); // Здесь слева будет найден name[AClass], потому что поиск идет только среди абстрактных свойств, справа же будет найден name[CClass]
+name(CClass c) += name(c); // Here name[AClass] will be found on the left, because the search goes only among abstract properties, and on the right name[CClass] will be found
 name(DClass d) += 'DClass' + innerName(d) IF d IS DClass;
 //#extendproperty end
 
@@ -220,7 +220,7 @@ whoAmI (Cat c) + {  MESSAGE 'I am a сat!'; }
 
 ask ()  { 
     FOR Animal a IS Animal DO
-        whoAmI(a); // для каждого объекта будет выдано соответствующее сообщение
+        whoAmI(a); // a corresponding message will be shown for each object
 }
 
 onStarted  ABSTRACT LIST ( );
@@ -230,7 +230,7 @@ onStarted () + {
 onStarted () + { 
     name(Sku s) <- '2';
 }
-// сначала выполниться 1е действие, потом 2е действие
+// first, the 1st action is executed, then the 2nd action
 
 CLASS Human;
 name = DATA STRING[100] (Human);
@@ -243,9 +243,9 @@ testName (Human h) + WHEN name(h) == 'Bob' THEN {  MESSAGE 'I am Bob'; }
 
 //#meta
 META objectProperties(object, type, caption)
-    object##Name 'Имя'##caption = DATA BPSTRING[100](###object); // делаем заглавной первую букву
-    object##Type 'Тип'##caption = DATA type (###object);
-    object##Value 'Стоимость'##caption = DATA INTEGER (###object);
+    object##Name 'Name'##caption = DATA BPSTRING[100](###object); // capitalizing the first letter
+    object##Type 'Type'##caption = DATA type (###object);
+    object##Value 'Cost'##caption = DATA INTEGER (###object);
 END
   
 META objectProperties(object, type)
@@ -255,10 +255,10 @@ END
 
 //#implementmeta
 CLASS Book;
-@objectProperties(book, INTEGER, 'Книга');
+@objectProperties(book, INTEGER, 'Book');
 
 CLASS Flower;
-@objectProperties(flower, BPSTRING[100], ); // если не передать параметр, то он будет пустым
+@objectProperties(flower, BPSTRING[100], ); // if the parameter is not passed, then it will be empty
 
 CLASS Table;
 @objectProperties(table, NUMERIC[14,2]);
@@ -268,7 +268,7 @@ CLASS Table;
 sum = GROUP SUM sum(OrderDetail od) BY order(od) MATERIALIZED;
 date(OrderDetail od) = date(order(od)) MATERIALIZED;
 
- // такое свойство нельзя материализовать, так как оно не NULL для бесконечного числа дат
+ // such a property cannot be materialized, since it is not NULL for an infinite number of dates
 lastDate(Customer customer, DATE date) = GROUP LAST date(Order order) IF customer(order) = customer AND date(order) < date;
 //#materialized end
 
@@ -276,10 +276,10 @@ lastDate(Customer customer, DATE date) = GROUP LAST date(Order order) IF custome
 TABLE book (Book);
 
 in = DATA BOOLEAN (Sku, Stock);
-TABLE skuStock (Sku, Stock); // в ней будет храниться свойство in
+TABLE skuStock (Sku, Stock); // it will store the in property
 
 price = DATA NUMERIC[10,2] (Sku, DATE);
-TABLE skuDate (Sku, DATE); // в ней будет храниться свойство Sku
+TABLE skuDate (Sku, DATE); // it will store the Sku property
 
 TABLE sku (Sku) FULL;
 //#table end
@@ -295,12 +295,12 @@ INDEX name(Sku s), price(s, DATE d), d;
 
 //#before
 changeName(Sku s, STRING[100] name)  { name(s) <- name; }
-BEFORE changeName(Sku s, STRING[100] name) DO MESSAGE 'Changing user name'; // Сообщение будет показано перед каждым вызовом changeName
+BEFORE changeName(Sku s, STRING[100] name) DO MESSAGE 'Changing user name'; // The message will be shown before each call to changeName
 //#before end
 
 //#after
 changePrice(Sku s, DATE d, NUMERIC[10,2] price)  { price(s, d) <- price; }
-AFTER changePrice(Sku s, DATE d, NUMERIC[10,2] price) DO MESSAGE 'Price was changed'; // Сообщение будет показано после каждого вызова changePrice
+AFTER changePrice(Sku s, DATE d, NUMERIC[10,2] price) DO MESSAGE 'Price was changed'; // A message will be shown after each call to changePrice
 //#after end
 
 //#loggable
@@ -309,9 +309,9 @@ LOGGABLE name[Sku], price[Sku, DATE];
 
 //#empty
 CLASS Result {
-    yes 'Да',
-    no 'Нет'
-};  // точка с запятой здесь не нужна, но ее наличие не является ошибкой
+    yes 'Yes',
+    no 'No'
+};  // semicolon is not needed here, but its presence is not an error
   
-;;;; // это является допустимым кодом на lsFusion
+;;;; // this is valid lsFusion code
 //#empty end

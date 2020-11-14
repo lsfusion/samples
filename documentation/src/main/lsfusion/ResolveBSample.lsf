@@ -4,14 +4,14 @@ REQUIRE ResolveA;
 
 f = DATA INTEGER (B);
 
-h(C c) = f(c); // найдет верхнее объявление - ResolveB.f[B]
-j(C c) = ResolveA.f(c); // найдет объявление в ResolveA - ResolveA.f[C]
-z(C c) = f[A](c); // найдет объявление в ResolveA - ResolveA.f[A]
+h(C c) = f(c); // will find the upper declaration - ResolveB.f[B]
+j(C c) = ResolveA.f(c); // will find the declaration in ResolveA - ResolveA.f[C]
+z(C c) = f[A](c); // will find the declaration in ResolveA - ResolveA.f[A]
 
 test(C c, A a) {
     LOCAL f = INTEGER (B);
     
-    f(c) <- 1; // найдет верхнее объявление - f[B]
-    MESSAGE f(a); // найдет верхнее объявление - f[B]
-    ResolveB.f(c) <- 1; // найдет верхнее объявление в ResolveB - ResolveB.f[B]
+    f(c) <- 1; // will find the upper declaration - f[B]
+    MESSAGE f(a); // will find the upper declaration - f[B]
+    ResolveB.f(c) <- 1; // will find the upper declaration in ResolveB - ResolveB.f[B]
 }

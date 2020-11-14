@@ -5,7 +5,7 @@ META defineObject(class, id, shortId, caption, multiCaption)
     CLASS class caption;
     TABLE id(class);
     
-    name 'Наименование' = DATA ISTRING[100] (class);
+    name 'Name' = DATA ISTRING[100] (class);
 
     FORM id caption
         OBJECTS shortId = class PANEL
@@ -33,6 +33,6 @@ END
 //#defineobject end
 
 //#usedefineobject
-@defineObject(book, b, 'Книга', 'Книги');
-@defineObject(magazine, m, 'Журнал', 'Журналы');
+@defineObject(book, b, 'Book', 'Books');
+@defineObject(magazine, m, 'Magazine', 'Magazines');
 //#usedefineobject end

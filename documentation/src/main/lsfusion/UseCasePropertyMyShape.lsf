@@ -2,4 +2,4 @@ MODULE MyShape;
 
 REQUIRE Shape;
 
-overSquareCircle (circle) += radius(circle) * radius(circle) * 3.14159265359; // используем формулу с более высокой точностью
+overSquareCircle (circle) += radius(circle) * radius(circle) * 3.14159265359; // using a formula with higher accuracy

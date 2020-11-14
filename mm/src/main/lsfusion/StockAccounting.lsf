@@ -8,12 +8,12 @@ REQUIRE Stock, Item, LegalEntity, Receipt, Shipment, StockItem;
 
 //#navigator
 NAVIGATOR {
-    NEW FOLDER masterData 'Справочники' FIRST WINDOW toolbar {
+    NEW FOLDER masterData 'Directories' FIRST WINDOW toolbar {
         NEW items;
         NEW stocks;
         NEW legalEntities;
     }
-    NEW FOLDER documents 'Документы' AFTER masterData WINDOW toolbar {
+    NEW FOLDER documents 'Documents' AFTER masterData WINDOW toolbar {
         NEW receipts;
         NEW shipments;
     }

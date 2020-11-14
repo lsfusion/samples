@@ -9,33 +9,33 @@ REQUIRE Stock, Item, LegalEntity;
 //#header end
 
 //#class
-CLASS Shipment 'Расходная накладная';
-CLASS ShipmentDetail 'Строка расходной накладной';
+CLASS Shipment 'Shipment';
+CLASS ShipmentDetail 'Shipment line';
 
-shipment 'Документ строки' = DATA Shipment (ShipmentDetail) NONULL DELETE;
-index 'Номер строки' (ShipmentDetail d) =
+shipment 'Line document' = DATA Shipment (ShipmentDetail) NONULL DELETE;
+index 'Line number' (ShipmentDetail d) =
         PARTITION SUM 1 IF d IS ShipmentDetail
         ORDER d BY shipment(d);
 //#class end
 
 //#headerattributes
-number 'Номер накладной' = DATA BPSTRING[10] (Shipment);
-date 'Дата накладной' = DATA DATE (Shipment);
+number 'Shipment number' = DATA BPSTRING[10] (Shipment);
+date 'Shipment date' = DATA DATE (Shipment);
 
-customer 'Покупатель' = DATA LegalEntity (Shipment);
-nameCustomer 'Наименование покупателя' (Shipment s) = name(customer(s));
+customer 'Customer' = DATA LegalEntity (Shipment);
+nameCustomer 'Customer name' (Shipment s) = name(customer(s));
 
-stock 'Склад' = DATA Stock(Shipment);
-nameStock 'Наименование склада' (Shipment s) = name(stock(s));
+stock 'Warehouse' = DATA Stock(Shipment);
+nameStock 'Warehouse name' (Shipment s) = name(stock(s));
 //#headerattributes end
 
 //#detailattributes
-item 'Товар' = DATA Item (ShipmentDetail);
-nameItem 'Наименование товара' (ShipmentDetail d) = name(item(d));
+item 'Product' = DATA Item (ShipmentDetail);
+nameItem 'Product name' (ShipmentDetail d) = name(item(d));
 
-quantity 'Количество' = DATA NUMERIC[16,4](ShipmentDetail);
-price 'Цена продажи' = DATA NUMERIC[17,2](ShipmentDetail);
-sum 'Сумма продажи' (ShipmentDetail d) = quantity(d) * price(d);
+quantity 'Quantity' = DATA NUMERIC[16,4](ShipmentDetail);
+price 'Selling price' = DATA NUMERIC[17,2](ShipmentDetail);
+sum 'Sale amount' (ShipmentDetail d) = quantity(d) * price(d);
 //#detailattributes end
 
 //#priceset
@@ -43,7 +43,7 @@ price(ShipmentDetail d) <- salePrice(item(d)) WHEN CHANGED(item(d));
 //#priceset end
 
 //#formedit
-FORM shipment 'Расходная накладная'
+FORM shipment 'Shipment'
 	OBJECTS s = Shipment PANEL
 	PROPERTIES(s) number, date, nameCustomer, nameStock
 
@@ -56,7 +56,7 @@ FORM shipment 'Расходная накладная'
 //#formedit end
 
 //#formlist
-FORM shipments 'Расходные накладные'
+FORM shipments 'Shipments'
 	OBJECTS s = Shipment
 	PROPERTIES(s) READONLY number, date, nameCustomer, nameStock
 	PROPERTIES(s) NEWSESSION NEW, EDIT, DELETE 

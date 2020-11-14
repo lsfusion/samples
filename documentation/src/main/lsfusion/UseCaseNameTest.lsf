@@ -5,10 +5,10 @@ REQUIRE UseCaseNamePurchase, UseCaseNameSale;
 
 NAMESPACE Test;
 
-messagePurchaseCount 'Вывести кол-во заказов на закупку' {
+messagePurchaseCount 'Display the number of purchase orders' {
     MESSAGE GROUP SUM 1 IF o IS Purchase.Order;
 }
-messageSaleCount 'Вывести кол-во заказов на продажу' {
+messageSaleCount 'Display the number of sales orders' {
     MESSAGE GROUP SUM 1 IF o IS Sale.Order;
 }
 

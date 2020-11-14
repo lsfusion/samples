@@ -6,21 +6,21 @@ REQUIRE Shipment, Time;
 sum = GROUP SUM sum(ShipmentDetail sd) BY shipment(sd); 
 
 run() {
-    FOR price(ShipmentDetail sd) > 10 DO { // для всех строк накладных с ценой больше 10 изменим ее на 15, а количество уменьшим на 5
+    FOR price(ShipmentDetail sd) > 10 DO { // for all shipment lines with a price greater than 10, changing it to 15, and decreasing the quantity by 5
         price(sd) <- 15;
         quantity(sd) <- 5;
     }
-    LOCAL NESTED s = STRING(); // так как s - NESTED, она будет видна в NEWSESSION и не обнулятся при APPLY
+    LOCAL NESTED s = STRING(); // since s is NESTED, it will be visible in NEWSESSION and will not be reset on APPLY
     s() <- ''; 
     
-    FOR CHANGED(sum(Shipment s)) DO { // для всех накладных у которых изменилась сумма (в результате верхних изменений)
+    FOR CHANGED(sum(Shipment s)) DO { // for all shipments for which the amount has changed (as a result of upper changes)
         NEWSESSION {
-            s() <- s() + number(s) + ' : ' + sum(s) + '\n'; // добавим в вывод сумму инвойса (без учета верхних изменений)  
-            date(s) <- sum(date(s), 1); // увеличим дату инвойса на 1                     
-            APPLY; // сохраним изменения
+            s() <- s() + number(s) + ' : ' + sum(s) + '\n'; // adding the shipment amount to the output (excluding the upper changes)  
+            date(s) <- sum(date(s), 1); // increasing the shipment date by 1                     
+            APPLY; // saving changes
         }
     }
     
     exportString() <- s();
-    // изменения в сессии не сохраняются, соответственно видны не будут
+    // changes in the session are not saved, so they will not be visible
 }
