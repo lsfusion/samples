@@ -2,18 +2,18 @@ MODULE Main;
 
 REQUIRE SystemEvents, Service, Utils, SchedulerDefaultData;
 
-CLASS Server 'Сервер';
+CLASS Server 'Server';
 processId = DATA LONG (Server);
-text 'Текст ответа' = DATA TEXT (Server, LONG);
+text 'Response text' = DATA TEXT (Server, LONG);
 
-baseDir 'Директорий запуска' = DATA BPSTRING[50] ();
-examplesDBDir 'Директорий примеров (СУБД)' = DATA BPSTRING[50] ();
-examplesPlatformDir 'Директорий примеров (Платформа)' = DATA BPSTRING[50] ();
-dbPassword 'Пароль к базе' = DATA BPSTRING[50] () CHARWIDTH 10 NOFLEX; // for postgres user
-serverStartCmd 'Команда запуска сервера' = DATA STRING[1000] (); // will be started from some basedir subfolder 
-serverEncoding 'Кодировка консоли' = DATA BPSTRING[10] (); // server console output encoding
-minPort 'Мин. порт' = DATA LONG (); 
-maxPort 'Макс. порт' = DATA LONG (); 
+baseDir 'Launch directory' = DATA BPSTRING[50] ();
+examplesDBDir 'Sample directory (DBMS)' = DATA BPSTRING[50] ();
+examplesPlatformDir 'Sample directory (Platform)' = DATA BPSTRING[50] ();
+dbPassword 'Database password' = DATA BPSTRING[50] () CHARWIDTH 10 NOFLEX; // for postgres user
+serverStartCmd 'Server start command' = DATA STRING[1000] (); // will be started from some basedir subfolder 
+serverEncoding 'Console encoding' = DATA BPSTRING[10] (); // server console output encoding
+minPort 'Min. port' = DATA LONG (); 
+maxPort 'Max. port' = DATA LONG (); 
 
 EXTEND FORM options
     PROPERTIES() baseDir, examplesDBDir, examplesPlatformDir, dbPassword, serverEncoding, serverStartCmd, minPort, maxPort
@@ -59,7 +59,7 @@ killProcess INTERNAL 'KillProcessActionProperty' (Server);
 serverDir(Server server) = baseDir() + '/' + LONG(server);
 dbName(Server server) = 'db' + LONG(server);
 
-createServer 'Создать сервер' (Server server) {
+createServer 'Create server' (Server server) {
     registerPort(server);
 
     LOCAL confDir = TEXT ();
@@ -78,7 +78,7 @@ createServer 'Создать сервер' (Server server) {
 
 }
 
-deleteServer 'Удалить сервер' (Server server) {
+deleteServer 'Delete server' (Server server) {
     EXTERNAL SQL 'jdbc:postgresql://localhost/tryonline?user=postgres&password='+dbPassword() EXEC 'DROP DATABASE ' + dbName(server) + ';';
     
     LOCAL confDir = TEXT ();
@@ -91,7 +91,7 @@ deleteServer 'Удалить сервер' (Server server) {
 code = DATA TEXT (Server);
 dateStart = DATA DATETIME (Server);
 
-runServer 'Запустить сервер' (Server server, TEXT code) {
+runServer 'Start server' (Server server, TEXT code) {
     NEWSESSION NEWSQL NEWTHREAD {
         WRITE RAWFILE(TEXTFILE('MODULE Main; ' + code)) TO 'file://' + serverDir(server) + '/Main.lsf';
         APPLY { code(server) <- code; dateStart(server) <- currentDateTime(); }
@@ -99,7 +99,7 @@ runServer 'Запустить сервер' (Server server, TEXT code) {
     }
 }
 
-killServer 'Остановить сервер' (Server server) {
+killServer 'Stop server' (Server server) {
     killProcess(server);
     
     sleep(1000); // will wait a little bit to give process time to write all its text
@@ -149,8 +149,8 @@ stopUnusedServers() {
 }
 
 loadDefaultScheduledTasks () + {     
-    loadDefaultScheduledTask ('Остановка неиспользованных серверов', 2014_07_01_01:00, 60, SchedulerStartType.afterStart);
-    loadDefaultScheduledTaskDetail ('Остановка неиспользованных серверов', 1, 'Main.stopUnusedServers[]');
+    loadDefaultScheduledTask ('Stopping unused servers', 2014_07_01_01:00, 60, SchedulerStartType.afterStart);
+    loadDefaultScheduledTaskDetail ('Stopping unused servers', 1, 'Main.stopUnusedServers[]');
 }
 
 getServerLog(JSONFILE file) {
@@ -164,12 +164,12 @@ getServerLog(JSONFILE file) {
     }
 } @@noauth;
 
-FORM servers 'Сервера'
+FORM servers 'Servers'
     OBJECTS s=Server
     PROPERTIES (s) VALUE, code, dateStart, port ON CHANGE { FOR LONG oldp = port(s) DO INPUT newp=oldp DO { server(oldp) <- NULL; server(newp) <- s; } ; }, NEW, EDIT, DELETE 
     PROPERTIES (s) GRID createServer, killServer, deleteServer 
     
-    OBJECTS a 'Ответы' = LONG
+    OBJECTS a 'Responses' = LONG
     PROPERTIES VALUE(a), text(s, a)
     FILTERS text(s, a)
 ;
@@ -179,13 +179,13 @@ NAVIGATOR {
 } 
 
 CLASS Example;
-caption 'Заголовок' = DATA STRING (Example);
-path 'Путь' = DATA STRING (Example);
-mode 'Режим' = DATA INTEGER (Example);
-order 'Порядок' = DATA INTEGER (Example);
-exPath 'Путь' = DATA STRING (Example, LONG); 
+caption 'Header' = DATA STRING (Example);
+path 'Path' = DATA STRING (Example);
+mode 'Mode' = DATA INTEGER (Example);
+order 'Order' = DATA INTEGER (Example);
+exPath 'Path' = DATA STRING (Example, LONG); 
 
-FORM examples 'Примеры'
+FORM examples 'Examples'
     OBJECTS e = Example
     PROPERTIES (e) caption, path, mode, order, NEW, DELETE
     ORDERS mode(e), order(e)

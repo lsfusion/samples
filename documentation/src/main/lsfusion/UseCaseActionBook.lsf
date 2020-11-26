@@ -1,9 +1,9 @@
 MODULE Book;
   
-CLASS Book; // объявляем класс книга
-overCopy  ABSTRACT ( Book, Book); // абстрактное действие, которое принимает на вход две книги и является "точкой входа", в которую другие модули смогут добавлять реализацию
-copy (Book book)  { // создаем действие по копированию книги
-    NEW b = Book { // добавляем новую книгу
+CLASS Book; // declaring class "book"
+overCopy  ABSTRACT ( Book, Book); // abstract action that takes an input two books and is "entry point", to which other modules can add realization
+copy (Book book)  { // creating action on book copy
+    NEW b = Book { // adding new book
         overCopy(b, book);
     }
 }

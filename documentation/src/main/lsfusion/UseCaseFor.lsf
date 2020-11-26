@@ -3,10 +3,10 @@ MODULE UseCaseFor;
 REQUIRE Utils;
 
 //#sample1
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[50] (Book);
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[50] (Book);
 
-FORM books 'Книги'
+FORM books 'Books'
     OBJECTS b = Book
     PROPERTIES(b) name, NEW, DELETE
 ;
@@ -17,9 +17,9 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1
-findNemo 'Найти книгу' ()  { 
+findNemo 'Find book' ()  { 
     FOR isSubstring(name(Book b), 'Nemo') DO {
-        MESSAGE 'Найдена книга ' + name(b) + ' с внутренним кодом ' + b;
+        MESSAGE 'Found book ' + name (b) + ' with internal code ' + b;
     } 
 }
 EXTEND FORM books
@@ -28,16 +28,16 @@ EXTEND FORM books
 //#solution1 end
 
 //#solution2
-add100Books 'Добавить 100 книг' ()  { 
-    // Вариант 1
+add100Books 'Add 100 books' ()  { 
+    // Option 1
     FOR iterate(INTEGER i, 1, 100) NEW b = Book DO {
-        name(b) <- 'Книга ' + i;
+        name(b) <- 'Book ' + i;
     }
     
-    // Вариант 2
+    // Option 2
     FOR iterate(INTEGER i, 1, 100) DO {
         NEW b = Book {
-            name(b) <- 'Книга ' + i;
+            name(b) <- 'Book ' + i;
         }
     }
 }
@@ -48,47 +48,47 @@ EXTEND FORM books
 //#solution2 end
 
 //#sample3
-CLASS Order 'Заказ';
+CLASS Order 'Order';
   
-CLASS OrderDetail 'Строка заказа';
-order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
-book 'Книга' = DATA Book (OrderDetail);
-nameBook 'Книга' (OrderDetail d) = name(book(d));
+CLASS OrderDetail 'Order line';
+order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
+book 'Book' = DATA Book (OrderDetail);
+nameBook 'Book' (OrderDetail d) = name(book(d));
 
-price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
+price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
 
-discount 'Скидка, %' = DATA NUMERIC[8,2] (OrderDetail);
-discountPrice 'Цена со скидкой' = DATA NUMERIC[14,2] (OrderDetail); 
+discount 'Discount, %' = DATA NUMERIC[8,2] (OrderDetail);
+discountPrice 'Discount price' = DATA NUMERIC[14,2] (OrderDetail); 
 //#sample3 end
 
 //#solution3
-makeDiscount 'Сделать скидку' (Order o)  { 
-    // Вариант 1
+makeDiscount 'Make discount' (Order o)  { 
+    // Option 1
     FOR order(OrderDetail d) == o AND price(d) > 100 DO {
         discount(d) <- 10;
         discountPrice(d) <- price(d) * (100.0 - discount(d)) / 100.0;
     }
     
-    // Вариант 2
+    // Option 2
     discount(OrderDetail d) <- 10 WHERE order(d) == o AND price(d) > 100;
     discountPrice(OrderDetail d) <- price(d) * (100.0 - discount(d)) / 100.0 WHERE order(d) == o AND price(d) > 100; 
 }
 //#solution3 end
 
 //#sample4
-price 'Цена' = DATA NUMERIC[14,2] (Book);
+price 'Price' = DATA NUMERIC[14,2] (Book);
 //#sample4 end
 
 //#solution4
-addSelectedBooks 'Добавить отмеченные книги' (Order o)  { 
-    // Вариант 1
+addSelectedBooks 'Add marked books' (Order o)  { 
+    // Option 1
     FOR price(Book b) > 100 NEW d = OrderDetail DO {
         order(d) <- o;
         book(d) <- b;
         price(d) <- price(b);
     }
 
-    // Вариант 2
+    // Option 2
     FOR price(Book b) == NUMERIC[14,2] p AND p > 100 NEW d = OrderDetail DO {
         order(d) <- o;
         book(d) <- b;

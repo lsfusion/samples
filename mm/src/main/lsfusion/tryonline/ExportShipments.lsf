@@ -5,14 +5,14 @@ REQUIRE Shipment;
 //#header end
 FORM shipment
     OBJECTS dFrom=DATE, dTo=DATE
-    OBJECTS s=Shipment // накладная
-    PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // выгружаем дату, имя покупателя (с именем customer) и имя склада (с именем stock)
-    FILTERS dFrom <= date(s) AND date(s) <= dTo // накладные за заданные даты
-    OBJECTS sd=ShipmentDetail // строки накладной     
-    FILTERS shipment(sd) = s // строки накладной из накладной
-    PROPERTIES (sd) index, item = nameItem, price, quantity // выгружаем номер, имя товара (с именем item),  количество, цену
+    OBJECTS s=Shipment // shipment
+    PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // exporting the date, customer name (named customer) and warehouse name (named stock)
+    FILTERS dFrom <= date(s) AND date(s) <= dTo // shipments for specified dates
+    OBJECTS sd=ShipmentDetail // shipment lines     
+    FILTERS shipment(sd) = s // shipment lines from shipment
+    PROPERTIES (sd) index, item = nameItem, price, quantity // exporting the number, product name (named item), quantity, price
 ;
 
 run() {
-    EXPORT shipment OBJECTS dFrom = 2019_02_20, dTo = 2019_04_28; // выгружаем накладные в заданном периоде
+    EXPORT shipment OBJECTS dFrom = 2019_02_20, dTo = 2019_04_28; // exporting shipments for a given period
 }

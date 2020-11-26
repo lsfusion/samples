@@ -9,10 +9,10 @@ REQUIRE Utils, Time;
 META defineMasterObject(object, caption, captions, nameLength)
     CLASS ###object caption;
     
-    id 'Код' = DATA INTEGER (###object);
+    id 'Code' = DATA INTEGER (###object);
     object (INTEGER id) = GROUP AGGR ###object o BY id(o);
     
-    name 'Имя' = DATA ISTRING (###object) CHARWIDTH nameLength;
+    name 'Name' = DATA ISTRING (###object) CHARWIDTH nameLength;
     object (ISTRING name) = GROUP AGGR ###object o BY name(o);
     
     FORM object caption
@@ -40,14 +40,14 @@ META defineMasterObject(object, caption, captions, nameLength)
     }
 END
 
-@defineMasterObject(tournament, 'Турнир', 'Турниры', 20);
-@defineMasterObject(season, 'Сезон', 'Сезоны', 5);
-@defineMasterObject(round, 'Раунд', 'Раунды', 15);
-@defineMasterObject(country, 'Страна', 'Страны', 10);
-@defineMasterObject(team, 'Клуб', 'Клубы', 20);
+@defineMasterObject(tournament, 'Tournament', 'Tournaments', 20);
+@defineMasterObject(season, 'Season', 'Seasons', 5);
+@defineMasterObject(round, 'Round', 'Rounds', 15);
+@defineMasterObject(country, 'Country', 'Countries', 10);
+@defineMasterObject(team, 'Club', 'Clubs', 20);
 
 country = DATA Country (Team);
-nameCountry 'Страна' (Team t) = name(country(t));
+nameCountry 'Country' (Team t) = name(country(t));
 
 EXTEND FORM team PROPERTIES(o) nameCountry;
 EXTEND FORM teams PROPERTIES(o) READONLY nameCountry;

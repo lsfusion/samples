@@ -5,11 +5,11 @@ MODULE LegalEntity;
 //#header end
 
 //#class
-CLASS LegalEntity 'Организация';
+CLASS LegalEntity 'Organization';
 
-name 'Наименование' = DATA STRING[100](LegalEntity) IN base;
-address 'Адрес' = DATA STRING[150](LegalEntity) IN base;
-inn 'ИНН' = DATA BPSTRING[9](LegalEntity) IN base;
+name 'Name' = DATA STRING[100](LegalEntity) IN base;
+address 'Address' = DATA STRING[150](LegalEntity) IN base;
+inn 'TIN' = DATA BPSTRING[9](LegalEntity) IN base;
 //#class end
 
 //#inn
@@ -17,7 +17,7 @@ legalEntityINN = GROUP AGGR LegalEntity legalEntity BY inn(legalEntity);
 //#inn end
 
 //#form
-FORM legalEntities 'Организации'
+FORM legalEntities 'Organization'
 	OBJECTS l = LegalEntity
 	PROPERTIES(l) name, inn, address, NEW, DELETE
 ;

@@ -3,36 +3,36 @@ MODULE UseCaseExport;
 //#sample1
 REQUIRE Time;
 
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[100] (Book) IN id;
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[100] (Book) IN id;
 
-CLASS Customer 'Покупатель';
-name 'Наименование' = DATA ISTRING[50] (Customer) IN id;
-address 'Адрес' = DATA ISTRING[50] (Customer) IN base;
+CLASS Customer 'Customer';
+name 'Name' = DATA ISTRING[50] (Customer) IN id;
+address 'Address' = DATA ISTRING[50] (Customer) IN base;
 
-CLASS Currency 'Валюта';
-name 'Наименование' = DATA ISTRING[50] (Currency) IN id;  
+CLASS Currency 'Currency';
+name 'Name' = DATA ISTRING[50] (Currency) IN id;  
 
-CLASS Order 'Заказ';
-date 'Дата' = DATA DATE (Order);
-number 'Номер' = DATA STRING[10] (Order);
+CLASS Order 'Order';
+date 'Date' = DATA DATE (Order);
+number 'Number' = DATA STRING[10] (Order);
 
-customer 'Покупатель' = DATA Customer (Order);
-nameCustomer 'Покупатель' (Order o) = name(customer(o));
+customer 'Customer' = DATA Customer (Order);
+nameCustomer 'Customer' (Order o) = name(customer(o));
 
-CLASS OrderDetail 'Строка заказа';
-order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
+CLASS OrderDetail 'Order line';
+order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
   
-book 'Книга' = DATA Book (OrderDetail) NONULL;
-nameBook 'Книга' (OrderDetail d) = name(book(d));
+book 'Book' = DATA Book (OrderDetail) NONULL;
+nameBook 'Book' (OrderDetail d) = name(book(d));
   
-quantity 'Количество' = DATA INTEGER (OrderDetail);
-price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
+quantity 'Quantity' = DATA INTEGER (OrderDetail);
+price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
 
-currency 'Валюта' = DATA Currency (OrderDetail);
-nameCurrency 'Валюта' (OrderDetail d) = name(currency(d)); 
+currency 'Currency' = DATA Currency (OrderDetail);
+nameCurrency 'Currency' (OrderDetail d) = name(currency(d)); 
 
-FORM order 'Заказ'
+FORM order 'Order'
     OBJECTS o = Order PANEL
     PROPERTIES(o) date, number, nameCustomer
     
@@ -43,7 +43,7 @@ FORM order 'Заказ'
     EDIT Order OBJECT o
 ;
 
-FORM orders 'Заказы'
+FORM orders 'Orders'
     OBJECTS o = Order
     PROPERTIES(o) READONLY date, number, nameCustomer
     PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
@@ -77,7 +77,7 @@ FORM Order
     FILTERS order(Detail) = order
 ;
 
-exportToXML 'Экспорт в XML' (Order o) {
+exportToXML 'Export to XML' (Order o) {
     EXPORT Order OBJECTS order = o XML;
     open(exportFile());
 }
@@ -88,7 +88,7 @@ EXTEND FORM orders
 //#solution1 end
 
 //#solution2
-exportToJSON 'Экспорт в JSON' (Order o) {
+exportToJSON 'Export to JSON' (Order o) {
     EXPORT Order OBJECTS order = o JSON;
     open(exportFile());
 }
@@ -110,11 +110,11 @@ exportToCSV (DATE date) {
     WRITE CLIENT DIALOG file() TO 'orders';
 }
 
-FORM exportParameters 'Параметры'
+FORM exportParameters 'Parameters'
     OBJECTS d = DATE PANEL
-    PROPERTIES(d) 'Дата' = VALUE
+    PROPERTIES(d) 'Date' = VALUE
 ;
-exportToCSV 'Экспорт в CSV' () {
+exportToCSV 'Export to CSV' () {
     DIALOG exportParameters OBJECTS d INPUT DO
         exportToCSV(d);
 }

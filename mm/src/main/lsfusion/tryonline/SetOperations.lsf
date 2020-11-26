@@ -3,11 +3,11 @@ MODULE SetOperations;
 
 REQUIRE Shipment;
 //#header end
-// порядковый номер строки по возрастанию цены в накладной
+// sequential line number in ascending order of price in the shipment
 priceIndex = PARTITION SUM 1 ORDER price(ShipmentDetail sd) BY shipment(sd);
-// сумма первых N строк для накладной, оператор GROUP в SQL-стиле 
+// sum of the first N lines for shipment, SQL-style GROUP operator 
 topSum = GROUP SUM price(ShipmentDetail sd) * quantity(sd) IF priceIndex(sd) <= N BY shipment(sd), N;
 
 run() {
-    exportNumeric() <- topSum((GROUP MAX Shipment s IF number(s) = '12345'), 3); // выводим первые 3 записи , оператор GROUP в функциональном стиле
+    exportNumeric() <- topSum((GROUP MAX Shipment s IF number(s) = '12345'), 3); // displaying the first 3 records, the GROUP operator in a functional style
 }

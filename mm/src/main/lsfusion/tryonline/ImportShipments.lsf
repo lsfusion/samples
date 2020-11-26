@@ -3,32 +3,32 @@ MODULE ImportShipments;
 
 REQUIRE Shipment;
 //#header end
-// для импорта примитивных данных, для которых нужно найти объекты в системе
+// for importing primitive data for which objects in the system need to be found
 inn = DATA LOCAL BPSTRING[9] (Shipment);
 barcode = DATA LOCAL BPSTRING[13] (ShipmentDetail);
 
 FORM shipments
-    OBJECTS s=Shipment EXTID 'shipments' // используем EXTID чтобы оставить короткое имя объекта s, но при экспорте его именем будет считаться shipments 
+    OBJECTS s=Shipment EXTID 'shipments' // using EXTID to keep the short name of the s object, but when exporting, shipments will be considered its name 
     PROPERTIES (s) number, date, inn
-    OBJECTS sd=ShipmentDetail EXTID 'detail' // используем EXTID чтобы оставить короткое имя объекта sd, но при экспорте его именем будет считаться detail
-    FILTERS shipment(sd) = s // автоматически заполнит shipment для detail
+    OBJECTS sd=ShipmentDetail EXTID 'detail' // using EXTID to keep the short name of the sd object, but when exporting, detail will be considered its name
+    FILTERS shipment(sd) = s // will automatically fill shipment for detail
     PROPERTIES (sd) barcode, price, quantity
 ;
 
 run() {
-    FOR jsonFile = JSONFILE('\{ shipments : [ ' + // jsonFile должен / может передаваться в параметре run, {} надо escape'ить так как фигурные скобки используются в интернационализации
+    FOR jsonFile = JSONFILE('\{ shipments : [ ' + // jsonFile must/can be passed in the run parameter, {} must be escaped' + // jsonFile must/can be passed in the run parameter, {} must be escaped since braces are used in internationalization
                 ' \{number : "13423", date : "01.01.2019", inn : "2", detail : [\{ barcode : "141", quantity : 5, price : 10 \}, \{ barcode : "545", quantity : 2, price : 11 \}] \},' + 
                 ' \{number : "12445", date : "01.02.2019", inn : "1", detail : [\{ barcode : "13", quantity : 1, price : 22 \}] \} ]\}')
                  DO {
-        IMPORT shipments FROM jsonFile; // тип импорта автоматически определяется из типа файла
-        FOR BPSTRING[9] inn = inn(Shipment s) DO { // для всех принятых inn
-            customer(s) <- legalEntityINN(inn); // в поставку записываем клиента с принятым INN
-            stock(s) <- GROUP MAX st AS Stock; // запишем какой-нибудь склад (с максимальным id) 
+        IMPORT shipments FROM jsonFile; // import type is automatically determined from the file type
+        FOR BPSTRING[9] inn = inn(Shipment s) DO { // for all received inn
+            customer(s) <- legalEntityINN(inn); // writing the client to the delivery with the received INN
+            stock(s) <- GROUP MAX st AS Stock; // writing some warehouse (with maximum id) 
         }        
-        FOR barcode(Item item) = barcode(ShipmentDetail sd) DO // еще один способ связать примитивные данные с объектными
+        FOR barcode(Item item) = barcode(ShipmentDetail sd) DO // another way to bind primitive data with object data
             item(sd) <- item;
             
         APPLY;
-        exportString() <- IF canceled() THEN applyMessage() ELSE 'Накладная записана успешно';
+        exportString() <- IF canceled() THEN applyMessage() ELSE 'The shipment was written successfully';
    }
 }

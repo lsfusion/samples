@@ -1,18 +1,18 @@
 MODULE UseCaseCreate;
 
 //#sample1
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[50] (Book) IN id;
-price 'Цена' = DATA NUMERIC[14,2] (Book); 
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[50] (Book) IN id;
+price 'Price' = DATA NUMERIC[14,2] (Book); 
 
-FORM book 'Книга'
+FORM book 'Book'
     OBJECTS b = Book PANEL
     PROPERTIES(b) name, price
     
     EDIT Book OBJECT b
 ;
 
-FORM books 'Книги'
+FORM books 'Books'
     OBJECTS b = Book
     PROPERTIES(b) READONLY name, price
     PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
@@ -20,7 +20,7 @@ FORM books 'Книги'
 //#sample1 end
 
 //#solution1
-copy 'Копировать' (Book book)  { 
+copy 'Copy' (Book book)  { 
     NEWSESSION {
         NEW newBook = Book {
             name(newBook) <- name(book);
@@ -36,21 +36,21 @@ EXTEND FORM books
 //#solution1 end
 
 //#sample2
-// Заказы
-CLASS Order 'Заказ';
-date 'Дата' = DATA DATE (Order);
-number 'Номер' = DATA INTEGER (Order);
+// Orders
+CLASS Order 'Order';
+date 'Date' = DATA DATE (Order);
+number 'Number' = DATA INTEGER (Order);
   
-CLASS OrderDetail 'Строка заказа';
-order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
+CLASS OrderDetail 'Order line';
+order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
   
-book 'Книга' = DATA Book (OrderDetail) NONULL;
-nameBook 'Книга' (OrderDetail d) = name(book(d));
+book 'Book' = DATA Book (OrderDetail) NONULL;
+nameBook 'Book' (OrderDetail d) = name(book(d));
   
-quantity 'Количество' = DATA INTEGER (OrderDetail);
-price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
+quantity 'Quantity' = DATA INTEGER (OrderDetail);
+price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
 
-FORM order 'Заказ'
+FORM order 'Order'
     OBJECTS o = Order PANEL
     PROPERTIES(o) date, number
     
@@ -61,26 +61,26 @@ FORM order 'Заказ'
     EDIT Order OBJECT o    
 ;
 
-FORM orders 'Заказы'
+FORM orders 'Orders'
     OBJECTS o = Order
     PROPERTIES(o) READONLY date, number
     PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
 ;
-// Счета
-CLASS Invoice 'Счет';
-date 'Дата' = DATA DATE (Invoice);
-number 'Номер' = DATA INTEGER (Invoice);
+// Accounts
+CLASS Invoice 'Invoice';
+date 'Date' = DATA DATE (Invoice);
+number 'Number' = DATA INTEGER (Invoice);
   
-CLASS InvoiceDetail 'Строка счета';
-invoice 'Счет' = DATA Invoice (InvoiceDetail) NONULL DELETE;
+CLASS InvoiceDetail 'Invoice line';
+invoice 'Invoice' = DATA Invoice (InvoiceDetail) NONULL DELETE;
   
-book 'Книга' = DATA Book (InvoiceDetail) NONULL;
-nameBook 'Книга' (InvoiceDetail d) = name(book(d));
+book 'Book' = DATA Book (InvoiceDetail) NONULL;
+nameBook 'Book' (InvoiceDetail d) = name(book(d));
   
-quantity 'Количество' = DATA INTEGER (InvoiceDetail);
-price 'Цена' = DATA NUMERIC[14,2] (InvoiceDetail);
+quantity 'Quantity' = DATA INTEGER (InvoiceDetail);
+price 'Price' = DATA NUMERIC[14,2] (InvoiceDetail);
 
-FORM invoice 'Счет'
+FORM invoice 'Invoice'
     OBJECTS i = Invoice PANEL
     PROPERTIES(i) date, number
     
@@ -91,7 +91,7 @@ FORM invoice 'Счет'
 //#sample2 end
 
 //#solution2
-createInvoice 'Создать счет' (Order o)  { 
+createInvoice 'Create invoice' (Order o)  { 
     NEWSESSION {
         NEW i = Invoice {
             date(i) <- date(o);
@@ -116,7 +116,7 @@ EXTEND FORM orders
 //#solution2 end
 
 //#solution3
-fillOrder 'Заполнить по заказу' (Invoice i)  { 
+fillOrder 'Fill in by order' (Invoice i)  { 
     DIALOG orders OBJECTS o INPUT DO {
         date(i) <- date(o);
         number(i) <- number(o);

@@ -1,4 +1,4 @@
 MODULE MA;
 
-CLASS ABSTRACT A; // объявляем абстрактный класс
-a = ABSTRACT BPSTRING[10] (A); // объявляем абстрактное свойство a
+CLASS ABSTRACT A; // declaring an abstract class
+a = ABSTRACT BPSTRING[10] (A); // declaring an abstract property a

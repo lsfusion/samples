@@ -6,16 +6,16 @@ REQUIRE Shipment;
 GROUP money;
 
 FORM shipment
-    OBJECTS s=Shipment // накладная
-    PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // выгружаем дату, имя покупателя (с именем customer) и имя склада (с именем stock)
-    PROPERTIES IN money total = (GROUP SUM quantity(ShipmentDetail d)*price(d) IF shipment(d)=s) // выгружаем общую сумму накладной в теге money
-    OBJECTS sd=ShipmentDetail // строки накладной     
-    FILTERS shipment(sd) = s // строки накладной из накладной
-    PROPERTIES (sd) index, item = nameItem // выгружаем номер, имя товара (с именем item)
-    PROPERTIES (sd) IN money price, quantity // выгружаем количество, цену в теге money
-    PROPERTIES sum = quantity(sd) * price(sd) // выгружаем кол-во * цену (с именем sum)    
+    OBJECTS s=Shipment // shipment
+    PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // exporting the date, customer name (named customer) and warehouse name (named stock)
+    PROPERTIES IN money total = (GROUP SUM quantity(ShipmentDetail d)*price(d) IF shipment(d)=s) // exporting the total shipment amount in the money tag
+    OBJECTS sd=ShipmentDetail // shipment lines     
+    FILTERS shipment(sd) = s // shipment lines from shipment
+    PROPERTIES (sd) index, item = nameItem // exporting the number, name of the product (with the name item)
+    PROPERTIES (sd) IN money price, quantity // exporting the quantity, price in the money tag
+    PROPERTIES sum = quantity(sd) * price(sd) // exporting quantity * price (named sum)    
 ;
 
 run() {
-    EXPORT shipment OBJECTS s = (GROUP MAX Shipment s IF number(s) = '12345'); // выгружаем накладную с номером 12345
+    EXPORT shipment OBJECTS s = (GROUP MAX Shipment s IF number(s) = '12345'); // exporting the shipment with the number 12345
 }

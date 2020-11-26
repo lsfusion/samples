@@ -1,12 +1,12 @@
 //#module
 MODULE HelloWorld;
 //#module end
-showHelloWorld 'Показать сообщение' () {
+showHelloWorld 'Show message' () {
     MESSAGE 'Hello world!';
 }
 
-FORM formHelloWorld 'Форма'
-    PROPERTIES 'Сообщение' = 'Hello world!';
+FORM formHelloWorld 'Form'
+    PROPERTIES 'Message' = 'Hello world!';
 ;
 
 NAVIGATOR {

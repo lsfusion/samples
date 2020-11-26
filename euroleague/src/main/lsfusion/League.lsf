@@ -8,31 +8,31 @@ REQUIRE Master;
 //#require end
 //#header end
 
-CLASS League 'Лига';
+CLASS League 'League';
 
-id 'Код' = DATA INTEGER (League);
+id 'Code' = DATA INTEGER (League);
 league (INTEGER id) = GROUP AGGR League o BY id(o);
 
 tournament = DATA Tournament (League);
-nameTournament 'Турнир' (League l)= name(tournament(l));
+nameTournament 'Tournament' (League l)= name(tournament(l));
 
 season = DATA Season(League);
-nameSeason 'Сезон' (League l)= name(season(l));
+nameSeason 'Season' (League l)= name(season(l));
 
-FORM league 'Лига'
+FORM league 'League'
     OBJECTS o = League PANEL
     PROPERTIES(o) id, nameTournament, nameSeason
     
     EDIT League OBJECT o
 ;
 
-FORM leagues 'Лиги'
+FORM leagues 'Leagues'
     OBJECTS o = League
     PROPERTIES(o) READONLY id, nameTournament, nameSeason
     PROPERTIES(o) NEWSESSION NEW, EDIT, DELETE
 ;
 
-FORM dialogLeagues 'Лиги'
+FORM dialogLeagues 'Leagues'
     OBJECTS o = League
     PROPERTIES(o) READONLY id, nameTournament, nameSeason
     

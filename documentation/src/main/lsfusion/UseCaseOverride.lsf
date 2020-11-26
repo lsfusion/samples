@@ -1,17 +1,17 @@
 MODULE UseCaseOverride;
 
 //#block1
-CLASS Category 'Категория';
-name 'Наименование' = DATA ISTRING[50] (Category) IN id;
+CLASS Category 'Category';
+name 'Name' = DATA ISTRING[50] (Category) IN id;
 
-parent 'Родитель' = DATA Category (Category) AUTOSET;
-nameParent 'Родитель' (Category c) = name(parent(c)) IN id;
+parent 'Parent' = DATA Category (Category) AUTOSET;
+nameParent 'Parent' (Category c) = name(parent(c)) IN id;
 
-markup 'Надбавка' = DATA NUMERIC[8,2] (Category);
+markup 'Markup' = DATA NUMERIC[8,2] (Category);
 //#block1 end
 
 //#block2
-level 'Уровень' (Category child, Category parent) = RECURSION 1l IF child IS Category AND parent == child
+level 'Level' (Category child, Category parent) = RECURSION 1l IF child IS Category AND parent == child
                                                                  STEP 2l IF parent == parent($parent) MATERIALIZED;
 //#block2 end
 
@@ -21,32 +21,32 @@ parent (Category child, LONG level) = GROUP MAX Category parent
 //#block3 end
 
 //#block4
-nearestGroupLevel 'Ближайший уровень, для которого задана надбавка' (Category child) = 
+nearestGroupLevel 'The closest level for which the markup is set' (Category child) = 
     GROUP MIN level(child, Category parent) IF markup(parent);
 //#block4 end
 
 //#block5
-nearestGroup 'Ближайшая группа, для которой задана надбавка' (Category category) = parent(category, nearestGroupLevel(category));
+nearestGroup 'The closest group for which the markup is set' (Category category) = parent(category, nearestGroupLevel(category));
 
-overMarkup 'Надбавка перегруженная' (Category category) = markup(nearestGroup(category));
+overMarkup 'Overidden markup' (Category category) = markup(nearestGroup(category));
 //#block5 end
 
 //#block6
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[100] (Book) IN id;
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[100] (Book) IN id;
 
-category 'Категория' = DATA Category (Book) AUTOSET;
-nameCategory 'Категория' (Book b) = name(category(b)) IN id; 
+category 'Category' = DATA Category (Book) AUTOSET;
+nameCategory 'Category' (Book b) = name(category(b)) IN id; 
 //#block6 end
 
 //#block7
-markup 'Надбавка для товара' = DATA NUMERIC[8,2] (Book);
+markup 'Product markup' = DATA NUMERIC[8,2] (Book);
 
-overMarkup 'Надбавка перегруженная' (Book b) = OVERRIDE markup(b), overMarkup(category(b));
+overMarkup 'Overidden markup' (Book b) = OVERRIDE markup(b), overMarkup(category(b));
 //#block7 end
 
 //#block8
-FORM markups 'Надбавки'
+FORM markups 'Markups'
     TREE categories c = Category PARENT parent(c)
     PROPERTIES(c) name READONLY, markup, overMarkup
     PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE

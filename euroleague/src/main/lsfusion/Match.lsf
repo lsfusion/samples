@@ -8,34 +8,34 @@ REQUIRE League;
 //#require end
 //#header end
 
-CLASS Match 'Матч';
+CLASS Match 'Match';
 
-id 'Код' = DATA INTEGER (Match);
+id 'Code' = DATA INTEGER (Match);
 match (INTEGER id) = GROUP AGGR Match o BY id(o);
 
-dateTime 'Время' = DATA DATETIME (Match);  
+dateTime 'Time' = DATA DATETIME (Match);  
 
 league = DATA League (Match);
 
 tournament (Match m) = tournament(league(m));
-nameTournament 'Турнир' (Match m) = name(tournament(m));  
+nameTournament 'Tournament' (Match m) = name(tournament(m));  
 
 season(Match m) = season(league(m));
-nameSeason 'Сезон' (Match m) = name(season(m));  
+nameSeason 'Season' (Match m) = name(season(m));  
 
 round = DATA Round (Match);
-nameRound 'Раунд' (Match m) = name(round(m));
+nameRound 'Round' (Match m) = name(round(m));
 
 homeTeam = DATA Team (Match);
-nameHomeTeam 'Хозяева' (Match m) = name(homeTeam(m));
+nameHomeTeam 'Hosts' (Match m) = name(homeTeam(m));
 
 awayTeam = DATA Team (Match);
-nameAwayTeam 'Гости' (Match m) = name(awayTeam(m));
+nameAwayTeam 'Guests' (Match m) = name(awayTeam(m));
 
-goalsHome 'Голы (хозяева)' = DATA INTEGER (Match);
-goalsAway 'Голы (гости)' = DATA INTEGER (Match);
+goalsHome 'Goals (hosts)' = DATA INTEGER (Match);
+goalsAway 'Goals (guests)' = DATA INTEGER (Match);
 
-FORM match 'Матч'
+FORM match 'Match'
     OBJECTS o = Match PANEL
     PROPERTIES(o) id, dateTime, nameTournament, nameSeason, nameRound, 
                   nameHomeTeam, goalsHome, goalsAway, nameAwayTeam
@@ -43,7 +43,7 @@ FORM match 'Матч'
     EDIT Match OBJECT o
 ;
 
-FORM matches 'Матчи'
+FORM matches 'Matches'
     OBJECTS o = Match
     PROPERTIES(o) READONLY id, dateTime, nameTournament, nameSeason, nameRound, 
                            nameHomeTeam, goalsHome, goalsAway, nameAwayTeam

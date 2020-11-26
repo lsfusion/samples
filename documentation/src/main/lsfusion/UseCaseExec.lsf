@@ -1,15 +1,15 @@
 MODULE UseCaseExec;
 
 //#sample1
-CLASS Category 'Категория';
+CLASS Category 'Category';
 
-name 'Наименование' = DATA ISTRING[50] (Category);
-id 'Код' = DATA INTEGER (Category);
-saleDate 'Дата начала продаж' = DATA DATE (Category);
+name 'Name' = DATA ISTRING[50] (Category);
+id 'Code' = DATA INTEGER (Category);
+saleDate 'Sales start date' = DATA DATE (Category);
 //#sample1 end
 
 //#solution1
-createCategory 'Создать категорию' (ISTRING[50] name, INTEGER id, DATE saleDate)  { 
+createCategory 'Create category' (ISTRING[50] name, INTEGER id, DATE saleDate)  { 
     NEW c = Category {
         name(c) <- name;
         id(c) <- id;
@@ -17,15 +17,15 @@ createCategory 'Создать категорию' (ISTRING[50] name, INTEGER id
     }    
 }
 
-create3Categories 'Создать 3 категории' ()  { 
-    createCategory('Категория 1', 1, 2010_02_14);
-    createCategory('Категория 2', 2, 2011_03_08);
-    createCategory('Категория 3', 3, 2014_07_01);
+create3Categories 'Create 3 categories' ()  { 
+    createCategory('Category 1', 1, 2010_02_14);
+    createCategory('Category 2', 2, 2011_03_08);
+    createCategory('Category 3', 3, 2014_07_01);
 }
 //#solution1 end
 
 //#sample2
-parent 'Родитель' = DATA Category (Category); // если значение NULL, то родителя нету
+parent 'Parent' = DATA Category (Category); // if the value is NULL, then there is no parent
 //#sample2 end
 
 //#solution2

@@ -4,17 +4,17 @@ MODULE PrintShipment;
 REQUIRE Shipment;
 //#header end
 FORM shipment
-    OBJECTS s=Shipment // накладная
-    PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // печатаем дату, имя покупателя (с именем customer) и имя склада (с именем stock)
-    PROPERTIES total = (GROUP SUM quantity(ShipmentDetail d)*price(d) IF shipment(d)=s) // печатаем общую сумму накладной в теге money
-    OBJECTS sd=ShipmentDetail // строки накладной     
-    FILTERS shipment(sd) = s // строки накладной из накладной
-    PROPERTIES (sd) index, item = nameItem // печатаем номер, имя товара (с именем item)
-    PROPERTIES (sd) price, quantity // печатаем количество, цену в теге money
-    PROPERTIES sum 'Сумма' = (quantity(sd) * price(sd)) // печатаем кол-во * цену (с именем sum)    
+    OBJECTS s=Shipment // shipment
+    PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // printing the date, customer name (named customer) and warehouse name (named stock)
+    PROPERTIES total = (GROUP SUM quantity(ShipmentDetail d)*price(d) IF shipment(d)=s) // printing the total shipment amount in the money tag
+    OBJECTS sd=ShipmentDetail // shipment lines     
+    FILTERS shipment(sd) = s // shipment lines from shipment
+    PROPERTIES (sd) index, item = nameItem // printing the number, name of the product (with the name item)
+    PROPERTIES (sd) price, quantity // printing the quantity, price in the money tag
+    PROPERTIES sum 'Amount' = (quantity(sd) * price(sd)) // printing quantity * price (named sum)    
 ;
 
 run() {
     PRINT shipment OBJECTS s = (GROUP MAX Shipment s IF number(s) = '12345') 
-    XLSX TO exportFile; // печатаем накладную с номером 12345
+    XLSX TO exportFile; // printing the shipment with the number 12345
 }

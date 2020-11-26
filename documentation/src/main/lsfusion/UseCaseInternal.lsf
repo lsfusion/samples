@@ -3,12 +3,12 @@ MODULE UseCaseInternal;
 //#solution1
 ip = DATA LOCAL TEXT();
 getIPJava INTERNAL 'GetIP';
-showIPJava 'Показать имя компьютера (Java)' {
+showIPJava 'Show computer name (Java)' {
     getIPJava();
     MESSAGE ip();
 }
 
-FORM info 'Информация'
+FORM info 'Information'
     PROPERTIES() showIPJava
 ;
 
@@ -19,7 +19,7 @@ NAVIGATOR {
 
 //#solution1fusion
 getIPFusion INTERNAL <{ findProperty("ip").change((Object)java.net.InetAddress.getLocalHost().toString(), context); }>;
-showIPFusion 'Показать имя компьютера (Fusion)' {
+showIPFusion 'Show computer name (Fusion)' {
     getIPFusion();
     MESSAGE ip();
 }
@@ -31,9 +31,9 @@ EXTEND FORM info
 
 //#solution2
 gcd = DATA LOCAL INTEGER();
-calculateGCD 'Рассчитать НОД' INTERNAL 'CalculateGCD' (INTEGER, INTEGER);
+calculateGCD 'Calculate GCD' INTERNAL 'CalculateGCD' (INTEGER, INTEGER);
 
-FORM gcd 'НОД'
+FORM gcd 'GCD'
     OBJECTS (a = INTEGER, b = INTEGER) PANEL
     PROPERTIES 'A' = VALUE(a), 'B' = VALUE(b)
     
@@ -50,7 +50,7 @@ CLASS Calculation;
 a = DATA INTEGER (Calculation);
 b = DATA INTEGER (Calculation);
 gcd = DATA INTEGER (Calculation);
-calculateGCD 'Рассчитать НОД' INTERNAL 'CalculateGCDObject' (Calculation);
+calculateGCD 'Calculate GCD' INTERNAL 'CalculateGCDObject' (Calculation);
 
 EXTEND FORM gcd
     OBJECTS c = Calculation
@@ -60,7 +60,7 @@ EXTEND FORM gcd
 
 //#solution4
 beep INTERNAL 'Beep';
-FORM beep 'Сигнал'
+FORM beep 'Signal'
     PROPERTIES() beep
 ;
 

@@ -1,19 +1,19 @@
 MODULE UseCaseNew;
 
 //#sample1
-CLASS Order 'Заказ';
+CLASS Order 'Order';
   
-CLASS Customer 'Покупатель';
+CLASS Customer 'Customer';
 name = DATA ISTRING[50] (Customer);
   
-date 'Дата' = DATA DATE (Order);
+date 'Date' = DATA DATE (Order);
   
-customer 'Покупатель' = DATA Customer (Order);
-nameCustomer 'Покупатель' (Order o) = name(customer(o));
+customer 'Customer' = DATA Customer (Order);
+nameCustomer 'Customer' (Order o) = name(customer(o));
 //#sample1 end
 
 //#solution1
-copyOrder 'Копировать' (Order o)  { 
+copyOrder 'Copy' (Order o)  { 
     NEW n = Order {
         date(n) <- date(o);
         customer(n) <- customer(o);
@@ -22,15 +22,15 @@ copyOrder 'Копировать' (Order o)  {
 //#solution1 end
 
 //#sample2
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[50] (Book);
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[50] (Book);
   
-CLASS OrderDetail 'Строка заказа';
-order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
-book 'Книга' = DATA Book (OrderDetail);
-nameBook 'Книга' (OrderDetail d) = name(book(d));
+CLASS OrderDetail 'Order line';
+order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
+book 'Book' = DATA Book (OrderDetail);
+nameBook 'Book' (OrderDetail d) = name(book(d));
   
-price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
+price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
 //#sample2 end
 
 //#solution2

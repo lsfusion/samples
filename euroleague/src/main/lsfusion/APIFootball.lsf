@@ -9,7 +9,7 @@ REQUIRE Main, Time;
 //#header end
 
 host = 'api-football-v1.p.rapidapi.com';
-key 'Ключ к API Football' = DATA STRING () CHARWIDTH 50;
+key 'Football API Key' = DATA STRING () CHARWIDTH 50;
 
 url = 'https://' + host() + '/v2';
 
@@ -32,7 +32,7 @@ FORM importLeagues
     PROPERTIES(leagues) name = tournamentName, season = seasonName, league_id = leagueId
 ;
 
-importLeagues 'Импортировать лиги' () {
+importLeagues 'Import leagues' () {
     LOCAL result = FILE();
     EXTERNAL HTTP GET url() + '/leagues' HEADERS headers TO result;
     
@@ -55,7 +55,7 @@ EXTEND FORM leagues
     PROPERTIES() importLeagues DRAW o TOOLBAR
 ;
 
-// Импорт клубов
+// Import clubs
 teamId = DATA LOCAL INTEGER(INTEGER);
 teamName = DATA LOCAL STRING(INTEGER);
 countryName = DATA LOCAL STRING(INTEGER);
@@ -65,7 +65,7 @@ FORM importTeams
     PROPERTIES(teams) team_id = teamId, name = teamName, country = countryName
 ;
 
-importTeams 'Импортировать клубы' (League l) {
+importTeams 'Import clubs' (League l) {
     LOCAL result = FILE();
     EXTERNAL HTTP GET url() + '/teams/league/' + id(l) HEADERS headers TO result;
 
@@ -81,7 +81,7 @@ importTeams 'Импортировать клубы' (League l) {
     }
 }
 
-// Импорт матчей
+// Import matches
 
 matchId = DATA LOCAL INTEGER(INTEGER);
 dateTime = DATA LOCAL STRING(INTEGER); 
@@ -104,18 +104,18 @@ FORM importMatches
                          goalsHomeTeam = goalsHome, goalsAwayTeam = goalsAway
 ;
 
-importMatches 'Импортировать матчи' (League l) {
+importMatches 'Import matches' (League l) {
     LOCAL result = FILE();
     EXTERNAL HTTP GET url() + '/fixtures/league/' + id(l) HEADERS headers TO result;
 
     IMPORT importMatches JSON FROM result();
     FOR [GROUP SUM 1 BY awayTeamId(INTEGER i)](INTEGER id) AND NOT team(id) DO {
-        MESSAGE 'Не найдена домашний клуб с кодом ' + id;
+        MESSAGE 'No home club found with code ' + id;
         RETURN;
     }
 
     FOR [GROUP SUM 1 BY awayTeamId(INTEGER i)](INTEGER id) AND NOT team(id) DO {
-        MESSAGE 'Не найдена гостевой клуб с кодом ' + id;
+        MESSAGE 'No guest club found with code ' + id;
         RETURN;
     }
 

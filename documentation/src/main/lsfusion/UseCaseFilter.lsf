@@ -1,17 +1,17 @@
 MODULE UseCaseFilter;
 
 //#sample1
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[100] (Book);
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[100] (Book);
   
-CLASS Stock 'Склад';
-name 'Наименование' = DATA ISTRING[100] (Stock);
+CLASS Stock 'Warehouse';
+name 'Name' = DATA ISTRING[100] (Stock);
   
-balance 'Остаток' = DATA INTEGER (Book, Stock); // для примера сделано первичным свойством, хотя обычно оно вычисляемое
+balance 'Balance' = DATA INTEGER (Book, Stock); // for example it is made a data property, although usually it is calculated
 //#sample1 end
 
 //#solution1
-FORM onStockObject 'Остатки'
+FORM onStockObject 'Balances'
     OBJECTS s = Stock PANEL
     PROPERTIES(s) name SELECTOR
   
@@ -19,23 +19,23 @@ FORM onStockObject 'Остатки'
     PROPERTIES READONLY name(b), balance(b, s)
     ORDERS name(b)
   
-    // Вариант 1
+    // Option 1
     FILTERS balance(b, s)
   
-    // Вариант 2
+    // Option 2
     FILTERGROUP bal
-        FILTER 'С положительным остатком' balance(b, s) > 0 'F10'
-        FILTER 'С отрицательными остатком' balance(b, s) < 0 'F9'
-        FILTER 'С остатком' balance(b, s) 'F8' DEFAULT
-        FILTER 'Без остатка' NOT balance(b, s) 'F7'
+        FILTER 'With positive balance' balance(b, s) > 0 'F10'
+        FILTER 'With negative balance' balance(b, s) < 0 'F9'
+        FILTER 'With balance' balance(b, s) 'F8' DEFAULT
+        FILTER 'No remainder' NOT balance (b, s) 'F7'
 ;
 //#solution1 end
 
 //#solution2
 filterStock = DATA LOCAL Stock ();
-nameFilterStock 'Склад' = name(filterStock());
+nameFilterStock 'Warehouse' = name(filterStock());
   
-FORM onStockLocal 'Остатки'
+FORM onStockLocal 'Balances'
     PROPERTIES() nameFilterStock
   
     OBJECTS sb = (s = Stock, b = Book)
@@ -47,21 +47,21 @@ FORM onStockLocal 'Остатки'
 //#solution2 end
 
 //#sample3
-CLASS Customer 'Покупатель';
-name 'Наименование' = DATA ISTRING[100] (Customer);
+CLASS Customer 'Customer';
+name 'Name' = DATA ISTRING[100] (Customer);
   
-CLASS Order 'Заказ';
-date 'Дата' = DATA DATE (Order);
+CLASS Order 'Order';
+date 'Date' = DATA DATE (Order);
   
-customer 'Покупатель' = DATA Customer (Order);
-nameCustomer 'Покупатель' (Order o) = name(customer(o));
+customer 'Customer' = DATA Customer (Order);
+nameCustomer 'Customer' (Order o) = name(customer(o));
 //#sample3 end
 
 //#solution3
 filterCustomer = DATA LOCAL Customer ();
-nameFilterCustomer 'Покупатель' = name(filterCustomer());
+nameFilterCustomer 'Customer' = name(filterCustomer());
   
-FORM orders 'Заказы'
+FORM orders 'Orders'
     PROPERTIES() nameFilterCustomer
   
     OBJECTS dates = (dateFrom = DATE, dateTo = DATE) PANEL

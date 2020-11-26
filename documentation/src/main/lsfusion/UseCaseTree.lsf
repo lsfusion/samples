@@ -1,16 +1,16 @@
 MODULE UseCaseTree;
 
 //#sample1
-CLASS Category 'Категория';
-name 'Наименование' = DATA ISTRING[50] (Category);
+CLASS Category 'Category';
+name 'Name' = DATA ISTRING[50] (Category);
 
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[50] (Book);
-category 'Категория' = DATA Category (Book);
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[50] (Book);
+category 'Category' = DATA Category (Book);
 //#sample1 end
 
 //#solution1
-FORM books 'Книги'
+FORM books 'Books'
     TREE cb c = Category, b = Book
     PROPERTIES name(c), name(b)
     FILTERS category(b) == c 
@@ -18,21 +18,21 @@ FORM books 'Книги'
 //#solution1 end
 
 //#sample2
-parent 'Родитель' = DATA Category (Category);
+parent 'Parent' = DATA Category (Category);
 //#sample2 end
 
 //#solution2
-FORM categories 'Категории'
+FORM categories 'Categories'
     TREE categories c = Category PARENT parent(c)
     PROPERTIES(c) name
 ;
 //#solution2 end
 
 //#solution3
-level 'Уровень' (Category child, Category parent) = RECURSION 1l IF child IS Category AND parent == child
+level 'Level' (Category child, Category parent) = RECURSION 1l IF child IS Category AND parent == child
                                                                  STEP 2l IF parent == parent($parent) MATERIALIZED;
 
-FORM categoryBooks 'Книги по категориям'
+FORM categoryBooks 'Books by category'
     TREE categories c = Category PARENT parent(c)
     PROPERTIES(c) name
 

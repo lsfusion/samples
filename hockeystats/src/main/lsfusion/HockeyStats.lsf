@@ -1,40 +1,40 @@
 //#module
 MODULE HockeyStats;
 //#module end
-// описание логики : https://documentation.lsfusion.org/pages/viewpage.action?pageId=2228240
+// logic description: https://documentation.lsfusion.org/pages/viewpage.action?pageId=2228240
 //#require 
 REQUIRE System;
 //#require end
 
 //#classteam
-CLASS Team 'Команда';
+CLASS Team 'Team';
 //#classteam end
 
 //#nameteam
-name 'Название команды' = DATA STRING[30] (Team) IN base;
+name 'Team name' = DATA STRING[30] (Team) IN base;
 //#nameteam end
 
 //#game
-CLASS Game 'Игра';
+CLASS Game 'Game';
 
-date 'Дата' = DATA DATE (Game);
+date 'Date' = DATA DATE (Game);
 hostTeam = DATA Team (Game);
 guestTeam = DATA Team (Game);
-hostTeamName 'Хозяева' (Game game) = name(hostTeam(game));
-guestTeamName 'Гости' (Game game) = name(guestTeam(game));
+hostTeamName 'Hosts' (Game game) = name(hostTeam(game));
+guestTeamName 'Guests' (Game game) = name(guestTeam(game));
 //#game end
 
 //#constrainthostguest
-CONSTRAINT hostTeam(Game team) = guestTeam(team) CHECKED BY hostTeam, guestTeam MESSAGE 'Хозяйская и гостевая команды должны быть разными';
+CONSTRAINT hostTeam(Game team) = guestTeam(team) CHECKED BY hostTeam, guestTeam MESSAGE 'Host and guest teams must be different';
 //#constrainthostguest end
 
 //#goals
-hostGoals 'Х голы' = DATA INTEGER (Game);
-guestGoals 'Г голы' = DATA INTEGER (Game);
+hostGoals 'H goals' = DATA INTEGER (Game);
+guestGoals 'G goals' = DATA INTEGER (Game);
 //#goals end
 
 //#constraintgoals
-CONSTRAINT hostGoals(Game game) = guestGoals(game) MESSAGE 'Игра не может закончиться вничью';
+CONSTRAINT hostGoals(Game game) = guestGoals(game) MESSAGE 'The game cannot end in a draw';
 //#constraintgoals end
 
 //#gamewinner
@@ -50,75 +50,75 @@ looser(Game game) = IF hostGoals(game) > guestGoals(game)
 //#gamelooser end
 
 //#gameresultclass
-CLASS GameResult 'Р/И' {
-    win 'П',
-    winOT 'ПО',
-    winSO 'ПБ'
+CLASS GameResult 'G/R' {
+    win 'W',
+    winOT 'LO',
+    winSO 'LB'
 }
 //#gameresultclass end
 
 //#gameresultname
-resultName 'Имя' (GameResult game) = staticCaption(game) IF game IS GameResult IN base;
+resultName 'Name' (GameResult game) = staticCaption(game) IF game IS GameResult IN base;
 //#gameresultname end
 
 //#gameresult
 userResult = DATA GameResult (Game);
 result (Game game) = OVERRIDE userResult(game), 
     (GameResult.win IF ((hostGoals(game) (-) guestGoals(game)) > 1 OR (guestGoals(game) (-) hostGoals(game)) > 1));
-resultName 'Р/И' (Game game) = resultName(result(game));
+resultName 'G/R' (Game game) = resultName(result(game));
 
 CONSTRAINT ((hostGoals(Game game) (-) guestGoals(game)) > 1 OR (hostGoals(game) (-) guestGoals(game)) < -1) AND userResult(game) 
-    MESSAGE 'Результат игры определен автоматически';
+    MESSAGE 'The result of the game is determined automatically';
 //#gameresult end
 
 //#gameresultset
 CONSTRAINT ((hostGoals(Game game) (-) guestGoals(game)) < 2 AND (hostGoals(game) (-) guestGoals(game)) > -2) AND NOT userResult(game) 
-    MESSAGE 'Укажите результат игры';
+    MESSAGE 'Specify the result of the game';
 //#gameresultset end
 
 //#gamesplayed
 hostGamesPlayed = GROUP SUM 1 BY hostTeam(Game game);
 guestGamesPlayed = GROUP SUM 1 BY guestTeam(Game game);
-gamesPlayed 'И' (Team team) = hostGamesPlayed(team) (+) guestGamesPlayed(team);
+gamesPlayed 'G' (Team team) = hostGamesPlayed(team) (+) guestGamesPlayed(team);
 //#gamesplayed end
 
 //#gameswon
 gamesWonBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY winner(Game game), result(game)](team, type), 0;
 
-gamesWon 'В' (Team team) = gamesWonBy(team, GameResult.win);
-gamesWonOT 'ВО' (Team team) = gamesWonBy(team, GameResult.winOT);
-gamesWonSO 'ВБ' (Team team) = gamesWonBy(team, GameResult.winSO);
+gamesWon 'W' (Team team) = gamesWonBy(team, GameResult.win);
+gamesWonOT 'WO' (Team team) = gamesWonBy(team, GameResult.winOT);
+gamesWonSO 'WB' (Team team) = gamesWonBy(team, GameResult.winSO);
 //#gameswon end
 
 //#gameslost
 gamesLostBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY looser(Game game), result(game)](team, type), 0;
 
-gamesLost 'П' (Team team) = gamesLostBy(team, GameResult.win);
-gamesLostOT 'ПО' (Team team) = gamesLostBy(team, GameResult.winOT);
-gamesLostSO 'ПБ' (Team team) = gamesLostBy(team, GameResult.winSO);
+gamesLost 'L' (Team team) = gamesLostBy(team, GameResult.win);
+gamesLostOT 'LO' (Team team) = gamesLostBy(team, GameResult.winOT);
+gamesLostSO 'LB' (Team team) = gamesLostBy(team, GameResult.winSO);
 //#gameslost end
 
 //#points
-points 'Очки' (Team team) = gamesWon(team) * 3 + (gamesWonSO(team) + gamesWonOT(team)) * 2 + gamesLostOT(team) + gamesLostSO(team);
+points 'Points' (Team team) = gamesWon(team) * 3 + (gamesWonSO(team) + gamesWonOT(team)) * 2 + gamesLostOT(team) + gamesLostSO(team);
 //#points end
 
 //#goalsresult
 hostGoalsScored = GROUP SUM hostGoals(Game game) BY hostTeam(game);
 guestGoalsScored = GROUP SUM guestGoals(Game game) BY guestTeam(game);
-goalsScored 'Кол-во забитых голов' (Team team) = OVERRIDE hostGoalsScored(team) (+) guestGoalsScored(team), 0 IF team IS Team;
+goalsScored 'Scored goals' (Team team) = OVERRIDE hostGoalsScored(team) (+) guestGoalsScored(team), 0 IF team IS Team;
 
 hostGoalsConceded = GROUP SUM guestGoals(Game game) BY hostTeam(game);
 guestGoalsConceded = GROUP SUM hostGoals(Game game) BY guestTeam(game);
-goalsConceded 'Кол-во пропущенных голов' (Team team) = OVERRIDE hostGoalsConceded(team) (+) guestGoalsConceded(team), 0 IF team IS Team;
+goalsConceded 'Conceded goals' (Team team) = OVERRIDE hostGoalsConceded(team) (+) guestGoalsConceded(team), 0 IF team IS Team;
 //#goalsresult end
 
 //#place
-place 'Место' (Team team) = PARTITION SUM 1 ORDER DESC points(team), gamesWon(team), gamesWonOT(team), gamesWonSO(team),
+place 'Rank' (Team team) = PARTITION SUM 1 ORDER DESC points(team), gamesWon(team), gamesWonOT(team), gamesWonSO(team),
                                                (OVERRIDE goalsScored(team) (-) goalsConceded(team), 0), goalsScored(team);
 //#place end
 
 //#formgame
-FORM MainForm 'Турнирная таблица'
+FORM MainForm 'Score table'
     OBJECTS game = Game
     PROPERTIES(game) date, hostTeamName, hostGoals, guestGoals, guestTeamName, resultName, NEW, DELETE
 ;
@@ -134,7 +134,7 @@ EXTEND FORM MainForm
 //#formteam end
 
 //#formsingle
-FORM MainFormSingle 'Турнирная таблица'
+FORM MainFormSingle 'Score table'
     OBJECTS game = Game
     PROPERTIES(game) date, hostTeamName, hostGoals, guestGoals, guestTeamName, resultName, NEW, DELETE
     

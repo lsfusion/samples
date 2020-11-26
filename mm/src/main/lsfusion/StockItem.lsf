@@ -9,17 +9,17 @@ REQUIRE Shipment, Receipt;
 //#header end
 
 //#properties
-receivedQuantity 'Суммарный приход' = GROUP SUM quantity(ReceiptDetail d) BY item(d), stock(receipt(d));
-shippedQuantity 'Суммарный расход' = GROUP SUM quantity(ShipmentDetail d) BY item(d), stock(shipment(d));
-currentBalance 'Текущий остаток' (Item i, Stock s) = receivedQuantity (i, s) (-) shippedQuantity (i, s);
+receivedQuantity 'Total income' = GROUP SUM quantity(ReceiptDetail d) BY item(d), stock(receipt(d));
+shippedQuantity 'Total expenses' = GROUP SUM quantity(ShipmentDetail d) BY item(d), stock(shipment(d));
+currentBalance 'Current balance' (Item i, Stock s) = receivedQuantity (i, s) (-) shippedQuantity (i, s);
 //#properties end
 
 //#constraint
-CONSTRAINT currentBalance(Item i, Stock s) < 0 MESSAGE 'Остаток по товару не может быть отрицательным';
+CONSTRAINT currentBalance(Item i, Stock s) < 0 MESSAGE 'The balance of the product cannot be negative';
 //#constraint end
 
 //#form
-FORM currentBalanceItemStock 'Текущие остатки'
+FORM currentBalanceItemStock 'Current balances'
     OBJECTS si = (s = Stock, i = Item)
     PROPERTIES READONLY name(i), barcode(i), name(s), currentBalance(i, s)
     FILTERS currentBalance(i, s)

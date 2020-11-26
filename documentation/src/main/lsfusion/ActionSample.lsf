@@ -5,8 +5,8 @@ REQUIRE Utils, Authentication, Chat, Time, Geo;
 CLASS Item;
 
 //#default
-showMessage  { MESSAGE 'Hello World!'; } 								// объявление действия
-loadImage 'Загрузить изображение'  ABSTRACT ( Item); 	
+showMessage  { MESSAGE 'Hello World!'; } 								// action declaration
+loadImage 'Upload image'  ABSTRACT ( Item); 	
 //#default end
 
 //#action
@@ -17,11 +17,11 @@ code = DATA INTEGER (Currency);
 CLASS Order;
 currency = DATA Currency (Order);
 customer = DATA STRING[100] (Order);
-copy 'Копировать' (Order old)  { 
-    NEW new = Order {                                   // создается действие, состоящее из последовательного выполнения двух действий
-        currency(new) <- currency(old);                 // точка с запятой указывается после каждого оператора
+copy 'Copy' (Order old)  { 
+    NEW new = Order {                                   // an action is created that consists of the sequential execution of two actions
+        currency(new) <- currency(old);                 // a semicolon is put after each statement
         customer(new) <- customer(old);
-    }                                                   // в этой строке точка с запятой не ставится, потому что оператор заканчивается на }
+    }                                                   // there is no semicolon in this line, because the operator ends in }
 }
  
 loadDefaultCurrency(ISTRING[30] name, INTEGER code)  { 
@@ -37,13 +37,13 @@ run ()  {
 //#action end
 
 //#abstract
-exportXls 'Выгрузить в Excel'  ABSTRACT CASE ( Order);         // В данном случае создается ABSTRACT CASE OVERRIDE LAST
+exportXls 'Export to Excel'  ABSTRACT CASE ( Order);         // In this case, ABSTRACT CASE OVERRIDE LAST is created
 exportXls (Order o) + WHEN name(currency(o)) == 'USD' THEN { 
     MESSAGE 'Export USD not implemented';
 } 
 
 CLASS Task;
-run 'Выполнить'  ABSTRACT ( Task);                           // ABSTRACT MULTI EXCLUSIVE
+run 'Execute'  ABSTRACT ( Task);                           // ABSTRACT MULTI EXCLUSIVE
 
 CLASS Task1 : Task;
 name = DATA STRING[100] (Task);
@@ -65,8 +65,8 @@ fill (OrderDetail od, InvoiceDetail id) + {
 //#abstract end
 
 //#activate
-//Форма с двумя закладками
-FORM myForm 'Моя форма'
+//Form with two tabs
+FORM myForm 'My form'
     OBJECTS u = CustomUser
     PROPERTIES(u) name
      
@@ -78,11 +78,11 @@ DESIGN myForm {
     NEW tabbedPane FIRST {
         type = TABBED;
         NEW contacts {
-            caption = 'Контакты';
+            caption = 'Contacts';
             MOVE BOX(u);
         }
         NEW recent {
-            caption = 'Последние';
+            caption = 'Recent';
             MOVE BOX(c);
         }       
     }
@@ -102,7 +102,7 @@ FORM POS
     PROPERTIES(d) barcode, quantityGrid = quantity
 ;
 
-createReceiptDetail 'Добавить строку продажи'(STRING[30] barcode)  { 
+createReceiptDetail 'Add sales line'(STRING[30] barcode)  { 
     NEW d = ReceiptDetail {
         barcode(d) <- barcode;
         ACTIVATE PROPERTY POS.quantityGrid;
@@ -129,33 +129,33 @@ applyIn()  {
     IF canceled() THEN
         MESSAGE applyMessage();
     FOR in(Sku s) DO
-        MESSAGE id(s); // показывает '123'
+        MESSAGE id(s); // shows '123'
 }
 
 calculateInTransaction()  { 
     APPLY {
-        id(Sku s) <- (GROUP MAX id(Sku ss)) (+) 1; // проставляем новый код внутри транзакции 
+        id(Sku s) <- (GROUP MAX id(Sku ss)) (+) 1; // putting down a new code inside the transaction 
     }
 }
 //#apply end
 
 //#ask
 testAsk ()  { 
-    ASK 'Вы действительно хотите продолжать ?' DO {
-        MESSAGE 'Вы продолжили';
+    ASK 'Are you sure you want to continue?' DO {
+        MESSAGE 'You continued';
     }
     
-    ASK 'Использовать старые значения ?' useOld = YESNO DO {
+    ASK 'Use old values?' useOld = YESNO DO {
         IF useOld THEN 
-            MESSAGE 'Используем старые значения';
+            MESSAGE 'Using old values';
         ELSE
-            MESSAGE 'Используем новые значения';
+            MESSAGE 'Using new values';
     }
 }
 //#ask end
 
 //#assign
-// установить всем клиентам у кого сумма заказа больше 100 скидку в размере 15 процентов
+// set a 15 percent discount for all customers who have an order amount over 100
 CLASS Customer;
 discount = DATA NUMERIC[5,2] (Customer);
 totalOrders = DATA NUMERIC[14,2] (Customer);
@@ -165,12 +165,12 @@ setDiscount  {
 
 discount = DATA NUMERIC[5,2] (Customer, Item);
 in = DATA BOOLEAN (Item); 
-// изменить скидку для выбранных товаров для клиента
+// change the discount for selected products for a customer
 setDiscount (Customer c)  { 
     discount(c, Item i) <- 15 WHERE in(i);
 }
   
-// скопировать свойство g в свойство f
+// copy property g to property f
 f = DATA INTEGER (INTEGER);
 g = DATA INTEGER (INTEGER);
 copyFG  { 
@@ -181,14 +181,14 @@ copyFG  {
 //#break
 testBreak ()  { 
     FOR iterate(INTEGER i, 1, 100) DO {
-        IF i == 50 THEN BREAK; // дойдет только до 50
+        IF i == 50 THEN BREAK; // will only come up to 50
     } 
 }     
 //#break end
 
 //#cancel
 dropChanges()  { 
-    CANCEL NESTED (in[Sku]); // отменяем все изменения, кроме свойства in
+    CANCEL NESTED (in[Sku]); // cancel all changes except the in property
 }
 //#cancel end
 
@@ -207,30 +207,30 @@ CLASS Document;
 date = DATA DATE (Document);
 
 CLASS ClosedDocument : Document;
-// переводит все документы с датой старше 2-х недель в статус закрыт
+// sets status to closed for all documents with a date older than 2 weeks
 changeStatus()  { 
     CHANGECLASS Document d TO ClosedDocument WHERE sum(date(d), 14) <= currentDate();
 }
 //#changeclass end
 
 //#custom
-showOnMap 'Показать на карте'  INTERNAL  'lsfusion.server.logics.classes.data.utils.geo.ShowOnMapAction' (DOUBLE, DOUBLE, MapProvider, BPSTRING[100]);
+showOnMap 'Show on map' INTERNAL 'lsfusion.server.logics.classes.data.utils.geo.ShowOnMapAction' (DOUBLE, DOUBLE, MapProvider, BPSTRING[100]);
 
-serviceDBMT 'Обслуживание БД (многопоточно, threadCount, timeout)'  INTERNAL  'lsfusion.server.physics.admin.service.action.ServiceDBMultiThreadAction' (INTEGER, INTEGER) NULL;
+serviceDBMT 'DB maintenance (multithreaded, threadCount, timeout)' INTERNAL 'lsfusion.server.physics.admin.service.action.ServiceDBMultiThreadAction' (INTEGER, INTEGER) NULL;
 
-printlnAction 'Вывести текст в консоль'  INTERNAL  <{ System.out.println("action test"); }>; 
-setNoCancelInTransaction()  INTERNAL  <{ context.getSession().setNoCancelInTransaction(true); }>; // здесь context - это параметр метода executeInternal
+printlnAction 'Print text to the console'  INTERNAL  <{System.out.println("action test"); }>; 
+setNoCancelInTransaction()  INTERNAL  <{ context.getSession().setNoCancelInTransaction(true); }>; // here context is a parameter of executeInternal method
 //#custom end
 
 //#delete
-// удаление объекта
+// deleting an object
 deleteObject(obj)  { DELETE obj; }
   
-// удаление всех неактивных товаров
+// deleting all inactive products
 CLASS Article;
 active = DATA BOOLEAN (Article);
 deleteInactiveArticles()  { 
-    DELETE Article a WHERE a IS Article AND NOT active(a); // добавляется локальный параметр a, соответствующий перебираемым объектам
+    DELETE Article a WHERE a IS Article AND NOT active(a); // a local parameter a is added corresponding to the objects to be iterated over
 }
 //#delete end
 
@@ -252,7 +252,7 @@ idSku (OrderDetail d) = id(sku(d));
 changeSku (OrderDetail d)  { 
     DIALOG selectSku OBJECTS s = sku(d) CHANGE;
     
-    //равносильно первому варианту
+    //equivalent to the first option
     DIALOG selectSku OBJECTS s = sku(d) INPUT NULL CONSTRAINTFILTER DO {
         sku(d) <- s;
     }
@@ -265,39 +265,39 @@ FORM remindUserPass
     PROPERTIES(u) READONLY login, name[Contact]
 ;
 
-emailUserPassUser 'Напоминание логина' (CustomUser user)  {
+emailUserPassUser 'Login reminder' (CustomUser user)  {
     LOCAL bodyFile = FILE (); 
     PRINT remindUserPass OBJECTS u = user HTML TO bodyFile;
     EMAIL
-    SUBJECT 'Напоминание логина'
+    SUBJECT 'Login reminder'
     TO email(user)
     BODY bodyFile();
 }
   
-justSendEmail 'Отправить письмо' ()  { 
+justSendEmail 'Send letter' ()  { 
     stringToFile('<font color=#FF0000 size=+3>big red text</font>');
     EMAIL
     FROM 'luxsoft@adsl.by'
-    SUBJECT 'Тема письма'
+    SUBJECT 'Letter subject'
     TO 'xxx@tut.by'
     BODY resultFile();
 }
 //#email end
 
 //#eval
-addProperty  { EVAL ACTION 'MESSAGE \'Hello World\''; }  // исходный код, состоящий из одной инструкции, задается строковой константой
+addProperty  { EVAL ACTION 'MESSAGE \'Hello World\''; }  // source code consisting of one instruction is specified with a string constant
   
-code 'Исходные код' = DATA BPSTRING[2000] ();              // свойство, в которое пользователь может ввести исходный код
-execute 'Выполнить код'  { EVAL code(); }      // действие, выполняющее этот код
+code 'Source code' = DATA BPSTRING[2000] ();              // a property to which the user can enter the source code
+execute 'Execute code'  { EVAL code(); }      // the action executing this code
 //#eval end
 
 //#exec
 importData(Sku sku, Order order)  { 
     MESSAGE 'Run import for ' + id(sku) + ' ' + customer(order);  
-}                                    // объявленное выше действие importData с двумя параметрами 
+}                                    // declared above action importData with two parameters 
 
 order = DATA Order (OrderDetail) NONULL DELETE;
-runImport(OrderDetail d)  { importData(sku(d), order(d)); } // объявление действия runImport, которое будет вызывать importData
+runImport(OrderDetail d)  { importData(sku(d), order(d)); } // declaration of the action runImport that will call importData
 //#exec end
 
 //#exportplain
@@ -309,11 +309,11 @@ weight = DATA NUMERIC[10,2] (Sku);
 in = DATA BOOLEAN (Store, Sku);
 
 exportSkus (Store store)  { 
-    EXPORT DBF CHARSET 'CP866' FROM id(Sku s), name(s), weight(s) WHERE in(store, s); // выгружаем в DBF все Sku, для которых задано in (Store, Sku) для нужного склада 
-    EXPORT CSV NOHEADER NOESCAPE FROM id(Sku s), name(s), weight(s) WHERE in(store, s); // выгружает CSV без строки заголовков и без экранирования спецсимволов
-    EXPORT FROM id(Sku s), name(s), weight(s) WHERE in(store, s) ORDER name(s) DESC; // выгружает JSON, сортируем по свойству name[Sku] в порядке убывания
-    EXPORT FROM ff='HI'; // выгружает JSON {"ff":"HI"}, так как по умолчанию получает имя value, а платформа объект {"value":"HI"} автоматически преобразует в 
-    EXPORT FROM 'HI'; // выгружает JSON "HI", так как по умолчанию получает имя value, а платформа объект {"value":"HI"} автоматически преобразует в "HI"     
+    EXPORT DBF CHARSET 'CP866' FROM id(Sku s), name(s), weight(s) WHERE in(store, s); // uploading to DBF all Sku for which in (Store, Sku) is specified for the desired warehouse 
+    EXPORT CSV NOHEADER NOESCAPE FROM id(Sku s), name(s), weight(s) WHERE in(store, s); // uploads to CSV without header line and escaping special characters
+    EXPORT FROM id(Sku s), name(s), weight(s) WHERE in(store, s) ORDER name(s) DESC; // uploads JSON, sorting by property name[Sku] in descending order
+    EXPORT FROM ff='HI'; // uploads JSON {"ff":"HI"}, as by default it gets the name value, and the platform gets the object {"value":"HI"} to 
+    EXPORT FROM 'HI'; // uploads JSON "HI", as by default it gets the name value, and the platform automatically converts the object {"value": "HI"} to "HI"     
 }
 //#exportplain end
 
@@ -327,7 +327,7 @@ FORM exportSku
 ;
 
 exportSku (Store store)  { 
-    // выгружаем в DBF все Sku, для которых задано in (Store, Sku) для нужного склада 
+    // uploading to DBF all Sku for which in (Store, Sku) is specified for the desired warehouse 
     EXPORT exportSku OBJECTS st = store DBF CHARSET 'CP866'; 
     EXPORT exportSku XML;
     EXPORT exportSku OBJECTS st = store CSV ','; 
@@ -345,17 +345,17 @@ externalHTTP()  {
     EXTERNAL HTTP GET 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile; 
     open(exportFile()); 
 
-    EXTERNAL HTTP 'http://tryonline.lsfusion.org/exec?action=getExamples' PARAMS JSONFILE('\{"mode"=1\}') TO exportFile; // фигурные скобки escape'ся так как используются в интернационализации
+    EXTERNAL HTTP 'http://tryonline.lsfusion.org/exec?action=getExamples' PARAMS JSONFILE('\{"mode"=1\}') TO exportFile; // braces are escaped') TO exportFile; // braces are escaped as they are used in internationalization
     IMPORT FROM exportFile() FIELDS () TEXT caption, TEXT code DO
         MESSAGE 'Example : ' + caption + ', code : ' + code;
         
-    EXTERNAL HTTP 'http://tryonline.lsfusion.org/exec?action=doSomething&someprm=$1' BODYURL 'otherprm=$2&andonemore=$3' PARAMS 1,2,'3'; // передает в BODY url-encoded второй и третий параметры
+    EXTERNAL HTTP 'http://tryonline.lsfusion.org/exec?action=doSomething&someprm=$1' BODYURL 'otherprm=$2&andonemore=$3' PARAMS 1,2,'3'; // passes the second and third parameters to BODY url-encoded
 }
 externalSQL ()  { 
-    EXPORT TABLE FROM bc=barcode(Article a) WHERE name(a) LIKE '%Мясо%'; // получаем все штрих-коды товаров с именем мясо
-    EXTERNAL SQL 'jdbc:mysql://$1/test?user=root&password=' EXEC 'select price AS pc, articles.barcode AS brc from $2 x JOIN articles ON x.bc=articles.barcode' PARAMS 'localhost',exportFile() TO exportFile; // читаем цены для считанных штрих-кодов
+    EXPORT TABLE FROM bc=barcode(Article a) WHERE name(a) LIKE '%Meat%'; // getting all barcodes of products with the name meat
+    EXTERNAL SQL 'jdbc:mysql://$1/test?user=root&password=' EXEC 'select price AS pc, articles.barcode AS brc from $2 x JOIN articles ON x.bc=articles.barcode' PARAMS 'localhost',exportFile() TO exportFile; // reading prices for read barcodes
     
-    // для всех товаров с полученными штрих-кодами записываем цены
+    // writing prices for all products with received barcodes
     LOCAL price = INTEGER (INTEGER);
     LOCAL barcode = STRING[30] (INTEGER);
     IMPORT FROM exportFile() TO price=pc,barcode=brc;
@@ -381,8 +381,8 @@ testFor  {
         MESSAGE 'Sku ' + id(s) + ' was selected';
     }
     
-    FOR Store st IS Store DO { // пробегаем по всем объектам класса Store
-        FOR in(st, Sku s) DO { // пробегаем по всем Sku, для которых in задано
+    FOR Store st IS Store DO { // iterating over all objects of the Store class
+        FOR in(st, Sku s) DO { // iterating over all Sku for which in is set
             MESSAGE 'There is Sku ' + id(s) + ' in store ' + name(st); 
         }   
         
@@ -413,7 +413,7 @@ createDetails (Order o)  {
 //#for end
 
 //#ifthena
-// Действие, сравнивающее значение свойства count с числом 3 и выдающее пользователю сообщение
+// Action that compares the value of the count property to 3 and displays a message to the user
 moreThan3(obj)  { 
     IF count(obj) > 3 THEN 
         MESSAGE '>3';
@@ -446,7 +446,7 @@ import()  {
         IMPORT XLS SHEET 2 FROM f TO field1 = C, field2, field3 = F, field4 = A;
         IMPORT XLS SHEET ALL FROM f TO field1 = C, field2, field3 = F, field4 = A;
         
-        FOR imported(INTEGER i) DO { // свойство imported - системное свойство, предназначенное для перебора данных
+        FOR imported(INTEGER i) DO { // imported property - a system property for iterating data
             MESSAGE 'field1 value = ' + field1(i);
             MESSAGE 'field2 value = ' + field2(i);
             MESSAGE 'field3 value = ' + field3(i);
@@ -456,12 +456,12 @@ import()  {
     
     LOCAL t = FILE ();
     EXTERNAL SQL 'jdbc:postgresql://localhost/test?user=postgres&password=12345' EXEC 'SELECT x.a,x.b,x.c,x.d FROM orders x WHERE x.id = $1;' PARAMS '4553' TO t;
-    IMPORT FROM t() FIELDS INTEGER a, DATE b, BPSTRING[50] c, BPSTRING[50] d DO        // импорт с опцией FIELDS
+    IMPORT FROM t() FIELDS INTEGER a, DATE b, BPSTRING[50] c, BPSTRING[50] d DO        // import with FIELDS option
         NEW o = Order {
             number(o) <- a;
             date(o) <- b;
             customer(o) <- c;
-            currency(o) <- GROUP MAX Currency currency IF name(currency) = d; // находим currency с данным именем
+            currency(o) <- GROUP MAX Currency currency IF name(currency) = d; // finding currency with this name
         }
     
     
@@ -487,25 +487,25 @@ sku = DATA BPSTRING[50] (INTEGER);
 price = DATA NUMERIC[14,2] (INTEGER); 
 order = DATA INTEGER (INTEGER); 
 FORM import
-    OBJECTS o = INTEGER // заказы
-    OBJECTS od = INTEGER // строки заказов
-    PROPERTIES (o) dateOrder = date // импортируем дату из поля dateOrder
-    PROPERTIES (od) sku = sku, price = price // импортируем товар количество из полей sku и price
-    FILTERS order(od) = o // в order - записываем верхний заказ 
+    OBJECTS o = INTEGER // orders
+    OBJECTS od = INTEGER // order lines
+    PROPERTIES (o) dateOrder = date // importing the date from the dateOrder field
+    PROPERTIES (od) sku = sku, price = price // importing product quantity from sku and price fields
+    FILTERS order(od) = o // writing the top order to order 
     
 ;
 
 importForm()  { 
     INPUT f = FILE DO {
         IMPORT import JSON FROM f;
-        SHOW import; // показываем что импортировалось
+        SHOW import; // showing what was imported
 
-        // создаем объекты в базе        
+        // creating objects in the database        
         FOR DATE date = date(INTEGER io) NEW o = Order DO {
             date(o) <- date;
             FOR order(INTEGER iod) = io NEW od = OrderDetail DO {
                 price(od) <- price(iod); 
-                sku(od) <- GROUP MAX Sku sku IF name(sku) = sku(iod); // находим sku с данным именем
+                sku(od) <- GROUP MAX Sku sku IF name(sku) = sku(iod); // finding sku with this name
             }        
         }             
     }
@@ -529,8 +529,8 @@ FORM order
 ;
 
 testFile  { 
-    INPUT f = FILE DO { // запрашиваем диалог по выбору файла
-        open(f); // открываем выбранный файл
+    INPUT f = FILE DO { // requesting a dialog to select a file
+        open(f); // opening the selected file
     }
 }
 //#input end
@@ -555,20 +555,20 @@ requestCustomer (Order o)  {
 
 FORM request
     OBJECTS o = Order
-    PROPERTIES(o) customer ON CHANGE requestCustomer(o) // будет работать, к примеру, групповая корректировка  
+    PROPERTIES(o) customer ON CHANGE requestCustomer(o) // for example, group adjustment will be performed  
 ;
 
 //#request end
 
 //#message
-message  { MESSAGE 'Hello World!'; }                                // простое текстовое сообщение
+message  { MESSAGE 'Hello World!'; }                                // plain text message
 
 isGood = DATA BOOLEAN (Item);
 stringData(Item i)   { 
-    MESSAGE IF isGood(i) THEN 'Good' ELSE 'Bad';   // в зависимости от того, какой item будет передан действию, будет показываться окно с текстом 'Good', либо с текстом 'Bad'
+    MESSAGE IF isGood(i) THEN 'Good' ELSE 'Bad';   // depending on which item will be passed to the action, a window will be shown either with the text 'Good' or with the text 'Bad'
 }
   
-testMessage()  {                    // В этом случае пользователю будет выдано пять текстовых сообщений
+testMessage()  {                    // In this case, five text messages will be shown to the user
     LOCAL i = INTEGER();
     i() <- 0;
     WHILE i() < 5 DO {
@@ -577,7 +577,7 @@ testMessage()  {                    // В этом случае пользова
     }
 }
  
-testMessageNowait()  {              // В случае NOWAIT пользователю будет выдано одно текстовое сообщение, объединяющее сообщения от пяти вызовов MESSAGE
+testMessageNowait()  {              // In the case of NOWAIT, one text message combining messages from five MESSAGE calls will be shown to the user
     LOCAL i = INTEGER();
     i() <- 0;
     WHILE i() < 5 DO {
@@ -616,12 +616,12 @@ newSku ()  {
 testNestedSession ()  { 
     NESTEDSESSION {
         name(Sku s) <- 'aaa';
-        APPLY; // на самом деле изменения применятся не в базу данных, а в "верхнюю" сессию
+        APPLY; // in fact, the changes will not be applied to the database, but to the "upper" session
     }
     
-    MESSAGE (GROUP SUM 1 IF name(Sku s) == 'aaa'); // возвращает все строки
+    MESSAGE (GROUP SUM 1 IF name(Sku s) == 'aaa'); // returns all rows
     CANCEL;
-    MESSAGE (GROUP SUM 1 IF name(Sku s) == 'aaa'); // возвращает NULL, если в базе не было раньше Sku с именем aaa
+    MESSAGE (GROUP SUM 1 IF name(Sku s) == 'aaa'); // returns NULL if there was no Sku named aaa in the database before
     
 }
 
@@ -632,7 +632,7 @@ FORM sku
 newNestedSession()  { 
     NESTEDSESSION {
         NEW s = Sku {
-            // показывает форму, но любые изменения в ней не будут применены в базу данных, а будут сохранены в "верхней сессии"
+            // shows the form, but any changes in it will not be applied to the database, but will be saved in the "upper session" session
             SHOW sku OBJECTS s = s;
         }       
     }
@@ -645,7 +645,7 @@ testExecutor  {
         FOR id(Sku s) DO {
             NEWTHREAD {
                 NEWSESSION {
-                    name(s) <- STRING[20](id(s)); // записываем в наименование код в 10 потоков
+                    name(s) <- STRING[20](id(s)); // writing the code into the name in 10 threads
                     APPLY;
                 }
             }
@@ -663,15 +663,15 @@ testNewSession ()  {
         }
         APPLY;
     }
-    // здесь новый объект класса Currency уже в базе данных
+    // here a new object of class Currency is already in the database
     
     LOCAL local = BPSTRING[10] (Currency);
     local(Currency c) <- 'Local';
     NEWSESSION {
-        MESSAGE (GROUP SUM 1 IF local(Currency c) == 'Local'); // возвратит NULL
+        MESSAGE (GROUP SUM 1 IF local(Currency c) == 'Local'); // will return NULL
     }
     NEWSESSION NESTED (local) {
-        MESSAGE (GROUP SUM 1 IF local(Currency c) == 'Local'); // возвратит кол-во объектов класса Currency
+        MESSAGE (GROUP SUM 1 IF local(Currency c) == 'Local'); // will return the number of objects of class Currency
     }
     
     NEWSESSION {
@@ -687,12 +687,12 @@ testNewSession ()  {
 
 //#newthread
 testNewThread ()  { 
-    //Показ всем сообщения 'Сообщение'
+    //Showing messages 'Message' to all
     FOR user(Connection conn) AND connectionStatus(conn) == ConnectionStatus.connectedConnection AND conn != currentConnection() DO {
-        NEWTHREAD MESSAGE 'Сообщение'; CONNECTION conn;
+        NEWTHREAD MESSAGE 'Message'; CONNECTION conn;
     }
       
-    //Выполнение действия action с периодичностью в 10 секунд и задержкой 5 секунд
+    //Execution of the 'action' action with a frequency of 10 seconds and a delay of 5 seconds
     NEWTHREAD MESSAGE 'Hello World'; SCHEDULE PERIOD 10000 DELAY 5000;
 }
 //#newthread end
@@ -708,7 +708,7 @@ FORM printOrder
 ;
 
 print (Order o)  { 
-    PRINT printOrder OBJECTS o = o; // выводим на печать
+    PRINT printOrder OBJECTS o = o; // printing
     
     LOCAL file = FILE (); 
     PRINT printOrder OBJECTS o = o DOCX TO file;
@@ -716,11 +716,11 @@ print (Order o)  {
     
     //v 2.0-2.1 syntax
     LOCAL sheetName = STRING[255]();
-    sheetName() <- 'enctypted';
+    sheetName() <- 'encrypted';
     PRINT printOrder OBJECTS o = o XLS SHEET sheetName PASSWORD 'pass';
     
     //v 2.2 syntax
-    //PRINT printOrder OBJECTS o = o XLS SHEET 'enctypted' PASSWORD 'pass';
+    //PRINT printOrder OBJECTS o = o XLS SHEET 'encrypted' PASSWORD 'pass';
 }
 //#print end
 
@@ -729,17 +729,17 @@ readFiles()  {
   
     LOCAL importFile = FILE ();
  
-    //чтение из FTP
+    //reading from FTP
     READ 'ftp://ftp.lsfusion.org/file.xlsx' TO importFile;
-    //чтение из SFTP
+    //reading from SFTP
     READ 'sftp://sftp.lsfusion.org/file.xlsx' TO importFile;
-    //чтение из FILE
+    //reading from FILE
     READ 'D://lsfusion/file.xlsx' TO importFile;
     READ 'file://D://lsfusion/file.xlsx' TO importFile;
 }
 
 connectionString = DATA STRING[100]();  
-importXls 'Импортировать надбавки'()  { 
+importXls 'Import markups'()  { 
     LOCAL importFile = FILE ();
     READ connectionString() + '@SELECT field1, field2 FROM myTable' TO importFile;
     
@@ -811,7 +811,7 @@ tryToImport(FILE f)  {
 }
 
 CLASS MyLock {
-    lock 'Блокировка'
+    lock 'Blocking'
 }
 
 singleDo ()  { 

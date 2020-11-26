@@ -1,8 +1,8 @@
 MODULE InputUseCase;
 
 //#sample1
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[100] (Book);
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[100] (Book);
  
 FORM books
      OBJECTS b = Book
@@ -15,8 +15,8 @@ NAVIGATOR {
 
 //#solution1
 changeName(Book b)  { 
-     INPUT s = ISTRING[100] // вводим ISTRING[100] "в параметр" s (автоматически оборачивается в REQUEST, то есть доступны групповая корректировки, PASTE и т.п.)
-                     DO // проверка на requestCanceled
+     INPUT s = ISTRING[100] // inputting ISTRING[100] "to parameter" s (automatically wrapped in REQUEST, that is, group adjustments, PASTE, etc. are available)
+                     DO // checking for requestCanceled
                           name(b) <- s;
 }
   
@@ -26,21 +26,21 @@ EXTEND FORM books
 //#solution1 end
 
 //#sample2
-CLASS Genre 'Жанр';
-name 'Наименование' = DATA ISTRING[100] (Genre);
+CLASS Genre 'Genre';
+name 'Name' = DATA ISTRING[100] (Genre);
  
-genre 'Жанр' = DATA Genre (Book);
-isForbidden 'Запрет' = DATA BOOLEAN (Book);
+genre 'Genre' = DATA Genre (Book);
+isForbidden 'Prohibition' = DATA BOOLEAN (Book);
   
-CLASS Order 'Заказ';
-book 'Книга' = DATA Book (Order);
-nameBook 'Наименование книги' (Order o) = name(book(o));
+CLASS Order 'Order';
+book 'Book' = DATA Book (Order);
+nameBook 'Book name' (Order o) = name(book(o));
 
-date 'Дата' = DATA DATE (Order);
-number 'Номер' = DATA STRING[100] (Order);
+date 'Date' = DATA DATE (Order);
+number 'Number' = DATA STRING[100] (Order);
 
 CONSTRAINT isForbidden(book(Order o)) 
-    CHECKED BY book MESSAGE 'Запрещено выбирать эту книгу';
+    CHECKED BY book MESSAGE 'It is forbidden to choose this book';
  
 FORM booksByGenre
      OBJECTS g = Genre PANEL
@@ -50,7 +50,7 @@ FORM booksByGenre
 ;
  
  
-FORM orders 'Заказы'
+FORM orders 'Orders'
     OBJECTS g = Genre PANEL
     PROPERTIES (g) name
     
@@ -66,14 +66,14 @@ NAVIGATOR {
 
 //#solution2
 changeNameBook(Genre g, Order o)  { 
-          DIALOG booksByGenre OBJECTS // (автоматически оборачивается в REQUEST, то есть доступны групповая корректировки, PASTE и т.п.)
-                g = g NULL, // разрешен NULL на входе
+          DIALOG booksByGenre OBJECTS // (automatically wrapped in REQUEST, that is, group adjustments, PASTE, etc. are available)
+                g = g NULL, // NULL input allowed
                 b = book(o) NULL INPUT bk NULL CONSTRAINTFILTER
-                    // book(o) NULL - подставляем book(o) на вход (при необходимости можно не указывать вход, то есть писать просто b INPUT ..., что в свою очередь эквивалентно b=NULL NULL INPUT ...)
-                    // INPUT b NULL - возвращаем значение этого объекта "в параметр" bk (разрешен возврат NULL то есть будет кнопка сбросить). Так как не указана опция TO, результат будет записан в requestedObject
-                    // CONSTRAINTFILTER - учитываем для объекта b ограничения из предположения что результат будет записан в свойство передаваемое на вход (в данном случае book(o),
-                    // при необходимости можно задать другое выражение в виде CONSTRAINTFILTER = dataBook(o)
-    DO // проверка на requestCanceled
+                    // book(o) NULL - substituting book(o) to the input (if necessary, the input can be omitted, that is, the user can simply write b INPUT ..., which in turn is equivalent to b=NULL NULL INPUT ...)
+                    // INPUT b NULL - returning the value of this object "to parameter" bk (return NULL is allowed, that is, there will be a reset button). Since the TO option is not specified, the result will be written to the requestedObject
+                    // CONSTRAINTFILTER - taking into account the constraints for object b on the assumption that the result will be written to the property passed to the input (in this case book(o),
+                    // if necessary, another expression can be specified in the form CONSTRAINTFILTER = dataBook(o)
+    DO // checking for requestCanceled
         book(o) <- bk;
 }
   

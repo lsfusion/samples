@@ -23,10 +23,10 @@ END
 
 //#definemeta2
 META objectProperties(object, caption)
-    object##Name 'Имя '##caption = DATA BPSTRING[100](object);
-    object##Type 'Тип '##caption = DATA Type (object);
-    object##Value 'Стоимость '##caption = DATA INTEGER (object);
+    object##Name 'Name '##caption = DATA BPSTRING[100](object);
+    object##Type 'Type '##caption = DATA Type (object);
+    object##Value 'Cost '##caption = DATA INTEGER (object);
 END
   
-@objectProperties(Document, 'документа');
+@objectProperties(Document, 'of the document');
 //#definemeta2 end

@@ -3,18 +3,18 @@ MODULE UseCaseReports;
 //#sample1
 NAMESPACE Sample;
 
-CLASS Category 'Категория';
-name 'Наименование' = DATA ISTRING[50] (Category) IN id;
+CLASS Category 'Category';
+name 'Name' = DATA ISTRING[50] (Category) IN id;
 
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[100] (Book) IN id;
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[100] (Book) IN id;
 
-category 'Категория' = DATA Category (Book) AUTOSET;
-nameCategory 'Категория' (Book b) = name(category(b)) IN id;
+category 'Category' = DATA Category (Book) AUTOSET;
+nameCategory 'Category' (Book b) = name(category(b)) IN id;
 
-countBooks 'Кол-во книг' (Category c) = GROUP SUM 1 BY category(Book b);
+countBooks 'Number of books' (Category c) = GROUP SUM 1 BY category(Book b);
 
-FORM books 'Книги'
+FORM books 'Books'
     OBJECTS b = Book
     PROPERTIES(b) READONLY name, nameCategory
     PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
@@ -26,7 +26,7 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1a
-FORM booksByCategories 'Книги по категориям'
+FORM booksByCategories 'Books by category'
     OBJECTS c = Category
     PROPERTIES(c) name, countBooks
     
@@ -37,11 +37,11 @@ FORM booksByCategories 'Книги по категориям'
 //#solution1a end
 
 //#solution1b
-printBooksByCategories 'Книги по категориям' ()  { 
+printBooksByCategories 'Books by category' ()  { 
     PRINT booksByCategories;
 }
 
-xlsxBooksByCategories 'Книги по категориям (XLSX)' ()  { 
+xlsxBooksByCategories 'Books by category (XLSX)' ()  { 
     PRINT booksByCategories XLSX;
 }
 //#solution1b end
@@ -53,20 +53,20 @@ EXTEND FORM books
 //#solution1c end
 
 //#sample2
-CLASS Invoice 'Счет';
-date 'Дата' = DATA DATE (Invoice);
-number 'Номер' = DATA STRING[10] (Invoice);
+CLASS Invoice 'Invoice';
+date 'Date' = DATA DATE (Invoice);
+number 'Number' = DATA STRING[10] (Invoice);
   
-CLASS InvoiceDetail 'Строка счета';
-invoice 'Счет' = DATA Invoice (InvoiceDetail) NONULL DELETE;
+CLASS InvoiceDetail 'Invoice line';
+invoice 'Invoice' = DATA Invoice (InvoiceDetail) NONULL DELETE;
   
-book 'Книга' = DATA Book (InvoiceDetail) NONULL;
-nameBook 'Книга' (InvoiceDetail d) = name(book(d));
+book 'Book' = DATA Book (InvoiceDetail) NONULL;
+nameBook 'Book' (InvoiceDetail d) = name(book(d));
   
-quantity 'Количество' = DATA INTEGER (InvoiceDetail);
-price 'Цена' = DATA NUMERIC[14,2] (InvoiceDetail);
+quantity 'Quantity' = DATA INTEGER (InvoiceDetail);
+price 'Price' = DATA NUMERIC[14,2] (InvoiceDetail);
 
-FORM invoice 'Счет'
+FORM invoice 'Invoice'
     OBJECTS i = Invoice PANEL
     PROPERTIES(i) date, number
     
@@ -77,7 +77,7 @@ FORM invoice 'Счет'
     EDIT Invoice OBJECT i
 ;
 
-FORM invoices 'Счета'
+FORM invoices 'Invoices'
     OBJECTS i = Invoice
     PROPERTIES(i) READONLY date, number
     PROPERTIES(i) NEWSESSION NEW, EDIT, DELETE
@@ -89,10 +89,10 @@ NAVIGATOR {
 //#sample2 end
 
 //#solution2
-print 'Печать' (Invoice i)  { 
+print 'Print' (Invoice i)  { 
     PRINT invoice OBJECTS i = i;
 }
-printWord 'Печать (DOCX)' (Invoice i)  { 
+printWord 'Print (DOCX)' (Invoice i)  { 
     PRINT invoice OBJECTS i = i DOCX;
 }
 
@@ -102,10 +102,10 @@ EXTEND FORM invoices
 //#solution2 end
 
 //#sample3
-CLASS Customer 'Покупатель';
-name 'Наименование' = DATA ISTRING[50] (Customer) IN id;
+CLASS Customer 'Customer';
+name 'Name' = DATA ISTRING[50] (Customer) IN id;
 
-FORM customers 'Покупатели'
+FORM customers 'Customers'
     OBJECTS c = Customer
     PROPERTIES(c) READONLY name
     PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE
@@ -115,28 +115,28 @@ NAVIGATOR {
     NEW customers;
 }
 
-customer 'Покупатель' = DATA Customer (Invoice);
-nameCustomer 'Покупатель' (Invoice i) = name(customer(i));
+customer 'Customer' = DATA Customer (Invoice);
+nameCustomer 'Customer' (Invoice i) = name(customer(i));
 
 EXTEND FORM invoice PROPERTIES(i) nameCustomer;
 
-CLASS Order 'Заказ';
-date 'Дата' = DATA DATE (Order);
-number 'Номер' = DATA STRING[10] (Order);
+CLASS Order 'Order';
+date 'Date' = DATA DATE (Order);
+number 'Number' = DATA STRING[10] (Order);
 
-customer 'Покупатель' = DATA Customer (Order);
-nameCustomer 'Покупатель' (Order o) = name(customer(o));
+customer 'Customer' = DATA Customer (Order);
+nameCustomer 'Customer' (Order o) = name(customer(o));
 
-CLASS OrderDetail 'Строка заказа';
-order 'Заказ' = DATA Order (OrderDetail) NONULL DELETE;
+CLASS OrderDetail 'Order line';
+order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
   
-book 'Книга' = DATA Book (OrderDetail) NONULL;
-nameBook 'Книга' (OrderDetail d) = name(book(d));
+book 'Book' = DATA Book (OrderDetail) NONULL;
+nameBook 'Book' (OrderDetail d) = name(book(d));
   
-quantity 'Количество' = DATA INTEGER (OrderDetail);
-price 'Цена' = DATA NUMERIC[14,2] (OrderDetail);
+quantity 'Quantity' = DATA INTEGER (OrderDetail);
+price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
 
-FORM order 'Заказ'
+FORM order 'Order'
     OBJECTS o = Order PANEL
     PROPERTIES(o) date, number, nameCustomer
     
@@ -147,7 +147,7 @@ FORM order 'Заказ'
     EDIT Order OBJECT o
 ;
 
-FORM orders 'Заказы'
+FORM orders 'Orders'
     OBJECTS i = Order
     PROPERTIES(i) READONLY date, number, nameCustomer
     PROPERTIES(i) NEWSESSION NEW, EDIT, DELETE
@@ -159,7 +159,7 @@ NAVIGATOR {
 //#sample3 end
 
 //#solution3
-FORM customerInfo 'Информация по клиенту'
+FORM customerInfo 'Customer information'
     OBJECTS c = Customer PANEL
     PROPERTIES(c) name
     
@@ -180,7 +180,7 @@ FORM customerInfo 'Информация по клиенту'
     FILTERS invoice(id) == i
 ;
 
-printInfo 'Распечатать информацию' (Customer c)  { 
+printInfo 'Print information' (Customer c)  { 
     PRINT customerInfo OBJECTS c = c;
 }
 

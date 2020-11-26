@@ -1,13 +1,13 @@
 MODULE UseCaseNavigator;
 
 //#sample1
-FORM categories 'Категории';
-FORM books 'Книги';
+FORM categories 'Categories';
+FORM books 'Books';
 //#sample1 end
 
 //#solution1
 NAVIGATOR {
-    NEW FOLDER application 'Приложение' WINDOW toolbar FIRST {
+    NEW FOLDER application 'Application' WINDOW toolbar FIRST {
         NEW categories;
         NEW books;
     }
@@ -17,7 +17,7 @@ NAVIGATOR {
 //#solution2
 NAVIGATOR {
     application {
-        NEW FOLDER masterData 'Справочники' {
+        NEW FOLDER masterData 'Directories' {
             NEW categories;
             NEW books;
         }

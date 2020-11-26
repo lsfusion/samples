@@ -1,23 +1,23 @@
 MODULE UseCaseIfCase;
 
 //#sample1
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[50] (Book);
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[50] (Book);
 
-CLASS Category 'Категория' {
-    novel 'Роман',
-    thriller 'Триллер',
-    fiction 'Фантастика'
+CLASS Category 'Category' {
+    novel 'Novel',
+    thriller 'Thriller',
+    fiction 'Fiction'
 }
 
-category 'Категория' = DATA Category (Book);
-price 'Цена' = DATA NUMERIC[14,2] (Book);
+category 'Category' = DATA Category (Book);
+price 'Price' = DATA NUMERIC[14,2] (Book);
 //#sample1 end
 
 //#solution1
-setPriceIf 'Установить цену' (Book b)  { 
+setPriceIf 'Set price' (Book b)  { 
     IF NOT category(b) THEN
-        MESSAGE 'Не выбрана категория для книги';
+        MESSAGE 'No category selected for the book';
     ELSE
         IF category(b) == Category.novel THEN
             price(b) <- 50.0;
@@ -27,7 +27,7 @@ setPriceIf 'Установить цену' (Book b)  {
 //#solution1 end
 
 //#solution2
-setPriceCase 'Установить цену' (Book b)  { 
+setPriceCase 'Set price' (Book b)  { 
     CASE
         WHEN category(b) == Category.novel THEN
             price(b) <- 50.0;

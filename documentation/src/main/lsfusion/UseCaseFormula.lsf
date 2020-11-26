@@ -1,11 +1,11 @@
 MODULE UseCaseFormula;
 
 //#sample1
-CLASS Order 'Заказ';
-date 'Дата' = DATA DATE (Order);
-number 'Номер' = DATA STRING[30] (Order);
+CLASS Order 'Order';
+date 'Date' = DATA DATE (Order);
+number 'Number' = DATA STRING[30] (Order);
   
-FORM orders 'Заказы на закупку'
+FORM orders 'Purchase orders'
     OBJECTS o = Order
     PROPERTIES(o) date, number, NEW, DELETE
 ;
@@ -18,7 +18,7 @@ NAVIGATOR {
 //#solution1
 toISO = FORMULA STRING[10] 'to_char($1,\'YYYY-MM-DD\')';
 
-exportToCSV 'Экспорт в CSV' () {
+exportToCSV 'Export to CSV' () {
     LOCAL file = FILE ();
     EXPORT CSV FROM toISO(date(Order o)), number(o) TO file;
     open(file()); 
@@ -33,8 +33,8 @@ EXTEND FORM orders
 CLASS OrderDetail;
 order = DATA Order (OrderDetail) NONULL DELETE;
 
-quantity 'Кол-во' = DATA NUMERIC[14,3] (OrderDetail);
-sum 'Сумма' = DATA NUMERIC[14,2] (OrderDetail);
+quantity 'Qty' = DATA NUMERIC[14,3] (OrderDetail);
+sum 'Amount' = DATA NUMERIC[14,2] (OrderDetail);
 
 EXTEND FORM orders
     OBJECTS d = OrderDetail
@@ -46,7 +46,7 @@ EXTEND FORM orders
 //#solution2
 toString = FORMULA TEXT 'to_char($1,$2)';
 
-exportToCSV 'Экспорт в CSV' (Order o) {
+exportToCSV 'Export to CSV' (Order o) {
     LOCAL file = FILE ();
     EXPORT CSV FROM toISO(date(o)), number(o), toString(quantity(OrderDetail d), '999 999.999'), toString(sum(d), '999 999.99') WHERE order(d) = o TO file;
     open(file()); 
@@ -61,6 +61,6 @@ EXTEND FORM orders
 onlyDigits = FORMULA NULL BOOLEAN 'CASE WHEN trim($1) ~ \'^[0-9]*$\' THEN 1 ELSE NULL END';
 
 EXTEND FORM orders
-    PROPERTIES 'Только цифры' = onlyDigits(number(o))
+    PROPERTIES 'Only numbers' = onlyDigits(number(o))
 ;
 //#solution3 end

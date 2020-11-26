@@ -1,7 +1,7 @@
 MODULE UseCaseTyping;
 
-CLASS Order 'Заказ';
-CLASS OrderDetail 'Заказ';
+CLASS Order 'Order';
+CLASS OrderDetail 'Order';
 
 order = DATA Order (OrderDetail);
  
@@ -11,5 +11,5 @@ sum = GROUP SUM sum(OrderDetail od) BY order(od);
 //#sums end
 
 //#sref
-CONSTRAINT sum(Order o) < 0 MESSAGE 'Сумма заказа должна быть положительной';
+CONSTRAINT sum(Order o) < 0 MESSAGE 'The order amount must be positive';
 //#sref end

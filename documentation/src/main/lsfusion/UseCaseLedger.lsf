@@ -4,45 +4,45 @@ MODULE UseCaseLedger;
 REQUIRE Utils;
 
 CLASS SKU 'SKU';
-CLASS Stock 'Склад';
+CLASS Stock 'Warehouse';
 //#skumaster end
 
 //#skuledger
-CLASS ABSTRACT SKULedger 'Регистр изменения остатка товара';
+CLASS ABSTRACT SKULedger 'Register of changes in the product balance';
 
-posted 'Проведен' = ABSTRACT BOOLEAN (SKULedger);
-dateTime 'Дата/время' = ABSTRACT DATETIME (SKULedger);
+posted 'Completed' = ABSTRACT BOOLEAN (SKULedger);
+dateTime 'Date/time' = ABSTRACT DATETIME (SKULedger);
 
 sku 'SKU' = ABSTRACT SKU (SKULedger);
-stock 'Склад' = ABSTRACT Stock (SKULedger);
+stock 'Warehouse' = ABSTRACT Stock (SKULedger);
 
-quantity 'Кол-во' = ABSTRACT NUMERIC[14,2] (SKULedger);
+quantity 'Qty' = ABSTRACT NUMERIC[14,2] (SKULedger);
 
-balance 'Остаток' = GROUP SUM quantity(SKULedger l) IF posted(l) BY stock(l), sku(l);
+balance 'Balance' = GROUP SUM quantity(SKULedger l) IF posted(l) BY stock(l), sku(l);
 
-balance 'Остаток на дату/время' = GROUP SUM quantity(SKULedger l) IF posted(l) AND dateTime(l) <= DATETIME dt BY stock(l), sku(l), dateTime(l);
+balance 'Balance as of date/time' = GROUP SUM quantity(SKULedger l) IF posted(l) AND dateTime(l) <= DATETIME dt BY stock(l), sku(l), dateTime(l);
 //#skuledger end
 
 //#skureceipt
-CLASS Receipt 'Поступление на склад';
-posted 'Проведен' = DATA BOOLEAN (Receipt);
-dateTime 'Дата/время' = DATA DATETIME (Receipt);
+CLASS Receipt 'Warehouse arrival';
+posted 'Completed' = DATA BOOLEAN (Receipt);
+dateTime 'Date/time' = DATA DATETIME (Receipt);
 
-stock 'Склад' = DATA Stock (Receipt); 
+stock 'Warehouse' = DATA Stock (Receipt); 
 
-CLASS ReceiptDetail 'Строка поступления на склад';
-receipt 'Поступление' = DATA Receipt (ReceiptDetail) NONULL DELETE;
+CLASS ReceiptDetail 'Warehouse arrival line';
+receipt 'Arrival' = DATA Receipt (ReceiptDetail) NONULL DELETE;
 
 sku 'SKU' = DATA SKU (ReceiptDetail);
 
-quantity 'Кол-во' = DATA NUMERIC[14,2] (ReceiptDetail);
-price 'Цена' = DATA NUMERIC[14,2] (ReceiptDetail);
+quantity 'Qty' = DATA NUMERIC[14,2] (ReceiptDetail);
+price 'Price' = DATA NUMERIC[14,2] (ReceiptDetail);
 //#skureceipt end
 
 //#skureceiptimplement
 EXTEND CLASS ReceiptDetail : SKULedger;
 
-// необходимо указывать [SKULedger], так как ReceiptDetail также наследует PriceLedger в этом же примере и платформе надо знать, какое именно свойство надо реализовать
+// [SKULedger] must be specified, since ReceiptDetail also inherits PriceLedger in the same example and the platform needs to know which property needs to be implemented
 posted[SKULedger](ReceiptDetail d) += posted(receipt(d));
 dateTime[SKULedger](ReceiptDetail d) += dateTime(receipt(d));
 
@@ -53,20 +53,20 @@ quantity[SKULedger](ReceiptDetail d) += quantity(d);
 //#skureceiptimplement end
 
 //#skutransfer
-CLASS Transfer 'Перемещение со склада на склад';
-posted 'Проведен' = DATA BOOLEAN (Transfer);
-dateTime 'Дата/время' = DATA DATETIME (Transfer);
+CLASS Transfer 'Moving from warehouse to warehouse';
+posted 'Completed' = DATA BOOLEAN (Transfer);
+dateTime 'Date/time' = DATA DATETIME (Transfer);
 
-fromStock 'Склад (откуда)' = DATA Stock (Transfer); 
-toStock 'Склад (куда)' = DATA Stock (Transfer); 
+fromStock 'Warehouse (from)' = DATA Stock (Transfer); 
+toStock 'Warehouse (to)' = DATA Stock (Transfer); 
 
-CLASS TransferDetail 'Строка отгрузки со склада';
-transfer 'Поступление' = DATA Transfer (TransferDetail) NONULL DELETE;
+CLASS TransferDetail 'Warehouse shipment line';
+transfer 'Arrival' = DATA Transfer (TransferDetail) NONULL DELETE;
 
 sku 'SKU' = DATA SKU (TransferDetail);
 
-quantity 'Кол-во' = DATA NUMERIC[14,2] (TransferDetail);
-price 'Цена' = DATA NUMERIC[14,2] (TransferDetail);
+quantity 'Qty' = DATA NUMERIC[14,2] (TransferDetail);
+price 'Price' = DATA NUMERIC[14,2] (TransferDetail);
 //#skutransfer end
 
 //#skutransferimplement
@@ -82,7 +82,7 @@ quantity(TransferDetail d) += -quantity(d);
 //#skutransferimplement end
 
 //#skutransferaggregation
-CLASS TransferSKULedger 'Перемещение на склад (регистр)' : SKULedger; 
+CLASS TransferSKULedger 'Moving to warehouse (register)' : SKULedger; 
 transferSKULedger = AGGR TransferSKULedger WHERE posted(TransferDetail transferDetail);
 
 posted(TransferSKULedger d) += d IS TransferSKULedger;
@@ -95,29 +95,29 @@ quantity(TransferSKULedger d) += quantity(transferDetail(d));
 //#skutransferaggregation end
 
 //#priceledger
-CLASS ABSTRACT PriceLedger 'Регистр изменения цены поступления';
+CLASS ABSTRACT PriceLedger 'Receipt price change register';
 
-posted 'Проведен' = ABSTRACT BOOLEAN (PriceLedger);
-dateTime 'Дата/время' = ABSTRACT DATETIME (PriceLedger);
+posted 'Completed' = ABSTRACT BOOLEAN (PriceLedger);
+dateTime 'Date/time' = ABSTRACT DATETIME (PriceLedger);
 
 sku 'SKU' = ABSTRACT SKU (PriceLedger);
-stock 'Склад' = ABSTRACT Stock (PriceLedger);
+stock 'Warehouse' = ABSTRACT Stock (PriceLedger);
 
-price 'Цена' = ABSTRACT NUMERIC[14,2] (PriceLedger);
+price 'Price' = ABSTRACT NUMERIC[14,2] (PriceLedger);
 
-price 'Цена' (Stock stock, SKU sku, DATETIME dateTime) = 
+price 'Price' (Stock stock, SKU sku, DATETIME dateTime) = 
     GROUP LAST price(PriceLedger l)
           ORDER dateTime(l), l 
           WHERE posted(l) AND dateTime(l) <= dateTime 
           BY stock(l), sku(l); 
 
-price 'Цена' (Stock stock, SKU sku) =
+price 'Price' (Stock stock, SKU sku) =
     GROUP LAST price(PriceLedger l)
           ORDER dateTime(l), l
           WHERE posted(l) 
           BY stock(l), sku(l); 
 
-price 'Цена' (SKU sku, DATETIME dateTime) = 
+price 'Price' (SKU sku, DATETIME dateTime) = 
     GROUP LAST price(PriceLedger l)
           ORDER dateTime(l), l 
           WHERE posted(l) AND dateTime(l) <= dateTime 
@@ -127,7 +127,7 @@ price 'Цена' (SKU sku, DATETIME dateTime) =
 //#pricereceiptimplement
 EXTEND CLASS ReceiptDetail : PriceLedger;
 
-// необходимо указывать [PriceLedger], так как ReceiptDetail также наследует SKULedger в этом же примере и платформе надо знать, какое именно свойство надо реализовать
+// [PriceLedger] must be specified, since ReceiptDetail also inherits SKULedger in the same example and the platform needs to know which property to implement
 posted[PriceLedger](ReceiptDetail d) += posted(receipt(d));
 dateTime[PriceLedger](ReceiptDetail d) += dateTime(receipt(d));
 

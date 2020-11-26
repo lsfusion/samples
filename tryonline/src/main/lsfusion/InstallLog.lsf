@@ -21,7 +21,7 @@ saveInstallLog(STRING fileString) {
     }
 } @@noauth;
 
-FORM installLog 'Журнал инсталляций'
+FORM installLog 'Installations log'
     OBJECTS log = InstallLog
     PROPERTIES(log) READONLY date, installLog, configureLog
 ;

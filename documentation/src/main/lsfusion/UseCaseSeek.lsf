@@ -3,23 +3,23 @@ MODULE UseCaseSeek;
 //#sample1
 REQUIRE Time;
 
-CLASS Category 'Категория';
-name 'Наименование' = DATA ISTRING[50] (Category) IN id;
+CLASS Category 'Category';
+name 'Name' = DATA ISTRING[50] (Category) IN id;
 
-CLASS Book 'Книга';
-name 'Наименование' = DATA ISTRING[50] (Book) IN id;
+CLASS Book 'Book';
+name 'Name' = DATA ISTRING[50] (Book) IN id;
 
-category 'Категория' = DATA Category (Book) NONULL;
-nameCategory 'Категория' (Book b) = name(category(b));
+category 'Category' = DATA Category (Book) NONULL;
+nameCategory 'Category' (Book b) = name(category(b));
 
-FORM book 'Книга'
+FORM book 'Book'
     OBJECTS b = Book PANEL
     PROPERTIES(b) name, nameCategory
     
     EDIT Book OBJECT b
 ;
 
-FORM books 'Книги'
+FORM books 'Books'
     OBJECTS c = Category
     PROPERTIES(c) READONLY name
     PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE
@@ -35,7 +35,7 @@ NAVIGATOR {
 //#sample1 end
 
 //#solution1
-createBook 'Создать книгу' (Category c)  { 
+createBook 'Create book' (Category c)  { 
     NEWSESSION {
         NEW newBook = Book {
             category(newBook) <- c;
@@ -52,12 +52,12 @@ EXTEND FORM books
 //#solution1 end
 
 //#sample2
-CLASS Customer 'Покупатель';
-name 'Наименование' = DATA ISTRING[50] (Customer) IN id;
+CLASS Customer 'Customer';
+name 'Name' = DATA ISTRING[50] (Customer) IN id;
 
-price 'Цена' = DATA NUMERIC[14,2] (Customer, Book);
+price 'Price' = DATA NUMERIC[14,2] (Customer, Book);
 
-FORM prices 'Цены'
+FORM prices 'Prices'
     OBJECTS c = Customer PANEL
     PROPERTIES(c) name SELECTOR
     
@@ -71,8 +71,8 @@ NAVIGATOR {
 //#sample2 end
 
 //#solution2
-defaultCustomer 'Покупатель по умолчанию' = DATA Customer ();
-nameDefaultCustomer 'Покупатель по умолчанию' () = name(defaultCustomer());
+defaultCustomer 'Default customer' = DATA Customer ();
+nameDefaultCustomer 'Default customer' () = name(defaultCustomer());
 
 EXTEND FORM options PROPERTIES() nameDefaultCustomer;
 DESIGN options { commons { MOVE PROPERTY(nameDefaultCustomer()); } }
@@ -83,7 +83,7 @@ EXTEND FORM prices
 //#solution2 end
 
 //#sample3
-FORM report 'Отчет'
+FORM report 'Report'
     OBJECTS dFrom = DATE PANEL, dTo = DATE PANEL
     PROPERTIES VALUE(dFrom), VALUE(dTo)
 ;
@@ -94,15 +94,15 @@ NAVIGATOR {
 //#sample3 end
 
 //#solution3
-setReportLastWeek 'Последняя неделя' ()  { 
+setReportLastWeek 'Last week' ()  { 
     SEEK report.dFrom = subtract(currentDate(), 7);
     SEEK report.dTo = subtract(currentDate(), 1); 
 }
-setReportCurrentMonth 'Текущий месяц' ()  { 
+setReportCurrentMonth 'Current month' ()  { 
     SEEK report.dFrom = firstDayOfMonth(currentDate());
     SEEK report.dTo = lastDayOfMonth(currentDate());
 }
-setReportLastMonth 'Последний месяц' ()  { 
+setReportLastMonth 'Last month' ()  { 
     SEEK report.dFrom = firstDayOfMonth(subtract(firstDayOfMonth(currentDate()), 1));
     SEEK report.dTo = subtract(firstDayOfMonth(currentDate()), 1);
 }
@@ -112,7 +112,7 @@ EXTEND FORM report
 ;
 //#solution3 end
 
-FORM customers 'Покупатели'
+FORM customers 'Customers'
     OBJECTS c = Customer
     PROPERTIES(c) name, NEW, DELETE
 ;

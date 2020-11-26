@@ -3,17 +3,17 @@ MODULE WorldCup2014;
 //#module end
 REQUIRE Authentication, Time;
 
-CLASS Team 'Команда';
-name 'Название' = DATA ISTRING[50] (Team) IN id;
+CLASS Team 'Team';
+name 'Name' = DATA ISTRING[50] (Team) IN id;
 
-FORM team 'Команда'
+FORM team 'Team'
     OBJECTS t = Team PANEL
     PROPERTIES(t) name
     
     EDIT Team OBJECT t
 ;
 
-FORM teams 'Команды'
+FORM teams 'Teams'
     OBJECTS t = Team
     PROPERTIES(t) READONLY name
     PROPERTIES(t) NEWSESSION NEW, EDIT, DELETE 
@@ -21,44 +21,44 @@ FORM teams 'Команды'
     LIST Team OBJECT t
 ;
 
-CLASS Match 'Матч';
-dateTime 'Начало матча' = DATA DATETIME (Match) NONULL IN id;
+CLASS Match 'Match';
+dateTime 'Match start' = DATA DATETIME (Match) NONULL IN id;
 started (Match m) = dateTime(m) < currentDateTime();
 
-CONSTRAINT CHANGED(dateTime(Match m)) AND PREV(dateTime(m)) AND NOT DROPPED(m IS Match) MESSAGE 'Запрещено изменять время начала матча';
+CONSTRAINT CHANGED(dateTime(Match m)) AND PREV(dateTime(m)) AND NOT DROPPED(m IS Match) MESSAGE 'It is forbidden to change the start time of the match';
 
-homeTeam 'Хозяева' = DATA Team (Match) NONULL;
-nameHomeTeam 'Хозяева' (Match m) = name(homeTeam(m)) IN id; 
+homeTeam 'Hosts' = DATA Team (Match) NONULL;
+nameHomeTeam 'Hosts' (Match m) = name(homeTeam(m)) IN id; 
 
-awayTeam 'Гости' = DATA Team (Match) NONULL;
-nameAwayTeam 'Гости' (Match m) = name(awayTeam(m)) IN id; 
+awayTeam 'Guests' = DATA Team (Match) NONULL;
+nameAwayTeam 'Guests' (Match m) = name(awayTeam(m)) IN id; 
 
-homeScore 'Результат (хозяева)' = DATA INTEGER (Match);
-awayScore 'Результат (гости)' = DATA INTEGER (Match);
+homeScore 'Result (hosts)' = DATA INTEGER (Match);
+awayScore 'Result (guests)' = DATA INTEGER (Match);
 
-homeScore 'Ставка (хозяева)' = DATA INTEGER (Match, CustomUser);
-awayScore 'Ставка (гости)' = DATA INTEGER (Match, CustomUser);
+homeScore 'Bet (hosts)' = DATA INTEGER (Match, CustomUser);
+awayScore 'Bet (guests)' = DATA INTEGER (Match, CustomUser);
 
-home 'Победа (хозяева)' (Match m) = (GROUP SUM 1 IF homeScore(m, CustomUser c) > awayScore(m, c)) IF started(m);   
-tie 'Ничья' (Match m) = (GROUP SUM 1 IF homeScore(m, CustomUser c) = awayScore(m, c)) IF started(m);
-away 'Победа (гости)' (Match m) = (GROUP SUM 1 IF homeScore(m, CustomUser c) < awayScore(m, c)) IF started(m);
+home 'Victory (hosts)' (Match m) = (GROUP SUM 1 IF homeScore(m, CustomUser c) > awayScore(m, c)) IF started(m);   
+tie 'Draw' (Match m) = (GROUP SUM 1 IF homeScore(m, CustomUser c) = awayScore(m, c)) IF started(m);
+away 'Victory (guests)' (Match m) = (GROUP SUM 1 IF homeScore(m, CustomUser c) < awayScore(m, c)) IF started(m);
 
-startedHomeScore 'Ставка (хозяева)' (Match m, CustomUser c) = homeScore(m, c) IF started(m);  
-startedAwayScore 'Ставка (хозяева)' (Match m, CustomUser c) = awayScore(m, c) IF started(m);  
+startedHomeScore 'Bet (hosts)' (Match m, CustomUser c) = homeScore(m, c) IF started(m);  
+startedAwayScore 'Bet (hosts)' (Match m, CustomUser c) = awayScore(m, c) IF started(m);  
 
-hasBet 'Сделана ставка' (Match m, CustomUser c) = homeScore(m, c) AND awayScore(m, c);
-countBets 'Кол-во ставок' (Match m) = GROUP SUM 1 IF hasBet(m, CustomUser c); 
+hasBet 'Bet made' (Match m, CustomUser c) = homeScore(m, c) AND awayScore(m, c);
+countBets 'Number of bets' (Match m) = GROUP SUM 1 IF hasBet(m, CustomUser c); 
 
-CONSTRAINT DROPPED(Match m IS Match) AND PREV(countBets(m)) MESSAGE 'Запрещено удалять матч, по которому сделаны ставки';
+CONSTRAINT DROPPED(Match m IS Match) AND PREV(countBets(m)) MESSAGE 'It is forbidden to delete a match on which bets were made';
 
-CONSTRAINT CHANGED(homeScore(Match m, CustomUser c)) AND started(m) MESSAGE 'Запрещено изменять результат начавшегося матча';
-CONSTRAINT CHANGED(awayScore(Match m, CustomUser c)) AND started(m) MESSAGE 'Запрещено изменять результат начавшегося матча';
+CONSTRAINT CHANGED(homeScore(Match m, CustomUser c)) AND started(m) MESSAGE 'It is forbidden to change the result of a started match';
+CONSTRAINT CHANGED(awayScore(Match m, CustomUser c)) AND started(m) MESSAGE 'It is forbidden to change the result of a started match';
 
-CONSTRAINT CHANGED(homeScore(Match m)) AND NOT started(m) MESSAGE 'Запрещено изменять счет матча до начала матча';
-CONSTRAINT CHANGED(awayScore(Match m)) AND NOT started(m) MESSAGE 'Запрещено изменять счет матча до начала матча';
+CONSTRAINT CHANGED(homeScore(Match m)) AND NOT started(m) MESSAGE 'It is forbidden to change the match score before the match start';
+CONSTRAINT CHANGED(awayScore(Match m)) AND NOT started(m) MESSAGE 'It is forbidden to change the match score before the match start';
 
-currentHomeScore 'Ставка (хозяева)' (Match m) = homeScore(m, currentUser()); 
-currentAwayScore 'Ставка (гости)' (Match m) = awayScore(m, currentUser());
+currentHomeScore 'Bet (hosts)' (Match m) = homeScore(m, currentUser()); 
+currentAwayScore 'Bet (guests)' (Match m) = awayScore(m, currentUser());
 
 changeCurrentHomeScore (Match m)  { 
     FOR CustomUser u = currentUser() DO
@@ -70,35 +70,35 @@ changeCurrentAwayScore (Match m)  {
         INPUT =awayScore(m, u) CHANGE;
 }
 
-// Расчет очков
+// Points calculation
 
-cost 'Стоимость' = DATA INTEGER (Match);
+cost 'Cost' = DATA INTEGER (Match);
 
 correctScore (Match m, CustomUser c) = homeScore(m, c) == homeScore(m) AND awayScore(m, c) == awayScore(m); 
-correctScore 'Правильный счет' (CustomUser c) = GROUP SUM 1 IF correctScore (Match m, c);
+correctScore 'Correct score' (CustomUser c) = GROUP SUM 1 IF correctScore (Match m, c);
  
 correctDelta (Match m, CustomUser c) = homeScore(m, c) - awayScore(m, c) == homeScore(m) -  awayScore(m); 
-correctDelta 'Правильная разница' (CustomUser c) = GROUP SUM 1 IF correctDelta (Match m, c);
+correctDelta 'Correct difference' (CustomUser c) = GROUP SUM 1 IF correctDelta (Match m, c);
 
 correctResult (Match m, CustomUser c) = (homeScore(m, c) - awayScore(m, c)) * (homeScore(m) -  awayScore(m)) > 0 OR 
                                       (homeScore(m, c) == awayScore(m, c) AND homeScore(m) == awayScore(m)); 
-correctResult 'Правильный результат' (CustomUser c) = GROUP SUM 1 IF correctResult (Match m, c);
+correctResult 'Correct result' (CustomUser c) = GROUP SUM 1 IF correctResult (Match m, c);
 
-points 'Кол-во баллов' = CASE
+points 'Number of points' = CASE
                                             WHEN correctScore(Match m, CustomUser c) THEN 3
                                             WHEN correctDelta(m, c) THEN 2
                                             WHEN correctResult(m, c) THEN 1;
 
-points 'Кол-во баллов' (CustomUser c) = GROUP SUM points(Match m, c); 
-points 'Кол-во баллов' (Match m) = GROUP SUM points(m, CustomUser c);
-pointsStarted 'Кол-во баллов' (Match m) = points(m) IF started(m); 
+points 'Number of points' (CustomUser c) = GROUP SUM points(Match m, c); 
+points 'Number of points' (Match m) = GROUP SUM points(m, CustomUser c);
+pointsStarted 'Number of points' (Match m) = points(m) IF started(m); 
 
-score 'Кол-во очков' (Match m, CustomUser c) = NUMERIC[16,4](cost(m) * points(m, c)) / points(m);
+score 'Number of points' (Match m, CustomUser c) = NUMERIC[16,4](cost(m) * points(m, c)) / points(m);
   
-score 'Кол-во очков' (CustomUser c) = GROUP SUM score(Match m, c); 
+score 'Number of points' (CustomUser c) = GROUP SUM score(Match m, c); 
 
 
-FORM match 'Матч'
+FORM match 'Match'
     OBJECTS m = Match PANEL
     PROPERTIES(m) cost, dateTime, nameHomeTeam, nameAwayTeam, homeScore, awayScore
     EDIT Match OBJECT m
@@ -112,7 +112,7 @@ DESIGN match {
 
 backgroundScore = RGB(255, 224, 224);
 backgroundBet = RGB(224, 224, 255);
-FORM matches 'Ставки'
+FORM matches 'Bets'
     OBJECTS m = Match
     PROPERTIES(m) READONLY cost, dateTime, nameHomeTeam, nameAwayTeam
     PROPERTIES(m) BACKGROUND backgroundScore() READONLY homeScore, awayScore, pointsStarted
@@ -127,7 +127,7 @@ FORM matches 'Ставки'
 ;
 
 
-FORM standings 'Таблица'
+FORM standings 'Table'
     OBJECTS c = CustomUser GRID
     PROPERTIES(c) READONLY name[Contact], correctScore, correctDelta, correctResult, points, score
     PROPERTIES(c) NEWSESSION NEW, EDIT, DELETE 
