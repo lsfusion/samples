@@ -923,7 +923,7 @@ showDocumentArticleModalForm 'Show modal "By documents"'()  {
 	        name[Named](k) <- 'this is new article';
 	        BREAK;
 	    } ELSE
-	        MESSAGE 'Object wasn't added';
+	        MESSAGE 'Object wasn\'t added';
 	
 	    DIALOG documentArticle OBJECTS article INPUT, document INPUT DO {
 	        MESSAGE 'You pressed "ok"';
