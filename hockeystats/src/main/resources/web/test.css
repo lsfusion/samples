@@ -1,0 +1,10 @@
+.event-highlight {
+    border-color: #2C4751;
+    background-color: #2C4751;
+}
+.fc-event:hover {
+    background-color: #2C4751;
+}
+.event-highlight:hover { /* should come after .fc-event:hover */
+    background-color: #2C4751;
+}
