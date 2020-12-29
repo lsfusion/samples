@@ -178,8 +178,13 @@ NAVIGATOR {
     NEW servers;
 } 
 
+CLASS Locale {
+    ru 'RU',
+    en 'EN'
+}
+
 CLASS Example;
-caption 'Header' = DATA STRING (Example);
+caption 'Caption' = DATA STRING (Example, Locale);
 path 'Path' = DATA STRING (Example);
 mode 'Mode' = DATA INTEGER (Example);
 order 'Order' = DATA INTEGER (Example);
@@ -187,8 +192,10 @@ exPath 'Path' = DATA STRING (Example, LONG);
 
 FORM examples 'Examples'
     OBJECTS e = Example
-    PROPERTIES (e) caption, path, mode, order, NEW, DELETE
+    PROPERTIES (e) path, mode, order, NEW, DELETE
     ORDERS mode(e), order(e)
+    OBJECTS l 'Captions' = Locale 
+    PROPERTIES 'Locale' = STRING[2](staticCaption(l)), caption(e, l)
     OBJECTS i = INTEGER
     FILTERS iterate(i, 1, 10)
     PROPERTIES exPath(e, i); 
@@ -216,7 +223,7 @@ readPathToText(STRING path) {
 }
 
 getExamples(JSONFILE file) {
-    IMPORT JSON FROM file FIELDS () INTEGER mode DO {
+    IMPORT JSON FROM file FIELDS () INTEGER mode, STRING locale DO {
         LOCAL file = TEXT (Example);
         FOR mode(Example ex) = mode DO {
             readPathToText(path(ex));
@@ -238,6 +245,6 @@ getExamples(JSONFILE file) {
             }
             file(ex) <- text();
         }
-        EXPORT JSON FROM caption = caption(Example ex), text = file(ex) WHERE file(ex) ORDER order(ex);                          
+        EXPORT JSON FROM caption = caption(Example ex, nameStatic('Main_Locale.' + locale)), text = file(ex) WHERE file(ex) ORDER order(ex);                          
     }
 } @@noauth;

@@ -345,7 +345,7 @@ externalHTTP()  {
     EXTERNAL HTTP GET 'https://www.cs.cmu.edu/~chuck/lennapg/len_std.jpg' TO exportFile; 
     open(exportFile()); 
 
-    EXTERNAL HTTP 'http://tryonline.lsfusion.org/exec?action=getExamples' PARAMS JSONFILE('\{"mode"=1\}') TO exportFile; // braces are escaped') TO exportFile; // braces are escaped as they are used in internationalization
+    EXTERNAL HTTP 'http://tryonline.lsfusion.org/exec?action=getExamples' PARAMS JSONFILE('\{"mode"=1,"locale"="en"\}') TO exportFile; // braces are escaped') TO exportFile; // braces are escaped as they are used in internationalization
     IMPORT FROM exportFile() FIELDS () TEXT caption, TEXT code DO
         MESSAGE 'Example : ' + caption + ', code : ' + code;
         
