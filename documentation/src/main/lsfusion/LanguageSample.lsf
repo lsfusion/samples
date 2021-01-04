@@ -1,4 +1,4 @@
-// Module caption
+// Module header
 MODULE LanguageExample;
 
 REQUIRE System;
