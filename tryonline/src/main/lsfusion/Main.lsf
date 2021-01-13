@@ -235,7 +235,7 @@ getExamples(JSONFILE file) {
                 FOR p = exPath(ex, LONG l) ORDER l DO {
                     readPathToText(p);
                     removeTextBeforeBlockEnd('header');
-                    text() <- text() + '\n' + readedText(); 
+                    text() <- CONCAT '\n', text(), readedText(); 
                 }
                 // removing other tags from text
                 text() <- regexpReplace(text(), '//#.*(\\n)?', '', 'ng');
