@@ -1323,6 +1323,12 @@ DESIGN TestTree {
         MOVE BOX(TREE forms) {
             fill = 1;
         }
+        
+        GRID(TREE forms) {
+            expandOnClick = FALSE;
+            headerHeight = 100;
+        }
+        
         MOVE BOX(TREE forms2) {
             fill = 1;
         }
