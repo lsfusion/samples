@@ -183,18 +183,11 @@ def extract_code_fragment(code, block_id=default_id):
     else:
         return result_code, start_line
 
-
-app = Flask(__name__)
-
-
-@app.route("/samphighl", methods=['GET', 'POST'])
-def index():
+def getCode():
     files_path = argv[1]
     rel_path = argv[2]
     def_project_name = argv[3]
     file_location = request.args.get('file', 'Test') + '.lsf'
-    blockid = request.args.get('block', 'default')
-    original_lines = request.args.get('original')
 
     file_elements = file_location.split("/")
     if len(file_elements) > 1:
@@ -204,10 +197,28 @@ def index():
         project_name = def_project_name
         file_name = file_location
 
-    with open(path.join(files_path, project_name, rel_path, file_name)) as file:
-        code = file.read()
+    lsf_file = open(path.join(files_path, project_name, rel_path, file_name), 'r')
+    code = lsf_file.read()
+    return code
+    
 
-    fragment, start_line = extract_code_fragment(code, blockid)
+app = Flask(__name__)
+
+@app.route("/sample", methods=['GET', 'POST'])
+def docusaurus_text():
+    blockid = request.args.get('block', 'default')
+    fragment, _ = extract_code_fragment(getCode(), blockid)
+    response = make_response(fragment)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+@app.route("/samphighl", methods=['GET', 'POST'])
+def confluence_html():
+    blockid = request.args.get('block', 'default')
+    original_lines = request.args.get('original')
+
+    fragment, start_line = extract_code_fragment(getCode(), blockid)
 
     if original_lines is None:
         start_line = 1
