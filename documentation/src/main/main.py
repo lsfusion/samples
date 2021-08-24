@@ -119,7 +119,7 @@ class LSFLexer(RegexLexer):
                     'RECALCULATE', 'RECURSION', 'REFLECTION', 'REGEXP', 'REMOVE', 'RENDER', 'REPLACE', 'REPORT',
                     'REPORTFILES', 'REQUEST', 'REQUIRE', 'RESOLVE', 'RETURN', 'RGB', 'RIGHT', 'ROOT', 'ROUND', 'ROW',
                     'ROWS', 'RTF', 'SCHEDULE', 'SCROLL', 'SEEK', 'SELECTOR', 'SERIALIZABLE', 'SET', 'SETCHANGED',
-                    'SETDROPPED', 'SETTINGS', 'SHEET', 'SHOW', 'SHOWDEP', 'SHOWIF', 'SHOWTYPE', 'SINGLE', 'SPLITH',
+                    'SETDROPPED', 'SETTINGS', 'SHEET', 'SHOW', 'SHOWDEP', 'SHOWIF', 'SINGLE', 'SPLITH',
                     'SPLITV', 'SQL', 'START', 'STEP', 'STRETCH', 'STRICT', 'STRUCT', 'SUBJECT', 'SUBREPORT', 'SUM',
                     'TAB', 'TABBED', 'TABLE', 'TAG', 'TEXTHALIGN', 'TEXTVALIGN', 'TFALSE', 'THEN', 'THREADS', 'TO',
                     'TOOLBAR', 'TOOLBARBOX', 'TOOLBARLEFT', 'TOOLBARRIGHT', 'TOOLBARSYSTEM', 'TOP', 'TREE', 'TRUE',
