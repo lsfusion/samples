@@ -116,7 +116,7 @@ class LSFLexer(RegexLexer):
                     'OVERRIDE', 'PAGESIZE', 'PANEL', 'PARAMS', 'PARENT', 'PARTITION', 'PASSWORD', 'PDF', 'PERIOD', 'PG',
                     'PIVOT', 'POSITION', 'POST', 'PREREAD', 'PREV', 'PREVIEW', 'PRINT', 'PRIORITY', 'PROPERTIES',
                     'PROPERTY', 'PROPORTION', 'PUT', 'QUERYCLOSE', 'QUICKFILTER', 'READ', 'READONLY', 'READONLYIF',
-                    'RECALCULATE', 'RECURSION', 'REFLECTION', 'REGEXP', 'REMOVE', 'RENDER', 'REPLACE', 'REPORT',
+                    'RECALCULATE', 'RECURSION', 'REFLECTION', 'REGEXP', 'REMOVE', 'REPORT',
                     'REPORTFILES', 'REQUEST', 'REQUIRE', 'RESOLVE', 'RETURN', 'RGB', 'RIGHT', 'ROOT', 'ROUND', 'ROW',
                     'ROWS', 'RTF', 'SCHEDULE', 'SCROLL', 'SEEK', 'SELECTOR', 'SERIALIZABLE', 'SET', 'SETCHANGED',
                     'SETDROPPED', 'SETTINGS', 'SHEET', 'SHOW', 'SHOWDEP', 'SHOWIF', 'SINGLE', 'SPLITH',
