@@ -67,7 +67,7 @@ sum(OrderDetail d) <- quantity(d) * price(d) WHEN CHANGED(quantity(d)) OR CHANGE
 //#constraint
 // balance not less than 0
 CONSTRAINT balance(Sku s, Stock st) < 0 
-    MESSAGE 'The balance cannot be negative for ' + (GROUP CONCAT 'Product: ' + name(Sku ss) + ' Warehouse: ' + name(Stock sst), '\n' IF SET(balance(ss, sst) < 0));
+    MESSAGE 'The balance cannot be negative for ' + (GROUP CONCAT 'Product: ' + name(Sku ss) + ' Warehouse: ' + name(Stock sst), '\n' IF SET(balance(ss, sst) < 0) ORDER sst);
 
 barcode = DATA STRING[15] (Sku);
 // "emulation" security policy
@@ -269,7 +269,7 @@ sum = GROUP SUM sum(OrderDetail od) BY order(od) MATERIALIZED;
 date(OrderDetail od) = date(order(od)) MATERIALIZED;
 
  // such a property cannot be materialized, since it is not NULL for an infinite number of dates
-lastDate(Customer customer, DATE date) = GROUP LAST date(Order order) IF customer(order) = customer AND date(order) < date;
+lastDate(Customer customer, DATE date) = GROUP LAST date(Order order) IF customer(order) = customer AND date(order) < date ORDER order;
 //#materialized end
 
 //#table

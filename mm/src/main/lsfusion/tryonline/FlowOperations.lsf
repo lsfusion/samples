@@ -14,7 +14,7 @@ run() {
     }
     
     IF (GROUP SUM 1 IF shippedTo(Item i, LegalEntity l)) >= 2 THEN // number of positions >= 2
-        exportString() <- GROUP CONCAT name(Item i) + ' -> ' + name(LegalEntity l) IF shippedTo(i, l),',\n'; // returning product/customer names separated by commas with newlines 
+        exportString() <- GROUP CONCAT name(Item i) + ' -> ' + name(LegalEntity l) IF shippedTo(i, l),',\n' ORDER i; // returning product/customer names separated by commas with newlines 
 	ELSE
     	exportString() <- 'Too few positions'; 
 }

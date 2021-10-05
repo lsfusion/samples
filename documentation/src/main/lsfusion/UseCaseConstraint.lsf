@@ -76,7 +76,7 @@ constraintBook (OrderDetail d) =
     (CHANGED(book(d)) OR CHANGED(price(d)) OR CHANGED(posted(order(d)))) AND posted(order(d)) AND price(d) > price(book(d)) * 1.1;
 WHEN (GROUP MAX constraintBook(OrderDetail d)) DO {
     MESSAGE 'A book is selected in the order line that is not allowed for the customer by lines: \n' + 
-            (GROUP CONCAT ('Date ' + date(order(OrderDetail d)) + '; Number ' + number(order(d))) IF constraintBook(d), ',') NOWAIT;
+            (GROUP CONCAT ('Date ' + date(order(OrderDetail d)) + '; Number ' + number(order(d))) IF constraintBook(d), ',' ORDER d) NOWAIT;
     CANCEL;
 }
 //#solution6 end

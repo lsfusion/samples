@@ -1223,7 +1223,7 @@ DESIGN storeArticle {
         maxValue = 1000000;
         notNull = TRUE;
         foreground = #00AA00;
-        panelCaptionAfter = TRUE;
+        panelCaptionLast = TRUE;
     } 
     
     newCont {
@@ -3211,9 +3211,6 @@ testStrings()  {
     MESSAGE 'VAR + : ' + vtst(1) + ',' + vtst(2);
     MESSAGE 'NOFLEX CONCAT : ' + CONCAT ',',tst(1),tst(2);
     MESSAGE 'VAR CONCAT : ' + CONCAT ',',vtst(1),vtst(1);
-    
-    MESSAGE 'NOFLEX GROUPC : ' + (GROUP CONCAT tst(a),',');
-    MESSAGE 'VAR GROUPC : ' + (GROUP CONCAT vtst(a),',');
 }
 NAVIGATOR {
     NEW ACTION testStrings;
