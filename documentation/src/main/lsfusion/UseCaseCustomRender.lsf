@@ -1,0 +1,137 @@
+MODULE UseCaseCustomRender;
+
+REQUIRE Authentication, Time, Utils, Eval;
+
+NAMESPACE Chat;
+
+CLASS Message 'Message';
+
+dateTime 'Time' = DATA DATETIME (Message);
+text 'Text' = DATA TEXT (Message);
+
+author = DATA CustomUser (Message);
+nameAuthor 'Author' (Message m) = name(author(m));
+
+replyTo = DATA Message (Message);
+nameAuthorReplyTo (Message m) = nameAuthor(replyTo(m)); 
+textReplyTo (Message m) = text(replyTo(m)); 
+
+json (Message m) = 
+    [FORMULA STRING 'json_build_object(\'author\',$1,\'time\',$2,\'text\',$3,\'own\',$4,\'replyAuthor\',$5,\'replyText\',$6,\'replyMessage\',$7)'](
+         (OVERRIDE nameAuthor(m), ''), 
+         dateTime(m), 
+         text(m), 
+         IF author(m) = currentUser() THEN 1 ELSE 0, 
+         (OVERRIDE nameAuthorReplyTo(m), ''), 
+         (OVERRIDE textReplyTo(m), ''), 
+         (OVERRIDE LONG(replyTo(m)), 0)
+    );
+
+replyTo = DATA LOCAL Message ();
+
+changeMessage (Message m) {
+    INPUT s = STRING DO {
+        stringToFile(s);
+        
+        LOCAL action = STRING();
+        IMPORT JSON FROM resultFile() TO() action;
+        
+        IF action() = 'goToReply' THEN {
+            seek(replyTo(m));
+        }
+
+        IF action() = 'reply' THEN {
+            replyTo() <- m; 
+        }
+    }
+}
+
+FORM chat 'Chat'
+    OBJECTS msg = Message LAST
+    PROPERTIES(msg) json CUSTOM 'chatMessageRender' ON CHANGE changeMessage(msg)
+;
+
+DESIGN chat {
+    OBJECTS {
+        NEW chat {
+            fill = 1; 
+            MOVE GRID(msg) {
+                headerHeight = 0;
+                PROPERTY(json(msg)) {
+                    autoSize = TRUE;
+                }
+            }
+            REMOVE BOX(msg);
+        }
+    }
+    REMOVE TOOLBARBOX;       
+}
+
+NAVIGATOR {
+    NEW chat;
+}
+
+// send
+message = DATA LOCAL TEXT ();
+
+send 'Send' () { 
+    NEWSESSION NESTED LOCAL {
+        NEW m = Message {
+            dateTime(m) <- currentDateTime();
+            author(m) <- currentUser();
+            replyTo(m) <- replyTo();
+            text(m) <- message();
+            seek(m);
+            APPLY;
+        }
+    }
+} 
+
+jsonInputMessage () = [FORMULA STRING 'json_build_object(\'replyAuthor\',$1,\'replyText\',$2,\'text\',$3)']
+                                ((OVERRIDE nameAuthor(replyTo()), ''), (OVERRIDE text(replyTo()), ''), (OVERRIDE message(), ''));
+
+changeInputMessage () {
+    INPUT s = TEXT DO {
+        stringToFile(s);
+        
+        LOCAL action = STRING();
+        LOCAL value = TEXT();
+        IMPORT JSON FROM resultFile() TO() action, value;
+
+        IF action() = 'replyRemove' THEN {
+            replyTo() <- NULL;
+        }
+
+        IF action() = 'send' THEN {
+            message() <- value();
+            send();
+        }
+        
+        IF action() = 'change' THEN {
+            message() <- value();
+        }
+    }
+}
+
+
+EXTEND FORM chat
+    PROPERTIES jsonInputMessage() CUSTOM 'chatMessageInputRender' ON CHANGE changeInputMessage(), 
+               send()
+;
+
+DESIGN chat {
+    chat {
+        NEW chatMessage {
+            autoSize = TRUE;
+            type = CONTAINERH;
+            alignment = STRETCH;
+            MOVE PROPERTY(jsonInputMessage()) {
+                fill = 1; 
+                autoSize = TRUE; 
+                width = 0; 
+                caption = ''; 
+            }
+            MOVE PROPERTY(send()) { fontSize = 32; alignment = STRETCH; }
+        }
+    }  
+}
