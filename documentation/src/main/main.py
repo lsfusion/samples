@@ -1,8 +1,9 @@
-from flask import Flask, make_response, request
 from os import path
+
+from flask import Flask, make_response, request
 from pygments import highlight
-from pygments.formatters.html import HtmlFormatter
 from pygments.formatter import Formatter
+from pygments.formatters.html import HtmlFormatter
 from pygments.lexer import RegexLexer, words
 from pygments.style import Style
 from pygments.token import *
@@ -100,7 +101,7 @@ class LSFLexer(RegexLexer):
                     'DOC', 'DOCKED', 'DOCX', 'DRAW', 'DRAWROOT', 'DRILLDOWN', 'DROP', 'DROPCHANGED', 'DROPPED', 'ECHO',
                     'EDIT', 'ELSE', 'EMAIL', 'END', 'EQUAL', 'ESCAPE', 'EVAL', 'EVENTID', 'EVENTS', 'EXCEPTLAST',
                     'EXCLUSIVE', 'EXEC', 'EXPAND', 'EXPORT', 'EXTEND', 'EXTERNAL', 'EXTID', 'EXTKEY', 'FALSE', 'FIELDS',
-                    'FILTER', 'FILTERGROUP', 'FILTERGROUPS', 'FILTERS', 'FINALLY', 'FIRST', 'FIXED', 'FLEX', 'FLOAT',
+                    'FILTER', 'FILTERGROUP', 'FILTERGROUPS', 'FILTER', 'FILTERS', 'FINALLY', 'FIRST', 'FIXED', 'FLEX', 'FLOAT',
                     'FOLDER', 'FOOTER', 'FOR', 'FOREGROUND', 'FORM', 'FORMEXTID', 'FORMS', 'FORMULA', 'FROM', 'FULL',
                     'GET', 'GLOBAL', 'GOAFTER', 'GRID', 'GRIDBOX', 'GROUP', 'GROUPCHANGE', 'HALIGN', 'HEADER',
                     'HEADERS', 'HEADERSTO', 'HIDE', 'HIDESCROLLBARS', 'HIDETITLE', 'HINT', 'HINTNOUPDATE', 'HINTTABLE',
