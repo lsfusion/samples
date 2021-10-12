@@ -107,7 +107,7 @@ class LSFLexer(RegexLexer):
                     'HORIZONTAL', 'HTML', 'HTTP', 'IF', 'IMAGE', 'IMPORT', 'IMPOSSIBLE', 'IN', 'INDEX', 'INDEXED',
                     'INIT', 'INLINE', 'INPUT', 'INTERNAL', 'IS', 'JAVA', 'JOIN', 'JSON', 'KEYPRESS', 'LAST', 'LEFT',
                     'LIKE', 'LIMIT', 'LIST', 'LOCAL', 'LOCALASYNC', 'LOGGABLE', 'LSF', 'MANAGESESSION', 'MAP',
-                    'MATERIALIZED', 'MAX', 'MEASURE', 'MEASURES', 'MEMO', 'MENU', 'MESSAGE', 'META', 'MIN', 'MODULE',
+                    'MATERIALIZED', 'MATCH', 'MAX', 'MEASURE', 'MEASURES', 'MEMO', 'MENU', 'MESSAGE', 'META', 'MIN', 'MODULE',
                     'MOVE', 'MS', 'MULTI', 'NAGGR', 'NAME', 'NAMESPACE', 'NATIVE', 'NAVIGATOR', 'NESTED',
                     'NESTEDSESSION', 'NEW', 'NEWEDIT', 'NEWEXECUTOR', 'NEWSESSION', 'NEWSQL', 'NEWTHREAD', 'NO',
                     'NOCANCEL', 'NOCHANGE', 'NOCOMPLEX', 'NOCONSTRAINTFILTER', 'NODEFAULT', 'NOESCAPE', 'NOFLEX',
