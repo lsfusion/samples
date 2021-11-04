@@ -1184,9 +1184,7 @@ DESIGN storeArticle {
     TOOLBARSYSTEM(s) {
         showCalculateSum = FALSE;	
         showCountQuantity = TRUE;	
-        showGroupChange = FALSE;	
         showGroup = TRUE;	
-        showPrintGroup = FALSE;	
         showPrintGroupXls = TRUE;	
         showSettings = FALSE;
     }
@@ -1399,7 +1397,7 @@ DESIGN TestHotkeys {
 
 storeIsHugeOrBig(Store s) = storeIsHuge(s) OR storeIsBig(s);
 
-FORM TestTabs 'Tab test'
+FORM TestTabs 'Tabs test'
     OBJECTS s=Store, a=Article
     PROPERTIES(s) VALUE, name, storeSizeCode
     PROPERTIES(a) VALUE, name
@@ -1409,23 +1407,16 @@ FORM TestTabs 'Tab test'
 ;
 
 DESIGN TestTabs {
-    OBJECTS {
-        NEW sTabs BEFORE BOX(a) {
-            type=TABBED;
-            flex = 0;
-            align = STRETCH;
-    
-            MOVE PANEL(a) {
-                caption = 'Panel a';
-                MOVE PROPERTY(oq);
-            };
-            MOVE PANEL(s) {
-                caption = 'Panel s';
-                MOVE PROPERTY(iq);
-            };
-        }
+    NEW tabBox BEFORE TOOLBARBOX {
+        fill = 1;
+        tabbed = TRUE;
+        NEW tab1 { caption = 'Tab 1'; MOVE BOX(s); }
+        NEW tab2 { caption = 'Tab 2'; MOVE BOX(a); }
     }
 }
+activateTab1() { ACTIVATE TAB TestTabs.tab1; }
+activateTab2() { ACTIVATE TAB TestTabs.tab2; }
+EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2;
 
 isEditable 'Enable editing' () = DATA LOCAL BOOLEAN ();
 isReadOnly 'Read-only' () = TRUE AND NOT isEditable();
@@ -2381,6 +2372,7 @@ NAVIGATOR {
     }
 
     NEW FOLDER tests 'Tests' WINDOW toolbar {
+        NEW TestTabs;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestTree;
@@ -2388,7 +2380,6 @@ NAVIGATOR {
         NEW TestHeaders;
         NEW TestHotkeys;
         NEW TestEvalActionForm;
-        NEW TestTabs;
         NEW TestReadOnlyIf;
         NEW TestOnActions;
         NEW TestOperators;
