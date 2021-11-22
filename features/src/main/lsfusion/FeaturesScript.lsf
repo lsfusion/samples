@@ -1416,7 +1416,8 @@ DESIGN TestTabs {
 }
 activateTab1() { ACTIVATE TAB TestTabs.tab1; }
 activateTab2() { ACTIVATE TAB TestTabs.tab2; }
-EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2;
+EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
+EVENTS ON INIT activateTab2();
 
 isEditable 'Enable editing' () = DATA LOCAL BOOLEAN ();
 isReadOnly 'Read-only' () = TRUE AND NOT isEditable();
@@ -3511,3 +3512,58 @@ PROPERTIES() str1, str2;
 NAVIGATOR {
     NEW testForm222;
 }
+
+str4 = DATA STRING[200] (Store);// INDEXED MATCH;
+str5 = DATA STRING[200] (Store);// INDEXED LIKE;
+//str6 = DATA STRING[200] (Store) INDEXED;// LIKE;
+
+testBoolean1 = DATA BOOLEAN();
+testBoolean2 = DATA BOOLEAN();
+testBoolean3 = DATA BOOLEAN();
+testBoolean4 = DATA BOOLEAN();
+
+testString1 = DATA STRING();
+testString2 = DATA STRING();
+testString3 = DATA STRING();
+testString4 = DATA STRING();
+
+testAction1 {}
+testAction2 {}
+
+FORM testForm
+PROPERTIES() testBoolean1, testBoolean2, testAction1, testBoolean3, testAction2, testBoolean4;
+
+DESIGN testForm {
+    OBJECTS {
+        lines = 1;
+        MOVE PROPERTY(testBoolean1());
+        MOVE PROPERTY(testAction1());
+        MOVE PROPERTY(testBoolean2());
+        MOVE PROPERTY(testBoolean3());
+        MOVE PROPERTY(testAction2());
+        MOVE PROPERTY(testBoolean4());
+    }
+
+}
+
+FORM testForm2
+PROPERTIES() testString1, testString2, testAction1, testString3, testAction2, testString4;
+
+DESIGN testForm2 {
+    OBJECTS {
+        lines = 1;
+        MOVE PROPERTY(testString1());
+        MOVE PROPERTY(testAction1());
+        MOVE PROPERTY(testString2());
+        MOVE PROPERTY(testString3());
+        MOVE PROPERTY(testAction2());
+        MOVE PROPERTY(testString4());
+    }
+
+}
+
+NAVIGATOR {
+NEW testForm BEFORE storeArticle;
+NEW testForm2 BEFORE storeArticle;
+}
+
