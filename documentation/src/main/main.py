@@ -89,7 +89,7 @@ class LSFLexer(RegexLexer):
                     'IMAGELINK', 'INTEGER', 'ISTRING', 'JSONFILE', 'JSONLINK', 'LINK', 'LONG', 'NUMERIC', 'PDFFILE',
                     'PDFLINK', 'DBFFILE', 'DBFLINK', 'RAWFILE', 'RAWLINK', 'RICHTEXT', 'STRING', 'TABLEFILE',
                     'TABLELINK', 'TEXT', 'TEXTFILE', 'TEXTLINK', 'TIME', 'WORDFILE', 'WORDLINK', 'XMLFILE', 'XMLLINK',
-                    'YEAR', 'ABSTRACT', 'ACTION', 'ACTIVATE', 'ACTIVE', 'AFTER', 'AGGR', 'ALL', 'AND', 'APPEND',
+                    'YEAR', 'ABSTRACT', 'ACTION', 'ACTIONS', 'ACTIVATE', 'ACTIVE', 'AFTER', 'AGGR', 'ALL', 'AND', 'APPEND',
                     'APPLY', 'AS', 'ASK', 'ASON', 'ASYNCUPDATE', 'ATTACH', 'ATTR', 'AUTOREFRESH', 'AUTOSET',
                     'BACKGROUND', 'BCC', 'BEFORE', 'BODY', 'BODYPARAMHEADERS', 'BODYPARAMNAMES', 'BODYURL', 'BOTTOM',
                     'BOX', 'BREAK', 'BY', 'CALENDAR', 'CANCEL', 'CANONICALNAME', 'CASE', 'CATCH', 'CC', 'CENTER',
