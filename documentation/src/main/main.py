@@ -86,7 +86,7 @@ class LSFLexer(RegexLexer):
             (r"#[0-9A-Fa-f]{6}", Number.Integer),       # COLOR
             (words(('BOOLEAN', 'TBOOLEAN', 'BPISTRING', 'BPSTRING', 'COLOR', 'CSVFILE', 'CSVLINK', 'DATE', 'DATETIME',
                     'INTERVAL', 'DOUBLE', 'EXCELFILE', 'EXCELLINK', 'FILE', 'HTMLFILE', 'HTMLLINK', 'IMAGEFILE',
-                    'IMAGELINK', 'INTEGER', 'ISTRING', 'JSONFILE', 'JSONLINK', 'LINK', 'LONG', 'NUMERIC', 'PDFFILE',
+                    'IMAGELINK', 'INTEGER', 'ISTRING', 'JSONFILE', 'JSONLINK', 'LINK', 'LONG', 'NAMEDFILE', 'NUMERIC', 'PDFFILE',
                     'PDFLINK', 'DBFFILE', 'DBFLINK', 'RAWFILE', 'RAWLINK', 'RICHTEXT', 'STRING', 'TABLEFILE',
                     'TABLELINK', 'TEXT', 'TEXTFILE', 'TEXTLINK', 'TIME', 'WORDFILE', 'WORDLINK', 'XMLFILE', 'XMLLINK',
                     'YEAR', 'ABSTRACT', 'ACTION', 'ACTIONS', 'ACTIVATE', 'ACTIVE', 'AFTER', 'AGGR', 'ALL', 'AND', 'APPEND',
