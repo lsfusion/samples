@@ -1371,30 +1371,6 @@ DESIGN TestHeaders {
     }
 }
 
-FORM TestHotkeys 'Hotkey test'
-    OBJECTS s=Store, a=Article
-    PROPERTIES(s) ns=name, storeSizeCode
-    PROPERTIES(a) VALUE, na=name
-    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar, testUnion
-    FILTERGROUP filters1
-        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F7'
-    FILTERGROUP filters2
-        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F3'
-        FILTER 'Show only big warehouses' storeIsBig(s) 'F9'
-        FILTER 'Show only medium warehouses' storeIsMedium(s) 'F10'
-        FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
-;
-
-DESIGN TestHotkeys {
-    PROPERTY(ns) {
-        changeKey = 'F4';
-    }
-
-    PROPERTY(na) {
-        changeKey = 'F5';
-    }
-}
-
 storeIsHugeOrBig(Store s) = storeIsHuge(s) OR storeIsBig(s);
 
 FORM TestTabs 'Tabs test'
@@ -1418,6 +1394,31 @@ activateTab1() { ACTIVATE TAB TestTabs.tab1; }
 activateTab2() { ACTIVATE TAB TestTabs.tab2; }
 EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
 EVENTS ON INIT activateTab2();
+
+FORM TestHotkeys 'Hotkeys test'
+    OBJECTS s=Store, a=Article
+    PROPERTIES(s) ns=name ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2'; },
+                                                                             'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeCode
+    PROPERTIES(a) VALUE, na=name
+    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar, testUnion
+    FILTERGROUP filters1
+        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F7'
+    FILTERGROUP filters2
+        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F3'
+        FILTER 'Show only big warehouses' storeIsBig(s) 'F9'
+        FILTER 'Show only medium warehouses' storeIsMedium(s) 'F10'
+        FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
+;
+
+DESIGN TestHotkeys {
+    PROPERTY(ns) {
+        changeKey = 'F4';
+    }
+
+    PROPERTY(na) {
+        changeKey = 'F5';
+    }
+}
 
 isEditable 'Enable editing' () = DATA LOCAL BOOLEAN ();
 isReadOnly 'Read-only' () = TRUE AND NOT isEditable();
@@ -2374,12 +2375,12 @@ NAVIGATOR {
 
     NEW FOLDER tests 'Tests' WINDOW toolbar {
         NEW TestTabs;
+        NEW TestHotkeys;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestTree;
         NEW TestAggr;
         NEW TestHeaders;
-        NEW TestHotkeys;
         NEW TestEvalActionForm;
         NEW TestReadOnlyIf;
         NEW TestOnActions;
