@@ -1373,6 +1373,8 @@ DESIGN TestHeaders {
 
 storeIsHugeOrBig(Store s) = storeIsHuge(s) OR storeIsBig(s);
 
+//--------------- Tabs test ---------------//
+
 FORM TestTabs 'Tabs test'
     OBJECTS s=Store, a=Article
     PROPERTIES(s) VALUE, name, storeSizeCode
@@ -1395,6 +1397,10 @@ activateTab2() { ACTIVATE TAB TestTabs.tab2; }
 EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
 EVENTS ON INIT activateTab2();
 
+//--------------- Hotkeys test ---------------//
+
+sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLCK';
+
 FORM TestHotkeys 'Hotkeys test'
     OBJECTS s=Store, a=Article
     PROPERTIES(s) ns=name ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2'; },
@@ -1414,10 +1420,61 @@ DESIGN TestHotkeys {
     PROPERTY(ns) {
         changeKey = 'F4';
     }
+}
 
-    PROPERTY(na) {
-        changeKey = 'F5';
+//--------------- Property Options test ---------------//
+
+likeString = DATA STRING (Store) INDEXED LIKE;
+matchString = DATA STRING (Store) INDEXED MATCH;
+boolean = DATA BOOLEAN (Store);
+tboolean = DATA TBOOLEAN (Store);
+
+FORM TestPropertyOptions 'Property Options test'
+OBJECTS s=Store
+PROPERTIES(s) name BACKGROUND RGB(255,0,0) STICKY, storeSizeCode, likeString, matchString
+PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
+;
+
+DESIGN TestPropertyOptions {
+    PROPERTY(storeSizeCode(s)) {
+        background = RGB (128,128,128);
     }
+}
+
+//--------------- Files & JSON test ---------------//
+
+FORM testJSON 
+      OBJECTS j = INTEGER
+      PROPERTIES ab='34'
+      OBJECTS i = INTEGER
+      PROPERTIES name = 'Name ' + (i AS INTEGER)
+      FILTERS iterate(i,1,j)
+;
+
+actionJSON() {
+	MESSAGE JSON (testJSON OBJECTS j=4 FILTERS mod(i,2) = 0);
+	MESSAGE JSON (FROM code = '1', message = 'OK');
+	MESSAGE STRING ( JSON ( FROM value = 'Name3' + (INTEGER i AS INTEGER) WHERE iterate(i,1,5) ORDER i DESC));
+}
+
+rawFile = DATA RAWFILE ();
+file = DATA FILE ();
+namedFile = DATA NAMEDFILE ();
+
+FORM TestFilesAndJSON 'Files & JSON test'
+PROPERTIES() rawFile, file, namedFile, actionJSON;
+
+//--------------- SCHEDULE test ---------------//
+
+scheduleOnStartAction() {
+    NEWSESSION NEWSQL NEWTHREAD  {
+        MESSAGE 'worked';
+        sleepTwoSeconds();       
+    } SCHEDULE PERIOD 1000;
+}
+
+onStarted() + {
+    //scheduleOnStartAction();
 }
 
 isEditable 'Enable editing' () = DATA LOCAL BOOLEAN ();
@@ -2283,8 +2340,6 @@ FORM TestActionDebugger 'ActionDebugger test'
 
 path(Store s) = DATA BPSTRING[100](Store);
 
-file() = DATA LOCAL FILE ();
-
 readA(Store s)  { READ path(s) TO file; }  
 writeA(Store s)  { WRITE file() TO path(s) + 'txt'; } 
 
@@ -2376,6 +2431,8 @@ NAVIGATOR {
     NEW FOLDER tests 'Tests' WINDOW toolbar {
         NEW TestTabs;
         NEW TestHotkeys;
+        NEW TestPropertyOptions;
+        NEW TestFilesAndJSON;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestTree;
