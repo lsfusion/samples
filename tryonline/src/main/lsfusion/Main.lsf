@@ -166,7 +166,7 @@ getServerLog(JSONFILE file) {
 
 FORM servers 'Servers'
     OBJECTS s=Server
-    PROPERTIES (s) VALUE, code, dateStart, port ON CHANGE { FOR LONG oldp = port(s) DO INPUT newp=oldp DO { server(oldp) <- NULL; server(newp) <- s; } ; }, NEW, EDIT, DELETE 
+    PROPERTIES (s) VALUE, code, dateStart, port ON CHANGE { FOR LONG oldp = port(s) DO INPUT newp=port(s) DO { server(oldp) <- NULL; server(newp) <- s; } ; }, NEW, EDIT, DELETE 
     PROPERTIES (s) GRID createServer, killServer, deleteServer 
     
     OBJECTS a 'Responses' = LONG
