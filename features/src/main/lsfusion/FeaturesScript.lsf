@@ -1464,6 +1464,22 @@ namedFile = DATA NAMEDFILE ();
 FORM TestFilesAndJSON 'Files & JSON test'
 PROPERTIES() rawFile, file, namedFile, actionJSON;
 
+//--------------- Colors test ---------------//
+
+color (INTEGER i) = CASE
+    WHEN i = 1 THEN #FF0000
+    WHEN i = 2 THEN #00FF00
+    WHEN i = 3 THEN #0000FF
+;
+
+FORM TestColor 'Colors test'
+    OBJECTS i = INTEGER
+    PROPERTIES (i) color
+    FILTERS iterate(i, 1, 3)
+    OBJECTS s = Store
+    PROPERTIES(s) scolor, NEW
+;
+
 //--------------- SCHEDULE test ---------------//
 
 scheduleOnStartAction() {
@@ -1890,7 +1906,7 @@ DESIGN TestImage {
 FORM TestMargins 'Margins test'
     OBJECTS s=Store, a=Article
     PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric, scolor
+    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric
     PROPERTIES(a) VALUE, name
 ;
 
@@ -1916,7 +1932,7 @@ DESIGN TestMargins {
 FORM TestToolbars 'Toolbars test'
     OBJECTS s=Store, a=Article
     PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric, scolor
+    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric
     PROPERTIES(a) VALUE, name
 ;
 
@@ -2433,6 +2449,7 @@ NAVIGATOR {
         NEW TestHotkeys;
         NEW TestPropertyOptions;
         NEW TestFilesAndJSON;
+        NEW TestColor;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestTree;
