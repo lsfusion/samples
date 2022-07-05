@@ -1,0 +1,123 @@
+//#module
+MODULE GanttTask;
+//#module end
+
+REQUIRE Gantt, Multiselect, Time;
+
+CLASS Task;
+
+id = DATA STRING (Task);
+name 'Name' = DATA STRING (Task);
+
+start = DATA DATE (Task);
+end = DATA DATE (Task);
+
+progress 'Progress' = DATA INTEGER (Task);
+
+// dependencies
+depends = DATA BOOLEAN (Task, Task);
+idChildren 'Dependencies' (Task parent) = GROUP CONCAT id(Task child), ',' IF depends(parent, child) ORDER child;
+nameChildren (Task parent) = GROUP CONCAT name(Task child), ' ' IF depends(parent, child) ORDER child;
+
+// order
+order = DATA INTEGER (Task);
+index = PARTITION SUM 1 ORDER order(Task t), t;
+task (INTEGER i) = GROUP MAX Task t BY index(t);
+moveUp 'Move Up' (Task t) {
+    FOR INTEGER i = index(t) AND INTEGER o = order(task(i)) AND Task st = task(i-1) DO {
+        order(t) <- order(st);
+        order(st) <- o;
+    } 
+}
+moveDown 'Move Down' (Task t) {
+    FOR INTEGER i = index(t) AND INTEGER o = order(task(i)) AND Task st = task(i+1) DO {
+        order(t) <- order(st);
+        order(st) <- o;
+    } 
+}
+
+// fill properties
+WHEN LOCAL SET(Task t IS Task) AND NOT id(t) DO id(t) <- STRING(t);
+WHEN LOCAL SET(Task t IS Task) AND NOT name(t) DO name(t) <- 'Task ' + t;
+WHEN LOCAL SET(Task t IS Task) AND NOT order(t) DO order(t) <- [GROUP MAX order(Task tt)]() (+) 1;
+WHEN LOCAL SET(Task t IS Task) AND NOT start(t) DO start(t) <- currentDate();
+WHEN LOCAL SET(Task t IS Task) AND NOT end(t) DO end(t) <- currentDate();
+WHEN LOCAL SET(Task t IS Task) AND NOT progress(t) DO progress(t) <- 10;
+
+FORM gantt 'Gantt'
+    OBJECTS t = Task CUSTOM 'gantt_day'
+    PROPERTIES(t) id, name, start, end, progress, dependencies = idChildren, order
+    PROPERTIES(t) NEW
+    ORDERS order(t)
+
+    PROPERTIES(t) PANEL pname = name, pprogress = progress,
+                        moveUp, moveDown, delete = DELETE
+
+    OBJECTS c = Task CUSTOM 'select2_set'
+    PROPERTIES name = name(c), selected = depends(c, t)
+    FILTERS t != c
+
+;
+
+DESIGN gantt {
+    GRID(t) { 
+        autoSize = FALSE;
+        NEW header {
+            alignment = STRETCH;
+            type = CONTAINERH;
+            MOVE PROPERTY(pname);
+            MOVE PROPERTY(pprogress);
+        }
+        NEW dependencies {
+            alignment = STRETCH;
+            caption = 'Dependencies';
+            MOVE GRID(c);
+        }
+        NEW actions {
+            alignment = STRETCH;
+            type = CONTAINERH;
+            MOVE PROPERTY(moveUp(t));
+            MOVE PROPERTY(moveDown(t));
+            MOVE PROPERTY(delete);
+        }
+    }
+    REMOVE BOX(c);
+}
+
+NAVIGATOR {
+    NEW gantt;
+}
+
+// default data
+onStarted() + {
+    IF NOT GROUP SUM 1 IF t IS Task THEN {
+        NEW rw = Task {
+            name(rw) <- 'Redesign website';
+            start(rw) <- 2022_07_05;
+            end(rw) <- 2022_07_11;
+            progress(rw) <- 50;            
+            NEW wnc = Task {
+                name(wnc) <- 'Write new content';
+                start(wnc) <- 2022_07_06;
+                end(wnc) <- 2022_07_09;
+                depends(wnc, rw) <- TRUE;
+                progress(wnc) <- 30;            
+                NEW aps = Task {
+                    name(aps) <- 'Apply new styles';
+                    start(aps) <- 2022_07_08;
+                    end(aps) <- 2022_07_11;
+                    depends(aps, wnc) <- TRUE;
+                    progress(aps) <- 70;            
+                }
+                NEW rv = Task {
+                    name(rv) <- 'Review';
+                    start(rv) <- 2022_07_09;
+                    end(rv) <- 2022_07_13;
+                    depends(rv, wnc) <- TRUE;
+                    progress(rv) <- 10;            
+                }
+            }
+        }
+    }
+}
+
