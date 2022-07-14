@@ -1418,7 +1418,8 @@ FORM TestHotkeys 'Hotkeys test'
 
 DESIGN TestHotkeys {
     PROPERTY(ns) {
-        changeKey = 'F4';
+        changeKey = 'F4;priority=1000;editing=all';
+        changeMouse = 'DBLCLK;priority=2000';
     }
 }
 
