@@ -2,7 +2,7 @@
 MODULE GanttTask;
 //#module end
 
-REQUIRE Gantt, Multiselect, Time;
+REQUIRE FrappeGantt, Multiselect, Time;
 
 CLASS Task;
 
