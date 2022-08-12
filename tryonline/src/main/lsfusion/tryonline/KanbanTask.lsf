@@ -1,0 +1,82 @@
+//#module
+MODULE KanbanTask;
+//#module end
+
+REQUIRE SystemEvents, JKanban;
+
+// status
+CLASS Status;
+name = DATA STRING (Status);
+status = GROUP MAX Status s BY name(s);
+onStarted() + {
+    IF NOT GROUP SUM 1 IF s IS Status THEN {
+        NEW s = Status { name(s) <- 'New'; }
+        NEW s = Status { name(s) <- 'In Progress'; }
+        NEW s = Status { name(s) <- 'Done'; }
+    }
+}
+
+// task
+CLASS Task;
+text = DATA RICHTEXT (Task);
+status = DATA Status (Task);
+
+onStarted() + {
+    IF NOT GROUP SUM 1 IF t IS Task THEN {
+        NEW t = Task { text(t) <- 'Task 1'; status(t) <- status('New'); }
+        NEW t = Task { text(t) <- 'Task 2'; status(t) <- status('New'); }
+        NEW t = Task { text(t) <- 'Task 3'; status(t) <- status('In Progress'); }
+    }
+}
+
+// kanban
+CLASS ABSTRACT Element;
+order = DATA INTEGER (Element);
+
+title = ABSTRACT RICHTEXT (Element) IN id;
+
+board = ABSTRACT Element (Element);
+boardTitle (Element e) = title(board(e));
+
+countElement (Element b) = GROUP SUM 1 IF board(Element e) = b;
+
+FORM kanban
+    OBJECTS e = Element CUSTOM 'kanban'
+    PROPERTIES id = STRING(e), title = title(e), 
+               boardId = board(e) ON CHANGE { 
+                    INPUT l = LONG DO
+                        FOR LONG(Element b AS Element) = l DO board(e) <- b;  
+               }, order = order(e)
+    ORDERS boardId, order
+    
+    PROPERTIES(e) PANEL ptitle = title, pdelete = DELETE
+;
+
+DESIGN kanban {
+    GRID(e) {
+        height = 200;
+        MOVE PROPERTY(ptitle) { size = (400, 300); caption = ''; };
+        MOVE PROPERTY(pdelete) { alignment = STRETCH; } 
+    }
+}
+
+NAVIGATOR {
+    NEW kanban;
+}
+
+// implement
+EXTEND CLASS Status : Element;
+title(Status s) += name(s);
+
+EXTEND CLASS Task : Element;
+title(Task t) += text(t);
+board(Task t) += status(t);
+
+EXTEND FORM kanban
+    PROPERTIES GRID new = {
+        NEW ne = Task {
+            status(ne) <- e;
+            order(ne) <- countElement(e) + 1; 
+        }
+    }
+;
