@@ -398,9 +398,6 @@ testFormActionXLSX  { PRINT TestCase XLSX; }
 testFormActionXLS  { PRINT TestCase XLS; } 
 testFormActionPDF  { PRINT TestCase PDF; }
 testFormActionExport  { PRINT TestCase PDF TO exportFile; } 
-testFormActionINF  { SHOW TestCase; }
-testFormActionINF2  { SHOW TestCase; }
-
 
 testMessageAction()  { 
     LOCAL i = INTEGER();
@@ -422,7 +419,7 @@ testMessageActionNW()  {
 
 
 EXTEND FORM TestCase
-PROPERTIES() testFormAction, testFormActionAUTO, testFormActionXLS, testFormActionXLSX, testFormActionPDF, testFormActionExport, testFormActionINF, testFormActionINF2,
+PROPERTIES() testFormAction, testFormActionAUTO, testFormActionXLS, testFormActionXLSX, testFormActionPDF, testFormActionExport,
              testMessageAction, testMessageActionNW
 ;
 
@@ -1481,6 +1478,22 @@ FORM TestColor 'Colors test'
     PROPERTIES(s) scolor, NEW
 ;
 
+//--------------- Show / Close test ---------------//
+
+FORM TestShowClose 'Show / Close test';
+
+DESIGN TestShowClose {
+    NEW innerContainer {
+        caption = 'inner container';
+    };
+}
+
+showTestColor() { SHOW 'colors' = TestColor IN TestShowClose.innerContainer;}
+closeTestColor() { CLOSE FORM 'colors'; }
+
+EXTEND FORM TestShowClose
+PROPERTIES() showTestColor, closeTestColor;
+
 //--------------- SCHEDULE test ---------------//
 
 scheduleOnStartAction() {
@@ -2451,6 +2464,7 @@ NAVIGATOR {
         NEW TestPropertyOptions;
         NEW TestFilesAndJSON;
         NEW TestColor;
+        NEW TestShowClose;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestTree;
@@ -2981,8 +2995,6 @@ FORM TFA1 'TEST 1'
     EDIT A1 OBJECT a1
 ;
 
-//edit(A1 a1) + {  SHOW TFA1 OBJECTS a1=a1; }
-
 CLASS A2 : A0;
 a2 = DATA STRING[30] (A2);
 a(A2 a2) += a2(a2);
@@ -2992,8 +3004,6 @@ FORM TFA2 'TEST 2'
 //    EDIT A2 OBJECT a2
 ;
 
-//edit(A2 a2) + {  SHOW TFA2 OBJECTS a2=a2; }
-
 CLASS A3 : A0;
 a3 = DATA STRING[30] (A3);
 a(A3 a3) += a3(a3);
@@ -3002,8 +3012,6 @@ FORM TFA3 'TEST 3'
     PROPERTIES (a3) a3
     EDIT A3 OBJECT a3
 ;
-
-//edit(A3 a3) + {  SHOW TFA3 OBJECTS a3=a3; }
 
 changeC(Store s, Article a)  { 
     INPUT 
