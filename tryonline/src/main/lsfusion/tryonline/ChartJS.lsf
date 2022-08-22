@@ -1,0 +1,75 @@
+MODULE ChartJS;
+
+REQUIRE Authentication, SystemEvents, Chart;
+
+CLASS Month;
+name = DATA STRING (Month);
+
+onStarted() + {
+    IF NOT GROUP SUM 1 IF m IS Month THEN {
+        NEW m = Month { name(m) <- 'January'; }
+        NEW m = Month { name(m) <- 'February'; }
+        NEW m = Month { name(m) <- 'March'; }
+        NEW m = Month { name(m) <- 'April'; }
+        NEW m = Month { name(m) <- 'May'; }
+        NEW m = Month { name(m) <- 'June'; }
+        NEW m = Month { name(m) <- 'July'; }
+        NEW m = Month { name(m) <- 'August'; }
+        NEW m = Month { name(m) <- 'September'; }
+        NEW m = Month { name(m) <- 'October'; }
+        NEW m = Month { name(m) <- 'November'; }
+        NEW m = Month { name(m) <- 'December'; }
+    }
+}
+
+metric1 'Metric 1' (Month m) = INTEGER(random() * 100 + 1) IF m IS Month;
+metric2 'Metric 2' (Month m) = INTEGER(random() * 100 + 1) IF m IS Month;
+
+randomColor() = COLOR(random() * 16000000);
+
+FORM chart 'Chart'
+    OBJECTS l 'Line' = Month CUSTOM 'chart_line'
+    PROPERTIES(l) name EXTID 'label', metric1 BACKGROUND RGB(123,192,64) FOREGROUND RGB(123,15,214), metric2 BACKGROUND RGB(26, 211, 183) FOREGROUND RGB(210,120,99)
+
+    OBJECTS b 'Bar' = Month CUSTOM 'chart_bar'
+    PROPERTIES(b) name EXTID 'label', metric1, metric2
+
+    OBJECTS p 'Pie' = Month CUSTOM 'chart_pie'
+    PROPERTIES(p) name EXTID 'label', metric1 BACKGROUND randomColor() FOREGROUND RGB(123,15,214), metric2 BACKGROUND randomColor() FOREGROUND RGB(210,120,99)
+
+    OBJECTS r 'Radar' = Month CUSTOM 'chart_radar'
+    PROPERTIES(r) name EXTID 'label', metric1 BACKGROUND RGB(123,192,64) FOREGROUND RGB(123,15,214), metric2 BACKGROUND RGB(26, 211, 183) FOREGROUND RGB(210,120,99)
+;
+
+DESIGN chart {
+    OBJECTS {
+        NEW pane {
+            fill = 1;
+            type = CONTAINERH;
+            NEW firstColumn {
+                fill = 2;
+                MOVE BOX(l) {
+                    GRID(l) { size = (200, 200); }
+                }
+                MOVE BOX(b) {
+                    GRID(b) { size = (200, 200); }
+                    PROPERTY(metric1(b)) { background = #34ebd8; foreground = #8ceb34; }
+                    PROPERTY(metric2(b)) { background = #eb5f34; foreground = #eb34eb; }
+                }
+            }
+            NEW secondColumn {
+                fill = 1;
+                MOVE BOX(p) {
+                    GRID(p) { size = (200, 200); }
+                }
+                MOVE BOX(r) {
+                    GRID(r) { size = (200, 200); }
+                }
+            }
+        }
+    }
+}
+
+NAVIGATOR {
+    NEW chart;
+}
