@@ -1495,6 +1495,30 @@ closeTestColor() { CLOSE FORM 'colors'; }
 EXTEND FORM TestShowClose
 PROPERTIES() showTestColor, closeTestColor;
 
+//--------------- Export test ---------------//
+
+FORM TestExport 'Export test'
+    OBJECTS s=Store
+    PROPERTIES(s) name, stime EXTID 'timefield', sdate NOEXTID;
+
+exportFormXML() {
+    EXPORT TestExport XML;
+    open(exportFile());
+}
+
+exportFormJSON() {
+    EXPORT TestExport JSON;
+    open(exportFile());
+}
+
+exportFormDBF  { 
+    EXPORT TestExport DBF TO s=exportFile;
+    open(exportFile());
+}
+
+EXTEND FORM TestExport
+    PROPERTIES() exportFormXML, exportFormJSON, exportFormDBF;
+
 //--------------- SCHEDULE test ---------------//
 
 scheduleOnStartAction() {
@@ -2466,6 +2490,7 @@ NAVIGATOR {
         NEW TestFilesAndJSON;
         NEW TestColor;
         NEW TestShowClose;
+        NEW TestExport;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestTree;
@@ -3123,24 +3148,8 @@ FORM articlesTest
     PROPERTIES(s) VALUE, name
     FILTERS name(s)
 ;
-
-testExportJSONForm()  { 
-    EXPORT articlesTest JSON;
-    open(exportFile());
-}  
-
-testExportXMLForm  { 
-    EXPORT articlesTest XML;
-    open(exportFile());
-}
-
-testExportDBFForm  { 
-    EXPORT articlesTest DBF TO a=exportFile;
-    open(exportFile());
-}
     
 FORM TestRequestInput 'RequestInput test'
-    PROPERTIES () testExportJSONForm, testExportXMLForm, testExportDBFForm
     OBJECTS s=Store PANEL, a=Article
     PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, testExport
     PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode, contextStore
@@ -3308,9 +3317,6 @@ tstexp()  {
 	open(xml());
 	//EXPORT DBF FROM f(INTEGER a) TO dbf;
 	//EXPORT FROM 5, xml(), dbf();
-
-//	EXPORT XML FROM a=incomeQuantity(Store s,Article a), b=Features.name(a), c=barcode(a), d=Features.name(a), s=Features.name(s) WHERE incomeQuantity(s, a);	
-//	test(5);
 }	
 
 tstimp()  { 	
