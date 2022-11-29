@@ -82,7 +82,7 @@ FORM parents
     TREE skuTree sg = ArticleGroup PARENT parent(sg)
     PROPERTIES(sg) nameArticle, EDIT, NEWEDIT, nnn = NEW, DELETE
 
-    OBJECTS p=ArticleGroup
+    OBJECTS p = ArticleGroup
     PROPERTIES (p) nameArticle, nameParent, childNumber, descendantNumber, isLeaf, canonicalName, NEW, DELETE GRID
     PROPERTIES (sg, p) level, levelRoot, isParent
 ;
@@ -206,13 +206,13 @@ storeSizeName = staticCaption(storeSize(Store store)) IN base; // we can omit na
 // IS - is(), AS - object()
 is(IncomeDocument document) = document IS IncomeDocument;
 ttt = DATA INTEGER (IncomeDocument) IN base;
-testtettest(IncomeDocument doc) = (-5+2) (-) (-ttt(doc));
+testtettest(IncomeDocument doc) = (-5 + 2) (-) (-ttt(doc));
 
 // AND, IF (identical in action)
 // Expression syntax:
 // propertyExpression (AND | IF) [NOT] propertyExpression
 inQuantity(IncomeDocument document, Article article) = quantity(document, article) IF is(document);
-outQuantity(document, article) = quantity[Document,Article](document, article) IF document IS OutcomeDocument; // specifying parameter numbers instead of names
+outQuantity(document, article) = quantity[Document, Article](document, article) IF document IS OutcomeDocument; // specifying parameter numbers instead of names
 
 // Group property
 // SUM, MAX, MIN, EQUAL group property
@@ -223,7 +223,7 @@ outcomeQuantity(store, article) = GROUP SUM outQuantity(Document doc, article) B
 
 incomeQuantity2(store, Article article) = GROUP SUM quantity(IncomeDocument document, article) IF document IS IncomeDocument BY store(document);
 outcomeQuantity2(store, Article article) = GROUP SUM quantity(OutcomeDocument doc, article) IF doc IS OutcomeDocument BY store(doc);
-lastQuantity 'lastQ' (store, Article article) = GROUP LAST inQuantity(IncomeDocument d, article) ORDER oq(d,article), date(d) WHERE inQuantity(d, article) > 5 BY store(d);
+lastQuantity 'lastQ' (store, Article article) = GROUP LAST inQuantity(IncomeDocument d, article) ORDER oq(d, article), date(d) WHERE inQuantity(d, article) > 5 BY store(d);
 
 // CONCAT group property
 // GROUP CONCAT propertyExpr, separatorPropertyExpr [BY propertyExpr1, ..., propertyExprN] [ORDER [DESC] orderPropertyExpr1, ..., orderPropertyExprK]
@@ -381,9 +381,9 @@ dr(a) {
 }
 
 FORM TestCase 'CASE test'
-    OBJECTS a=CaseA, b=CaseB, c=CaseC
+    OBJECTS a = CaseA, b = CaseB, c = CaseC
     PROPERTIES(a) GRID NEW TOOLBAR, testInt, caseData1, caseData2, caseData3, overrideTest, overrideTestA, exclusiveTest, exclusiveTestA, caseTest, caseTest2, //caseTestA, caseTestA2, 
-        multiTest, multiTestA, multiTest2,// multiTestA2,
+        multiTest, multiTestA, multiTest2, // multiTestA2,
         caseActionTest, caseActionTestA, caseActionTest2, caseActionTestA2//, multiActionTest, multiActionTestA, multiActionTest2, multiActionTestA2
         , dr
     PROPERTIES NEW(b), NEW(c), caseDataB(b), caseDataC(c), caseAM(), scase(), caseAMN()
@@ -511,7 +511,7 @@ foo(store, article) = 5 * incomeQuantity(store, article);
 foo2(Store store, Article article) = - outcomeQuantity(store, article) + 5 * incomeQuantity(store, article);
 bar = incomeQuantity(Store store, Article article) * 5 - 3 - 4 + outcomeQuantity(store, article);
 bar2(store, article) = 3.5 * incomeQuantity(store, article) - (5 + outcomeQuantity(store, article));
-foobar(Store store, Article article) = [ x*x + y](foo(store, article), bar(store, article)); // lambda-like syntax
+foobar(Store store, Article article) = [ x * x + y](foo(store, article), bar(store, article)); // lambda-like syntax
 baz(Store store, Article article) = bar(store, article) > bar2(store, article) IN base;
 baz2 = foo(Store s, Article a) >= 15 == foo2(s, a) >= 15;
 
@@ -593,7 +593,7 @@ addB() { NEW AOB; }
 addAllBTo() { NEW AOB WHERE count[AOA](a) > 5 TO AOBfor(a); }
 
 FORM testAddObject
-    OBJECTS a=AOA, b=AOB
+    OBJECTS a = AOA, b = AOB
     PROPERTIES name(a), name(b), count(a), addA(), addB(), addAllBTo(), AOBfor(a), countAOAAOB(a, b)
 ;
 
@@ -631,10 +631,10 @@ changeAllAWhenCountAB 'all count CCACCB > 5' (CCB b) { CHANGECLASS CCA a TO CCB 
 changeAllAWhenCount 'all count CCB > 5' (CCB b) { CHANGECLASS CCA a TO CCB WHERE count(b) > 5 AND a IS CCA; }
 
 FORM testChangeClass
-    OBJECTS a=CCA, b=CCB
+    OBJECTS a = CCA, b = CCB
     PROPERTIES name(a), name(b), count(a), count(b), CCBfor(a), countCCACCB(a, b)
     PROPERTIES change(a) GRID, changeAllA(), deleteA(), changeWhenCount(a, b) GRID, changeWhenCountAB(a, b) GRID
-    PROPERTIES NEWSESSION GRID changeAllAWhenCountAB(b), changeAllAWhenCount(b), DELETE(a), d=DELETE(a)
+    PROPERTIES NEWSESSION GRID changeAllAWhenCountAB(b), changeAllAWhenCount(b), DELETE(a), d = DELETE(a)
 ;
 
 // Confirm action
@@ -654,7 +654,7 @@ script(doc) = DATA TEXT (Document);
 evalScript(Document doc) { EVAL script(doc); }
 
 FORM TestEvalActionForm 'Scripts test'
-    OBJECTS d=Document
+    OBJECTS d = Document
     PROPERTIES(d) store, script, evalScript GRID;
 
 copyNameToArticles 'Copy warehouse name to article names' (Store s) {
@@ -714,7 +714,7 @@ testPush(Document document) {
         name(article) <- 'Article ' + quantity(document2, article);
     }
 
-    NEW added=Article {
+    NEW added = Article {
         MESSAGE name(added);
     }
 
@@ -782,7 +782,7 @@ importAction() {
 }
 
 FORM TestImport 'IMPORT test'
-    OBJECTS i=INTEGER
+    OBJECTS i = INTEGER
     PROPERTIES(i) kgrmat, polnaim
     PROPERTIES() importAction, sheetNumber
     FILTERS kgrmat(i)
@@ -815,7 +815,7 @@ constraintAction (Store store, Article article) {
     }
 };
 
-WHEN LOCAL foo(Store store, Article article)>10000 ORDER name(article) DO constraintAction(store, article);
+WHEN LOCAL foo(Store store, Article article) > 10000 ORDER name(article) DO constraintAction(store, article);
 
 /////////////GLOBAL EVENT STATEMENT//////////////
 // Syntax:
@@ -859,7 +859,7 @@ FORM documentArticle 'By documents (caption)'
     // Object definition syntax:
     // [alias=] className ['<caption>'] [ON CHANGE action]
 
-    OBJECTS document=Document, article=Article
+    OBJECTS document = Document, article = Article
 
     // TreeGroup list syntax:
     // TREE [SID] [alias=] className ['<caption>'] [PARENT <property>] | [groupAlias=] (object1 definition, ..., objectN definition) [PARENT <properties separated with space>],
@@ -944,7 +944,7 @@ testAction 'Show "By documents" 3 times'() {
 };
 
 FORM testModalForm 'Test form'
-    OBJECTS article=Article, i 'New product name ("Product %N%"):' =INTEGER PANEL, store=Store, s 'New warehouse name:' =STRING[50] PANEL
+    OBJECTS article = Article, i 'New product name ("Product %N%"):' = INTEGER PANEL, store = Store, s 'New warehouse name:' = STRING[50] PANEL
     PROPERTIES name(article), name(store), VALUE(s), VALUE(i)
 ;
 
@@ -982,16 +982,16 @@ name(Store s) <- 'Warehouse ' + s WHEN SET(s IS Store);
 
 FORM remindUserPass 'Login reminder'
 
-    OBJECTS u=CustomUser PANEL
+    OBJECTS u = CustomUser PANEL
     PROPERTIES(u) READONLY login, name[Contact]
 ;
 
 remindPasswordEmail 'Send login to this email' (Contact u, BPSTRING[200] to) {
     LOCAL bodyFile = FILE ();
-    PRINT remindUserPass OBJECTS u=(u AS CustomUser) HTML TO bodyFile;
+    PRINT remindUserPass OBJECTS u= (u AS CustomUser) HTML TO bodyFile;
 
     LOCAL attachFile = FILE ();
-    PRINT remindUserPass OBJECTS u=(u AS CustomUser) PDF TO attachFile;
+    PRINT remindUserPass OBJECTS u= (u AS CustomUser) PDF TO attachFile;
 
     EMAIL
         //    FROM 'luxsoft@adsl.by'
@@ -1011,19 +1011,19 @@ justSendEmail 'Just send an email' (BPSTRING[200] to) {
 }
 
 FORM TestEmailForm 'EMAIL test'
-    OBJECTS s 'Email:' =STRING[100] PANEL, u=CustomUser
+    OBJECTS s 'Email:' = STRING[100] PANEL, u = CustomUser
     PROPERTIES VALUE(s), login(u), email(u), NEW(u), remindPasswordEmail(u, s) DRAW s, justSendEmail(s)
 ;
 
 testRequestInput 'Testing REQUEST input'(Store s) {
     ASK 'To be or not to be?' DO {
-        INPUT x=COLOR DO
+        INPUT x = COLOR DO
             scolor(s) <- IF x == #FF0000 THEN #00FF00 ELSE x WHERE s IS Store;
     }
 };
 
 loadf(Store s) { open(simage(s)); }
-savef(Store s) { INPUT =simage(s) CHANGE; }
+savef(Store s) { INPUT = simage(s) CHANGE; }
 
 //fs = ABSTRACT BOOLEAN (Store);
 //countF 'Number of filtered warehouses' = GROUP SUM 1 IF fs(s);
@@ -1040,17 +1040,17 @@ dataStringFlex = DATA STRING[100] (Store) CHARWIDTH 52 FLEX;
 dataString = DATA STRING[100] (Store) CHARWIDTH 50;
 
 FORM storeArticle 'By warehouses'
-    OBJECTS s=Store
+    OBJECTS s = Store
 
     TREE skuTree sg = ArticleGroup PARENT parent(sg)
     PROPERTIES READONLY nameArticle(sg)
 
-    OBJECTS a=Article
-    PROPERTIES sname=name(s), obja=VALUE(a), aname=name(a)
+    OBJECTS a = Article
+    PROPERTIES sname = name(s), obja = VALUE(a), aname = name(a)
     PROPERTIES DRAW s setDefaultNames(), copyNameToArticles(s), copyStoreNameToArticle(s, a), copyStoreNameToArticleError(s, a), createNewStore(), showDocumentArticleModalForm(), showTestModalForm() TOOLBAR, testRequestInput(s) TOOLBAR
     //    PROPERTIES() countF, setNameX
     PROPERTIES(s, a) SHOWIF storeIsHuge(s) incomeQuantity2, outcomeQuantity2, lastQuantity
-    PROPERTIES(s) GRID storeSizeName, dataString, dataStringFixed, dataStringFlex, sss, sssFixed, ssc1=storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi=simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData
+    PROPERTIES(s) GRID storeSizeName, dataString, dataStringFixed, dataStringFlex, sss, sssFixed, ssc1 = storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi = simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foo, foo2 SHOWIF storeIsHuge(s), bar, foobar HEADER name(a), bar2, baz, baz2, balanceQuantity, testUnion HEADER name(s), testPartition, testFormula
     //PROPERTIES tstDestruct(s), onlyIncomeQuantity(s,a) //commented because of assertion
     PROPERTIES currentTime(), allNames()
@@ -1059,7 +1059,7 @@ FORM storeArticle 'By warehouses'
 ;
 
 FORM TestSeek 'SEEK test'
-    OBJECTS g=(s=Store, a=Article)
+    OBJECTS g = (s = Store, a = Article)
     PROPERTIES VALUE(s), name(s), VALUE(a), name(a), incomeQuantity(s, a), storeSizeName(s)
 ;
 
@@ -1236,7 +1236,7 @@ DESIGN storeArticle {
 }
 
 EXTEND FORM storeArticle
-    PROPERTIES(s) ssw=sword AFTER ssi
+    PROPERTIES(s) ssw = sword AFTER ssi
 ;
 
 EXTEND FORM storeArticle
@@ -1244,7 +1244,7 @@ EXTEND FORM storeArticle
 ;
 
 FORM editStore 'Editing warehouse'
-    OBJECTS s=Store PANEL
+    OBJECTS s = Store PANEL
     PROPERTIES(s) name, storeSizeName, storeIsHuge, storeIsHuge2
     // To use this form as EDIT\DIALOG\LIST form for some class (for ex. store)
     // Use this syntax:
@@ -1253,7 +1253,7 @@ FORM editStore 'Editing warehouse'
 ;
 
 FORM editArticleGroup 'Editing a product group'
-    OBJECTS ag=ArticleGroup PANEL
+    OBJECTS ag = ArticleGroup PANEL
     PROPERTIES(ag) name, nameParent
     EDIT ArticleGroup OBJECT ag
 ;
@@ -1265,7 +1265,7 @@ variableDateTime(store) = DATA DATETIME (Store);
 teststring(Store store) = '\n\'\\ghhgh\\"' AND store IS Store;
 
 FORM TestDataPropForm 'Date test'
-    OBJECTS store=Store
+    OBJECTS store = Store
     PROPERTIES(store) dateProp, variableDateTime
     PROPERTIES dateTimeProp(store), teststring(store)
     PROPERTIES timeProp(store)
@@ -1276,10 +1276,10 @@ storeString (s, ss) = DATA BPSTRING[10] (Store, StoreSize);
 storeString2 (s, ss) = DATA BPSTRING[10] (Store, StoreSize);
 storeHeader (StoreSize ss) = 'storeSize: ' + sizeCode(ss);
 storeHeader2 (Store s, StoreSize ss) = OVERRIDE storeString(s, ss),
-    name(ss) IF s IS Store AND ss IS StoreSize AND ss!=StoreSize.small;
+    name(ss) IF s IS Store AND ss IS StoreSize AND ss != StoreSize.small;
 
 FORM TestColumnGroupObjects 'Group in columns test (StoreSize/Store)'
-    OBJECTS ss=StoreSize, s=Store
+    OBJECTS ss = StoreSize, s = Store
     PROPERTIES staticCaption(ss), sizeCode(ss)
     PROPERTIES VALUE(s), name(s), scolor(s), storeSizeCode(s)
     PROPERTIES storeString(s, ss) COLUMNS 'cols1' (ss) HEADER storeHeader(ss)
@@ -1291,10 +1291,10 @@ colorizeElementWithNumberGreaterFour(NavigatorElement element) = #5555ff IF numb
 stringEqualsAll (BPSTRING[3] string) = string == BPSTRING[3]('All');
 
 FORM TestTree 'Tree test (navigator elements)'
-    TREE forms e=NavigatorElement PARENT parent(e)
+    TREE forms e = NavigatorElement PARENT parent(e)
     PROPERTIES(e) VALUE, caption, canonicalName, number BACKGROUND colorizeElementWithNumberGreaterFour(e)
 
-    TREE forms2 a =BPSTRING[3], e2=NavigatorElement PARENT parent(e2)
+    TREE forms2 a = BPSTRING[3], e2 = NavigatorElement PARENT parent(e2)
     PROPERTIES(a) VALUE
     PROPERTIES(e2) VALUE, caption, canonicalName
 
@@ -1324,7 +1324,7 @@ DESIGN TestTree {
 showStores(ArticleGroup ag, Store s) = aginteger(ag) > 5 AND s IS Store;
 
 FORM TestExpandables 'Expandables test'
-    TREE groups a =BPSTRING[3], ag=ArticleGroup PARENT parent(ag), s=Store
+    TREE groups a = BPSTRING[3], ag = ArticleGroup PARENT parent(ag), s = Store
     PROPERTIES(a) VALUE
     PROPERTIES(ag) VALUE, name, nameParent, aginteger
     PROPERTIES(s) VALUE, name, storeSizeCode, sinteger
@@ -1334,12 +1334,12 @@ FORM TestExpandables 'Expandables test'
 ;
 
 FORM TestAggr 'Aggregation test'
-    OBJECTS s=QuantityString
+    OBJECTS s = QuantityString
     PROPERTIES NEWSESSION dateDocument(s), storeNameDocument(s), nameArticle(s), DELETE(s) GRID
 ;
 
 FORM TestHeaders 'Headers test'
-    OBJECTS s=Store, a=Article
+    OBJECTS s = Store, a = Article
     PROPERTIES(s) name, storeSizeCode
     PROPERTIES(a) VALUE, name
     PROPERTIES(s, a) SHOWIF storeIsHuge(s) incomeQuantity2 HEADER outcomeQuantity2(s, a), outcomeQuantity2
@@ -1364,12 +1364,12 @@ storeIsHugeOrBig(Store s) = storeIsHuge(s) OR storeIsBig(s);
 //--------------- Tabs test ---------------//
 
 FORM TestTabs 'Tabs test'
-    OBJECTS s=Store, a=Article
+    OBJECTS s = Store, a = Article
     PROPERTIES(s) VALUE, name, storeSizeCode
     PROPERTIES(a) VALUE, name
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar, testUnion
-    PROPERTIES SHOWIF storeIsHuge(s) PANEL iq=incomeQuantity(s, a)
-    PROPERTIES SHOWIF storeIsHugeOrBig(s) PANEL oq=outcomeQuantity(s, a)
+    PROPERTIES SHOWIF storeIsHuge(s) PANEL iq = incomeQuantity(s, a)
+    PROPERTIES SHOWIF storeIsHugeOrBig(s) PANEL oq = outcomeQuantity(s, a)
 ;
 
 DESIGN TestTabs {
@@ -1390,10 +1390,10 @@ EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
 sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLCK';
 
 FORM TestHotkeys 'Hotkeys test'
-    OBJECTS s=Store, a=Article
-    PROPERTIES(s) ns=name ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2'; },
+    OBJECTS s = Store, a = Article
+    PROPERTIES(s) ns = name ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2'; },
         'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeCode
-    PROPERTIES(a) VALUE, na=name
+    PROPERTIES(a) VALUE, na = name
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar, testUnion
     FILTERGROUP filters1
         FILTER 'Show only huge warehouses' storeIsHuge(s) 'F7'
@@ -1419,14 +1419,14 @@ boolean = DATA BOOLEAN (Store);
 tboolean = DATA TBOOLEAN (Store);
 
 FORM TestPropertyOptions 'Property Options test'
-    OBJECTS s=Store
-    PROPERTIES(s) name BACKGROUND RGB(255,0,0) STICKY, storeSizeCode, likeString, matchString
+    OBJECTS s = Store
+    PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, storeSizeCode, likeString, matchString
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
 ;
 
 DESIGN TestPropertyOptions {
     PROPERTY(storeSizeCode(s)) {
-        background = RGB (128,128,128);
+        background = RGB (128, 128, 128);
     }
 }
 
@@ -1434,17 +1434,17 @@ DESIGN TestPropertyOptions {
 
 FORM testJSON
     OBJECTS j = INTEGER
-    PROPERTIES ab='34'
+    PROPERTIES ab = '34'
 
     OBJECTS i = INTEGER
     PROPERTIES name = 'Name ' + (i AS INTEGER)
-    FILTERS iterate(i,1,j)
+    FILTERS iterate(i, 1, j)
 ;
 
 actionJSON() {
-    MESSAGE JSON (testJSON OBJECTS j=4 FILTERS mod(i,2) = 0);
+    MESSAGE JSON (testJSON OBJECTS j= 4 FILTERS mod(i, 2) = 0);
     MESSAGE JSON FROM code = '1', message = 'OK';
-    MESSAGE STRING ( JSON FROM value = 'Name3' + (INTEGER i AS INTEGER) WHERE iterate(i,1,5) ORDER i DESC);
+    MESSAGE STRING ( JSON FROM value = 'Name3' + (INTEGER i AS INTEGER) WHERE iterate(i, 1, 5) ORDER i DESC);
 }
 
 rawFile = DATA RAWFILE ();
@@ -1490,7 +1490,7 @@ EXTEND FORM TestShowClose
 //--------------- Export test ---------------//
 
 FORM TestExport 'Export test'
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES(s) name, stime EXTID 'timefield', sdate NOEXTID;
 
 exportFormXML() {
@@ -1504,7 +1504,7 @@ exportFormJSON() {
 }
 
 exportFormDBF {
-    EXPORT TestExport DBF TO s=exportFile;
+    EXPORT TestExport DBF TO s = exportFile;
     open(exportFile());
 }
 
@@ -1529,12 +1529,12 @@ isReadOnly 'Read-only' () = TRUE AND NOT isEditable();
 FORM TestReadOnlyIf 'Read-only test'
     PROPERTIES isEditable()
 
-    OBJECTS s=Store, a=Article
+    OBJECTS s = Store, a = Article
     PROPERTIES(s) READONLYIF isReadOnly() VALUE, name, storeSizeCode
     PROPERTIES(a) READONLYIF isReadOnly() VALUE, name
     PROPERTIES(s, a) READONLYIF isReadOnly() incomeQuantity, outcomeQuantity
 
-    TREE elements e=NavigatorElement PARENT parent(e)
+    TREE elements e = NavigatorElement PARENT parent(e)
     PROPERTIES(e) READONLYIF isReadOnly() caption, canonicalName, number, permit, forbid;
 ;
 
@@ -1561,13 +1561,13 @@ DESIGN TestReadOnlyIf {
 }
 
 onChangeStoreName() {
-    INPUT i=INTEGER DO {
+    INPUT i = INTEGER DO {
         MESSAGE 'Number: ' + i;
     }
 }
 
 onChangeSInteger(Store s) {
-    INPUT st =BPSTRING[15] DO {
+    INPUT st = BPSTRING[15] DO {
         MESSAGE 'String: ' + st;
 
         sinteger(s) <- INTEGER(st);
@@ -1594,7 +1594,7 @@ onEditStoreSizeCode() {
 onEditSimple() { MESSAGE 'Edit!'; }
 
 FORM SelectStoreSize
-    OBJECTS ss=StoreSize
+    OBJECTS ss = StoreSize
     PROPERTIES(ss) READONLY VALUE, staticName, staticCaption, sizeCode
 ;
 
@@ -1619,15 +1619,15 @@ testOnStringChange() {
 }
 
 FORM TestOnActions 'Test "ON actions"'
-    OBJECTS str =BPSTRING[15] PANEL
+    OBJECTS str = BPSTRING[15] PANEL
 
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES(s) NEWSESSION VALUE,
         name ON CHANGE onChangeStoreName(),
         sinteger ON CHANGE onChangeSInteger(s),
         sboolean,
-        ssc1=storeSizeCode ON EDIT onEditStoreSizeCode(),
-        ssc2=storeSizeCode ON CHANGE onChangeSizeCode(s),
+        ssc1 = storeSizeCode ON EDIT onEditStoreSizeCode(),
+        ssc2 = storeSizeCode ON CHANGE onChangeSizeCode(s),
         DELETE ON CONTEXTMENU 'Hello world!' onHelloWorld() GRID
     PROPERTIES(str) VALUE
     EVENTS
@@ -1678,7 +1678,7 @@ concatVarNotNull(Named store) = CONCAT '', 'name: ' IF store IS Store, name(stor
 castToNumeric = NUMERIC[10,3](sbpstring(Store s));
 
 FORM TestOperators 'Test of operators CAST, CONCAT, "+ - *"'
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES(s) VALUE, name, stime, sdate, sinteger, slong, sdouble, snumeric, sbpstring, castToNumeric, sstring, sboolean
     PROPERTIES(s) stext
     PROPERTIES(s) PANEL textToInt, longToString
@@ -1753,18 +1753,18 @@ DESIGN TestOperators {
 }
 
 FORM TestLayout 'Layout test'
-    OBJECTS ss1=Store, ss2=Store, sa=Article, ss3=Store
+    OBJECTS ss1 = Store, ss2 = Store, sa = Article, ss3 = Store
     PROPERTIES(ss1) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble
-    PROPERTIES(ss2) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, st=stext DRAW sa
+    PROPERTIES(ss2) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, st = stext DRAW sa
     PROPERTIES(sa) VALUE, name
     PROPERTIES(ss2, sa) incomeQuantity, outcomeQuantity, balanceQuantity
-    PROPERTIES(ss2) PANEL si1=simage, st1=stext
-    PROPERTIES(ss2) PANEL si2=simage, st2=stext
-    PROPERTIES(ss2) PANEL si3=simage, st3=stext
-    PROPERTIES(ss2) PANEL si4=simage, st4=stext
-    PROPERTIES(ss2) PANEL si5=simage, st5=stext
-    PROPERTIES(ss2) PANEL si6=simage, st6=stext
-    PROPERTIES(ss3) PANEL st7=stext, st8=stext
+    PROPERTIES(ss2) PANEL si1 = simage, st1 = stext
+    PROPERTIES(ss2) PANEL si2 = simage, st2 = stext
+    PROPERTIES(ss2) PANEL si3 = simage, st3 = stext
+    PROPERTIES(ss2) PANEL si4 = simage, st4 = stext
+    PROPERTIES(ss2) PANEL si5 = simage, st5 = stext
+    PROPERTIES(ss2) PANEL si6 = simage, st6 = stext
+    PROPERTIES(ss3) PANEL st7 = stext, st8 = stext
 ;
 
 DESIGN TestLayout {
@@ -1796,9 +1796,9 @@ DESIGN TestLayout {
                 MOVE BOX(ss1) {fill = 1;};
             }
 
-            GROUP(,ss1) { columns = 1; }
-            GROUP(,ss2) { columns = 1; }
-            GROUP(,sa) { columns = 1; size = (500, -1); }
+            GROUP(, ss1) { columns = 1; }
+            GROUP(, ss2) { columns = 1; }
+            GROUP(, sa) { columns = 1; size = (500, -1); }
         }
 
         NEW fills {
@@ -1829,8 +1829,8 @@ DESIGN TestLayout {
                 caption = 'Equally';
                 type = CONTAINERH;
                 alignment = STRETCH;
-                MOVE PROPERTY(st7) { caption='short'; fill = 1; panelCaptionVertical=TRUE; }
-                MOVE PROPERTY(st8) { caption='this caption is much loooooonger than the first one'; fill = 1; panelCaptionVertical=TRUE; }
+                MOVE PROPERTY(st7) { caption = 'short'; fill = 1; panelCaptionVertical = TRUE; }
+                MOVE PROPERTY(st8) { caption = 'this caption is much loooooonger than the first one'; fill = 1; panelCaptionVertical = TRUE; }
             }
         }
     }
@@ -1842,10 +1842,10 @@ addDetailBarcode(Article article, BPSTRING[15] barcode) {
 
     IF dialogBarcodeArticle() IS Article THEN {
         //        MESSAGE 'FOUND: ' + name(dialogBarcodeArticle()) + '; current: ' + name(article);
-        SHOW TestTabs OBJECTS a=dialogBarcodeArticle() ;
+        SHOW TestTabs OBJECTS a= dialogBarcodeArticle() ;
     } ELSE {
         //        MESSAGE 'NOT FOUND: current: ' + name(article);
-        SHOW TestTabs OBJECTS a=article ;
+        SHOW TestTabs OBJECTS a= article ;
     }
 };
 
@@ -1856,7 +1856,7 @@ changeAddDetailInputBarcode(Article article) {
 addDetailInputBarcode 'Barcode input:' (article) = DATA LOCAL BPSTRING[15] (Article) TOOLBAR CHANGEKEY 'F4' EVENTID 'SCANNER'
     ON CHANGE { changeAddDetailInputBarcode(article); }
 FORM TestRequest 'RequestInput test'
-    OBJECTS s=Store PANEL, a=Article
+    OBJECTS s = Store PANEL, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble
     PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, balanceQuantity
@@ -1867,31 +1867,31 @@ contextStoreName(Article article) = name(contextStore(article));
 CONSTRAINT storeSize(contextStore(Article article)) != StoreSize.huge AND storeSize(contextStore(article)) != StoreSize.big CHECKED MESSAGE 'Article\'s contextStore must be huge or big';
 
 FORM Stores
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES (s) VALUE, name, storeSizeName;
 
 changeContextStore(Article article) {
-    DIALOG Stores OBJECTS s=contextStore(article) CHANGE;
+    DIALOG Stores OBJECTS s= contextStore(article) CHANGE;
 }
 
 barcodeMoreThanSome(Article article) = barcode(article AS Article) > '3';
 FORM TestContextFilters 'ContextFilters test'
-    OBJECTS s=Store, a=Article, a2=Article
+    OBJECTS s = Store, a = Article, a2 = Article
     PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(a) VALUE, name, csn1=contextStoreName, csn2=contextStoreName ON CHANGE changeContextStore(a), barcode
-    PROPERTIES(a2) VALUE, name, csn3=contextStoreName, csn4=contextStoreName ON CHANGE changeContextStore(a)
+    PROPERTIES(a) VALUE, name, csn1 = contextStoreName, csn2 = contextStoreName ON CHANGE changeContextStore(a), barcode
+    PROPERTIES(a2) VALUE, name, csn3 = contextStoreName, csn4 = contextStoreName ON CHANGE changeContextStore(a)
     FILTERS storeSize(contextStore(a)) == StoreSize.huge
 ;
 
 DESIGN TestContextFilters {
-    PROPERTY(csn1) { caption='Default ON CHANGE'; }
-    PROPERTY(csn2) { caption='Custom ON CHANGE'; }
-    PROPERTY(csn3) { caption='Default ON CHANGE'; }
-    PROPERTY(csn4) { caption='Custom ON CHANGE'; }
+    PROPERTY(csn1) { caption = 'Default ON CHANGE'; }
+    PROPERTY(csn2) { caption = 'Custom ON CHANGE'; }
+    PROPERTY(csn3) { caption = 'Default ON CHANGE'; }
+    PROPERTY(csn4) { caption = 'Custom ON CHANGE'; }
 }
 
 FORM TestShowIfs 'ShowIfs test'
-    OBJECTS s=Store, a=Article GRID
+    OBJECTS s = Store, a = Article GRID
     PROPERTIES(s) VALUE, name, storeSizeName, NEW
     PROPERTIES(a) SHOWIF storeIsBig(s) VALUE, name, ainteger, along
     FILTERGROUP filters1
@@ -1902,13 +1902,13 @@ FORM TestShowIfs 'ShowIfs test'
 ;
 
 FORM TestQuickFilter 'QuickFilter test'
-    OBJECTS s=Store, a=Article GRID
+    OBJECTS s = Store, a = Article GRID
     PROPERTIES(s) VALUE, name, storeSizeName
     PROPERTIES(s) QUICKFILTER name(s) sinteger, sdouble, slong
 ;
 
 FORM TestQuickSearch 'QuickSearch test'
-    OBJECTS s=Store, s2=Store
+    OBJECTS s = Store, s2 = Store
     PROPERTIES(s) READONLY name, VALUE, storeSizeName, sinteger
     PROPERTIES(s) sdouble, slong
     PROPERTIES(s2) VALUE, name, storeSizeName, sinteger, sdouble, slong
@@ -1921,9 +1921,9 @@ DESIGN TestQuickSearch {
 }
 
 FORM TestImage 'Image test'
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES(s) VALUE, name, storeSizeName, sinteger, simage
-    PROPERTIES(s) PANEL si1=simage
+    PROPERTIES(s) PANEL si1 = simage
 ;
 
 DESIGN TestImage {
@@ -1936,7 +1936,7 @@ DESIGN TestImage {
 }
 
 FORM TestMargins 'Margins test'
-    OBJECTS s=Store, a=Article
+    OBJECTS s = Store, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName
     PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric
     PROPERTIES(a) VALUE, name
@@ -1962,7 +1962,7 @@ DESIGN TestMargins {
 }
 
 FORM TestToolbars 'Toolbars test'
-    OBJECTS s=Store, a=Article
+    OBJECTS s = Store, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName
     PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric
     PROPERTIES(a) VALUE, name
@@ -1979,14 +1979,14 @@ pToAL(Store store, Article article) = PARTITION UNGROUP sinteger LIMIT sainteger
 pToALStrict(Store store, Article article) = PARTITION UNGROUP sdouble LIMIT STRICT sainteger(store, article) ORDER name(article) BY store;
 
 FORM TestPartition 'Partition test'
-    OBJECTS s=Store, a=Article
+    OBJECTS s = Store, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName, sinteger, sdouble
     PROPERTIES(a) VALUE, name
     PROPERTIES(s, a) sadouble, sainteger, partitionToArticles, pToAStrict, pToAStrictR2, pToALStrict, pToAL
 ;
 
 FORM TestFocus 'Focus test'
-    OBJECTS s=Store, a=Article
+    OBJECTS s = Store, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName, sdouble
     PROPERTIES(a) VALUE, name
     PROPERTIES(s, a) sadouble, partitionToArticles
@@ -1999,9 +1999,9 @@ EXTEND FORM TestFocus
 ;
 
 FORM TestRichText 'RichText test'
-    OBJECTS s=Store
-    PROPERTIES(s) PANEL s1=srawrichtext, sr1=srichtext
-    PROPERTIES(s) VALUE, name, sr2=srichtext
+    OBJECTS s = Store
+    PROPERTIES(s) PANEL s1 = srawrichtext, sr1 = srichtext
+    PROPERTIES(s) VALUE, name, sr2 = srichtext
 ;
 
 DESIGN TestRichText {
@@ -2023,30 +2023,30 @@ DESIGN TestRichText {
 }
 
 FORM TestLabelWidth 'LabelWidth test'
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES(s) VALUE, name, storeSizeName, stime, sdate, sdatetime
     PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric, scolor
 ;
 
 DESIGN TestLabelWidth {
-    GROUP(,s) {
+    GROUP(, s) {
         columns = 1;
         MOVE PROPERTY(scolor(s));
     }
 }
 
 FORM TestColumns 'Group in columns test (Store/Article)'
-    OBJECTS s=Store, a=Article
+    OBJECTS s = Store, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName
     PROPERTIES(a) VALUE, name
     PROPERTIES(s, a) COLUMNS 'store' (s) HEADER name(s) sainteger
 ;
 
 FORM TestShowIfInTreeAndContainers 'ShowIf test (tree & containers)'
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES(s) VALUE, name, storeSizeCode
 
-    TREE groups a =BPSTRING[3], ag=ArticleGroup PARENT parent(ag)
+    TREE groups a = BPSTRING[3], ag = ArticleGroup PARENT parent(ag)
     PROPERTIES(a) SHOWIF storeIsBig(s) VALUE
     PROPERTIES(ag) SHOWIF storeIsBig(s) VALUE, name, nameParent, DELETE GRID
 
@@ -2062,8 +2062,8 @@ DESIGN TestShowIfInTreeAndContainers {
 substoreTitle = DATA BPSTRING[15] (SubStore);
 
 FORM wideModalForm
-    OBJECTS s=Store PANEL
-    PROPERTIES(s) so=VALUE, sn=name, si=sinteger, sl=slong, snm=snumeric, ss=sbpstring
+    OBJECTS s = Store PANEL
+    PROPERTIES(s) so = VALUE, sn = name, si = sinteger, sl = slong, snm = snumeric, ss = sbpstring
 ;
 
 DESIGN wideModalForm {
@@ -2179,7 +2179,7 @@ testAddInNestedSession 'Add product group'(ArticleGroup parentGroup) {
 }
 
 FORM TestNestedSessions 'Nested sessions test'
-    OBJECTS ag=ArticleGroup
+    OBJECTS ag = ArticleGroup
     PROPERTIES(ag) VALUE, name, nameParent, testAddInNestedSession
 ;
 
@@ -2199,8 +2199,8 @@ EXTEND FORM TestExtendFilterGroup
 ;
 
 FORM TestHTMLInReports 'Test HTML in reports'
-    OBJECTS s=Store
-    PROPERTIES(s) store = VALUE, name, storeSizeCode, srichtext, sr=srichtext PANEL
+    OBJECTS s = Store
+    PROPERTIES(s) store = VALUE, name, storeSizeCode, srichtext, sr = srichtext PANEL
 ;
 
 DESIGN TestHTMLInReports {
@@ -2217,7 +2217,7 @@ DESIGN TestHTMLInReports {
 
 testSessionIntegerProperty() = DATA LOCAL NESTED INTEGER();
 FORM TestKeepSessionProps 'Test LOCAL NESTED'
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES(s) VALUE, name, ssbpstring, ssboolean, ssinteger
     PROPERTIES testSessionIntegerProperty()
 ;
@@ -2376,11 +2376,11 @@ debuggableAction(Store s) {
     }
 }
 FORM TestActionDebugger 'ActionDebugger test'
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES(s) VALUE, name, storeSizeCode
     PROPERTIES(s) debuggableAction
 
-    OBJECTS a=Article
+    OBJECTS a = Article
     PROPERTIES(a) VALUE, name
 ;
 
@@ -2392,7 +2392,7 @@ readA(Store s) { READ path(s) TO file; }
 writeA(Store s) { WRITE file() TO path(s) + 'txt'; }
 
 FORM TestReadWrite 'READ/WRITE test'
-    OBJECTS s=Store
+    OBJECTS s = Store
     PROPERTIES(s) GRID VALUE, name, path, readA, writeA
 ;
 
@@ -2556,12 +2556,12 @@ END
 // TABLE name(className1, ..., classNameN);
 TABLE documentArticle(Document, Article);
 
-fib(INTEGER i, INTEGER to) = GROUP MAX INTEGER f IF (RECURSION i==1 AND f==0 AND INTEGER f1==1 AND to IS INTEGER
-    STEP i==$i+1 AND f==$f+0+$f1 AND f1==$f AND i<to CYCLES IMPOSSIBLE);
+fib(INTEGER i, INTEGER to) = GROUP MAX INTEGER f IF (RECURSION i == 1 AND f == 0 AND INTEGER f1 == 1 AND to IS INTEGER
+    STEP i == $i + 1 AND f == $f + 0 + $f1 AND f1 == $f AND i < to CYCLES IMPOSSIBLE);
 
 //fib(i, to) = RECURSION 1 IF (i==0 OR i==1) AND to IS INTEGER STEP 1 IF (i==$i+1 OR i==$i+2) AND i<to;
 FORM fibForm 'Fibonacci numbers'
-    OBJECTS to = INTEGER PANEL, i=INTEGER
+    OBJECTS to = INTEGER PANEL, i = INTEGER
     PROPERTIES VALUE(to), VALUE(i), fib(i, to)
     FILTERS fib(i, to)
 ;
@@ -2610,12 +2610,12 @@ quantity = DATA INTEGER (Change, CommonObject);
 balanceChange (CommonObject commonObject) = GROUP SUM quantity(Change change, commonObject) MATERIALIZED;
 
 startFilling() {
-    FOR iterate(INTEGER i,0,20) DO
+    FOR iterate(INTEGER i, 0, 20) DO
         NEWSESSION { NEWTHREAD {
-            FOR iterate(INTEGER j, 0, 100) NEW c=Change DO {
-                quantity(c, CommonObject o) <- (i + j + 1) WHERE o==CommonObject.first;
-                quantity(c, CommonObject o) <- (i + j + 2) WHERE o==CommonObject.second;
-                quantity(c, CommonObject o) <- (i + j + 3) WHERE o==CommonObject.third;
+            FOR iterate(INTEGER j, 0, 100) NEW c = Change DO {
+                quantity(c, CommonObject o) <- (i + j + 1) WHERE o == CommonObject.first;
+                quantity(c, CommonObject o) <- (i + j + 2) WHERE o == CommonObject.second;
+                quantity(c, CommonObject o) <- (i + j + 3) WHERE o == CommonObject.third;
                 apply();
             }
         } }
@@ -2638,9 +2638,9 @@ startChanging() {
     //    FOR iterate(i,0,4) DO
     NEWSESSION { NEWTHREAD {
         FOR iterate(INTEGER j, 0, 1005) DO {
-            data(X o) <- j + 1 WHERE o==X.first;
-            data(X o) <- j + 2 WHERE o==X.second;
-            data(X o) <- j + 3 WHERE o==X.third;
+            data(X o) <- j + 1 WHERE o == X.first;
+            data(X o) <- j + 2 WHERE o == X.second;
+            data(X o) <- j + 3 WHERE o == X.third;
             apply();
         }
     }
@@ -2655,7 +2655,7 @@ startAddDelete() {
             DELETE y;
             BREAK;
         }
-        NEW y=Y {
+        NEW y = Y {
             x(y) <- X.first;
         }
         apply();
@@ -2671,7 +2671,7 @@ valueG = DATA DATE ();
 
 testPush (DATE dateFrom, DATE dateTo) {
     FOR iterate(DATE d, dateFrom, dateTo) NOINLINE (d) DO {
-        FOR INTEGER q==dateTProp(d) NEW o=OPR29 DO {
+        FOR INTEGER q == dateTProp(d) NEW o = OPR29 DO {
             valueP(o) <- DATE(d);
         }
     }
@@ -2707,10 +2707,10 @@ FORM TestMultithreading 'Test Multithreading'
     //    PROPERTIES VALUE(c), quantityChange(c, o)
     //    FILTERS quantityChange(c,o)
 
-    OBJECTS x=X
+    OBJECTS x = X
     PROPERTIES (x) data
 
-    OBJECTS y=Y
+    OBJECTS y = Y
     PROPERTIES (y) VALUE, dataX;
 ;
 
@@ -2722,10 +2722,10 @@ FORM TestMultithreading2 'Test Multithreading'
     //    PROPERTIES VALUE(c), quantityChange(c, o)
     //    FILTERS quantityChange(c,o)
 
-    OBJECTS x=X
+    OBJECTS x = X
     PROPERTIES (x) data
 
-    OBJECTS y=Y
+    OBJECTS y = Y
     PROPERTIES (y) VALUE, dataX;
 ;
 
@@ -2746,7 +2746,7 @@ CLASS TestLink;
 TABLE testLink(TestLink);
 
 fileImage = DATA IMAGEFILE (TestLink);
-loadFileImage (TestLink i) { INPUT =fileImage(i) CHANGE; }
+loadFileImage (TestLink i) { INPUT = fileImage(i) CHANGE; }
 openFileImage (TestLink i) { open(fileImage(i)); }
 
 linkImage(t) = DATA IMAGELINK (TestLink);
@@ -2754,7 +2754,7 @@ linkImage(t) = DATA IMAGELINK (TestLink);
 openLinkImage (TestLink i) { open(linkImage(i)); }
 
 filePDF = DATA PDFFILE (TestLink);
-loadFilePDF (TestLink i) { INPUT =filePDF(i) CHANGE; }
+loadFilePDF (TestLink i) { INPUT = filePDF(i) CHANGE; }
 openFilePDF (TestLink i) { open(filePDF(i)); }
 
 linkPDF = DATA PDFLINK (TestLink);
@@ -2934,13 +2934,13 @@ CLASS CIncomeDocument : IncomeDocument;
 
 FORM DialCDocument
     OBJECTS o = CIncomeDocument PANEL
-    PROPERTIES (o) VALUE, storeName, s=storeName
+    PROPERTIES (o) VALUE, storeName, s = storeName
 
     EDIT CIncomeDocument OBJECT o;
 ;
 
 editCIncomeDocument 'Edit C' (IncomeDocument d) {
-    SHOW EDIT CIncomeDocument =d;
+    SHOW EDIT CIncomeDocument = d;
 }
 
 testFormNull(IncomeDocument d) {
@@ -2956,7 +2956,7 @@ FORM testAdd
     PROPERTIES () testInvocation, testNullRun
     PROPERTIES () addIncomeDocument DRAW d
     PROPERTIES (d) GRID editCIncomeDocument, testFormNull
-    PROPERTIES (d) a=NEWEDIT[CIncomeDocument]
+    PROPERTIES (d) a = NEWEDIT[CIncomeDocument]
     PROPERTIES (d) VALUE, objectClassName, storeName, NEW NEWSESSION, an = NEW NESTEDSESSION, as = NEWEDIT, EDIT, en = EDIT, es = EDIT, DELETE GRID, ds = DELETE GRID, testDelete GRID, newTestDelete GRID
 ;
 
@@ -2998,13 +2998,13 @@ changeB(Store s, Article a) {
 CONSTRAINT dq(s, a) < 10 MESSAGE 'ddd';
 
 FORM InputC
-    OBJECTS c=DOUBLE PANEL
+    OBJECTS c = DOUBLE PANEL
     PROPERTIES (c) VALUE
 
-    OBJECTS d=DOUBLE PANEL
+    OBJECTS d = DOUBLE PANEL
     PROPERTIES (d) VALUE
 
-    OBJECTS s=Store PANEL
+    OBJECTS s = Store PANEL
 ;
 
 CLASS ABSTRACT A0;
@@ -3014,7 +3014,7 @@ CLASS A1 : A0;
 a1 = DATA STRING[30] (A1);
 a(A1 a1) += a1(a1);
 FORM TFA1 'TEST 1'
-    OBJECTS a1=A1 PANEL
+    OBJECTS a1 = A1 PANEL
     PROPERTIES (a1) a1, VALUE
     EDIT A1 OBJECT a1
 ;
@@ -3023,7 +3023,7 @@ CLASS A2 : A0;
 a2 = DATA STRING[30] (A2);
 a(A2 a2) += a2(a2);
 FORM TFA2 'TEST 2'
-    OBJECTS a2=A2 PANEL
+    OBJECTS a2 = A2 PANEL
     PROPERTIES (a2) a2
     //    EDIT A2 OBJECT a2
 ;
@@ -3032,16 +3032,16 @@ CLASS A3 : A0;
 a3 = DATA STRING[30] (A3);
 a(A3 a3) += a3(a3);
 FORM TFA3 'TEST 3'
-    OBJECTS a3=A3 PANEL
+    OBJECTS a3 = A3 PANEL
     PROPERTIES (a3) a3
     EDIT A3 OBJECT a3
 ;
 
 changeC(Store s, Article a) {
     INPUT
-        z=dq(s,a) CHANGE DO {
+        z = dq(s, a) CHANGE DO {
         DIALOG InputC OBJECTS
-            c=dq(s,a) CHANGE NOCONSTRAINTFILTER NOASSIGN;
+            c= dq(s, a) CHANGE NOCONSTRAINTFILTER NOASSIGN;
     };
 
     //    ASK 'Are you sure?' d=YESNO DO {
@@ -3064,7 +3064,7 @@ changeA(A0 a) {
 
 fltest = DATA FILE ();
 test 'TEST INPUT FILE' () {
-    INPUT =fltest() CHANGE;
+    INPUT = fltest() CHANGE;
 }
 
 FORM ListA0
@@ -3084,14 +3084,14 @@ xd = DATA LOCAL TEXT (INTEGER);
 xs = DATA LOCAL TEXT (INTEGER);
 
 FORM ShowX
-    OBJECTS i=INTEGER
+    OBJECTS i = INTEGER
     PROPERTIES (i) xa, xb, xc, xd
     FILTERS imported(i)
 ;
 
 testExport (Store s) {
     LOCAL t = FILE ();
-    EXPORT TABLE FROM a=incomeQuantity(s,Article a), b=name(a), c=barcode(a), d=name(a), s=name(s) WHERE incomeQuantity(s, a) TO t;
+    EXPORT TABLE FROM a = incomeQuantity(s, Article a), b = name(a), c = barcode(a), d = name(a), s = name(s) WHERE incomeQuantity(s, a) TO t;
     //    open(t());
     //    IMPORT XML ROOT 'export' TO xa=a, xb=b, xc=c, xd=d, xs=s FROM t();
 
@@ -3109,7 +3109,7 @@ testExport (Store s) {
 
     testExternal(t(), 8);
 
-    IMPORT TABLE FROM testExternalResult() TO xa=a, xb=b, xc=c, xd=d;
+    IMPORT TABLE FROM testExternalResult() TO xa = a, xb = b, xc = c, xd = d;
 
     SHOW ShowX;
 
@@ -3119,7 +3119,7 @@ testExport (Store s) {
 impQ = DATA DOUBLE (Store, Article);
 
 FORM ImpQ
-    OBJECTS (s=Store, a=Article)
+    OBJECTS (s = Store, a = Article)
     PROPERTIES name(s), name(a), impQ(s, a)
 ;
 
@@ -3128,7 +3128,7 @@ NAVIGATOR {
 }
 
 testImport (FILE cf) {
-    IMPORT TABLE FROM cf TO xa=a, xb=b, xc=c, xd=d, xs=s;
+    IMPORT TABLE FROM cf TO xa = a, xb = b, xc = c, xd = d, xs = s;
     FOR barcode(Article a) = xc(INTEGER i) AND name(Store s) = xs(i) DO {
         impQ(s, a) <- xa(i);
     }
@@ -3140,7 +3140,7 @@ barcode = DATA STRING[100] (INTEGER);
 
 FORM articlesTest
     OBJECTS a = INTEGER
-    PROPERTIES(a) 'ORDER'=name, barcode=barcode
+    PROPERTIES(a) 'ORDER' = name, barcode = barcode
     FILTERS name(a)
 
     OBJECTS s = INTEGER
@@ -3149,20 +3149,20 @@ FORM articlesTest
 ;
 
 FORM TestRequestInput 'RequestInput test'
-    OBJECTS s=Store PANEL, a=Article
+    OBJECTS s = Store PANEL, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, testExport
     PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode, contextStore
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, b = dq ON CHANGE test(), c = dq ON CHANGE changeC(s, a)
-    PROPERTIES(s,a) d = dq ON CHANGE {
-        INPUT z=dq(s,a) CHANGE;
+    PROPERTIES(s, a) d = dq ON CHANGE {
+        INPUT z = dq(s, a) CHANGE;
         ACTIVATE PROPERTY TestRequestInput.b;
     }
 
     OBJECTS a0 = A0
-    PROPERTIES (a0) a, 'Add A1'=NEW[A1], 'Add A2'=NEW[A2], EDIT, DELETE
-    PROPERTIES fltest(), 'TESTCAPTION'=5 ON CHANGE {
-        DIALOG ListA0 OBJECTS a0=a0 NULL INPUT x DO {
-            SEEK TestRequestInput.a0=x;
+    PROPERTIES (a0) a, 'Add A1' = NEW[A1], 'Add A2' = NEW[A2], EDIT, DELETE
+    PROPERTIES fltest(), 'TESTCAPTION' = 5 ON CHANGE {
+        DIALOG ListA0 OBJECTS a0= a0 NULL INPUT x DO {
+            SEEK TestRequestInput.a0 = x;
         }
     }, v = {
         MESSAGE 'HI';
@@ -3189,7 +3189,7 @@ name = DATA BPSTRING[50](Class1);
 name = DATA BPSTRING[50](Class2);
 
 FORM test3 'testForm-3'
-    OBJECTS c1=Class1, c2=Class2
+    OBJECTS c1 = Class1, c2 = Class2
     PROPERTIES(c1) name, NEW, DELETE
     PROPERTIES(c2) name
 ;
@@ -3227,7 +3227,7 @@ o1 = DATA Class1 (Class2) NONULL DELETE;
 tstl = DATA LOCAL NESTED INTEGER (Class2);
 
 FORM x
-    OBJECTS c1=Class1, c2=Class2
+    OBJECTS c1 = Class1, c2 = Class2
     PROPERTIES (c1) zz, ta, t, tv PANEL
     PROPERTIES (c2) zz, o1, tstl, NEW, DELETE
     FILTERS o1(c2) = c1
@@ -3274,11 +3274,11 @@ testStrings() {
 
     MESSAGE tst() + ',' + vtst();
     MESSAGE tst2() + ',' + vtst2();
-    MESSAGE CONCAT ',',tst(),vtst();
-    MESSAGE CONCAT ',',tst2(),vtst2();
+    MESSAGE CONCAT ',', tst(), vtst();
+    MESSAGE CONCAT ',', tst2(), vtst2();
 
-    tst(a) <- 'fggf   ' WHERE a=1;
-    tst(a) <- 'tggf   ' WHERE a=2;
+    tst(a) <- 'fggf   ' WHERE a = 1;
+    tst(a) <- 'tggf   ' WHERE a = 2;
 
     //    vtst(a) <- 'fggf   ' WHERE a=1;
     //    vtst(a) <- 'tggf   ' WHERE a=2;
@@ -3289,14 +3289,14 @@ testStrings() {
     //     vtst(a) <- tst(2) WHERE a=2;
 
     vtst() <- tst(1);
-    vtst(a) <- vtst() WHERE a=1;
+    vtst(a) <- vtst() WHERE a = 1;
     vtst() <- tst(2);
-    vtst(a) <- vtst() WHERE a=2;
+    vtst(a) <- vtst() WHERE a = 2;
 
     MESSAGE 'NOFLEX + : ' + tst(1) + ',' + tst(2);
     MESSAGE 'VAR + : ' + vtst(1) + ',' + vtst(2);
-    MESSAGE 'NOFLEX CONCAT : ' + CONCAT ',',tst(1),tst(2);
-    MESSAGE 'VAR CONCAT : ' + CONCAT ',',vtst(1),vtst(1);
+    MESSAGE 'NOFLEX CONCAT : ' + CONCAT ',', tst(1), tst(2);
+    MESSAGE 'VAR CONCAT : ' + CONCAT ',', vtst(1), vtst(1);
 }
 NAVIGATOR {
     NEW ACTION testStrings;
@@ -3307,8 +3307,8 @@ g = DATA LOCAL INTEGER (INTEGER, INTEGER);
 
 tstexp() {
 
-    f(INTEGER a) <- 5 WHERE a=1;
-    f(INTEGER a) <- 6 WHERE a=2;
+    f(INTEGER a) <- 5 WHERE a = 1;
+    f(INTEGER a) <- 6 WHERE a = 2;
 
     LOCAL xml = FILE ();
     //LOCAL dbf = FILE ();	
@@ -3330,7 +3330,7 @@ tstimp() {
 }
 
 NAVIGATOR {
-    NEW ACTION i=tstimp;
+    NEW ACTION i = tstimp;
 }
 
 tstdt = DATA DATE ();
@@ -3390,11 +3390,11 @@ NAVIGATOR {
 DESIGN tst {
     PROPERTY (tstdt()) {
         fontSize = 20;
-        pattern='dd.MM';
+        pattern = 'dd.MM';
     }
     PROPERTY (tstdtm()) {
         fontSize = 30;
-        pattern='dd.MM';
+        pattern = 'dd.MM';
     }
     PROPERTY (tsttime()) {
         fontSize = 10;
@@ -3534,7 +3534,7 @@ doSomething(STRING[100] p1, STRING[100] p2) {
 }
 
 externalAction() {
-    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' PARAMS '1','2';
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' PARAMS '1', '2';
 }
 
 action () {
