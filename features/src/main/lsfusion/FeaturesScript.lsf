@@ -1538,6 +1538,11 @@ FORM TestExport 'Export test'
     OBJECTS s = Store
     PROPERTIES(s) name, stime EXTID 'timefield', sdate NOEXTID;
 
+exportPlainXML() {
+    EXPORT XML FROM 'tag' = 'hello', 'time' = currentDateTime();
+    open(exportFile());
+}
+
 exportFormXML() {
     EXPORT TestExport XML;
     open(exportFile());
@@ -1554,7 +1559,7 @@ exportFormDBF {
 }
 
 EXTEND FORM TestExport
-    PROPERTIES() exportFormXML, exportFormJSON, exportFormDBF;
+    PROPERTIES() exportPlainXML, exportFormXML, exportFormJSON, exportFormDBF;
 
 //--------------- Multithreading test ---------------//
 
@@ -3153,33 +3158,6 @@ NAVIGATOR {
 
 CLASS Class1 'Class1';
 CLASS Class2 'Class2';
-name = DATA BPSTRING[50](Class1);
-name = DATA BPSTRING[50](Class2);
-
-FORM test3 'testForm-3'
-    OBJECTS c1 = Class1, c2 = Class2
-    PROPERTIES(c1) name, NEW, DELETE
-    PROPERTIES(c2) name
-;
-
-DESIGN test3 {
-    NEW scroll {
-        type = SCROLL;
-        fill = 1;
-        MOVE BOX(c1) {
-            //            fill = 0;
-        }
-    }
-    MOVE BOX(c2);
-
-    GRID(c1) {
-        autoSize = TRUE;
-    }
-}
-
-NAVIGATOR {
-    NEW test3;
-}
 
 GROUP tgr 'ggf';
 t(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 10 NOFLEX;
@@ -3224,81 +3202,6 @@ DESIGN x {
             charWidth = 15;
         }
     }
-}
-
-tst = DATA LOCAL BPSTRING[10] ();
-tst = DATA LOCAL BPSTRING[10] (INTEGER);
-vtst = DATA LOCAL STRING[10] ();
-vtst = DATA LOCAL STRING[10] (INTEGER);
-tst2 = DATA LOCAL STRING[10] ();
-vtst2 = DATA LOCAL STRING[10] ();
-
-testStrings() {
-    tst() <- 'dfd     ';
-    vtst() <- 'bdfd     ';
-
-    tst2() <- 'fd   ';
-    vtst2() <- 'fd   ';
-
-    MESSAGE tst() + ',' + vtst();
-    MESSAGE tst2() + ',' + vtst2();
-    MESSAGE CONCAT ',', tst(), vtst();
-    MESSAGE CONCAT ',', tst2(), vtst2();
-
-    tst(a) <- 'fggf   ' WHERE a = 1;
-    tst(a) <- 'tggf   ' WHERE a = 2;
-
-    //    vtst(a) <- 'fggf   ' WHERE a=1;
-    //    vtst(a) <- 'tggf   ' WHERE a=2;
-
-    //     vtst(a) <- tst(a);
-
-    //     vtst(a) <- tst(1) WHERE a=1;
-    //     vtst(a) <- tst(2) WHERE a=2;
-
-    vtst() <- tst(1);
-    vtst(a) <- vtst() WHERE a = 1;
-    vtst() <- tst(2);
-    vtst(a) <- vtst() WHERE a = 2;
-
-    MESSAGE 'NOFLEX + : ' + tst(1) + ',' + tst(2);
-    MESSAGE 'VAR + : ' + vtst(1) + ',' + vtst(2);
-    MESSAGE 'NOFLEX CONCAT : ' + CONCAT ',', tst(1), tst(2);
-    MESSAGE 'VAR CONCAT : ' + CONCAT ',', vtst(1), vtst(1);
-}
-NAVIGATOR {
-    NEW ACTION testStrings;
-}
-
-f = DATA LOCAL INTEGER (INTEGER);
-g = DATA LOCAL INTEGER (INTEGER, INTEGER);
-
-tstexp() {
-
-    f(INTEGER a) <- 5 WHERE a = 1;
-    f(INTEGER a) <- 6 WHERE a = 2;
-
-    LOCAL xml = FILE ();
-    //LOCAL dbf = FILE ();	
-    EXPORT XML FROM xxx = f(INTEGER a) TO xml;
-    open(xml());
-    //EXPORT DBF FROM f(INTEGER a) TO dbf;
-    //EXPORT FROM 5, xml(), dbf();
-
-}
-
-tstimp() {
-
-    LOCAL result = INTEGER ();
-    LOCAL xml = FILE ();
-    LOCAL dbf = FILE ();
-    EXTERNAL LSF 'http://localhost:7651' EXEC 'Features.tstexp[]' TO result, xml, dbf;
-
-    open(xml());
-}
-
-NAVIGATOR {
-    NEW ACTION i = tstimp;
 }
 
 tstdt = DATA DATE ();
