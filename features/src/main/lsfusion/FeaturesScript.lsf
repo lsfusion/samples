@@ -1454,6 +1454,51 @@ namedFile = DATA NAMEDFILE ();
 FORM TestFilesAndJSON 'Files & JSON test'
     PROPERTIES() rawFile, file, namedFile, actionJSON;
 
+//--------------- Links test ---------------//
+
+fileImage = DATA IMAGEFILE ();
+openFileImage () { open(fileImage()); }
+
+linkImage = DATA IMAGELINK ();
+openLinkImage () { open(linkImage()); }
+
+filePDF = DATA PDFFILE ();
+openFilePDF () { open(filePDF()); }
+
+linkPDF = DATA PDFLINK ();
+openLinkPDF () { open(linkPDF()); }
+
+linkRaw = DATA RAWLINK ();
+openLinkRaw () { open(linkRaw()); }
+
+linkCustom = DATA LINK ();
+@defineLinkDialog(linkCustom);
+openLinkCustom () { open(linkCustom()); }
+
+FORM TestLinks 'Links test'
+    PROPERTIES() fileImage, openFileImage, linkImage, openLinkImage,
+        filePDF, openFilePDF, linkPDF, openLinkPDF, linkRaw, openLinkRaw,
+        linkCustom, openLinkCustom
+;
+
+DESIGN TestLinks {
+    NEW top {
+        lines = 2;
+        MOVE PROPERTY(fileImage());
+        MOVE PROPERTY(openFileImage());
+        MOVE PROPERTY(linkImage());
+        MOVE PROPERTY(openLinkImage());
+        MOVE PROPERTY(filePDF());
+        MOVE PROPERTY(openFilePDF());
+        MOVE PROPERTY(linkPDF());
+        MOVE PROPERTY(openLinkPDF());
+        MOVE PROPERTY(linkRaw());
+        MOVE PROPERTY(openLinkRaw());
+        MOVE PROPERTY(linkCustom());
+        MOVE PROPERTY(openLinkCustom());
+    }
+}
+
 //--------------- Colors test ---------------//
 
 color (INTEGER i) = CASE
@@ -2481,6 +2526,7 @@ NAVIGATOR {
         NEW TestHotkeys;
         NEW TestPropertyOptions;
         NEW TestFilesAndJSON;
+        NEW TestLinks;
         NEW TestColor;
         NEW TestShowClose;
         NEW TestExport;
@@ -2742,44 +2788,6 @@ testMakeZipFile() {
     }
 }
 
-CLASS TestLink;
-TABLE testLink(TestLink);
-
-fileImage = DATA IMAGEFILE (TestLink);
-loadFileImage (TestLink i) { INPUT = fileImage(i) CHANGE; }
-openFileImage (TestLink i) { open(fileImage(i)); }
-
-linkImage(t) = DATA IMAGELINK (TestLink);
-@defineLinkDialog(linkImage, TestLink);
-openLinkImage (TestLink i) { open(linkImage(i)); }
-
-filePDF = DATA PDFFILE (TestLink);
-loadFilePDF (TestLink i) { INPUT = filePDF(i) CHANGE; }
-openFilePDF (TestLink i) { open(filePDF(i)); }
-
-linkPDF = DATA PDFLINK (TestLink);
-openLinkPDF (TestLink i) { open(linkPDF(i)); }
-
-linkRaw = DATA RAWLINK (TestLink);
-openLinkRaw (TestLink i) { open(linkRaw(i)); }
-
-linkExcel = DATA EXCELLINK (TestLink);
-openLinkExcel (TestLink i) { open(linkExcel(i)); }
-
-linkWord = DATA WORDLINK (TestLink);
-openLinkWord (TestLink i) { open(linkWord(i)); }
-
-linkCustom = DATA LINK (TestLink);
-openLinkCustom (TestLink i) { open(linkCustom(i)); }
-
-FORM TestLink 'TestLink'
-    OBJECTS i = TestLink
-    PROPERTIES (i) GRID fileImage, loadFileImage, openFileImage, linkImage, openLinkImage,
-        filePDF, loadFilePDF, openFilePDF, linkPDF, openLinkPDF, linkRaw, openLinkRaw,
-        linkExcel, openLinkExcel, linkWord, openLinkWord,
-        linkCustom, openLinkCustom, NEW TOOLBAR, DELETE
-;
-
 CLASS Table1;
 int = DATA INTEGER (Table1);
 txt = DATA TEXT (Table1);
@@ -2877,7 +2885,6 @@ NAVIGATOR {
     NEW TestMultithreading;
     NEW TestMultithreading2;
     MOVE TestActionDebugger;
-    NEW TestLink;
     NEW TestScroll;
 }
 
@@ -2907,12 +2914,6 @@ FORM DialDocument
 
     EDIT IncomeDocument OBJECT o;
 ;
-
-testInvocation() {
-
-    SHOW TestLink DOCKED;
-
-}
 
 testDelete(Object o) {
     IF NOT sessionOwners() THEN {
@@ -2953,7 +2954,7 @@ testNullRun() {
 
 FORM testAdd
     OBJECTS d = IncomeDocument
-    PROPERTIES () testInvocation, testNullRun
+    PROPERTIES () testNullRun
     PROPERTIES () addIncomeDocument DRAW d
     PROPERTIES (d) GRID editCIncomeDocument, testFormNull
     PROPERTIES (d) a = NEWEDIT[CIncomeDocument]
@@ -3111,7 +3112,7 @@ testExport (Store s) {
 
     IMPORT TABLE FROM testExternalResult() TO xa = a, xb = b, xc = c, xd = d;
 
-    SHOW ShowX;
+    SHOW ShowX DOCKED;
 
     EXTERNAL LSF 'http://localhost:7651' EXEC 'Features.testImport[FILE]' PARAMS t();
 }
