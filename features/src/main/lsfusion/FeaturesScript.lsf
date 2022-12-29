@@ -1556,6 +1556,107 @@ exportFormDBF {
 EXTEND FORM TestExport
     PROPERTIES() exportFormXML, exportFormJSON, exportFormDBF;
 
+//--------------- Multithreading test ---------------//
+
+CLASS CommonObject {
+    first 'First',
+    second 'Second',
+    third 'Third'
+};
+
+CLASS Change;
+quantity = DATA INTEGER (Change, CommonObject);
+balanceChange (CommonObject commonObject) = GROUP SUM quantity(Change change, commonObject) MATERIALIZED;
+
+CLASS X {
+    first 'First',
+    second 'Second',
+    third 'Third'
+};
+CLASS Y;
+
+x = DATA X (Y);
+data = DATA INTEGER (X);
+dataX(Y y) = data(x(y)) MATERIALIZED;
+
+dateGProp = DATA DATE (INTEGER);
+dateTProp (DATE dFrom) = GROUP SUM 1 IF dateGProp(INTEGER i) >= dFrom;
+CLASS OPR29;
+valueP = DATA DATE (OPR29);
+
+testPush (DATE dateFrom, DATE dateTo) {
+    FOR iterate(DATE d, dateFrom, dateTo) NOINLINE (d) DO {
+        FOR INTEGER q == dateTProp(d) NEW o = OPR29 DO {
+            valueP(o) <- DATE(d);
+        }
+    }
+}
+
+testPush () {
+    testPush(2015_01_01, 2015_02_02);
+}
+
+startFilling() {
+    FOR iterate(INTEGER i, 0, 20) DO
+        NEWSESSION { NEWTHREAD {
+            FOR iterate(INTEGER j, 0, 100) NEW c = Change DO {
+                quantity(c, CommonObject o) <- (i + j + 1) WHERE o == CommonObject.first;
+                quantity(c, CommonObject o) <- (i + j + 2) WHERE o == CommonObject.second;
+                quantity(c, CommonObject o) <- (i + j + 3) WHERE o == CommonObject.third;
+                apply();
+            }
+        } }
+}
+
+startChanging() {
+    NEWSESSION { NEWTHREAD {
+        FOR iterate(INTEGER j, 0, 1005) DO {
+            data(X o) <- j + 1 WHERE o == X.first;
+            data(X o) <- j + 2 WHERE o == X.second;
+            data(X o) <- j + 3 WHERE o == X.third;
+            apply();
+        }
+    }
+    }
+}
+
+startAddDelete() {
+    FOR iterate(INTEGER j, 0, 1000) DO {
+        FOR Y y IS Y DO {
+            DELETE y;
+            BREAK;
+        }
+        NEW y = Y {
+            x(y) <- X.first;
+        }
+        apply();
+    }
+}
+
+counter = DATA INTEGER ();
+testActionMsg() {
+    IF NOT counter() THEN {
+        counter() <- 0;
+    }
+    data(x) <- counter();
+    counter() <- counter() + 1;
+};
+
+intPropD() = 5000;
+testNewThread { NEWTHREAD testActionMsg(); SCHEDULE DELAY intPropD() - 2000; }
+testNewThread2 { NEWTHREAD testActionMsg(); SCHEDULE; }
+testNewThread3 { NEWTHREAD testActionMsg(); SCHEDULE PERIOD intPropD() DELAY 2000L; }
+
+FORM TestMultithreading 'Test Multithreading'
+    PROPERTIES testPush(), startFilling(), startChanging(), startAddDelete(), testNewThread(), testNewThread2(), testNewThread3()
+
+    OBJECTS x = X
+    PROPERTIES (x) data
+
+    OBJECTS y = Y
+    PROPERTIES (y) VALUE, dataX;
+;
+
 //--------------- SCHEDULE test ---------------//
 
 scheduleOnStartAction() {
@@ -2530,6 +2631,7 @@ NAVIGATOR {
         NEW TestColor;
         NEW TestShowClose;
         NEW TestExport;
+        NEW TestMultithreading;        
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestTree;
@@ -2642,139 +2744,6 @@ NAVIGATOR {
     NEW parents;
 }
 
-// MULTITHREADING, LOCKS
-
-CLASS CommonObject {
-    first 'First',
-    second 'Second',
-    third 'Third'
-};
-
-CLASS Change;
-
-quantity = DATA INTEGER (Change, CommonObject);
-balanceChange (CommonObject commonObject) = GROUP SUM quantity(Change change, commonObject) MATERIALIZED;
-
-startFilling() {
-    FOR iterate(INTEGER i, 0, 20) DO
-        NEWSESSION { NEWTHREAD {
-            FOR iterate(INTEGER j, 0, 100) NEW c = Change DO {
-                quantity(c, CommonObject o) <- (i + j + 1) WHERE o == CommonObject.first;
-                quantity(c, CommonObject o) <- (i + j + 2) WHERE o == CommonObject.second;
-                quantity(c, CommonObject o) <- (i + j + 3) WHERE o == CommonObject.third;
-                apply();
-            }
-        } }
-}
-
-CLASS X {
-    first 'First',
-    second 'Second',
-    third 'Third'
-};
-CLASS Y;
-TABLE x (X);
-TABLE y (Y);
-
-x = DATA X (Y);
-data = DATA INTEGER (X);
-dataX(Y y) = data(x(y)) MATERIALIZED;
-
-startChanging() {
-    //    FOR iterate(i,0,4) DO
-    NEWSESSION { NEWTHREAD {
-        FOR iterate(INTEGER j, 0, 1005) DO {
-            data(X o) <- j + 1 WHERE o == X.first;
-            data(X o) <- j + 2 WHERE o == X.second;
-            data(X o) <- j + 3 WHERE o == X.third;
-            apply();
-        }
-    }
-    }
-}
-
-startAddDelete() {
-    //    FOR iterate(i,0,4) DO
-    //        NEWTHREAD {
-    FOR iterate(INTEGER j, 0, 1000) DO {
-        FOR Y y IS Y DO {
-            DELETE y;
-            BREAK;
-        }
-        NEW y = Y {
-            x(y) <- X.first;
-        }
-        apply();
-    }
-    //        }
-}
-
-dateGProp = DATA DATE (INTEGER);
-dateTProp (DATE dFrom) = GROUP SUM 1 IF dateGProp(INTEGER i) >= dFrom;
-CLASS OPR29;
-valueP = DATA DATE (OPR29);
-valueG = DATA DATE ();
-
-testPush (DATE dateFrom, DATE dateTo) {
-    FOR iterate(DATE d, dateFrom, dateTo) NOINLINE (d) DO {
-        FOR INTEGER q == dateTProp(d) NEW o = OPR29 DO {
-            valueP(o) <- DATE(d);
-        }
-    }
-}
-
-testPush2 () {
-    testPush(2015_01_01, 2015_02_02);
-}
-
-counter = DATA INTEGER ();
-
-testActionMsg() {
-    IF NOT counter() THEN {
-        counter() <- 0;
-    }
-
-    data(x) <- counter();
-    counter() <- counter() + 1;
-};
-
-intPropA = 5000;
-intPropB = 0;
-intPropD() = intPropA() + intPropB();
-testNewThread { NEWTHREAD testActionMsg(); SCHEDULE DELAY intPropD() - 2000; }
-testNewThread2 { NEWTHREAD testActionMsg(); SCHEDULE; }
-testNewThread3 { NEWTHREAD testActionMsg(); SCHEDULE PERIOD intPropD() DELAY 2000L; }
-
-FORM TestMultithreading 'Test Multithreading'
-    //    OBJECTS o=CommonObject
-    //    PROPERTIES (o) staticName, staticCaption, balanceChange
-    PROPERTIES testPush2(), startFilling(), startChanging(), startAddDelete(), testNewThread(), testNewThread2(), testNewThread3()
-    //    OBJECTS c=Change
-    //    PROPERTIES VALUE(c), quantityChange(c, o)
-    //    FILTERS quantityChange(c,o)
-
-    OBJECTS x = X
-    PROPERTIES (x) data
-
-    OBJECTS y = Y
-    PROPERTIES (y) VALUE, dataX;
-;
-
-FORM TestMultithreading2 'Test Multithreading'
-    //    OBJECTS o=CommonObject
-    //    PROPERTIES (o) staticName, staticCaption, balanceChange
-    PROPERTIES testPush2(), startFilling(), startChanging(), startAddDelete(), testNewThread(), testNewThread2(), testNewThread3()
-    //    OBJECTS c=Change
-    //    PROPERTIES VALUE(c), quantityChange(c, o)
-    //    FILTERS quantityChange(c,o)
-
-    OBJECTS x = X
-    PROPERTIES (x) data
-
-    OBJECTS y = Y
-    PROPERTIES (y) VALUE, dataX;
-;
-
 testMakeZipFile() {
     NEWSESSION {
         LOCAL zippingFile = FILE ();
@@ -2882,8 +2851,6 @@ DESIGN TestScroll {
 }
 
 NAVIGATOR {
-    NEW TestMultithreading;
-    NEW TestMultithreading2;
     MOVE TestActionDebugger;
     NEW TestScroll;
 }
