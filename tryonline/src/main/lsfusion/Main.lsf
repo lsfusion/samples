@@ -1,6 +1,6 @@
 MODULE Main;
 
-REQUIRE SystemEvents, Service, Utils, SchedulerDefaultData;
+REQUIRE SystemEvents, Service, Utils;
 
 CLASS Server 'Server';
 processId = DATA LONG (Server);
@@ -146,11 +146,6 @@ stopUnusedServers() {
         
         deleteServer(server);
     } 
-}
-
-loadDefaultScheduledTasks () + {     
-    loadDefaultScheduledTask ('Stopping unused servers', 2014_07_01_01:00, 60, SchedulerStartType.afterStart);
-    loadDefaultScheduledTaskDetail ('Stopping unused servers', 1, 'Main.stopUnusedServers[]');
 }
 
 getServerLog(JSONFILE file) {
