@@ -1137,36 +1137,20 @@ DESIGN storeArticle {
     foreground = RGB(255, 0, 0);
     background = RGB(0, 255, 0);
 
-    imagePath = 'add.png';
-
     MOVE TOOLBARBOX BEFORE OBJECTS;
 
-    PROPERTY(storeSizeName(s)) { caption = 'Warehouse size name'; }
+    PROPERTY(storeSizeName(s)) { 
+        caption = 'Warehouse size name';
+        captionClass = 'caption-class';
+    }
 
     PROPERTY(foo(s, a)) {
         focusable = FALSE;
         panelCaptionVertical = TRUE;
     }
 
-    PROPERTY(aname) {
-        //        font = '"Times New Roman" bold 36';
-        //        font = '';
-    }
-
-    PROPERTY (sname) {
-        //        font = '5';
-        //        fontSize = 36;
-        //        fontStyle = 'bold';
-    }
-
-    GRID(a) {
-        //        font = 'Tahoma 36';
-    }
-
     NEW newCont;
 }
-
-//fs(s) += [ FILTER storeArticle.s](s);
 
 DESIGN storeArticle {
     captionFont = 'bold 32';
@@ -1413,18 +1397,34 @@ DESIGN TestHotkeys {
 
 //--------------- Property Options test ---------------//
 
+stringWithComment = DATA STRING();
+stringWithPlaceholder = DATA STRING();
+
 likeString = DATA STRING (Store) INDEXED LIKE;
 matchString = DATA STRING (Store) INDEXED MATCH;
 boolean = DATA BOOLEAN (Store);
 tboolean = DATA TBOOLEAN (Store);
 
 FORM TestPropertyOptions 'Property Options test'
+    PROPERTIES() stringWithComment, stringWithPlaceholder
+    
     OBJECTS s = Store
     PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, storeSizeCode, likeString, matchString
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
 ;
 
 DESIGN TestPropertyOptions {
+    PROPERTY(stringWithComment()) {
+        comment = 'custom comment';
+        commentClass = 'comment-class';
+        panelCommentFirst = FALSE;
+        panelCommentAlignment = CENTER;
+        panelCommentVertical = FALSE;
+    }
+    PROPERTY(stringWithPlaceholder()) {
+        placeholder = 'input phone number';
+        alignCaption = FALSE;
+    }
     PROPERTY(storeSizeCode(s)) {
         background = RGB (128, 128, 128);
     }
@@ -1475,10 +1475,15 @@ linkCustom = DATA LINK ();
 @defineLinkDialog(linkCustom);
 openLinkCustom () { open(linkCustom()); }
 
+stringLinkStore = DATA STRING(Store);
+linkStore(Store s) = LINK(stringLinkStore(s));
+
 FORM TestLinks 'Links test'
     PROPERTIES() fileImage, openFileImage, linkImage, openLinkImage,
         filePDF, openFilePDF, linkPDF, openLinkPDF, linkRaw, openLinkRaw,
         linkCustom, openLinkCustom
+    OBJECTS s = Store
+    PROPERTIES(s) stringLinkStore, linkStore
 ;
 
 DESIGN TestLinks {
@@ -2566,7 +2571,7 @@ INDEX quantity(Document document, Article article);
 //              VALIGN( START | CENTER | END ) |
 //              TEXTHALIGN( START | CENTER | END ) |
 //              TEXTVALIGN( START | CENTER | END ) |
-WINDOW objectsWindow 'Objects' TREE POSITION(0, 6, 20, 64) DRAWROOT;
+WINDOW objectsWindow 'Objects' TREE POSITION(0, 6, 20, 64);// DRAWROOT;
 
 //Hide window
 //HIDE WINDOW System.log;
@@ -2619,8 +2624,8 @@ NAVIGATOR {
     // in such a way the window into which the element will be drawn can be separately configured
     root WINDOW root;
     testNavigators WINDOW toolbar;
-    administration WINDOW toolbar;
-    Authentication.account WINDOW toolbar;
+    administration WINDOW toolbar FIRST;
+    Authentication.account WINDOW toolbar FIRST;
     objects WINDOW objectsWindow;
 
     regionalData {
