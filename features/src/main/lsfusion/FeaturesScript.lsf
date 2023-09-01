@@ -1701,7 +1701,7 @@ DESIGN TestReadOnlyIf {
         MOVE PROPERTY(isEditable());
     }
     NEW tabsContainer BEFORE TOOLBARBOX {
-        type = TABBED;
+        tabbed = TRUE;
         fill = 1;
         NEW testGrids {
             caption = 'Tables';
@@ -1854,7 +1854,7 @@ DESIGN TestOperators {
     }
 
     NEW tabsContainer AFTER OBJECTS {
-        type = TABBED;
+        tabbed = TRUE;
         flex = 1;
 
         NEW castTab {
@@ -1926,7 +1926,7 @@ FORM TestLayout 'Layout test'
 DESIGN TestLayout {
     NEW layouts BEFORE TOOLBARBOX {
         fill = 1;
-        type = TABBED;
+        tabbed = TRUE;
 
         PROPERTY(st) {
             valueSize = (200, 36);
@@ -1959,7 +1959,7 @@ DESIGN TestLayout {
 
         NEW fills {
             caption = 'Filling';
-            type = TABBED;
+            tabbed = TRUE;
 
             NEW vert {
                 caption = 'Vertical';
@@ -2106,7 +2106,7 @@ DESIGN TestMargins {
         margin = 10;
     }
     NEW tabs BEFORE TOOLBARBOX {
-        type = TABBED;
+        tabbed = TRUE;
         fill = 1;
         margin = 10;
         MOVE BOX(s);
@@ -2815,7 +2815,7 @@ FORM TestScroll 'TestScroll'
 
 DESIGN TestScroll {
     NEW top BEFORE TOOLBARBOX {
-        type = TABBED;
+        tabbed = TRUE;
         fill = 1;
         NEW scroller {
             caption = 'Scroll';
