@@ -392,7 +392,7 @@ DESIGN order { // customizing the design of the form, starting with the default 
             size = (400, 300); //specifying that the container o.box should have a base size of 400x300 pixels
         }
         NEW detailPane { // creating a container that will store various specifications for the order
-            type = TABBED; // marking that this container should be a tab panel, where its descendats are tabs
+            tabbed = TRUE; // marking that this container should be a tab panel, where its descendats are tabs
             MOVE BOX(d) { // adding a container with order lines as one of the tabs in the top panel
                 caption = 'Lines'; // setting the caption of the tab panel
                 PROPERTY(index(d)) { focusable = FALSE; } // making the row number column never have focus
