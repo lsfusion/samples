@@ -1287,7 +1287,7 @@ FORM TestTree 'Tree test (navigator elements)'
 
 DESIGN TestTree {
     NEW trees BEFORE TOOLBARBOX {
-        type = CONTAINERH;
+        horizontal = TRUE;
         fill = 1;
 
         MOVE BOX(TREE forms) {
@@ -1973,7 +1973,7 @@ DESIGN TestLayout {
             }
             NEW horz {
                 caption = 'Horizontal';
-                type = CONTAINERH;
+                horizontal = TRUE;
                 MOVE PROPERTY(si4) { flex = 0; align = CENTER; }
                 MOVE PROPERTY(st4) { flex = 0; align = STRETCH; }
                 MOVE PROPERTY(si5) { flex = 1; align = END; valueSize = (200, 100); }
@@ -1983,7 +1983,7 @@ DESIGN TestLayout {
             }
             NEW equal {
                 caption = 'Equally';
-                type = CONTAINERH;
+                horizontal = TRUE;
                 alignment = STRETCH;
                 MOVE PROPERTY(st7) { caption = 'short'; fill = 1; panelCaptionVertical = TRUE; }
                 MOVE PROPERTY(st8) { caption = 'this caption is much loooooonger than the first one'; fill = 1; panelCaptionVertical = TRUE; }
@@ -2225,7 +2225,7 @@ FORM wideModalForm
 DESIGN wideModalForm {
     BOX {
         NEW some1 BEFORE OBJECTS {
-            type = CONTAINERH;
+            horizontal = TRUE;
             fill = 0;
             caption = 'some1';
             NEW some2 {
@@ -2824,7 +2824,7 @@ DESIGN TestScroll {
                 MOVE BOX(t1);
                 fill = 1;
                 NEW scrollingInScroller {
-                    type = CONTAINERH;
+                    horizontal = TRUE;
                     alignment = STRETCH;
                     NEW scrollerInScroller {
                         type = SCROLL;
@@ -2843,7 +2843,7 @@ DESIGN TestScroll {
             caption = 'No Scroll';
             MOVE BOX(t11);
             NEW noScroller {
-                type = CONTAINERH;
+                horizontal = TRUE;
                 alignment = STRETCH;
                 NEW scrollerInNoScroller {
                     type = SCROLL;
@@ -3201,7 +3201,7 @@ DESIGN x {
     }
 
     GROUP (tgr, c1) {
-        type = CONTAINERH;
+        horizontal = TRUE;
         fill = 1;
         PROPERTY(tv(c1)) {
             charWidth = 15;
@@ -3365,7 +3365,7 @@ ask = DATA YesNoMaybe (XA);
 //DESIGN testABAggr {
 //    OBJECTS {
 //        NEW common {
-//            type = CONTAINERH;
+//            horizontal = TRUE;
 //            fill = 1;
 //            NEW leftp {
 //                MOVE BOX(xa);
