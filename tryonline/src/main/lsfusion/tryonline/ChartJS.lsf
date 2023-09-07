@@ -47,7 +47,7 @@ DESIGN chart {
     OBJECTS {
         NEW pane {
             fill = 1;
-            type = CONTAINERH;
+            horizontal = TRUE;
             NEW firstColumn {
                 fill = 2;
                 MOVE BOX(l) {

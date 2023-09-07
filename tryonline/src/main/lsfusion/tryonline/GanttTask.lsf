@@ -64,7 +64,7 @@ DESIGN gantt {
         autoSize = FALSE;
         NEW header {
             alignment = STRETCH;
-            type = CONTAINERH;
+            horizontal = TRUE;
             MOVE PROPERTY(pname);
             MOVE PROPERTY(pprogress);
         }
@@ -75,7 +75,7 @@ DESIGN gantt {
         }
         NEW actions {
             alignment = STRETCH;
-            type = CONTAINERH;
+            horizontal = TRUE;
             MOVE PROPERTY(moveUp(t));
             MOVE PROPERTY(moveDown(t));
             MOVE PROPERTY(delete);
