@@ -123,7 +123,7 @@ DESIGN chat {
     chat {
         NEW chatMessage {
             autoSize = TRUE;
-            type = CONTAINERH;
+            horizontal = TRUE;
             alignment = STRETCH;
             MOVE PROPERTY(jsonInputMessage()) {
                 fill = 1; 

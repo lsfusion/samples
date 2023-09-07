@@ -92,7 +92,7 @@ DESIGN orders {
             // by default, the type of the new container is CONTAINERV, that is, all the components in it are arranged from top to bottom
             NEW filters { // creating a container in which all the components that are responsible for filtering will be placed
                 caption = 'Filters';
-                type = CONTAINERH; // making it horizontal so that all components go from left to right
+                horizontal = TRUE; // making it horizontal so that all components go from left to right
                 MOVE PROPERTY(df) {
                     caption = 'Date from';
                 }
