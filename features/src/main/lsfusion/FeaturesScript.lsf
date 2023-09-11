@@ -1199,7 +1199,7 @@ DESIGN storeArticle {
 
     newCont {
         type = COLUMNS;
-        columns = 2;
+        lines = 2;
         caption = '!!!';
         MOVE PROPERTY(currentTime());
         MOVE PROPERTY(allNames());
@@ -1860,7 +1860,7 @@ DESIGN TestOperators {
         NEW castTab {
             caption = 'cast, concat';
             type = COLUMNS;
-            columns = 1;
+            lines = 1;
 
             MOVE PROPERTY(textToInt(s));
             MOVE PROPERTY(longToString(s));
@@ -1875,7 +1875,7 @@ DESIGN TestOperators {
         NEW sumTab {
             caption = 'sum';
             type = COLUMNS;
-            columns = 1;
+            lines = 1;
             MOVE PROPERTY(sumStringBoolean(s));
             MOVE PROPERTY(sumIntLong(s));
             MOVE PROPERTY(sumNumericInt(s));
@@ -1889,7 +1889,7 @@ DESIGN TestOperators {
         NEW subTab {
             caption = 'sub';
             type = COLUMNS;
-            columns = 1;
+            lines = 1;
             MOVE PROPERTY(subIntLong(s));
             MOVE PROPERTY(subNumericInt(s));
             MOVE PROPERTY(subDoubleNumeric(s));
@@ -1899,7 +1899,7 @@ DESIGN TestOperators {
         NEW multTab {
             caption = 'mult';
             type = COLUMNS;
-            columns = 1;
+            lines = 1;
             MOVE PROPERTY(multIntLong(s));
             MOVE PROPERTY(multNumericInt(s));
             MOVE PROPERTY(multDoubleNumeric(s));
@@ -1952,9 +1952,9 @@ DESIGN TestLayout {
                 MOVE BOX(ss1) {fill = 1;};
             }
 
-            GROUP(, ss1) { columns = 1; }
-            GROUP(, ss2) { columns = 1; }
-            GROUP(, sa) { columns = 1; size = (500, -1); }
+            GROUP(, ss1) { lines = 1; }
+            GROUP(, ss2) { lines = 1; }
+            GROUP(, sa) { lines = 1; size = (500, -1); }
         }
 
         NEW fills {
@@ -2186,7 +2186,7 @@ FORM TestLabelWidth 'LabelWidth test'
 
 DESIGN TestLabelWidth {
     GROUP(, s) {
-        columns = 1;
+        lines = 1;
         MOVE PROPERTY(scolor(s));
     }
 }

@@ -106,7 +106,7 @@ FORM match 'Match'
 
 DESIGN match {
     GROUP(,m) {
-        columns = 1;
+        lines = 1;
     }
 }
 
