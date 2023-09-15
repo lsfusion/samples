@@ -1963,7 +1963,6 @@ DESIGN TestLayout {
 
             NEW vert {
                 caption = 'Vertical';
-                type = CONTAINERV;
                 MOVE PROPERTY(si1) { flex = 0; align = CENTER; }
                 MOVE PROPERTY(st1) { flex = 0; align = STRETCH; }
                 MOVE PROPERTY(si2) { flex = 1; align = END; valueSize = (200, 100); }
