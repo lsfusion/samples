@@ -46,7 +46,6 @@ DESIGN orders {
     // adding a new container to the very beginning of the form
     NEW orderList FIRST {
         fill = 1; // marking that this container should "stretch" in the upper container
-        type = SPLITV; // vertical splitter - that is, there can only be 2 children
         MOVE BOX(o); // the first container will be the list of orders
         NEW orderDetails {
             fill = 2; // Specifying that the specification will take up 2 times more space than the o.box container (for all such containers fill, by default, is 1)

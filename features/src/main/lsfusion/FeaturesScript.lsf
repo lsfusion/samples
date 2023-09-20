@@ -1943,7 +1943,6 @@ DESIGN TestLayout {
 
                 NEW vertSplit {
                     fill = 1;
-                    type = SPLITV;
 
                     MOVE BOX(ss2) {fill = 1;}
                     MOVE BOX(sa) {fill = 1;}
@@ -3186,7 +3185,6 @@ FORM x
 DESIGN x {
     NEW splitCont AFTER OBJECTS {
         caption = 'dsds';
-        type = SPLITV;
         fill = 1;
         MOVE BOX(c1) {
             fill = 1;
