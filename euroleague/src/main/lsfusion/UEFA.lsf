@@ -81,7 +81,7 @@ FORM countryCoefficientUEFA 'UEFA country odds'
 DESIGN countryCoefficientUEFA {
     OBJECTS {
         NEW countryDetails {
-            type = SPLITH;
+            horizontal = TRUE;
             fill = 0.5;
             MOVE BOX(t);
             MOVE BOX(m);

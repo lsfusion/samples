@@ -152,7 +152,7 @@ DESIGN leagues {
     OBJECTS {
         NEW leagueDetails {
             fill = 2;
-            type = SPLITH;
+            horizontal = TRUE;
             MOVE BOX(t);
             MOVE BOX(m);
         }

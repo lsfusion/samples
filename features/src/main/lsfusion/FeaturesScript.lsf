@@ -1335,7 +1335,7 @@ FORM TestHeaders 'Headers test'
 DESIGN TestHeaders {
     BOX {
         NEW horizontalBox BEFORE TOOLBARBOX {
-            type = SPLITH;
+            horizontal = TRUE;
             fill = 1;
             MOVE BOX(s);
             MOVE BOX(a);
@@ -1939,7 +1939,7 @@ DESIGN TestLayout {
             NEW horzSplit {
                 fill = 1;
 
-                type = SPLITH;
+                horizontal = TRUE;
 
                 NEW vertSplit {
                     fill = 1;
@@ -2082,7 +2082,7 @@ FORM TestImage 'Image test'
 
 DESIGN TestImage {
     NEW split BEFORE TOOLBARBOX {
-        type = SPLITH;
+        horizontal = TRUE;
         fill = 1;
         MOVE BOX(s);
         MOVE PROPERTY(si1) { caption = ''; fill = 1; };
@@ -2161,7 +2161,7 @@ FORM TestRichText 'RichText test'
 DESIGN TestRichText {
     BOX {
         NEW split BEFORE TOOLBARBOX {
-            type = SPLITH;
+            horizontal = TRUE;
             fill = 1;
 
             MOVE PROPERTY(s1) {
