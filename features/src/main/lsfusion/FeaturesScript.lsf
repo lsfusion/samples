@@ -1198,7 +1198,6 @@ DESIGN storeArticle {
     }
 
     newCont {
-        type = COLUMNS;
         lines = 2;
         caption = '!!!';
         MOVE PROPERTY(currentTime());
@@ -1859,12 +1858,8 @@ DESIGN TestOperators {
 
         NEW castTab {
             caption = 'cast, concat';
-            type = COLUMNS;
-            lines = 1;
-
             MOVE PROPERTY(textToInt(s));
             MOVE PROPERTY(longToString(s));
-
             MOVE PROPERTY(concatNull(s));
             MOVE PROPERTY(concatNotNull(s));
             MOVE PROPERTY(concatVarNull(s));
@@ -1874,8 +1869,6 @@ DESIGN TestOperators {
         }
         NEW sumTab {
             caption = 'sum';
-            type = COLUMNS;
-            lines = 1;
             MOVE PROPERTY(sumStringBoolean(s));
             MOVE PROPERTY(sumIntLong(s));
             MOVE PROPERTY(sumNumericInt(s));
@@ -1888,8 +1881,6 @@ DESIGN TestOperators {
 
         NEW subTab {
             caption = 'sub';
-            type = COLUMNS;
-            lines = 1;
             MOVE PROPERTY(subIntLong(s));
             MOVE PROPERTY(subNumericInt(s));
             MOVE PROPERTY(subDoubleNumeric(s));
@@ -1898,8 +1889,6 @@ DESIGN TestOperators {
 
         NEW multTab {
             caption = 'mult';
-            type = COLUMNS;
-            lines = 1;
             MOVE PROPERTY(multIntLong(s));
             MOVE PROPERTY(multNumericInt(s));
             MOVE PROPERTY(multDoubleNumeric(s));
