@@ -1656,7 +1656,7 @@ testNewThread { NEWTHREAD testActionMsg(); SCHEDULE DELAY intPropD() - 2000; }
 testNewThread2 { NEWTHREAD testActionMsg(); SCHEDULE; }
 testNewThread3 { NEWTHREAD testActionMsg(); SCHEDULE PERIOD intPropD() DELAY 2000L; }
 
-FORM TestMultithreading 'Test Multithreading'
+FORM TestMultithreading 'Multithreading test'
     PROPERTIES testPush(), startFilling(), startChanging(), startAddDelete(), testNewThread(), testNewThread2(), testNewThread3()
 
     OBJECTS x = X
@@ -1664,6 +1664,37 @@ FORM TestMultithreading 'Test Multithreading'
 
     OBJECTS y = Y
     PROPERTIES (y) VALUE, dataX;
+;
+
+//--------------- READONLYIF DISABLEIF test ---------------//
+
+makeReadOnly = DATA LOCAL BOOLEAN();
+makeDisabled = DATA LOCAL BOOLEAN();
+
+makeReadOnly = DATA LOCAL BOOLEAN (Store);
+makeDisabled = DATA LOCAL BOOLEAN (Store);
+
+okAction() { MESSAGE 'ok'; }
+readOnlyProp() = DATA STRING();
+disabledProp() = DATA STRING();
+readonlyDisabledProp() = DATA STRING();
+
+FORM TestReadOnlyIfDisableIf 'ReadOnlyIf DisableIf test'
+    PROPERTIES makeReadOnly(), makeDisabled()
+    PROPERTIES() okAction READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+
+    PROPERTIES() readOnlyProp READONLYIF makeReadOnly(),
+        disabledProp DISABLEIF makeDisabled(),
+        readonlyDisabledProp READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+
+    OBJECTS s = Store
+    PROPERTIES(s) makeReadOnly, makeDisabled
+    PROPERTIES(s) READONLYIF makeReadOnly(s) DISABLEIF makeDisabled(s)
+        name, storeSizeCode, scolor
+
+    TREE elements e = NavigatorElement PARENT parent(e)
+    PROPERTIES(e) READONLYIF makeReadOnly() READONLYIF makeDisabled()
+        caption, canonicalName, number, permit, forbid
 ;
 
 //--------------- SCHEDULE test ---------------//
@@ -1677,42 +1708,6 @@ scheduleOnStartAction() {
 
 onStarted() + {
     //scheduleOnStartAction();
-}
-
-isEditable 'Enable editing' () = DATA LOCAL BOOLEAN ();
-isReadOnly 'Read-only' () = TRUE AND NOT isEditable();
-FORM TestReadOnlyIf 'Read-only test'
-    PROPERTIES isEditable()
-
-    OBJECTS s = Store, a = Article
-    PROPERTIES(s) READONLYIF isReadOnly() VALUE, name, storeSizeCode
-    PROPERTIES(a) READONLYIF isReadOnly() VALUE, name
-    PROPERTIES(s, a) READONLYIF isReadOnly() incomeQuantity, outcomeQuantity
-
-    TREE elements e = NavigatorElement PARENT parent(e)
-    PROPERTIES(e) READONLYIF isReadOnly() caption, canonicalName, number, permit, forbid;
-;
-
-DESIGN TestReadOnlyIf {
-    NEW checkBox BEFORE TOOLBARBOX {
-        caption = 'Enable read-only';
-
-        MOVE PROPERTY(isEditable());
-    }
-    NEW tabsContainer BEFORE TOOLBARBOX {
-        tabbed = TRUE;
-        fill = 1;
-        NEW testGrids {
-            caption = 'Tables';
-            MOVE BOX(s);
-            MOVE BOX(a);
-        }
-
-        NEW testTree {
-            caption = 'Tree';
-            MOVE BOX(TREE elements);
-        }
-    }
 }
 
 onChangeStoreName() {
@@ -2628,14 +2623,14 @@ NAVIGATOR {
         NEW TestColor;
         NEW TestShowClose;
         NEW TestExport;
-        NEW TestMultithreading;        
+        NEW TestMultithreading;      
+        NEW TestReadOnlyIfDisableIf;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestTree;
         NEW TestAggr;
         NEW TestHeaders;
         NEW TestEvalActionForm;
-        NEW TestReadOnlyIf;
         NEW TestOnActions;
         NEW TestOperators;
         NEW TestLayout;
