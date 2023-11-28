@@ -1413,9 +1413,14 @@ FORM TestPropertyOptions 'Property Options test'
 ;
 
 DESIGN TestPropertyOptions {
+    PROPERTY(name(s)) {
+        tooltip = 'header tooltip';
+        valueTooltip = 'value tooltip ' + storeSizeCode(s);
+    }
     PROPERTY(stringWithComment()) {
         comment = 'custom comment';
         commentClass = 'comment-class';
+        tooltip = 'string with comment';
         panelCommentFirst = FALSE;
         panelCommentAlignment = CENTER;
         panelCommentVertical = FALSE;
@@ -1423,6 +1428,8 @@ DESIGN TestPropertyOptions {
     PROPERTY(stringWithPlaceholder()) {
         placeholder = 'input phone number';
         alignCaption = FALSE;
+        class = 'custom-cls';
+        valueClass = 'custom-value-cls';
     }
     PROPERTY(storeSizeCode(s)) {
         background = RGB (128, 128, 128);
