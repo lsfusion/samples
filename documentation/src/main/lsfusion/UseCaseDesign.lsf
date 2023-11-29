@@ -88,7 +88,7 @@ DESIGN orders {
     orderList { 
         NEW orderHeader FIRST { // creating a new container and adding the first component to the vertical splitter
             fill = 1; // it is necessary to make it "stretched" inside the orderList, as it will have a list of orders 
-            // by default, the type of the new container is CONTAINERV, that is, all the components in it are arranged from top to bottom
+            // by default, new container is vertical, that is, all the components in it are arranged from top to bottom
             NEW filters { // creating a container in which all the components that are responsible for filtering will be placed
                 caption = 'Filters';
                 horizontal = TRUE; // making it horizontal so that all components go from left to right
