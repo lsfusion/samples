@@ -102,7 +102,7 @@ class LSFLexer(RegexLexer):
                     'EXCLUSIVE', 'EXEC', 'EXPAND', 'EXPORT', 'EXTEND', 'EXTERNAL', 'EXTID', 'EXTKEY', 'EXTNULL', 'FALSE', 'FIELDS',
                     'FILTER', 'FILTERBOX', 'FILTERCONTROLS', 'FILTERGROUP', 'FILTERGROUPS', 'FILTER', 'FILTERS', 'FINALLY', 'FIRST', 'FIXED', 'FLEX', 'FLOAT',
                     'FOCUSED', 'FOLDER', 'FOOTER', 'FOR', 'FOREGROUND', 'FORM', 'FORMEXTID', 'FORMS', 'FORMULA', 'FROM', 'FULL',
-                    'GET', 'GLOBAL', 'GOAFTER', 'GRID', 'GRIDBOX', 'GROUP', 'GROUPCHANGE', 'HALIGN', 'HEADER',
+                    'GET', 'GLOBAL', 'GOAFTER', 'GRID', 'GROUP', 'GROUPCHANGE', 'HALIGN', 'HEADER',
                     'HEADERS', 'HEADERSTO', 'HIDE', 'HIDESCROLLBARS', 'HIDETITLE', 'HINT', 'HINTNOUPDATE', 'HINTTABLE',
                     'HORIZONTAL', 'HOVER', 'HTML', 'HTTP', 'IF', 'IMAGE', 'IMPORT', 'IMPOSSIBLE', 'IN', 'INDEX', 'INDEXED',
                     'INIT', 'INLINE', 'INPUT', 'INTERNAL', 'IS', 'JAVA', 'JOIN', 'JSON', 'KEYPRESS', 'LAST', 'LEFT',
