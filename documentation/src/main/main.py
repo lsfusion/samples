@@ -123,7 +123,7 @@ class LSFLexer(RegexLexer):
                     'SQL', 'START', 'STEP', 'STICKY', 'STRETCH', 'STRICT', 'STRUCT', 'SUBJECT', 'SUBREPORT', 'SUM',
                     'TAB', 'TABLE', 'TAG', 'TCP', 'TEXTHALIGN', 'TEXTVALIGN', 'TFALSE', 'THEN', 'THREADS', 'TO',
                     'TOOLBAR', 'TOOLBARBOX', 'TOOLBARLEFT', 'TOOLBARRIGHT', 'TOOLBARSYSTEM', 'TOP', 'TREE', 'TRUE',
-                    'TRY', 'TTRUE', 'UDP', 'UNGROUP', 'UP', 'USERFILTER', 'VALIGN', 'VALUE', 'VERTICAL', 'VIEW', 'WAIT',
+                    'TRY', 'TTRUE', 'UDP', 'UNGROUP', 'UP', 'VALIGN', 'VALUE', 'VERTICAL', 'VIEW', 'WAIT',
                     'WHEN', 'WHERE', 'WHILE', 'WINDOW', 'WRITE', 'XLS', 'XLSX', 'XML', 'XOR', 'YES', 'YESNO',
                      'ZDATETIME'), prefix=r'\b', suffix=r'\b'),
              Keyword),
