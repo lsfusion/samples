@@ -1450,6 +1450,7 @@ FORM testJSON
 actionJSON() {
     MESSAGE JSON (testJSON OBJECTS j= 4 FILTERS mod(i, 2) = 0);
     MESSAGE JSON FROM code = '1', message = 'OK';
+    MESSAGE JSONTEXT FROM code = '1', message = 'OK';
     MESSAGE STRING ( JSON FROM value = 'Name3' + (INTEGER i AS INTEGER) WHERE iterate(i, 1, 5) ORDER i DESC);
 }
 
