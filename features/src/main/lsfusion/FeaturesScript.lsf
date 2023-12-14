@@ -1213,7 +1213,7 @@ DESIGN storeArticle {
         fontSize = 12;
     }
 
-    USERFILTER(s) {
+    FILTERS(s) {
         visible = FALSE;
     }
 }
