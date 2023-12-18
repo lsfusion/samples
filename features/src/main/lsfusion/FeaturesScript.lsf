@@ -1141,7 +1141,8 @@ DESIGN storeArticle {
 
     PROPERTY(storeSizeName(s)) { 
         caption = 'Warehouse size name';
-        captionClass = 'caption-class';
+        //works since 6.0
+        //captionClass = 'caption-class';
     }
 
     PROPERTY(foo(s, a)) {
@@ -1415,21 +1416,27 @@ FORM TestPropertyOptions 'Property Options test'
 DESIGN TestPropertyOptions {
     PROPERTY(name(s)) {
         tooltip = 'header tooltip';
-        valueTooltip = 'value tooltip ' + storeSizeCode(s);
+        //works since 6.0
+        //valueTooltip = 'value tooltip ' + storeSizeCode(s);
     }
     PROPERTY(stringWithComment()) {
-        comment = 'custom comment';
-        commentClass = 'comment-class';
+        //works since 6.0
+        //comment = 'custom comment';
+        //commentClass = 'comment-class';
+        
         tooltip = 'string with comment';
-        panelCommentFirst = FALSE;
-        panelCommentAlignment = CENTER;
-        panelCommentVertical = FALSE;
+        
+        //works since 6.0
+        //panelCommentFirst = FALSE;
+        //panelCommentAlignment = CENTER;
+        //panelCommentVertical = FALSE;
     }
     PROPERTY(stringWithPlaceholder()) {
-        placeholder = 'input phone number';
-        alignCaption = FALSE;
-        class = 'custom-cls';
-        valueClass = 'custom-value-cls';
+        //works since 6.0
+        //placeholder = 'input phone number';
+        //alignCaption = FALSE;
+        //class = 'custom-cls';
+        //valueClass = 'custom-value-cls';
     }
     PROPERTY(storeSizeCode(s)) {
         background = RGB (128, 128, 128);
@@ -1538,11 +1545,11 @@ DESIGN TestShowClose {
     };
 }
 
-showTestColor() { SHOW 'colors' = TestColor IN TestShowClose.innerContainer;}
-closeTestColor() { CLOSE FORM 'colors'; }
-
-EXTEND FORM TestShowClose
-    PROPERTIES() showTestColor, closeTestColor;
+//works since 6.0
+//showTestColor() { SHOW 'colors' = TestColor IN TestShowClose.innerContainer;}
+//closeTestColor() { CLOSE FORM 'colors'; }
+//EXTEND FORM TestShowClose
+//    PROPERTIES() showTestColor, closeTestColor;
 
 //--------------- Export test ---------------//
 
@@ -1689,16 +1696,17 @@ readonlyDisabledProp() = DATA STRING();
 
 FORM TestReadOnlyIfDisableIf 'ReadOnlyIf DisableIf test'
     PROPERTIES makeReadOnly(), makeDisabled()
-    PROPERTIES() okAction READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+    //works since 6.0
+    //PROPERTIES() okAction READONLYIF makeReadOnly() DISABLEIF makeDisabled()
 
-    PROPERTIES() readOnlyProp READONLYIF makeReadOnly(),
-        disabledProp DISABLEIF makeDisabled(),
-        readonlyDisabledProp READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+    //PROPERTIES() readOnlyProp READONLYIF makeReadOnly(),
+    //    disabledProp DISABLEIF makeDisabled(),
+    //    readonlyDisabledProp READONLYIF makeReadOnly() DISABLEIF makeDisabled()
 
-    OBJECTS s = Store
-    PROPERTIES(s) makeReadOnly, makeDisabled
-    PROPERTIES(s) READONLYIF makeReadOnly(s) DISABLEIF makeDisabled(s)
-        name, storeSizeCode, scolor
+    //OBJECTS s = Store
+    //PROPERTIES(s) makeReadOnly, makeDisabled
+    //PROPERTIES(s) READONLYIF makeReadOnly(s) DISABLEIF makeDisabled(s)
+    //    name, storeSizeCode, scolor
 
     TREE elements e = NavigatorElement PARENT parent(e)
     PROPERTIES(e) READONLYIF makeReadOnly() READONLYIF makeDisabled()
