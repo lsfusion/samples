@@ -396,27 +396,8 @@ testFormActionXLS { PRINT TestCase XLS; }
 testFormActionPDF { PRINT TestCase PDF; }
 testFormActionExport { PRINT TestCase PDF TO exportFile; }
 
-testMessageAction() {
-    LOCAL i = INTEGER();
-    i() <- 0;
-    WHILE i() < 5 DO {
-        i() <- i() + 1;
-        MESSAGE i();
-    }
-}
-
-testMessageActionNW() {
-    LOCAL i = INTEGER();
-    i() <- 0;
-    WHILE i() < 5 DO {
-        i() <- i() + 1;
-        MESSAGE i() NOWAIT;
-    }
-}
-
 EXTEND FORM TestCase
-    PROPERTIES() testFormAction, testFormActionAUTO, testFormActionXLS, testFormActionXLSX, testFormActionPDF, testFormActionExport,
-        testMessageAction, testMessageActionNW
+    PROPERTIES() testFormAction, testFormActionAUTO, testFormActionXLS, testFormActionXLSX, testFormActionPDF, testFormActionExport
 ;
 
 storeSizeCode 'Warehouse size (code)' (Store s) = sizeCode(storeSize(s)) CHARWIDTH 50;
@@ -1400,17 +1381,29 @@ DESIGN TestHotkeys {
 stringWithComment = DATA STRING();
 stringWithPlaceholder = DATA STRING();
 
+//works since 6.0
+//need filled apiKey in Geo.lsf 
+//address = DATA STRING[500];
+
 likeString = DATA STRING (Store) INDEXED LIKE;
 matchString = DATA STRING (Store) INDEXED MATCH;
 boolean = DATA BOOLEAN (Store);
 tboolean = DATA TBOOLEAN (Store);
 
+//works since 6.0
+//storeSizeNameDefault(Store s) = staticCaption(storeSize(s));
+//storeSizeNameSelect(Store s) = staticCaption(storeSize(s)) SELECT 'buttonGroup';
+//storeSizeNameNoSelect(Store s) = staticCaption(storeSize(s)) NOSELECT;
+
 FORM TestPropertyOptions 'Property Options test'
     PROPERTIES() stringWithComment, stringWithPlaceholder
+
+    //PROPERTIES () address ON CHANGE { INPUT sl = STRING[500] CUSTOM 'googleAutocomplete' DO address() <- sl; }
     
     OBJECTS s = Store
-    PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, storeSizeCode, likeString, matchString
+    PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
+    //PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect
 ;
 
 DESIGN TestPropertyOptions {
@@ -1423,6 +1416,7 @@ DESIGN TestPropertyOptions {
         //works since 6.0
         //comment = 'custom comment';
         //commentClass = 'comment-class';
+        //tag = 'a';
         
         tooltip = 'string with comment';
         
@@ -1437,8 +1431,9 @@ DESIGN TestPropertyOptions {
         //alignCaption = FALSE;
         //class = 'custom-cls';
         //valueClass = 'custom-value-cls';
+        //inputType = 'text';
     }
-    PROPERTY(storeSizeCode(s)) {
+    PROPERTY(likeString(s)) {
         background = RGB (128, 128, 128);
     }
 }
@@ -1712,6 +1707,38 @@ FORM TestReadOnlyIfDisableIf 'ReadOnlyIf DisableIf test'
     PROPERTIES(e) READONLYIF makeReadOnly() READONLYIF makeDisabled()
         caption, canonicalName, number, permit, forbid
 ;
+
+//--------------- Actions test ---------------//
+
+confirmExceptionMessage() { throwException('confirmed'); } CONFIRM;
+
+breakContinueMessage() {
+    LOCAL i = INTEGER();
+    i() <- 0;
+    WHILE i() < 5 DO {
+        i() <- i() + 1;
+        IF i() == 2 THEN {
+            //works since 6.0
+            //CONTINUE;
+        } ELSE IF i() == 4 THEN {
+            BREAK;
+        }
+        MESSAGE i();
+    }
+};
+
+noWaitMessage() {
+    LOCAL i = INTEGER();
+    i() <- 0;
+    WHILE i() < 5 DO {
+        i() <- i() + 1;
+        MESSAGE i() NOWAIT;
+    }
+}
+
+FORM TestActions 'Actions test'
+    PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage
+;    
 
 //--------------- SCHEDULE test ---------------//
 
@@ -2640,6 +2667,7 @@ NAVIGATOR {
         NEW TestExport;
         NEW TestMultithreading;      
         NEW TestReadOnlyIfDisableIf;
+        NEW TestActions;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestTree;
