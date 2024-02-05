@@ -2,7 +2,7 @@
 MODULE ChartJS;
 //#module end
 
-REQUIRE Authentication, SystemEvents, Chart;
+REQUIRE Authentication, SystemEvents, Chart, Icon;
 
 CLASS Month;
 name = DATA STRING (Month);

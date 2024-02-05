@@ -1,6 +1,9 @@
 //#module
 MODULE HelloWorld;
 //#module end
+
+REQUIRE Icon;
+
 showHelloWorld 'Show message' () {
     MESSAGE 'Hello world!';
 }

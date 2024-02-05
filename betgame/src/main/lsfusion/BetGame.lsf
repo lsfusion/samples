@@ -1,7 +1,7 @@
 //#module
 MODULE WorldCup2014;
 //#module end
-REQUIRE Authentication, Time;
+REQUIRE Authentication, Time, Icon;
 
 CLASS Team 'Team';
 name 'Name' = DATA ISTRING[50] (Team) IN id;

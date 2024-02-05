@@ -9,7 +9,7 @@
 MODULE Features;
 //#module end
 
-REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler;
+REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler, Icon;
 
 NAMESPACE Features;
 

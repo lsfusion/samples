@@ -4,6 +4,8 @@ MODULE Stock;
 //#module end
 //#header end
 
+REQUIRE Icon;
+
 //#class
 CLASS Stock 'Warehouse';
 

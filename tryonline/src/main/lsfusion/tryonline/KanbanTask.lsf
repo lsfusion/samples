@@ -2,7 +2,7 @@
 MODULE KanbanTask;
 //#module end
 
-REQUIRE SystemEvents, JKanban;
+REQUIRE SystemEvents, JKanban, Icon;
 
 // status
 CLASS Status;
