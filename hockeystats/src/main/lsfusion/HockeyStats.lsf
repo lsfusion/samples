@@ -1,7 +1,7 @@
 //#module
 MODULE HockeyStats;
 //#module end
-// logic description: https://documentation.lsfusion.org/pages/viewpage.action?pageId=2228240
+// logic description: https://docs.lsfusion.org/Score_table/
 //#require 
 REQUIRE System, Utils;
 //#require end
