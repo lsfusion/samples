@@ -17,7 +17,7 @@ progress 'Progress' = DATA INTEGER (Task);
 // dependencies
 depends = DATA BOOLEAN (Task, Task);
 idChildren 'Dependencies' (Task parent) = GROUP CONCAT id(Task child), ',' IF depends(parent, child) ORDER child;
-nameChildren (Task parent) = GROUP CONCAT name(Task child), ' ' IF depends(parent, child) ORDER child;
+nameChildren 'Dependencies' (Task parent) = GROUP CONCAT name(Task child) IF depends(parent, child) AND parent != child, ' ' ORDER child;
 
 // order
 order = DATA INTEGER (Task);
@@ -50,12 +50,8 @@ FORM gantt 'Gantt'
     PROPERTIES(t) NEW
     ORDERS order(t)
 
-    PROPERTIES(t) PANEL pname = name, pprogress = progress,
+    PROPERTIES(t) PANEL pname = name, pprogress = progress, pchildren = nameChildren,
                         moveUp, moveDown, delete = DELETE
-
-    OBJECTS c = Task CUSTOM 'select2_set'
-    PROPERTIES name = name(c), selected = depends(c, t)
-    FILTERS t != c
 
 ;
 
@@ -67,11 +63,7 @@ DESIGN gantt {
             horizontal = TRUE;
             MOVE PROPERTY(pname);
             MOVE PROPERTY(pprogress);
-        }
-        NEW dependencies {
-            alignment = STRETCH;
-            caption = 'Dependencies';
-            MOVE GRID(c);
+            MOVE PROPERTY(pchildren);
         }
         NEW actions {
             alignment = STRETCH;
@@ -81,7 +73,6 @@ DESIGN gantt {
             MOVE PROPERTY(delete);
         }
     }
-    REMOVE BOX(c);
 }
 
 NAVIGATOR {
@@ -93,26 +84,26 @@ onStarted() + {
     IF NOT GROUP SUM 1 IF t IS Task THEN {
         NEW rw = Task {
             name(rw) <- 'Redesign website';
-            start(rw) <- 2022_07_05;
-            end(rw) <- 2022_07_11;
+            start(rw) <- currentDate();
+            end(rw) <- sum(currentDate(), 6);
             progress(rw) <- 50;            
             NEW wnc = Task {
                 name(wnc) <- 'Write new content';
-                start(wnc) <- 2022_07_06;
-                end(wnc) <- 2022_07_09;
+                start(wnc) <- sum(currentDate(), 1);
+                end(wnc) <- sum(currentDate(), 4);
                 depends(wnc, rw) <- TRUE;
                 progress(wnc) <- 30;            
                 NEW aps = Task {
                     name(aps) <- 'Apply new styles';
-                    start(aps) <- 2022_07_08;
-                    end(aps) <- 2022_07_11;
+                    start(aps) <- sum(currentDate(), 3);
+                    end(aps) <- sum(currentDate(), 6);
                     depends(aps, wnc) <- TRUE;
                     progress(aps) <- 70;            
                 }
                 NEW rv = Task {
                     name(rv) <- 'Review';
-                    start(rv) <- 2022_07_09;
-                    end(rv) <- 2022_07_13;
+                    start(rv) <- sum(currentDate(), 4);
+                    end(rv) <- sum(currentDate(), 8);
                     depends(rv, wnc) <- TRUE;
                     progress(rv) <- 10;            
                 }
