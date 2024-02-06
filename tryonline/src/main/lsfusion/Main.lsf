@@ -221,12 +221,16 @@ getExamples(JSONFILE file) {
     IMPORT JSON FROM file FIELDS () INTEGER mode, STRING locale DO {
         LOCAL file = TEXT (Example);
         FOR mode(Example ex) = mode DO {
-            readPathToText(path(ex));
+            IF path(ex) THEN {
+                readPathToText(path(ex));
+            }
             
             LOCAL text = TEXT ();
             IF mode != 0 THEN {
-                removeTextBeforeBlockEnd('module');
-                text() <- readedText();
+                IF path(ex) THEN {
+                    removeTextBeforeBlockEnd('module');
+                    text() <- readedText();
+                }
                 FOR p = exPath(ex, LONG l) ORDER l DO {
                     readPathToText(p);
                     removeTextBeforeBlockEnd('header');
