@@ -1255,37 +1255,6 @@ colorizeElementWithNumberGreaterFour(NavigatorElement element) = #5555ff IF numb
 
 stringEqualsAll (BPSTRING[3] string) = string == BPSTRING[3]('All');
 
-FORM TestTree 'Tree test (navigator elements)'
-    TREE forms e = NavigatorElement PARENT parent(e)
-    PROPERTIES(e) VALUE, caption, canonicalName, number BACKGROUND colorizeElementWithNumberGreaterFour(e)
-
-    TREE forms2 a = BPSTRING[3], e2 = NavigatorElement PARENT parent(e2)
-    PROPERTIES(a) VALUE
-    PROPERTIES(e2) VALUE, caption, canonicalName
-
-    FILTERS stringEqualsAll(a)
-;
-
-DESIGN TestTree {
-    NEW trees BEFORE TOOLBARBOX {
-        horizontal = TRUE;
-        fill = 1;
-
-        MOVE BOX(TREE forms) {
-            fill = 1;
-        }
-
-        GRID(TREE forms) {
-            expandOnClick = FALSE;
-            headerHeight = 100;
-        }
-
-        MOVE BOX(TREE forms2) {
-            fill = 1;
-        }
-    }
-}
-
 showStores(ArticleGroup ag, Store s) = aginteger(ag) > 5 AND s IS Store;
 
 FORM TestExpandables 'Expandables test'
@@ -1739,6 +1708,64 @@ noWaitMessage() {
 FORM TestActions 'Actions test'
     PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage
 ;    
+
+//--------------- TREE test ---------------//
+
+FORM TestTree 'Tree test'
+    TREE forms e = NavigatorElement PARENT parent(e)
+    PROPERTIES(e) VALUE, caption, canonicalName, number BACKGROUND colorizeElementWithNumberGreaterFour(e)
+
+    TREE forms2 a = BPSTRING[3], e2 = NavigatorElement PARENT parent(e2)
+    PROPERTIES(a) VALUE
+    PROPERTIES(e2) VALUE, caption, canonicalName
+
+    FILTERS stringEqualsAll(a)
+;
+
+DESIGN TestTree {
+    NEW trees BEFORE TOOLBARBOX {
+        horizontal = TRUE;
+        fill = 1;
+
+        MOVE BOX(TREE forms) {
+            fill = 1;
+        }
+
+        GRID(TREE forms) {
+            expandOnClick = FALSE;
+            headerHeight = 100;
+        }
+
+        MOVE BOX(TREE forms2) {
+            fill = 1;
+        }
+    }
+}
+
+administrationNavigatorElement = navigatorElementCanonicalName('System.administration');
+
+expandDown {
+    EXPAND DOWN TestTree.e OBJECTS e = administrationNavigatorElement();
+}
+
+expandUp {
+    EXPAND UP TestTree.e OBJECTS e = administrationNavigatorElement();
+}
+
+expandAllTop {
+    EXPAND ALL TOP TestTree.e;
+}
+
+collapseDown {
+    COLLAPSE DOWN TestTree.e OBJECTS e = administrationNavigatorElement();
+}
+
+collapseAllTop {
+    COLLAPSE ALL TOP TestTree.e;
+}
+
+EXTEND FORM TestTree
+    PROPERTIES() expandDown, expandUp, expandAllTop, collapseDown, collapseAllTop;
 
 //--------------- SCHEDULE test ---------------//
 
@@ -2668,9 +2695,9 @@ NAVIGATOR {
         NEW TestMultithreading;      
         NEW TestReadOnlyIfDisableIf;
         NEW TestActions;
+        NEW TestTree;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
-        NEW TestTree;
         NEW TestAggr;
         NEW TestHeaders;
         NEW TestEvalActionForm;

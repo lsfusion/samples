@@ -79,7 +79,7 @@ a = ABSTRACT CASE STRING[100] (A);
 CLASS B : A;
 b = DATA STRING[100] (B);
 
-a(B b) += WHEN CLASS(b(b)) THEN b(b); // is equivalent to WHEN b IS B THEN b(b)
+a(B b) += WHEN ISCLASS(b(b)) THEN b(b); // is equivalent to WHEN b IS B THEN b(b)
 //#class end
 
 //#concat
