@@ -1333,8 +1333,8 @@ FORM TestHotkeys 'Hotkeys test'
         FILTER 'Show only huge warehouses' storeIsHuge(s) 'F7'
     FILTERGROUP filters2
         FILTER 'Show only huge warehouses' storeIsHuge(s) 'F3'
-        FILTER 'Show only big warehouses' storeIsBig(s) 'F9'
-        FILTER 'Show only medium warehouses' storeIsMedium(s) 'F10'
+        FILTER 'Show only big warehouses' storeIsBig(s) KEY 'F9;priority=1000'
+        FILTER 'Show only medium warehouses' storeIsMedium(s) MOUSE 'DBLCLK;priority=2000;cell=all'
         FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
 ;
 
