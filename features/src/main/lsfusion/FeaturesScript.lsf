@@ -131,7 +131,6 @@ storeCaption(StoreSize storeSize) = staticCaption(storeSize) IF storeSize IS Sto
 //                                                                                                 [ASON CHANGEWYS propertyName]
 //                                                                                                 [ASON EDIT propertyName]
 //                                                                                                 [IMAGE 'name'] [CHANGEKEY '<key code>' [SHOW | HIDE]] [AUTOSET] [CONFIRM]
-//                                                                                                 [REGEXP '<expression>' ['<regExp message>']] [LOGGABLE] [ECHO] [INDEXED]
 //                                                                                                 [NONULL [DELETE] [APPLY | SESSION] [FORMS form1, ..., formN]]
 //                                                                                                 [ON (CHANGE | CHANGEWYS | EDIT) action]
 //                                                                                                 [EVENTID 'id'];
@@ -1349,6 +1348,14 @@ DESIGN TestHotkeys {
 
 stringWithComment = DATA STRING();
 stringWithPlaceholder = DATA STRING();
+numericWithPattern = DATA NUMERIC() PATTERN '#,##0.##';
+stringWithPattern = DATA STRING() PATTERN '9\{2\}-9\{2\}-9\{2\}';
+dateWithStaticPattern = DATA DATE() PATTERN 'yyyy/MM-dd';
+dynamicPattern = DATA STRING();
+dateWithDynamicPattern = DATA DATE();
+stringWithStaticRegexp = DATA STRING() REGEXP '\\d\{2\}-\\d\{3\}' 'need to be string like 12-345';
+dynamicRegexp = DATA STRING();
+stringWithDynamicRegexp = DATA STRING();
 
 //works since 6.0
 //need filled apiKey in Geo.lsf 
@@ -1365,7 +1372,9 @@ tboolean = DATA TBOOLEAN (Store);
 //storeSizeNameNoSelect(Store s) = staticCaption(storeSize(s)) NOSELECT;
 
 FORM TestPropertyOptions 'Property Options test'
-    PROPERTIES() stringWithComment, stringWithPlaceholder
+    PROPERTIES() stringWithComment, stringWithPlaceholder, 
+        stringWithPattern, numericWithPattern, dateWithStaticPattern, dynamicPattern, dateWithDynamicPattern,
+        stringWithStaticRegexp, dynamicRegexp, stringWithDynamicRegexp
 
     //PROPERTIES () address ON CHANGE { INPUT sl = STRING[500] CUSTOM 'googleAutocomplete' DO address() <- sl; }
     
@@ -1401,6 +1410,13 @@ DESIGN TestPropertyOptions {
         //class = 'custom-cls';
         //valueClass = 'custom-value-cls';
         //inputType = 'text';
+    }
+    PROPERTY(dateWithDynamicPattern()) {
+        pattern = dynamicPattern();
+    }
+    PROPERTY(stringWithDynamicRegexp()) {
+        regexp = dynamicRegexp();
+        regexpMessage = 'incorrect value';
     }
     PROPERTY(likeString(s)) {
         background = RGB (128, 128, 128);
@@ -3232,11 +3248,9 @@ NAVIGATOR {
 DESIGN tst {
     PROPERTY (tstdt()) {
         fontSize = 20;
-        pattern = 'dd.MM';
     }
     PROPERTY (tstdtm()) {
         fontSize = 30;
-        pattern = 'dd.MM';
     }
     PROPERTY (tsttime()) {
         fontSize = 10;
