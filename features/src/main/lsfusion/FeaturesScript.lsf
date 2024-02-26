@@ -1767,6 +1767,20 @@ collapseAllTop {
 EXTEND FORM TestTree
     PROPERTIES() expandDown, expandUp, expandAllTop, collapseDown, collapseAllTop;
 
+//--------------- CAST and ROUND test ---------------//
+
+str = DATA STRING();
+strToInt 'string->integer' () = INTEGER(str());
+long = DATA LONG();
+longToStr 'long->string' () = STRING(long());
+
+rounding = DATA NUMERIC[10,3](); //12345.678
+rounded1 = ROUND(rounding(), 2); //12345.68
+rounded2 = ROUND(rounding(), -2); //12300.00
+
+FORM TestCastRound 'CAST & ROUND test'
+    PROPERTIES() str, strToInt, long, longToStr, rounding, rounded1, rounded2;
+    
 //--------------- SCHEDULE test ---------------//
 
 scheduleOnStartAction() {
@@ -1864,9 +1878,6 @@ DESIGN TestOnActions {
     }
 }
 
-textToInt 'string->integer' (Store store) = INTEGER(sbpstring(store));
-longToString 'long->string' (Store store) = BPSTRING[15](slong(store));
-
 nameDate 'name:date' (Store store) = name(store) + ':' + sdate(store);
 
 sumDoubleInt 'double+integer' (Store store) = sdouble(store) + sinteger(store) CHARWIDTH 25;
@@ -1897,11 +1908,10 @@ concatVarNotNull(Named store) = CONCAT '', 'name: ' IF store IS Store, name(stor
 //castToInt = INTEGER(sstring(s));
 castToNumeric = NUMERIC[10,3](sbpstring(Store s));
 
-FORM TestOperators 'Test of operators CAST, CONCAT, "+ - *"'
+FORM TestOperators 'Test of operators CONCAT, "+ - *"'
     OBJECTS s = Store
     PROPERTIES(s) VALUE, name, stime, sdate, sinteger, slong, sdouble, snumeric, sbpstring, castToNumeric, sstring, sboolean
     PROPERTIES(s) stext
-    PROPERTIES(s) PANEL textToInt, longToString
     PROPERTIES(s) PANEL sumNameString, nameDate, sumDoubleInt, sumDoubleNumeric, sumNumericInt, sumIntLong, sumStringBoolean, sumTextInteger
     PROPERTIES(s) PANEL concatNull, concatNotNull, concatVarNull, concatVarNotNull, concatToText, concatToVar
     PROPERTIES(s) PANEL subDoubleInt, subDoubleNumeric, subNumericInt, subIntLong
@@ -1922,9 +1932,7 @@ DESIGN TestOperators {
         flex = 1;
 
         NEW castTab {
-            caption = 'cast, concat';
-            MOVE PROPERTY(textToInt(s));
-            MOVE PROPERTY(longToString(s));
+            caption = 'concat';
             MOVE PROPERTY(concatNull(s));
             MOVE PROPERTY(concatNotNull(s));
             MOVE PROPERTY(concatVarNull(s));
@@ -2696,6 +2704,7 @@ NAVIGATOR {
         NEW TestReadOnlyIfDisableIf;
         NEW TestActions;
         NEW TestTree;
+        NEW TestCastRound;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestAggr;
