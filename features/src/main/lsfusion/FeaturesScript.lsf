@@ -1314,7 +1314,7 @@ sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLCK';
 
 FORM TestHotkeys 'Hotkeys test'
     OBJECTS s = Store, a = Article
-    PROPERTIES(s) ns = name ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2'; },
+    PROPERTIES(s) ns = name ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2' LOG; },
         'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeCode
     PROPERTIES(a) VALUE, na = name
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar, testUnion
@@ -1542,6 +1542,11 @@ exportFormJSON() {
     open(exportFile());
 }
 
+//method for api without authorisation
+testJSONData () {
+    EXPORT JSON FROM code = '0', message = 'ok';
+} @@noauth;
+
 exportFormDBF {
     EXPORT TestExport DBF TO s = exportFile;
     open(exportFile());
@@ -1592,14 +1597,14 @@ testPush () {
 
 startFilling() {
     FOR iterate(INTEGER i, 0, 20) DO
-        NEWSESSION { NEWTHREAD {
+        NEWEXECUTOR { NEWSESSION NEWTHREAD {
             FOR iterate(INTEGER j, 0, 100) NEW c = Change DO {
                 quantity(c, CommonObject o) <- (i + j + 1) WHERE o == CommonObject.first;
                 quantity(c, CommonObject o) <- (i + j + 2) WHERE o == CommonObject.second;
                 quantity(c, CommonObject o) <- (i + j + 3) WHERE o == CommonObject.third;
                 apply();
             }
-        } }
+        } } THREADS 2;
 }
 
 startChanging() {
