@@ -1134,7 +1134,6 @@ DESIGN storeArticle {
 }
 
 DESIGN storeArticle {
-    captionFont = 'bold 32';
     TOOLBARSYSTEM(s) {
         showCalculateSum = FALSE;
         showCountQuantity = TRUE;
@@ -1144,27 +1143,20 @@ DESIGN storeArticle {
     }
     PROPERTY(setNameX()) {
         imagePath = 'add.png';
-        font = 'bold 16';
         flex = 3;
         askConfirm = TRUE;
         askConfirmMessage = 'ORLY?';
     }
     PROPERTY(countF()) {
         imagePath = 'add.png';
-        font = 'bold 16';
-        captionFont = 'bold 16';
     }
 
     PROPERTY(currentTime()) {
         imagePath = 'add.png';
-        captionFont = 'bold 16';
-        font = 'bold 16';
     }
 
     PROPERTY(allNames()) {
         imagePath = 'add.png';
-        captionFont = 'bold 16';
-        font = 'bold 16';
         alignment = CENTER;
         align = CENTER;
         valueHeight = 20;
@@ -1190,8 +1182,6 @@ DESIGN storeArticle {
         quickSearch = TRUE;
         headerHeight = 50;
         foreground = #00AA00;
-        font = 'bold';
-        fontSize = 12;
     }
 
     FILTERS(s) {
@@ -1796,7 +1786,27 @@ rounded2 = ROUND(rounding(), -2); //12300.00
 
 FORM TestCastRound 'CAST & ROUND test'
     PROPERTIES() str, strToInt, long, longToStr, rounding, rounded1, rounded2;
-    
+
+//--------------- Font test ---------------//
+
+largeFont = DATA STRING();
+smallFont = DATA STRING();
+
+FORM TestFont 'Font test'
+    PROPERTIES() largeFont, smallFont
+;
+
+DESIGN TestFont {
+    PROPERTY (largeFont()) {
+        captionFont = 'italic 48';
+        font = 'bold 36';
+    }
+    PROPERTY (smallFont()) {
+        fontSize = 10;
+    }
+}
+
+
 //--------------- SCHEDULE test ---------------//
 
 scheduleOnStartAction() {
@@ -2721,6 +2731,7 @@ NAVIGATOR {
         NEW TestActions;
         NEW TestTree;
         NEW TestCastRound;
+        NEW TestFont;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestAggr;
@@ -3243,18 +3254,6 @@ FORM tst3
 
 NAVIGATOR {
     NEW tst BEFORE storeArticle;
-}
-
-DESIGN tst {
-    PROPERTY (tstdt()) {
-        fontSize = 20;
-    }
-    PROPERTY (tstdtm()) {
-        fontSize = 30;
-    }
-    PROPERTY (tsttime()) {
-        fontSize = 10;
-    }
 }
 
 CLASS XA 'XA';
