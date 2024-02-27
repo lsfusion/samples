@@ -972,7 +972,12 @@ remindPasswordEmail 'Send login to this email' (Contact u, BPSTRING[200] to) {
 
     LOCAL attachFile = FILE ();
     PRINT remindUserPass OBJECTS u= (u AS CustomUser) PDF TO attachFile;
-
+    
+    LOCAL attachFiles = FILE(INTEGER);
+    attachFiles(0) <- attachFile();
+    LOCAL attachNames = STRING(INTEGER);
+    attachNames(0) <- 'copy';
+    
     EMAIL
         //    FROM 'luxsoft@adsl.by'
         SUBJECT 'Password reminder for ' + email(u)
@@ -980,7 +985,8 @@ remindPasswordEmail 'Send login to this email' (Contact u, BPSTRING[200] to) {
         CC 'some@someserv.net'
         //    BCC 'luxsoft@adsl.by'
         BODY bodyFile()
-        ATTACH attachFile() NAME 'ATTACH: Password reminder for ' + email(u);
+        ATTACH attachFile() NAME 'ATTACH: Password reminder for ' + email(u)
+        ATTACH LIST attachFiles NAME attachNames;
 }
 
 justSendEmail 'Just send an email' (BPSTRING[200] to) {
