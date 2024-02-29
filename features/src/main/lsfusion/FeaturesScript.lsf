@@ -861,9 +861,7 @@ FORM documentArticle 'By documents (caption)'
     PROPERTIES inQuantity(document, article) PANEL, outQuantity(document, article), documentBalance(document, article), selCur(document, article), selAll(document, article), selArt(article)
     PROPERTIES NEW(document), DELETE(document), NEW(article), testAbstractAction(document) GRID
     PROPERTIES globalInt()
-
-    // Filters list syntax:
-    // FILTERS propertyExpression1, ..., propertyExpressionK
+    
     FILTERS name(article)
 
     // Events list syntax:
@@ -1011,13 +1009,6 @@ testRequestInput 'Testing REQUEST input'(Store s) {
 loadf(Store s) { open(simage(s)); }
 savef(Store s) { INPUT = simage(s) CHANGE; }
 
-//fs = ABSTRACT BOOLEAN (Store);
-//countF 'Number of filtered warehouses' = GROUP SUM 1 IF fs(s);
-//setNameX 'Add X to name' = () {
-//    FOR fs(s) DO
-//        name(s) <- 'X' + name(s);
-//}
-
 sssFixed = storeSizeName(Store s) CHARWIDTH 51 NOFLEX;
 sss = storeSizeName(Store s);// CHARWIDTH 51;
 
@@ -1035,9 +1026,9 @@ FORM storeArticle 'By warehouses'
     PROPERTIES sname = name(s), obja = VALUE(a), aname = name(a)
     PROPERTIES DRAW s setDefaultNames(), copyNameToArticles(s), copyStoreNameToArticle(s, a), copyStoreNameToArticleError(s, a), createNewStore(), showDocumentArticleModalForm(), showTestModalForm() TOOLBAR, testRequestInput(s) TOOLBAR
     //    PROPERTIES() countF, setNameX
-    PROPERTIES(s, a) SHOWIF storeIsHuge(s) incomeQuantity2, outcomeQuantity2, lastQuantity
+    PROPERTIES(s, a) incomeQuantity2, outcomeQuantity2, lastQuantity
     PROPERTIES(s) GRID storeSizeName, dataString, dataStringFixed, dataStringFlex, sss, sssFixed, ssc1 = storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi = simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData
-    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foo, foo2 SHOWIF storeIsHuge(s), bar, foobar HEADER name(a), bar2, baz, baz2, balanceQuantity, testUnion HEADER name(s), testPartition, testFormula
+    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foo, bar, foobar HEADER name(a), bar2, baz, baz2, balanceQuantity, testUnion HEADER name(s), testPartition, testFormula
     //PROPERTIES tstDestruct(s), onlyIncomeQuantity(s,a) //commented because of assertion
     PROPERTIES currentTime(), allNames()
     FILTERGROUP filters1
@@ -1189,10 +1180,6 @@ DESIGN storeArticle {
         headerHeight = 50;
         foreground = #00AA00;
     }
-
-    FILTERS(s) {
-        visible = FALSE;
-    }
 }
 
 EXTEND FORM storeArticle
@@ -1258,7 +1245,6 @@ FORM TestExpandables 'Expandables test'
     PROPERTIES(ag) VALUE, name, nameParent, aginteger
     PROPERTIES(s) VALUE, name, storeSizeCode, sinteger
     FILTERS stringEqualsAll(a)
-    FILTERS storeIsHuge(s)
     FILTERS showStores(ag, s)
 ;
 
@@ -1271,10 +1257,8 @@ FORM TestHeaders 'Headers test'
     OBJECTS s = Store, a = Article
     PROPERTIES(s) name, storeSizeCode
     PROPERTIES(a) VALUE, name
-    PROPERTIES(s, a) SHOWIF storeIsHuge(s) incomeQuantity2 HEADER outcomeQuantity2(s, a), outcomeQuantity2
+    PROPERTIES(s, a) incomeQuantity2 HEADER outcomeQuantity2(s, a), outcomeQuantity2
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar HEADER name(a), testUnion HEADER name(s)
-    FILTERGROUP filters1
-        FILTER '{showhuge}' storeIsHuge(s) 'F10'
 ;
 
 DESIGN TestHeaders {
@@ -1318,25 +1302,51 @@ EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
 
 sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLCK';
 
-FORM TestHotkeys 'Hotkeys test'
-    OBJECTS s = Store, a = Article
-    PROPERTIES(s) ns = name ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2' LOG; },
-        'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeCode
-    PROPERTIES(a) VALUE, na = name
-    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar, testUnion
+FORM TestHotkeysAndFilters 'Hotkeys and Filters test'
+    OBJECTS s = Store
+    PROPERTIES(s) ns = name ORDER DESC ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2' LOG; },
+        'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeName
+
+    //fixed filter
+    FILTERS storeSizeName(s)
+
+    //two ways setting user filters like by F3
+    PROPERTIES(s) storeSizeCode FILTER
+    USERFILTERS storeSizeCode(s), storeSizeName(s)
+
+    //regular filters
     FILTERGROUP filters1
-        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F7'
+        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F7' DEFAULT
     FILTERGROUP filters2
         FILTER 'Show only huge warehouses' storeIsHuge(s) 'F3'
-        FILTER 'Show only big warehouses' storeIsBig(s) KEY 'F9;priority=1000' SHOW
-        FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE
+        FILTER 'Show only big warehouses' storeIsBig(s) 'F9'
+        //works since 6.0
+        //FILTER 'Show only big warehouses' storeIsBig(s) KEY 'F9;priority=1000' SHOW
+        FILTER 'Show only medium warehouses' storeIsMedium(s) 'F4'
+        //works since 6.0
+        //FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE     
+;
+
+EXTEND FORM TestHotkeysAndFilters
+    EXTEND FILTERGROUP filters2
         FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
 ;
 
-DESIGN TestHotkeys {
+DESIGN TestHotkeysAndFilters {
     PROPERTY(ns) {
         changeKey = 'F4;priority=1000;editing=all';
         changeMouse = 'DBLCLK;priority=2000';
+    }
+    
+    //remove user filter
+    REMOVE FILTER(storeSizeCode(s));
+    
+    //remove regular filter
+    REMOVE FILTERGROUP(filters1);
+
+    FILTERS(s) {
+        //disable user filters
+        //visible = FALSE;
     }
 }
 
@@ -1345,11 +1355,11 @@ DESIGN TestHotkeys {
 stringWithComment = DATA STRING();
 stringWithPlaceholder = DATA STRING();
 numericWithPattern = DATA NUMERIC() PATTERN '#,##0.##';
-stringWithPattern = DATA STRING() PATTERN '9\{2\}-9\{2\}-9\{2\}';
+stringWithPattern = DATA STRING();//works since 6.0 PATTERN '9\{2\}-9\{2\}-9\{2\}';
 dateWithStaticPattern = DATA DATE() PATTERN 'yyyy/MM-dd';
 dynamicPattern = DATA STRING();
 dateWithDynamicPattern = DATA DATE();
-stringWithStaticRegexp = DATA STRING() REGEXP '\\d\{2\}-\\d\{3\}' 'need to be string like 12-345';
+stringWithStaticRegexp = DATA STRING();//works since 6.0 REGEXP '\\d\{2\}-\\d\{3\}' 'need to be string like 12-345';
 dynamicRegexp = DATA STRING();
 stringWithDynamicRegexp = DATA STRING();
 
@@ -1408,11 +1418,13 @@ DESIGN TestPropertyOptions {
         //inputType = 'text';
     }
     PROPERTY(dateWithDynamicPattern()) {
-        pattern = dynamicPattern();
+        //works since 6.0
+        //pattern = dynamicPattern();
     }
     PROPERTY(stringWithDynamicRegexp()) {
-        regexp = dynamicRegexp();
-        regexpMessage = 'incorrect value';
+        //works since 6.0
+        //regexp = dynamicRegexp();
+        //regexpMessage = 'incorrect value';
     }
     PROPERTY(likeString(s)) {
         background = RGB (128, 128, 128);
@@ -1662,7 +1674,9 @@ FORM TestMultithreading 'Multithreading test'
     PROPERTIES (y) VALUE, dataX;
 ;
 
-//--------------- READONLYIF DISABLEIF test ---------------//
+//--------------- SHOWIF, READONLYIF, DISABLEIF test ---------------//
+
+showIfReadOnly = DATA LOCAL STRING();
 
 makeReadOnly = DATA LOCAL BOOLEAN();
 makeDisabled = DATA LOCAL BOOLEAN();
@@ -1675,8 +1689,8 @@ readOnlyProp() = DATA STRING();
 disabledProp() = DATA STRING();
 readonlyDisabledProp() = DATA STRING();
 
-FORM TestReadOnlyIfDisableIf 'ReadOnlyIf DisableIf test'
-    PROPERTIES makeReadOnly(), makeDisabled()
+FORM TestShowIfReadOnlyIfDisableIf 'ShowIf ReadOnlyIf DisableIf test'
+    PROPERTIES makeReadOnly(), makeDisabled(), showIfReadOnly() SHOWIF makeReadOnly()
     //works since 6.0
     //PROPERTIES() okAction READONLYIF makeReadOnly() DISABLEIF makeDisabled()
 
@@ -2143,17 +2157,6 @@ DESIGN TestContextFilters {
     PROPERTY(csn4) { caption = 'Custom ON CHANGE'; }
 }
 
-FORM TestShowIfs 'ShowIfs test'
-    OBJECTS s = Store, a = Article GRID
-    PROPERTIES(s) VALUE, name, storeSizeName, NEW
-    PROPERTIES(a) SHOWIF storeIsBig(s) VALUE, name, ainteger, along
-    FILTERGROUP filters1
-        FILTER 'int(product) == 12' ainteger(a) == 12 'F8'
-        FILTER 'int(product) == 13' ainteger(a) == 13 'F9'
-    FILTERGROUP filters2
-        FILTER 'long(product) == 12' along(a) == 12 'F10'
-;
-
 FORM TestQuickFilter 'QuickFilter test'
     OBJECTS s = Store, a = Article GRID
     PROPERTIES(s) VALUE, name, storeSizeName
@@ -2436,21 +2439,6 @@ FORM TestNestedSessions 'Nested sessions test'
     PROPERTIES(ag) VALUE, name, nameParent, testAddInNestedSession
 ;
 
-FORM TestExtendFilterGroup 'EXTEND FilterGroup test'
-    OBJECTS s = Store
-    PROPERTIES (s) VALUE, name, storeSizeCode
-    FILTERGROUP sizeFilter
-    EXTEND FILTERGROUP sizeFilter
-        FILTER 'SMALL Stores' storeIsSmall(s) 'F9'
-        FILTER 'MEDIUM Stores' storeIsMedium(s) 'F10'
-;
-
-EXTEND FORM TestExtendFilterGroup
-    EXTEND FILTERGROUP sizeFilter
-        FILTER 'BIG Stores' storeIsBig(s) 'F11'
-        FILTER 'HUGE Stores' storeIsHuge(s) 'F12'
-;
-
 FORM TestHTMLInReports 'Test HTML in reports'
     OBJECTS s = Store
     PROPERTIES(s) store = VALUE, name, storeSizeCode, srichtext, sr = srichtext PANEL
@@ -2730,7 +2718,7 @@ NAVIGATOR {
 
     NEW FOLDER tests 'Tests' WINDOW toolbar {
         NEW TestTabs;
-        NEW TestHotkeys;
+        NEW TestHotkeysAndFilters;
         NEW TestPropertyOptions;
         NEW TestFilesAndJSON;
         NEW TestLinks;
@@ -2738,7 +2726,7 @@ NAVIGATOR {
         NEW TestShowClose;
         NEW TestExport;
         NEW TestMultithreading;      
-        NEW TestReadOnlyIfDisableIf;
+        NEW TestShowIfReadOnlyIfDisableIf;
         NEW TestActions;
         NEW TestTree;
         NEW TestCastRound;
@@ -2753,7 +2741,6 @@ NAVIGATOR {
         NEW TestLayout;
         NEW TestRequest;
         NEW TestContextFilters;
-        NEW TestShowIfs;
         NEW TestQuickFilter;
         NEW TestQuickSearch;
         NEW TestMargins;
@@ -2769,7 +2756,6 @@ NAVIGATOR {
         NEW TestDisappearingActon;
         NEW TestSessionProps;
         NEW TestNestedSessions;
-        NEW TestExtendFilterGroup;
         NEW TestHTMLInReports;
         NEW TestKeepSessionProps;
         NEW TestActionDebugger;
