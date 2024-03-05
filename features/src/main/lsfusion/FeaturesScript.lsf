@@ -1831,6 +1831,14 @@ DESIGN TestFont {
     }
 }
 
+//--------------- Pivot test ---------------//
+
+FORM TestPivot 'Pivot test'
+    OBJECTS s = Store
+    PROPERTIES(s) name, storeSizeCode, storeSizeName, sinteger, slong, sdouble
+    PIVOT s 'Bar Chart' NOSETTINGS MAX //CONFIG 'configFun' 
+        ROWS name(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)    
+;
 
 //--------------- SCHEDULE test ---------------//
 
@@ -2731,6 +2739,7 @@ NAVIGATOR {
         NEW TestTree;
         NEW TestCastRound;
         NEW TestFont;
+        NEW TestPivot;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestAggr;
