@@ -1765,6 +1765,7 @@ DESIGN TestTree {
         GRID(TREE forms) {
             expandOnClick = FALSE;
             headerHeight = 100;
+            hierarchicalWidth = 60;
         }
 
         MOVE BOX(TREE forms2) {
