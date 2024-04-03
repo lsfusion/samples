@@ -1721,7 +1721,8 @@ FORM TestShowIfReadOnlyIfDisableIf 'ShowIf ReadOnlyIf DisableIf test'
 
     TREE elements e = NavigatorElement PARENT parent(e)
     PROPERTIES(e) READONLYIF makeReadOnly() READONLYIF makeDisabled()
-        caption, canonicalName, number, permit, forbid
+        //works since 6.0
+        caption READONLY, canonicalName DISABLE, number, permit, forbid
 ;
 
 //--------------- Actions test ---------------//
