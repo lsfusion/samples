@@ -1382,6 +1382,10 @@ button21 { MESSAGE 'button 2-1';}
 button22 { MESSAGE 'button 2-2';}
 button3 {MESSAGE 'button 3';}
 
+asonMessage {
+    MESSAGE 'ASON change';
+} ASON CHANGE stringWithComment[];
+
 FORM TestPropertyOptions 'Property Options test'
     PROPERTIES() stringWithComment, stringWithPlaceholder, 
         stringWithPattern, numericWithPattern, dateWithStaticPattern, dynamicPattern, dateWithDynamicPattern,
@@ -1394,6 +1398,21 @@ FORM TestPropertyOptions 'Property Options test'
     PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
     //PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect
+
+    //works since 6.0
+//    EVENTS
+//    ON CHANGE PROPERTY BEFORE stringWithComment() {
+//        MESSAGE 'before onchange';
+//        beforeCanceled() <- TRUE;
+//    },
+//    
+//    ON CHANGE PROPERTY AFTER stringWithComment() {
+//        MESSAGE 'after onchange';
+//    },
+//
+//    ON CHANGE OBJECT s {
+//        MESSAGE 'changed s ' + name(s);
+//    }
 ;
 
 DESIGN TestPropertyOptions {
@@ -1401,6 +1420,7 @@ DESIGN TestPropertyOptions {
         tooltip = 'header tooltip';
         //works since 6.0
         //valueTooltip = 'value tooltip ' + storeSizeCode(s);
+        defaultCompare = '=@';
     }
     PROPERTY(stringWithComment()) {
         //works since 6.0
@@ -1446,6 +1466,36 @@ DESIGN TestPropertyOptions {
         MOVE PROPERTY(button3());
     }
 }
+
+//--------------- Collapsible containers test ---------------//
+
+FORM TestCollapsibleContainers 'Collapsible Containers test'
+    PROPERTIES() stringWithComment
+
+    OBJECTS s = Store
+    PROPERTIES(s) name
+;
+
+DESIGN TestCollapsibleContainers {
+    NEW container1 {
+        caption = 'FIRST';
+        MOVE PROPERTY(stringWithComment());
+    }
+}
+
+//works since 6.0
+//EXTEND FORM TestCollapsibleContainers
+//EVENTS
+//    ON EXPAND container1 {
+//        MESSAGE 'FIRST expanded';
+//    },
+//    ON COLLAPSE container1 {
+//        MESSAGE 'FIRST collapsed';
+//    },
+//    ON EXPAND BOX(s) {
+//        MESSAGE 'BOX(s) expanded';
+//    }
+//;
 
 //--------------- Files & JSON test ---------------//
 
@@ -1718,11 +1768,10 @@ FORM TestShowIfReadOnlyIfDisableIf 'ShowIf ReadOnlyIf DisableIf test'
     //PROPERTIES(s) makeReadOnly, makeDisabled
     //PROPERTIES(s) READONLYIF makeReadOnly(s) DISABLEIF makeDisabled(s)
     //    name, storeSizeCode, scolor
-
-    TREE elements e = NavigatorElement PARENT parent(e)
-    PROPERTIES(e) READONLYIF makeReadOnly() READONLYIF makeDisabled()
-        //works since 6.0
-        caption READONLY, canonicalName DISABLE, number, permit, forbid
+    
+    //TREE elements e = NavigatorElement PARENT parent(e)
+    //PROPERTIES(e) READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+    //    caption READONLY, canonicalName DISABLE, number
 ;
 
 //--------------- Actions test ---------------//
@@ -1935,7 +1984,8 @@ FORM TestOnActions 'Test "ON actions"'
 
     OBJECTS s = Store
     PROPERTIES(s) NEWSESSION VALUE,
-        name ON CHANGE onChangeStoreName(),
+        //works since 6.0
+        //name ON CHANGE onChangeStoreName() ON CHANGE BEFORE {MESSAGE 'before change';} ON CHANGE AFTER {MESSAGE 'after change';},
         sinteger ON CHANGE onChangeSInteger(s),
         sboolean,
         ssc1 = storeSizeCode ON EDIT onEditStoreSizeCode(),
@@ -2747,6 +2797,7 @@ NAVIGATOR {
         NEW TestTabs;
         NEW TestHotkeysAndFilters;
         NEW TestPropertyOptions;
+        NEW TestCollapsibleContainers;
         NEW TestFilesAndJSON;
         NEW TestLinks;
         NEW TestColor;
