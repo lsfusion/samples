@@ -89,7 +89,7 @@ class LSFLexer(RegexLexer):
                     'PDFLINK', 'DBFFILE', 'DBFLINK', 'RAWFILE', 'RAWLINK', 'RICHTEXT', 'STRING', 'TABLEFILE',
                     'TABLELINK', 'TEXT', 'TEXTFILE', 'TEXTLINK', 'TIME', 'WORDFILE', 'WORDLINK', 'XMLFILE', 'XMLLINK',
                     'YEAR', 'ABSTRACT', 'ACTION', 'ACTIONS', 'ACTIVATE', 'ACTIVE', 'AFTER', 'AGGR', 'ALL', 'AND', 'APPEND',
-                    'APPLY', 'AS', 'ASK', 'ASON', 'ASYNCUPDATE', 'ATTACH', 'ATTR', 'AUTOREFRESH', 'AUTOSET',
+                    'APPLY', 'AS', 'ASK', 'ASON', 'ASYNCUPDATE', 'ATTACH', 'ATTR', 'AUTOSET',
                     'BACKGROUND', 'BCC', 'BEFORE', 'BODY', 'BODYPARAMHEADERS', 'BODYPARAMNAMES', 'BODYURL', 'BOTTOM',
                     'BOX', 'BREAK', 'BY', 'CALENDAR', 'CANCEL', 'CANONICALNAME', 'CASE', 'CATCH', 'CC', 'CENTER',
                     'CHANGE', 'CHANGEABLE', 'CHANGECLASS', 'CHANGED', 'CHANGEKEY', 'CHANGEMOUSE', 'CHANGEWYS',
