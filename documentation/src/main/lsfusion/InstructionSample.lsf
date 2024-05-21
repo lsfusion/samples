@@ -169,7 +169,7 @@ WINDOW hotforms TOOLBAR HORIZONTAL VALIGN(CENTER) TEXTVALIGN(START) BOTTOM;
 //#window end
 
 //#hidewindow
-HIDE WINDOW System.tree;
+HIDE WINDOW System.logo;
 //#hidewindow end
 
 //#extendclass
