@@ -1455,16 +1455,17 @@ DESIGN TestPropertyOptions {
     PROPERTY(likeString(s)) {
         background = RGB (128, 128, 128);
     }
-    POPUP {
-        MOVE PROPERTY(button1());
-        NEW button2Container {
-            popup = TRUE;
-            caption = 'button 2';
-            MOVE PROPERTY(button21());
-            MOVE PROPERTY(button22());
-        }
-        MOVE PROPERTY(button3());
-    }
+    //works since 6.0
+//    POPUP(s) {
+//        MOVE PROPERTY(button1());
+//        NEW button2Container {
+//            popup = TRUE;
+//            caption = 'button 2';
+//            MOVE PROPERTY(button21());
+//            MOVE PROPERTY(button22());
+//        }
+//        MOVE PROPERTY(button3());
+//    }
 }
 
 //--------------- Collapsible containers test ---------------//
@@ -2447,11 +2448,13 @@ disappearingAction(SubStore ss) {
     SHOW wideModalForm OBJECTS s = ss ;
 }
 
-FORM TestDisappearingActon 'Disappearing button test' AUTOREFRESH 1
+FORM TestDisappearingActon 'Disappearing button test'
     OBJECTS s = Store, ss = SubStore
     PROPERTIES (s) name, objectClassName
     PROPERTIES (ss) name, substoreTitle, disappearingAction
     FILTERS objectClass(s) == objectClass(ss)
+
+    EVENTS ON SCHEDULE PERIOD 1 formRefresh()
 ;
 
 sessionSstring = DATA LOCAL BPSTRING[30](Store);
@@ -2787,7 +2790,6 @@ NAVIGATOR {
     testNavigators WINDOW toolbar;
     administration WINDOW toolbar FIRST;
     Authentication.account WINDOW toolbar FIRST;
-    objects WINDOW objectsWindow;
 
     regionalData {
         MOVE dictionaries 'Dictionaries';
