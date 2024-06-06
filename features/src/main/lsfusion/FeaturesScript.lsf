@@ -2722,24 +2722,6 @@ FORM TestReadWrite 'READ/WRITE test'
 // INDEX propertyName1(param1, ..., paramN) | paramI  [, ..., propertyNameN (param1, ..., paramN) | paramI];
 INDEX quantity(Document document, Article article);
 
-//////////////// WINDOW STATEMENT /////////////////
-// Add new window statement
-// Syntax:
-// WINDOW <name> '<caption>' (MENU | PANEL | TREE | TOOLBAR) [ option [, option ...] ]
-// option ::=   HIDETITLE |
-//              HIDESCROLLBARS |
-//              (VERTICAL | HORIZONTAL) |
-//              (LEFT | RIGHT | TOP | BOTTOM) |
-//              POSITION(x, y, w, h) |
-//              HALIGN( START | CENTER | END ) |
-//              VALIGN( START | CENTER | END ) |
-//              TEXTHALIGN( START | CENTER | END ) |
-//              TEXTVALIGN( START | CENTER | END ) |
-WINDOW objectsWindow 'Objects' TREE POSITION(0, 6, 20, 64);
-
-//Hide window
-//HIDE WINDOW System.log;
-
 //////////////// NAVIGATOR STATEMENT /////////////////
 //configuring the navigator
 NAVIGATOR {
