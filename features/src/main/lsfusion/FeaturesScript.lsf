@@ -1377,10 +1377,10 @@ tboolean = DATA TBOOLEAN (Store);
 //storeSizeNameSelect(Store s) = staticCaption(storeSize(s)) SELECT 'buttonGroup';
 //storeSizeNameNoSelect(Store s) = staticCaption(storeSize(s)) NOSELECT;
 
-button1 {MESSAGE 'button 1';}
+button1 {MESSAGE 'button 1' HEADER 'info';}
 button21 { MESSAGE 'button 2-1';}
 button22 { MESSAGE 'button 2-2';}
-button3 {MESSAGE 'button 3';}
+button3 {ASK 'button 3 ? ' HEADER 'question';}
 
 asonMessage {
     MESSAGE 'ASON change';
@@ -1460,6 +1460,7 @@ DESIGN TestPropertyOptions {
 //        MOVE PROPERTY(button1());
 //        NEW button2Container {
 //            popup = TRUE;
+//            image = 'add.png';
 //            caption = 'button 2';
 //            MOVE PROPERTY(button21());
 //            MOVE PROPERTY(button22());
@@ -2767,8 +2768,6 @@ NAVIGATOR {
         //if an action name is defined, then an element is created to execute this action
         NEW ACTION testNavigatorAction 'Show "By documents" 3 times' = testAction[] FIRST;
     }
-    // in such a way the window into which the element will be drawn can be separately configured
-    root WINDOW root;
     testNavigators WINDOW toolbar;
     administration WINDOW toolbar FIRST;
     Authentication.account WINDOW toolbar FIRST;
