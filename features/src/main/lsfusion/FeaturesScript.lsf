@@ -9,7 +9,7 @@
 MODULE Features;
 //#module end
 
-REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler, Icon;
+REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler, Icon, UserEvents;
 
 NAMESPACE Features;
 
@@ -1327,9 +1327,36 @@ FORM TestHotkeysAndFilters 'Hotkeys and Filters test'
         //FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE     
 ;
 
+setFilterGroup() {
+    FILTERGROUP TestHotkeysAndFilters.filters2 FROM 2;
+}
+readFilterGroup() {
+    LOCAL to = INTEGER();
+    FILTERGROUPS TestHotkeysAndFilters.filters2 TO to;
+    MESSAGE to();
+}
+clearFilterGroup() {
+    FILTERGROUP TestHotkeysAndFilters.filters2;
+}
+
+setFilterProperty() {
+    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM 'small';
+}
+readFilterProperty() {
+    LOCAL to = STRING();
+    FILTERS PROPERTY TestHotkeysAndFilters.storeSizeName(s) TO to;
+    MESSAGE to();
+}
+clearFilterProperty() {
+    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM NULL;
+}
+
 EXTEND FORM TestHotkeysAndFilters
     EXTEND FILTERGROUP filters2
         FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
+
+    PROPERTIES() setFilterGroup, readFilterGroup, clearFilterGroup,
+        setFilterProperty, readFilterProperty, clearFilterProperty
 ;
 
 DESIGN TestHotkeysAndFilters {
@@ -1451,6 +1478,16 @@ DESIGN TestPropertyOptions {
         //works since 6.0
         //regexp = dynamicRegexp();
         //regexpMessage = 'incorrect value';
+
+        //works since 6.0
+        //overflowHorz = 'auto';
+        //overflowVert = 'visible';
+        //valueAlignmentHorz = STRETCH;
+        //valueAlignmentVert = CENTER;
+        //valueOverflowHorz = 'auto';
+        //valueOverflowVert = 'visible';
+        //valueShrinkHorz = TRUE;
+        //valueShrinkVert = TRUE;
     }
     PROPERTY(likeString(s)) {
         background = RGB (128, 128, 128);
@@ -1520,9 +1557,11 @@ actionJSON() {
 rawFile = DATA RAWFILE ();
 file = DATA FILE ();
 namedFile = DATA NAMEDFILE ();
+videoFile = DATA VIDEOFILE();
+videoLink = DATA VIDEOLINK();
 
 FORM TestFilesAndJSON 'Files & JSON test'
-    PROPERTIES() rawFile, file, namedFile, actionJSON;
+    PROPERTIES() rawFile, file, namedFile, actionJSON, videoFile, videoLink;
 
 //--------------- Links test ---------------//
 
