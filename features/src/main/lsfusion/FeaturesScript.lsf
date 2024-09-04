@@ -1132,11 +1132,13 @@ DESIGN storeArticle {
 
 DESIGN storeArticle {
     TOOLBARSYSTEM(s) {
-        showCalculateSum = FALSE;
-        showCountQuantity = TRUE;
-        showGroup = TRUE;
-        showPrintGroupXls = TRUE;
+        showViews = TRUE;
+        showFilters = TRUE;
         showSettings = FALSE;
+        showCountQuantity = FALSE;
+        showCalculateSum = FALSE;
+        showPrintGroupXls = TRUE;
+        showManualUpdate = FALSE;
     }
     PROPERTY(setNameX()) {
         imagePath = 'add.png';
@@ -1658,12 +1660,12 @@ exportPlainXML() {
 }
 
 exportFormXML() {
-    EXPORT TestExport XML;
+    EXPORT TestExport XML TOP s=3;
     open(exportFile());
 }
 
 exportFormJSON() {
-    EXPORT TestExport JSON;
+    EXPORT TestExport JSON TOP 3;
     open(exportFile());
 }
 
@@ -1948,6 +1950,10 @@ FORM TestPivot 'Pivot test'
     PIVOT s 'Bar Chart' NOSETTINGS MAX //CONFIG 'configFun' 
         ROWS name(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)    
 ;
+
+onWebClientStarted() +{ 
+    //INTERNAL CLIENT WAIT 'pivotMobile.js';
+}
 
 //--------------- SCHEDULE test ---------------//
 
@@ -2816,7 +2822,7 @@ NAVIGATOR {
     }
 
     NEW FOLDER tests 'Tests' WINDOW toolbar {
-        NEW TestTabs;
+        NEW TestTabs SHOWIF isDesktop();
         NEW TestHotkeysAndFilters;
         NEW TestPropertyOptions;
         NEW TestCollapsibleContainers;
@@ -3413,70 +3419,11 @@ CLASS YesNoMaybe {
 
 ask = DATA YesNoMaybe (XA);
 
-//FORM testABAggr
-//    OBJECTS xa = XA
-//    OBJECTS xad = XADetail
-//    PROPERTIES name(xa), name(xad)
-//    PROPERTIES (xa) NEW, VALUE SELECTOR, DELETE, createXB 
-//    PROPERTIES =ask(xa)
-//    PROPERTIES (xad) NEW, DELETE
-//
-//    FILTERS xa(xad) = xa
-//
-//    OBJECTS xadl = XADetailLog
-//    PROPERTIES (xadl) xa, name
-//
-//    OBJECTS xb = XB
-//    OBJECTS xbd = XBDetail
-//    PROPERTIES name(xb), name(xbd), =name(xb(xbd))
-//    PROPERTIES (xb) NEW, DELETE
-//    PROPERTIES (xbd) NEW, DELETE
-//
-//    OBJECTS xc = XC
-//    OBJECTS xcd = XCDetail
-//    PROPERTIES name(xc), name(xcd), =name(xc(xcd))
-//    PROPERTIES (xc) NEW, DELETE
-//    PROPERTIES (xcd) NEW, DELETE
-//;
-//
-//DESIGN testABAggr {
-//    OBJECTS {
-//        NEW common {
-//            horizontal = TRUE;
-//            fill = 1;
-//            NEW leftp {
-//                MOVE BOX(xa);
-//                MOVE BOX(xad);
-//                MOVE BOX(xadl);
-//                fill = 1;
-//            }
-//            NEW rightp {
-//                MOVE BOX(xb);
-//                MOVE BOX(xbd);
-//                fill = 1;
-//            }
-//            NEW rightc {
-//                MOVE BOX(xc);
-//                MOVE BOX(xcd);
-//                fill = 1;
-//            }
-//        }    
-//    }
-//}
-
 actionXXX {
     htmlLinkInTab(HTMLLINK('https://luxsoft.by/'));
 }
 
-testABAggr {
-
-}
-
 NAVIGATOR {
-    NEW testABAggr BEFORE tst;
-    //    NEW FORM testABAggr BEFORE tst;
-    MOVE testABAggr;
-    MOVE testABAggr;
     NEW ACTION testFormAction;
     NEW ACTION xxx = actionXXX;
     MOVE testFormAction;
@@ -3487,7 +3434,7 @@ doSomething(STRING[100] p1, STRING[100] p2) {
 }
 
 externalAction() {
-    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' PARAMS '1', '2';
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' NOENCODE PARAMS '1', '2';
 }
 
 action () {
