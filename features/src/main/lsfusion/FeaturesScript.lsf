@@ -9,7 +9,8 @@
 MODULE Features;
 //#module end
 
-REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler, Icon, UserEvents;
+//UserEvents works since 6.0
+REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler, Icon;//, UserEvents;
 
 NAMESPACE Features;
 
@@ -1133,12 +1134,14 @@ DESIGN storeArticle {
 DESIGN storeArticle {
     TOOLBARSYSTEM(s) {
         showViews = TRUE;
-        showFilters = TRUE;
+        //works since 6.0
+        //showFilters = TRUE;
         showSettings = FALSE;
         showCountQuantity = FALSE;
         showCalculateSum = FALSE;
         showPrintGroupXls = TRUE;
-        showManualUpdate = FALSE;
+        //works since 6.0
+        //showManualUpdate = FALSE;
     }
     PROPERTY(setNameX()) {
         imagePath = 'add.png';
@@ -1329,37 +1332,38 @@ FORM TestHotkeysAndFilters 'Hotkeys and Filters test'
         //FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE     
 ;
 
-setFilterGroup() {
-    FILTERGROUP TestHotkeysAndFilters.filters2 FROM 2;
-}
-readFilterGroup() {
-    LOCAL to = INTEGER();
-    FILTERGROUPS TestHotkeysAndFilters.filters2 TO to;
-    MESSAGE to();
-}
-clearFilterGroup() {
-    FILTERGROUP TestHotkeysAndFilters.filters2;
-}
-
-setFilterProperty() {
-    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM 'small';
-}
-readFilterProperty() {
-    LOCAL to = STRING();
-    FILTERS PROPERTY TestHotkeysAndFilters.storeSizeName(s) TO to;
-    MESSAGE to();
-}
-clearFilterProperty() {
-    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM NULL;
-}
-
-EXTEND FORM TestHotkeysAndFilters
-    EXTEND FILTERGROUP filters2
-        FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
-
-    PROPERTIES() setFilterGroup, readFilterGroup, clearFilterGroup,
-        setFilterProperty, readFilterProperty, clearFilterProperty
-;
+//works since 6.0
+//setFilterGroup() {
+//    FILTERGROUP TestHotkeysAndFilters.filters2 FROM 2;
+//}
+//readFilterGroup() {
+//    LOCAL to = INTEGER();
+//    FILTERGROUPS TestHotkeysAndFilters.filters2 TO to;
+//    MESSAGE to();
+//}
+//clearFilterGroup() {
+//    FILTERGROUP TestHotkeysAndFilters.filters2;
+//}
+//
+//setFilterProperty() {
+//    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM 'small';
+//}
+//readFilterProperty() {
+//    LOCAL to = STRING();
+//    FILTERS PROPERTY TestHotkeysAndFilters.storeSizeName(s) TO to;
+//    MESSAGE to();
+//}
+//clearFilterProperty() {
+//    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM NULL;
+//}
+//
+//EXTEND FORM TestHotkeysAndFilters
+//    EXTEND FILTERGROUP filters2
+//        FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
+//
+//    PROPERTIES() setFilterGroup, readFilterGroup, clearFilterGroup,
+//        setFilterProperty, readFilterProperty, clearFilterProperty
+//;
 
 DESIGN TestHotkeysAndFilters {
     PROPERTY(ns) {
@@ -1406,10 +1410,14 @@ tboolean = DATA TBOOLEAN (Store);
 //storeSizeNameSelect(Store s) = staticCaption(storeSize(s)) SELECT 'buttonGroup';
 //storeSizeNameNoSelect(Store s) = staticCaption(storeSize(s)) NOSELECT;
 
-button1 {MESSAGE 'button 1' HEADER 'info';}
+button1 {MESSAGE 'button 1';}
+//works since 6.0
+//button1 {MESSAGE 'button 1' HEADER 'info';}
 button21 { MESSAGE 'button 2-1';}
 button22 { MESSAGE 'button 2-2';}
-button3 {ASK 'button 3 ? ' HEADER 'question';}
+button3 {ASK 'button 3 ?';}
+//works since 6.0
+//button3 {ASK 'button 3 ?' HEADER 'question';}
 
 asonMessage {
     MESSAGE 'ASON change';
@@ -1559,11 +1567,12 @@ actionJSON() {
 rawFile = DATA RAWFILE ();
 file = DATA FILE ();
 namedFile = DATA NAMEDFILE ();
-videoFile = DATA VIDEOFILE();
-videoLink = DATA VIDEOLINK();
+//works since 6.0
+//videoFile = DATA VIDEOFILE();
+//videoLink = DATA VIDEOLINK();
 
 FORM TestFilesAndJSON 'Files & JSON test'
-    PROPERTIES() rawFile, file, namedFile, actionJSON, videoFile, videoLink;
+    PROPERTIES() rawFile, file, namedFile, actionJSON;//, videoFile, videoLink;
 
 //--------------- Links test ---------------//
 
@@ -2822,7 +2831,9 @@ NAVIGATOR {
     }
 
     NEW FOLDER tests 'Tests' WINDOW toolbar {
-        NEW TestTabs SHOWIF isDesktop();
+        NEW TestTabs;
+        //works since 6.0
+        //NEW TestTabs SHOWIF isDesktop();
         NEW TestHotkeysAndFilters;
         NEW TestPropertyOptions;
         NEW TestCollapsibleContainers;
@@ -3434,7 +3445,9 @@ doSomething(STRING[100] p1, STRING[100] p2) {
 }
 
 externalAction() {
-    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' NOENCODE PARAMS '1', '2';
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' PARAMS '1', '2';
+    //NOENCODE works since 6.0
+    //EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' NOENCODE PARAMS '1', '2';
 }
 
 action () {
