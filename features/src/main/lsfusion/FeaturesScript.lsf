@@ -46,7 +46,7 @@ CLASS OutcomeDocument 'Expenses' : Document, EmptyClass;
 
 CONSTRAINT name(Named o) = '-TEST-' MESSAGE 'STRANGE NAME';
 
-nameArticle(Named artGroup) = name(artGroup);
+nameArticle(Named artGroup) = name(artGroup);// LAZY; works since 6.0
 parent = DATA ArticleGroup (ArticleGroup) AUTOSET;
 nameParent 'Parent object' = nameArticle(parent(ArticleGroup articleGroup)) IN base;
 
@@ -864,15 +864,12 @@ FORM documentArticle 'By documents (caption)'
     PROPERTIES globalInt()
     
     FILTERS name(article)
-
-    // Events list syntax:
-    // EVENTS
-    // ON (INIT | APPLY (BEFORE | AFTER) | OK | CANCEL | CLOSE | DROP | QUERYCLOSE) action1,
-    // ...
-    // ON (INIT | APPLY (BEFORE | AFTER) | OK | CANCEL | CLOSE | DROP | QUERYCLOSE) actionN
+    
     EVENTS
         ON CANCEL cancledMessage(),
-        ON APPLY BEFORE appliedMessage()
+        ON APPLY BEFORE appliedMessage(),
+        ON QUERYCLOSE REPLACE {},
+        ON QUERYOK NOREPLACE {}
 ;
 
 // Hints list syntax:
@@ -1329,7 +1326,16 @@ FORM TestHotkeysAndFilters 'Hotkeys and Filters test'
         //FILTER 'Show only big warehouses' storeIsBig(s) KEY 'F9;priority=1000' SHOW
         FILTER 'Show only medium warehouses' storeIsMedium(s) 'F4'
         //works since 6.0
-        //FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE     
+        //FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE
+
+    //works since 6.0
+    //EVENTS ON FILTERGROUPS filters2 {
+    //    MESSAGE 'changed filterGroup';
+    //}
+
+    //EVENTS ON FILTERS PROPERTY storeSizeName(s) {
+    //    MESSAGE 'changed filter property';
+    //}
 ;
 
 //works since 6.0
@@ -3503,3 +3509,23 @@ FORM documentsResult
         message EXTID 'Message',
         errorCode EXTID 'ErrorCode'
 ;
+
+//works since 6.0
+//CUSTOM aggregates in the GROUP / PARTITION operators
+//value = DATA INTEGER (INTEGER);
+//
+//median() = GROUP CUSTOM 'mode' WITHIN ORDER value(INTEGER i);
+//percentile() = GROUP CUSTOM 'percentile_cont' 0.5 WITHIN ORDER value(INTEGER i);
+//lag2(INTEGER i) = PARTITION CUSTOM NULL 'lag' value(i), 2 ORDER i;
+//rank(INTEGER i) = PARTITION CUSTOM INTEGER 'rank' ORDER DESC value(i), i;
+//
+//customExample() {
+//    value(1) <- 5;
+//    value(2) <- 16;
+//    value(3) <- 15;
+//    value(4) <- 10;
+//    value(5) <- 10;
+//    value(6) <- 4;
+//
+//    MESSAGE 'Median: ' + median() + ', Percentile: ' + percentile() + ', Two rows before 6: ' + lag2(6) + ', Rank of 2: ' + rank(2);
+//}
