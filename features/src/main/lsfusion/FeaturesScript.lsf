@@ -995,7 +995,16 @@ justSendEmail 'Just send an email' (BPSTRING[200] to) {
 FORM TestEmailForm 'EMAIL test'
     OBJECTS s 'Email:' = STRING[100] PANEL, u = CustomUser
     PROPERTIES VALUE(s), login(u), email(u), NEW(u), remindPasswordEmail(u, s) DRAW s, justSendEmail(s)
+    //works since 6.0
+    //EVENTS ON INIT { forceUpdate('s'); }
 ;
+
+DESIGN TestEmailForm {
+    GRID(s) {
+        //works since 6.0
+        //enableManualUpdate = TRUE;
+    }
+}
 
 testRequestInput 'Testing REQUEST input'(Store s) {
     ASK 'To be or not to be?' DO {
@@ -1298,7 +1307,11 @@ DESIGN TestTabs {
 activateTab1() { ACTIVATE TAB TestTabs.tab1; }
 activateTab2() { ACTIVATE TAB TestTabs.tab2; }
 EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
-    EVENTS ON INIT activateTab2();
+    EVENTS ON INIT activateTab2()
+    //works since 6.0        
+    //,
+           //ON TAB tab2 { MESSAGE 'hello tab2'; }
+;
 
 //--------------- Hotkeys test ---------------//
 
@@ -2840,7 +2853,8 @@ NAVIGATOR {
         NEW TestTabs;
         //works since 6.0
         //NEW TestTabs SHOWIF isDesktop();
-        NEW TestHotkeysAndFilters;
+        //works since 6.0
+        NEW TestHotkeysAndFilters;// CHANGEKEY 'F9;priority=1000' SHOW;
         NEW TestPropertyOptions;
         NEW TestCollapsibleContainers;
         NEW TestFilesAndJSON;
