@@ -98,7 +98,7 @@ class LSFLexer(RegexLexer):
                     'CONTAINER', 'CONTEXTMENU', 'CONTINUE', 'COOKIES', 'COOKIESTO', 'CSV', 'CUSTOM', 'CYCLES',
                     'DATA', 'DB', 'DBF', 'DEFAULT', 'DEFAULTCOMPARE', 'DELAY', 'DELETE', 'DESC', 'DESIGN', 'DIALOG', 'DO',
                     'DOC', 'DOCKED', 'DOCX', 'DRAW', 'DRILLDOWN', 'DROP', 'DROPCHANGED', 'DROPPED', 'ECHO',
-                    'EDIT', 'ELSE', 'EMAIL', 'EMBEDDED', 'END', 'EQUAL', 'ESCAPE', 'EVAL', 'EVENTID', 'EVENTS', 'EXCEPTLAST',
+                    'EDIT', 'ELSE', 'EMAIL', 'EMBEDDED', 'END', 'EQUAL', 'ESCAPE', 'EVAL', 'EVENTID', 'EVENTS',
                     'EXCLUSIVE', 'EXEC', 'EXPAND', 'EXPORT', 'EXTEND', 'EXTERNAL', 'EXTID', 'EXTKEY', 'EXTNULL', 'FALSE', 'FIELDS',
                     'FILTER', 'FILTERBOX', 'FILTERCONTROLS', 'FILTERGROUP', 'FILTERGROUPS', 'FILTER', 'FILTERS', 'FINALLY', 'FIRST', 'FIXED', 'FLEX', 'FLOAT',
                     'FOCUSED', 'FOLDER', 'FOOTER', 'FOR', 'FOREGROUND', 'FORM', 'FORMEXTID', 'FORMS', 'FORMULA', 'FROM', 'FULL',
