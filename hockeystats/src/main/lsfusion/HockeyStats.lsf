@@ -83,7 +83,8 @@ gamesPlayed 'G' (Team team) = hostGamesPlayed(team) (+) guestGamesPlayed(team);
 //#gamesplayed end
 
 //#gameswon
-gamesWonBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY winner(Game game), result(game)](team, type), (0 IF team IS Team AND type IS GameResult);
+gamesWonBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY winner(Game game), result(game)](team, type), 
+                                                  0 IF team IS Team AND type IS GameResult MATERIALIZED;
 
 gamesWon 'W' (Team team) = gamesWonBy(team, GameResult.win);
 gamesWonOT 'WO' (Team team) = gamesWonBy(team, GameResult.winOT);
@@ -91,7 +92,8 @@ gamesWonSO 'WB' (Team team) = gamesWonBy(team, GameResult.winSO);
 //#gameswon end
 
 //#gameslost
-gamesLostBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY looser(Game game), result(game)](team, type), (0 IF team IS Team AND type IS GameResult);
+gamesLostBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY looser(Game game), result(game)](team, type), 
+                                                   0 IF team IS Team AND type IS GameResult MATERIALIZED;
 
 gamesLost 'L' (Team team) = gamesLostBy(team, GameResult.win);
 gamesLostOT 'LO' (Team team) = gamesLostBy(team, GameResult.winOT);
