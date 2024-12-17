@@ -1,8 +1,6 @@
-//#header
 MODULE PrintShipment;
 
 REQUIRE Shipment;
-//#header end
 FORM shipment
     OBJECTS s=Shipment // shipment
     PROPERTIES (s) date, customer = nameCustomer, stock = nameStock // printing the date, customer name (named customer) and warehouse name (named stock)

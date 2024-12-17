@@ -1,6 +1,4 @@
-//#module
 MODULE GanttTask;
-//#module end
 
 REQUIRE FrappeGantt, Time, Icon;
 

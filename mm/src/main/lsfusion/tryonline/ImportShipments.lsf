@@ -1,8 +1,6 @@
-//#header
 MODULE ImportShipments;
 
 REQUIRE Shipment;
-//#header end
 // for importing primitive data for which objects in the system need to be found
 inn = DATA LOCAL BPSTRING[9] (Shipment);
 barcode = DATA LOCAL BPSTRING[13] (ShipmentDetail);

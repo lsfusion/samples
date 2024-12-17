@@ -1,21 +1,13 @@
-//#header
-//#module
 MODULE Stock;
-//#module end
-//#header end
 
 REQUIRE Icon;
 
-//#class
 CLASS Stock 'Warehouse';
 
 name 'Name' = DATA STRING[100] (Stock) IN base;
 address 'Address' = DATA STRING[150] (Stock) IN base;
-//#class end
 
-//#form
 FORM stocks 'Warehouses'
 	OBJECTS s = Stock
 	PROPERTIES(s) name, address, NEW, DELETE
 ;
-//#form end

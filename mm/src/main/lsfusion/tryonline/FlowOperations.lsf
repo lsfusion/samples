@@ -1,8 +1,6 @@
-//#header
 MODULE FlowOperations;
 
 REQUIRE Shipment, StockItem;
-//#header end
 run() {
     LOCAL shippedTo = BOOLEAN (Item, LegalEntity); // tagging marked products/customers
     FOR currentBalance(Item i, Stock s) > 10 ORDER DESC name(i) DO { // for products/warehouses with a balance > 10 in the order of product names

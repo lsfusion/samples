@@ -1,20 +1,11 @@
-//#module
 MODULE HockeyStats;
-//#module end
 // logic description: https://docs.lsfusion.org/Score_table/
-//#require 
 REQUIRE System, Utils, Icon;
-//#require end
 
-//#classteam
 CLASS Team 'Team';
-//#classteam end
 
-//#nameteam
 name 'Team name' = DATA STRING[30] (Team) IN base;
-//#nameteam end
 
-//#game
 CLASS Game 'Game';
 
 date 'Date' = DATA DATE (Game);
@@ -22,46 +13,30 @@ hostTeam = DATA Team (Game);
 guestTeam = DATA Team (Game);
 hostTeamName 'Hosts' (Game game) = name(hostTeam(game));
 guestTeamName 'Guests' (Game game) = name(guestTeam(game));
-//#game end
 
-//#constrainthostguest
 CONSTRAINT hostTeam(Game team) = guestTeam(team) CHECKED BY hostTeam, guestTeam MESSAGE 'Host and guest teams must be different';
-//#constrainthostguest end
 
-//#goals
 hostGoals 'H goals' = DATA INTEGER (Game);
 guestGoals 'G goals' = DATA INTEGER (Game);
-//#goals end
 
-//#constraintgoals
 CONSTRAINT hostGoals(Game game) = guestGoals(game) MESSAGE 'The game cannot end in a draw';
-//#constraintgoals end
 
-//#gamewinner
 winner(Game game) = IF hostGoals(game) > guestGoals(game)
                     THEN hostTeam(game)
                     ELSE guestTeam(game);
-//#gamewinner end
 
-//#gamelooser
 looser(Game game) = IF hostGoals(game) > guestGoals(game)
                     THEN guestTeam(game)
                     ELSE hostTeam(game);
-//#gamelooser end
 
-//#gameresultclass
 CLASS GameResult 'G/R' {
     win 'W',
     winOT 'LO',
     winSO 'LB'
 }
-//#gameresultclass end
 
-//#gameresultname
 resultName 'Name' (GameResult game) = staticCaption(game) IF game IS GameResult IN base;
-//#gameresultname end
 
-//#gameresult
 userResult = DATA GameResult (Game);
 result (Game game) = OVERRIDE userResult(game), 
     (GameResult.win IF ((hostGoals(game) (-) guestGoals(game)) > 1 OR (guestGoals(game) (-) hostGoals(game)) > 1));
@@ -69,42 +44,30 @@ resultName 'G/R' (Game game) = resultName(result(game));
 
 CONSTRAINT ((hostGoals(Game game) (-) guestGoals(game)) > 1 OR (hostGoals(game) (-) guestGoals(game)) < -1) AND userResult(game) 
     MESSAGE 'The result of the game is determined automatically';
-//#gameresult end
 
-//#gameresultset
 CONSTRAINT ((hostGoals(Game game) (-) guestGoals(game)) < 2 AND (hostGoals(game) (-) guestGoals(game)) > -2) AND NOT userResult(game) 
     MESSAGE 'Specify the result of the game';
-//#gameresultset end
 
-//#gamesplayed
 hostGamesPlayed = GROUP SUM 1 BY hostTeam(Game game);
 guestGamesPlayed = GROUP SUM 1 BY guestTeam(Game game);
 gamesPlayed 'G' (Team team) = hostGamesPlayed(team) (+) guestGamesPlayed(team);
-//#gamesplayed end
 
-//#gameswon
 gamesWonBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY winner(Game game), result(game)](team, type), 
                                                   0 IF team IS Team AND type IS GameResult MATERIALIZED;
 
 gamesWon 'W' (Team team) = gamesWonBy(team, GameResult.win);
 gamesWonOT 'WO' (Team team) = gamesWonBy(team, GameResult.winOT);
 gamesWonSO 'WB' (Team team) = gamesWonBy(team, GameResult.winSO);
-//#gameswon end
 
-//#gameslost
 gamesLostBy(Team team, GameResult type) = OVERRIDE [GROUP SUM 1 BY looser(Game game), result(game)](team, type), 
                                                    0 IF team IS Team AND type IS GameResult MATERIALIZED;
 
 gamesLost 'L' (Team team) = gamesLostBy(team, GameResult.win);
 gamesLostOT 'LO' (Team team) = gamesLostBy(team, GameResult.winOT);
 gamesLostSO 'LB' (Team team) = gamesLostBy(team, GameResult.winSO);
-//#gameslost end
 
-//#points
 points 'Points' (Team team) = gamesWon(team) * 3 + (gamesWonSO(team) + gamesWonOT(team)) * 2 + gamesLostOT(team) + gamesLostSO(team);
-//#points end
 
-//#goalsresult
 hostGoalsScored = GROUP SUM hostGoals(Game game) BY hostTeam(game);
 guestGoalsScored = GROUP SUM guestGoals(Game game) BY guestTeam(game);
 goalsScored 'Scored goals' (Team team) = OVERRIDE hostGoalsScored(team) (+) guestGoalsScored(team), 0 IF team IS Team;
@@ -112,30 +75,22 @@ goalsScored 'Scored goals' (Team team) = OVERRIDE hostGoalsScored(team) (+) gues
 hostGoalsConceded = GROUP SUM guestGoals(Game game) BY hostTeam(game);
 guestGoalsConceded = GROUP SUM hostGoals(Game game) BY guestTeam(game);
 goalsConceded 'Conceded goals' (Team team) = OVERRIDE hostGoalsConceded(team) (+) guestGoalsConceded(team), 0 IF team IS Team;
-//#goalsresult end
 
-//#place
 place 'Rank' (Team team) = PARTITION SUM 1 ORDER DESC points(team), gamesWon(team), gamesWonOT(team), gamesWonSO(team),
                                                (OVERRIDE goalsScored(team) (-) goalsConceded(team), 0), goalsScored(team);
-//#place end
 
-//#formgame
 FORM MainForm 'Score table'
     OBJECTS game = Game
     PROPERTIES(game) date, hostTeamName, hostGoals, guestGoals, guestTeamName, resultName, NEW, DELETE
 ;
-//#formgame end
 
-//#formteam
 EXTEND FORM MainForm
     OBJECTS team = Team
     PROPERTIES(team) place, name, gamesPlayed, gamesWon, gamesWonOT, gamesWonSO,
                      gamesLostSO, gamesLostOT, gamesLost, goalsScored, goalsConceded, points, NEW, DELETE
     ORDERS place(team)
 ;
-//#formteam end
 
-//#formsingle
 FORM MainFormSingle 'Score table'
     OBJECTS game = Game
     PROPERTIES(game) date, hostTeamName, hostGoals, guestGoals, guestTeamName, resultName, NEW, DELETE
@@ -145,10 +100,7 @@ FORM MainFormSingle 'Score table'
                      gamesLostSO, gamesLostOT, gamesLost, goalsScored, goalsConceded, points, NEW, DELETE
     ORDERS place(team)
 ;
-//#formsingle end
 
-//#navigator
 NAVIGATOR {
     NEW MainForm FIRST;
 }
-//#navigator end

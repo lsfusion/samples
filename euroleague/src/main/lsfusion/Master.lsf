@@ -1,8 +1,4 @@
-//#header
-//#module
 MODULE Master;
-//#module end
-//#header end
 
 REQUIRE Utils, Time, Icon;
 

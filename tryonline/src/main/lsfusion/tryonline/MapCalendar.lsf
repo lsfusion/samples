@@ -1,6 +1,4 @@
-//#module
 MODULE Map;
-//#module end
 
 REQUIRE Geo, SystemEvents, Icon;
 

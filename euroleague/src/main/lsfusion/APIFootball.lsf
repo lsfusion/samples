@@ -1,12 +1,6 @@
-//#header
-//#module
 MODULE APIFootball;
-//#module end
 
-//#require
 REQUIRE Main, Time;
-//#require end
-//#header end
 
 host = 'api-football-v1.p.rapidapi.com';
 key 'Football API Key' = DATA STRING () CHARWIDTH 50;

@@ -1,27 +1,15 @@
-//#header
-//#module
 MODULE StockItem;
-//#module end
 
-//#require
 REQUIRE Shipment, Receipt;
-//#require end
-//#header end
 
-//#properties
 receivedQuantity 'Total income' = GROUP SUM quantity(ReceiptDetail d) BY item(d), stock(receipt(d));
 shippedQuantity 'Total expenses' = GROUP SUM quantity(ShipmentDetail d) BY item(d), stock(shipment(d));
 currentBalance 'Current balance' (Item i, Stock s) = receivedQuantity (i, s) (-) shippedQuantity (i, s);
-//#properties end
 
-//#constraint
 CONSTRAINT currentBalance(Item i, Stock s) < 0 MESSAGE 'The balance of the product cannot be negative';
-//#constraint end
 
-//#form
 FORM currentBalanceItemStock 'Current balances'
     OBJECTS si = (s = Stock, i = Item)
     PROPERTIES READONLY name(i), barcode(i), name(s), currentBalance(i, s)
     FILTERS currentBalance(i, s)
 ;
-//#form end

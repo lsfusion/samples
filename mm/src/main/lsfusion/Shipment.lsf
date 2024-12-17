@@ -1,14 +1,7 @@
-//#header
-//#module
 MODULE Shipment;
-//#module end
 
-//#require
 REQUIRE Stock, Item, LegalEntity;
-//#require end
-//#header end
 
-//#class
 CLASS Shipment 'Shipment';
 CLASS ShipmentDetail 'Shipment line';
 
@@ -16,9 +9,7 @@ shipment 'Line document' = DATA Shipment (ShipmentDetail) NONULL DELETE;
 index 'Line number' (ShipmentDetail d) =
         PARTITION SUM 1 IF d IS ShipmentDetail
         ORDER d BY shipment(d);
-//#class end
 
-//#headerattributes
 number 'Shipment number' = DATA BPSTRING[10] (Shipment);
 date 'Shipment date' = DATA DATE (Shipment);
 
@@ -27,22 +18,16 @@ nameCustomer 'Customer name' (Shipment s) = name(customer(s));
 
 stock 'Warehouse' = DATA Stock(Shipment);
 nameStock 'Warehouse name' (Shipment s) = name(stock(s));
-//#headerattributes end
 
-//#detailattributes
 item 'Product' = DATA Item (ShipmentDetail);
 nameItem 'Product name' (ShipmentDetail d) = name(item(d));
 
 quantity 'Quantity' = DATA NUMERIC[16,4](ShipmentDetail);
 price 'Selling price' = DATA NUMERIC[17,2](ShipmentDetail);
 sum 'Sale amount' (ShipmentDetail d) = quantity(d) * price(d);
-//#detailattributes end
 
-//#priceset
 price(ShipmentDetail d) <- salePrice(item(d)) WHEN CHANGED(item(d));
-//#priceset end
 
-//#formedit
 FORM shipment 'Shipment'
 	OBJECTS s = Shipment PANEL
 	PROPERTIES(s) number, date, nameCustomer, nameStock
@@ -53,9 +38,7 @@ FORM shipment 'Shipment'
 
 	EDIT Shipment OBJECT s
 ;
-//#formedit end
 
-//#formlist
 FORM shipments 'Shipments'
 	OBJECTS s = Shipment
 	PROPERTIES(s) READONLY number, date, nameCustomer, nameStock
@@ -65,4 +48,3 @@ FORM shipments 'Shipments'
 	PROPERTIES(d) READONLY nameItem, quantity, price, sum
 	FILTERS shipment(d) = s
 ;
-//#formlist end

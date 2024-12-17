@@ -1,12 +1,7 @@
-//#header
-//#module
 MODULE StockAccounting;
 
 REQUIRE Stock, Item, LegalEntity, Receipt, Shipment, StockItem;
-//#module end
-//#header end
 
-//#navigator
 NAVIGATOR {
     NEW FOLDER masterData 'Directories' FIRST WINDOW toolbar {
         NEW items;
@@ -19,4 +14,3 @@ NAVIGATOR {
     }
     NEW currentBalanceItemStock AFTER documents;
 }
-//#navigator end

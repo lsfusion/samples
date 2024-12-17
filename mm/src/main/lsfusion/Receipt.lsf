@@ -1,29 +1,16 @@
-//#header
-//#module
 MODULE Receipt;
-//#module end
 
-//#require
 REQUIRE Stock, Item, LegalEntity;
-//#require end
-//#header end
 
-//#class
 CLASS Receipt 'Receipt';
 CLASS ReceiptDetail 'Receipt line';
-//#class end
 
-//#documentref
 receipt 'Line document' = DATA Receipt (ReceiptDetail) NONULL DELETE;
-//#documentref end
 
-//#index
 index 'Line number' (ReceiptDetail d) =
         PARTITION SUM 1 IF d IS ReceiptDetail
         ORDER d BY receipt(d);
-//#index end
 
-//#headerattributes
 number 'Receipt number' = DATA BPSTRING[10] (Receipt);
 date 'Receipt date' = DATA DATE (Receipt);
 
@@ -32,18 +19,14 @@ nameSupplier 'Supplier name' (Receipt r) = name(supplier(r));
 
 stock 'Warehouse' = DATA Stock (Receipt);
 nameStock 'Warehouse name' (Receipt r) = name(stock(r));
-//#headerattributes end
 
-//#detailattributes
 item 'Product' = DATA Item (ReceiptDetail);
 nameItem 'Product name' (ReceiptDetail d) = name(item(d));
 
 quantity 'Quantity' = DATA NUMERIC[16,4] (ReceiptDetail);
 price 'Supplier price' = DATA NUMERIC[17,2] (ReceiptDetail);
 sum 'Supplier amount' (ReceiptDetail d) = quantity(d) * price(d);
-//#detailattributes end
 
-//#formedit
 FORM receipt 'Receipt'
 	OBJECTS r = Receipt PANEL
 	PROPERTIES(r) number, date, nameSupplier, nameStock
@@ -54,9 +37,7 @@ FORM receipt 'Receipt'
 
 	EDIT Receipt OBJECT r
 ;
-//#formedit end
 
-//#formlist
 FORM receipts 'Receipts'
 	OBJECTS r = Receipt
 	PROPERTIES(r) READONLY number, date, nameSupplier, nameStock
@@ -66,4 +47,3 @@ FORM receipts 'Receipts'
 	PROPERTIES(d) READONLY index, nameItem, quantity, price, sum
 	FILTERS receipt(d) = r
 ;
-//#formlist end

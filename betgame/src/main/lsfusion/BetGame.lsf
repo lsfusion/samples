@@ -1,6 +1,4 @@
-//#module
 MODULE WorldCup2014;
-//#module end
 REQUIRE Authentication, Time, Icon;
 
 CLASS Team 'Team';

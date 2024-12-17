@@ -1,8 +1,6 @@
-//#header
 MODULE SetOperations;
 
 REQUIRE Shipment;
-//#header end
 // sequential line number in ascending order of price in the shipment
 priceIndex = PARTITION SUM 1 ORDER price(ShipmentDetail sd) BY shipment(sd);
 // sum of the first N lines for shipment, SQL-style GROUP operator 

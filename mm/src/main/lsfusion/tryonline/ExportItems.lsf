@@ -1,8 +1,6 @@
-//#header
 MODULE ExportItems;
 
 REQUIRE StockItem;
-//#header end
 run() {
     EXPORT FROM item = upper(name(Item i)), currentBalance(i, Stock s), 
     			stock = name(s), barcode(i), salePrice(i)
