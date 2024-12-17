@@ -1,6 +1,5 @@
 MODULE UseCaseExport;
 
-//#sample1
 REQUIRE Time;
 
 CLASS Book 'Book';
@@ -52,9 +51,7 @@ FORM orders 'Orders'
 NAVIGATOR {
     NEW orders;
 }
-//#sample1 end
 
-//#solution1
 GROUP Info;
 GROUP Customer : Info;
 
@@ -85,9 +82,7 @@ exportToXML 'Export to XML' (Order o) {
 EXTEND FORM orders
     PROPERTIES(o) exportToXML TOOLBAR
 ;
-//#solution1 end
 
-//#solution2
 exportToJSON 'Export to JSON' (Order o) {
     EXPORT Order OBJECTS order = o JSON;
     open(exportFile());
@@ -96,9 +91,7 @@ exportToJSON 'Export to JSON' (Order o) {
 EXTEND FORM orders
     PROPERTIES(o) exportToJSON TOOLBAR
 ;
-//#solution2 end
 
-//#solution3
 exportToCSV (DATE date) {
     LOCAL file = FILE();
     EXPORT CSV HEADER FROM number = number(order(OrderDetail d)), 
@@ -122,4 +115,3 @@ exportToCSV 'Export to CSV' () {
 EXTEND FORM orders
     PROPERTIES() exportToCSV DRAW o TOOLBAR 
 ;
-//#solution3 end

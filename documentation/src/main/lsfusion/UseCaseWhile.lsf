@@ -2,13 +2,10 @@ MODULE UseCaseWhile;
 
 REQUIRE Time;
 
-//#sample1
 CLASS Order 'Order';
 
 date 'Date' = DATA DATE (Order);
-//#sample1 end
 
-//#solution1
 countOrders (DATE date) = GROUP SUM 1 BY date(Order o);
 
 messageCountOrders 'Count the number of orders' (DATE dFrom, DATE dTo)  { 
@@ -25,17 +22,13 @@ messageCountOrders 'Count the number of orders' (DATE dFrom, DATE dTo)  {
     FOR iterate(DATE date, dFrom, dTo) DO
         MESSAGE 'Number of orders for ' + date + ' : ' + OVERRIDE countOrders(date()), 0.0;
 }
-//#solution1 end
 
-//#sample2
 CLASS OrderDetail 'Order line';
 order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
 
 sum 'Amount' = DATA NUMERIC[14,2] (OrderDetail);
 discountSum 'Discount amount' = DATA NUMERIC[14,2] (OrderDetail);
-//#sample2 end
 
-//#solution2
 distributeDiscount 'Distribute discount' (Order o, NUMERIC[14,2] discount)  { 
     LOCAL discount = NUMERIC[14,2] ();
     discount() <- discount;
@@ -52,18 +45,14 @@ distributeDiscount 'Distribute discount' (Order o, NUMERIC[14,2] discount)  {
             BREAK; // nothing left to break down
     }
 }
-//#solution2 end
 
-//#sample3
 CLASS Book 'Book';
 
 CLASS Ledger 'Change balance';
 date 'Date' = DATA DATE (Ledger);
 book 'Book' = DATA Book (Ledger);
 quantity 'Qty' = DATA NUMERIC[14,2] (Ledger);
-//#sample3 end
 
-//#solution3
 calculateIntegral (DATE dFrom, DATE dTo)  { 
     LOCAL date = DATE();
     date() <- dFrom;
@@ -83,4 +72,3 @@ calculateIntegral (DATE dFrom, DATE dTo)  {
         MESSAGE 'Accumulated balance for book ' + b + ' : ' + cumBalance(b);
     }
 }
-//#solution3 end

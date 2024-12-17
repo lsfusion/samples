@@ -1,42 +1,28 @@
 MODULE UseCaseMMA;
 
-//#sample1
 CLASS Book 'Book';
   
 id 'Number' = DATA INTEGER (Book);
-//#sample1 end
 
-//#solution1
 maxId 'Maximum number' () = GROUP MAX id(Book b);
-//#solution1 end
 
-//#solution2
 // Option 1
 book1 'Book' (INTEGER i) = GROUP MAX Book b BY id(b);
   
 // Option 2
 book2 'Book' (INTEGER i) = GROUP AGGR Book b BY id(b);
-//#solution2 end
 
-//#sample3
 CLASS Category 'Category';
   
 category 'Category' = DATA Category (Book);
 price 'Price' = DATA NUMERIC[10,2] (Book);
-//#sample3 end
 
-//#solution3
 minPrice 'Maximum number' (Category c) = GROUP MIN price(Book b) BY category(b);
-//#solution3 end
 
-//#sample4
 CLASS Shipment 'Shipment';
 CLASS ShipmentDetail 'Shipment line';
 shipment 'Shipment' = DATA Shipment (ShipmentDetail) NONULL DELETE;
   
 book 'Book' = DATA Book (ShipmentDetail);
-//#sample4 end
 
-//#solution4
 shipmentDetail 'Shipment line' (Shipment s, Book b) = GROUP MAX ShipmentDetail d BY shipment(d), book(d);
-//#solution4 end

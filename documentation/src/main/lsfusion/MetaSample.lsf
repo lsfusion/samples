@@ -8,20 +8,15 @@ closeForm  { };
 CLASS Document;
 CLASS Type;
 
-//#definemeta1
 META addActions(formName)
     EXTEND FORM formName
         PROPERTIES() showMessage, closeForm
     ;
 END
-//#definemeta1 end
 
-//#implementmeta1
 @addActions(documentForm);
 @addActions(orderForm);
-//#implementmeta1 end
 
-//#definemeta2
 META objectProperties(object, caption)
     object##Name 'Name '##caption = DATA BPSTRING[100](object);
     object##Type 'Type '##caption = DATA Type (object);
@@ -29,4 +24,3 @@ META objectProperties(object, caption)
 END
   
 @objectProperties(Document, 'of the document');
-//#definemeta2 end

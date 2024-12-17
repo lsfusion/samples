@@ -1,6 +1,5 @@
 MODULE UseCaseImport;
 
-//#sample1
 REQUIRE Utils;
 
 CLASS Book 'Book';
@@ -42,9 +41,7 @@ FORM orders 'Orders'
 NAVIGATOR {
     NEW orders;
 }
-//#sample1 end
 
-//#solution1
 importXlsx 'Import from XLS' (Order o)  { 
     INPUT f = EXCELFILE DO {
     
@@ -67,15 +64,11 @@ importXlsx 'Import from XLS' (Order o)  {
 EXTEND FORM order
     PROPERTIES(o) importXlsx
 ;
-//#solution1 end
 
-//#sample2
 serverDirectory 'Directory on the server from which orders should be imported' = DATA STRING[100] ();
 
 EXTEND FORM orders PROPERTIES() serverDirectory;
-//#sample2 end
 
-//#solution2
 importOrders 'Import orders from directory' ()  { 
 
     listFiles('file://' + serverDirectory());  
@@ -113,9 +106,7 @@ importOrders 'Import orders from directory' ()  {
 }
 
 EXTEND FORM orders PROPERTIES() importOrders;
-//#solution2 end
 
-//#solution3
 importBooks 'Import books' ()  { 
     LOCAL file = FILE ();
     READ 'jdbc:sqlserver://localhost;databaseName=books;User=import;Password=password@SELECT id, name FROM books' TO file;
@@ -137,9 +128,7 @@ importBooks 'Import books' ()  {
     // deleting books
     DELETE Book b WHERE b IS Book AND NOT [ GROUP SUM 1 BY id(INTEGER i)](id(b));
 }
-//#solution3 end
 
-//#sample4
 CLASS OrderDetailInfo 'Order line (transcript)';
 
 detail = DATA OrderDetail (OrderDetailInfo) NONULL DELETE;
@@ -152,9 +141,7 @@ EXTEND FORM order
     PROPERTIES(i) size, color, quantity, NEW, DELETE
     FILTERS detail(i) = d
 ;
-//#sample4 end
 
-//#solution4
 version = DATA LOCAL STRING[100]();
 
 GROUP item;
@@ -187,4 +174,3 @@ importOrderFromJSON 'Import from JSON' () {
 EXTEND FORM orders
     PROPERTIES() importOrderFromJSON DRAW o TOOLBAR
 ;
-//#solution4 end

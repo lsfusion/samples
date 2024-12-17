@@ -1,6 +1,5 @@
 MODULE UseCaseInheritance;
 
-//#item
 CLASS Item 'Product';
 name 'Name' = DATA ISTRING[50] (Item) IN id;
 FORM items 'Products'
@@ -10,9 +9,7 @@ FORM items 'Products'
 NAVIGATOR {
     NEW items;
 }
-//#item end
 
-//#receipt
 CLASS Receipt 'Arrival';
 date 'Date' = DATA DATE (Receipt) IN id;
 item 'Product' = DATA Item (Receipt);
@@ -26,9 +23,7 @@ FORM receipts 'Arrivals'
 NAVIGATOR {
     NEW receipts;
 }
-//#receipt end
 
-//#production
 CLASS Production 'Production';
 date 'Date' = DATA DATE (Production) IN id;
 item 'Product' = DATA Item (Production);
@@ -42,9 +37,7 @@ FORM productions 'Production'
 NAVIGATOR {
     NEW productions;
 }
-//#production end
 
-//#batch
 CLASS ABSTRACT Batch 'Batch';
 date 'Date' = ABSTRACT DATE (Batch) IN id;
 item 'Product' = ABSTRACT Item (Batch);
@@ -58,21 +51,15 @@ FORM batches 'Batches'
 NAVIGATOR {
     NEW batches;
 }
-//#batch end
 
-//#receiptbatch
 CLASS ReceiptBatch 'Arrival based batch';
 batch (Receipt receipt) = AGGR ReceiptBatch WHERE posted(receipt);
-//#receiptbatch end
 
-//#receiptbatchextend
 EXTEND CLASS ReceiptBatch : Batch;
 date(ReceiptBatch rb) += date(receipt(rb));
 item(ReceiptBatch rb) += item(receipt(rb));
 type(ReceiptBatch rb) += 'Arrival' IF rb IS ReceiptBatch;
-//#receiptbatchextend end
 
-//#productionbatch
 CLASS ProductionBatch 'Production based batch';
 batch (Production production) = AGGR ProductionBatch WHERE posted(production);
 
@@ -80,9 +67,7 @@ EXTEND CLASS ProductionBatch : Batch;
 date(ProductionBatch rb) += date(production(rb));
 item(ProductionBatch rb) += item(production(rb));
 type(ProductionBatch rb) += 'Production' IF rb IS ProductionBatch;
-//#productionbatch end
 
-//#userbatch
 CLASS UserBatch 'Manually created batch';
 date 'Date' = DATA DATE (UserBatch) IN id;
 item 'Product' = DATA Item (UserBatch);

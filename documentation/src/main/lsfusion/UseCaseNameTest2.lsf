@@ -2,15 +2,10 @@ MODULE UseCaseNameTest2;
 
 REQUIRE UseCaseNamePurchase, UseCaseNameSale;
 
-//#priority
 PRIORITY Purchase;
-//#priority end
 
-//#namespace
 NAMESPACE Purchase;
-//#namespace end
 
-//#sample
 messagePurchaseCount 'Display the number of purchase orders' {
     MESSAGE GROUP SUM 1 IF o IS Order;
 }
@@ -22,4 +17,3 @@ NAVIGATOR {
     NEW ACTION messagePurchaseCount;
     NEW ACTION messageSaleCount;
 }
-//#sample end

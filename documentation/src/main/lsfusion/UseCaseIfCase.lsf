@@ -1,6 +1,5 @@
 MODULE UseCaseIfCase;
 
-//#sample1
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book);
 
@@ -12,9 +11,7 @@ CLASS Category 'Category' {
 
 category 'Category' = DATA Category (Book);
 price 'Price' = DATA NUMERIC[14,2] (Book);
-//#sample1 end
 
-//#solution1
 setPriceIf 'Set price' (Book b)  { 
     IF NOT category(b) THEN
         MESSAGE 'No category selected for the book';
@@ -24,9 +21,7 @@ setPriceIf 'Set price' (Book b)  {
         ELSE
             price(b) <- 100.0;
 }
-//#solution1 end
 
-//#solution2
 setPriceCase 'Set price' (Book b)  { 
     CASE
         WHEN category(b) == Category.novel THEN
@@ -38,4 +33,3 @@ setPriceCase 'Set price' (Book b)  {
     ELSE
         price(b) <- 0.0;
 }
-//#solution2 end

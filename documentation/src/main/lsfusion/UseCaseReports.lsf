@@ -1,6 +1,5 @@
 MODULE UseCaseReports;
 
-//#sample1
 NAMESPACE Sample;
 
 CLASS Category 'Category';
@@ -23,9 +22,7 @@ FORM books 'Books'
 NAVIGATOR {
     NEW books;
 }
-//#sample1 end
 
-//#solution1a
 FORM booksByCategories 'Books by category'
     OBJECTS c = Category
     PROPERTIES(c) name, countBooks
@@ -34,9 +31,7 @@ FORM booksByCategories 'Books by category'
     PROPERTIES(b) name, nameCategory
     FILTERS category(b) == c 
 ;
-//#solution1a end
 
-//#solution1b
 printBooksByCategories 'Books by category' ()  { 
     PRINT booksByCategories;
 }
@@ -44,15 +39,11 @@ printBooksByCategories 'Books by category' ()  {
 xlsxBooksByCategories 'Books by category (XLSX)' ()  { 
     PRINT booksByCategories XLSX;
 }
-//#solution1b end
 
-//#solution1c
 EXTEND FORM books
     PROPERTIES() DRAW b TOOLBAR printBooksByCategories, xlsxBooksByCategories
 ;
-//#solution1c end
 
-//#sample2
 CLASS Invoice 'Invoice';
 date 'Date' = DATA DATE (Invoice);
 number 'Number' = DATA STRING[10] (Invoice);
@@ -86,9 +77,7 @@ FORM invoices 'Invoices'
 NAVIGATOR {
     NEW invoices;
 }
-//#sample2 end
 
-//#solution2
 print 'Print' (Invoice i)  { 
     PRINT invoice OBJECTS i = i;
 }
@@ -99,9 +88,7 @@ printWord 'Print (DOCX)' (Invoice i)  {
 EXTEND FORM invoices
     PROPERTIES(i) print TOOLBAR, printWord TOOLBAR
 ;
-//#solution2 end
 
-//#sample3
 CLASS Customer 'Customer';
 name 'Name' = DATA ISTRING[50] (Customer) IN id;
 
@@ -156,9 +143,7 @@ FORM orders 'Orders'
 NAVIGATOR {
     NEW orders;
 }
-//#sample3 end
 
-//#solution3
 FORM customerInfo 'Customer information'
     OBJECTS c = Customer PANEL
     PROPERTIES(c) name
@@ -187,4 +172,3 @@ printInfo 'Print information' (Customer c)  {
 EXTEND FORM customers
     PROPERTIES(c) printInfo TOOLBAR
 ;
-//#solution3 end

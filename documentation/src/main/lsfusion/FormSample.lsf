@@ -1,6 +1,5 @@
 MODULE FormSample;
 
-//#form
 CLASS Document;
 
 // declaring the Documents form
@@ -50,9 +49,7 @@ EXTEND FORM printInvoice
     // ... adding properties and filters to the form 
 ;
 print (Invoice invoice)  { PRINT printInvoice OBJECTS i = invoice; } // declaring an action that will open the invoice print form
-//#form end
 
-//#objects
 CLASS Shipment;
 // declaring the delivery form
 FORM shipments 'Deliveries'
@@ -72,9 +69,7 @@ FORM revenues 'Product turnovers'
     PROPERTIES VALUE(dateFrom), VALUE(dateTo) // adding to the form the properties of the date objects values, with which the user can select dates
     PROPERTIES name(i), revenue(i, dateFrom, dateTo) // adding the product name and the property with the product turnover for the date interval
 ;
-//#objects end
 
-//#tree
 CLASS SkuGroup;
 name = DATA ISTRING[100] (SkuGroup);
 active = DATA BOOLEAN (SkuGroup);
@@ -112,9 +107,7 @@ FORM groups
     PROPERTIES READONLY name(g1), name(g2), name(g3)
     FILTERS in(g1, g2), in(g2, g3)
 ;
-//#tree end
 
-//#properties
 CLASS Order;
 date = DATA DATE (Order);
 time = DATA TIME (Order);
@@ -243,9 +236,7 @@ FORM orderReport 'Sales by warehouse'
                COLUMNS (c) // marking that customers should be displayed in columns, with the same number of columns as there will be rows in the customer object, taking into account filters, and they will be displayed in the same order
                HEADER name(c) // setting that the name of the customer will be used as the column heading
 ;
-//#properties end
 
-//#filters
 CLASS Stock;
 name = DATA ISTRING[100] (Stock);
 region = DATA Region (Stock);
@@ -272,9 +263,7 @@ FORM onStock 'Balances' // creating a form in which the balances of products can
     PROPERTIES READONLY groupName = nameGroup(s), name(s), onStock(st, s) // adding the name of the group of products, assigning it groupName as the name of the property on the form, as well as the name and balance of the product
     FILTERS active(s) // turning it on to show only active products
 ;
-//#filters end
 
-//#regularfilters
 active = DATA BOOLEAN (Stock);
 
 EXTEND FORM onStock // extending the previously created form with balances
@@ -290,17 +279,13 @@ EXTEND FORM onStock
     EXTEND FILTERGROUP skuAvailability
         FILTER 'Negative balances' onStock (st, s) < 0 'F9' // adding filter by expression
 ;
-//#regularfilters end
 
-//#sort
 EXTEND FORM onStock // extending the previously created form with balances
     ORDERS name(s) // enabling ordering by warehouse name in the warehouse list
     ORDERS groupName, onStock(st, s) DESC // enabling ordering in ascending order of the group name, and inside in descending order of the balance in the warehouse
                                             // it should be noted that the property is the property name on the form groupName, not just the property name nameGroupSku
 ;
-//#sort end
 
-//#events
 showImpossibleMessage()  { MESSAGE 'It\'s impossible'; };
 
 posted = DATA BOOLEAN (Invoice);
@@ -345,9 +330,7 @@ EXTEND FORM POS // adding a property through the form extension so that SEEK cou
     EVENTS
         ON INIT createReceipt() // when opening the form, executing the action to create a new receipt, which fills in the shift, cashier and other information
 ;
-//#events end
 
-//#view
 // creating a form for printing a price tag for a product
 labelFile = DATA STRING[100] (Item);
 printLabelFile (Item i)= OVERRIDE labelFile(i), 'MyModule_printLabel_i.jrxml' IF i IS Item;
@@ -357,9 +340,7 @@ FORM printLabel 'Price tag printing'
                                    // for example, the user can input myLabel1.jrxml there, then the system will use a file named myLabel1.jrxml
 //  ... other properties required for printing
 ;
-//#view end
 
-//#design
 DESIGN order { // customizing the design of the form, starting with the default design
     // marking that all changes to the hierarchy will occur for the topmost container 
     NEW orderPane FIRST { // creating a new container as the very first one before the system buttons, in which we put two containers - header and specifications
@@ -410,9 +391,7 @@ DESIGN order { // customizing the design of the form, starting with the default 
 DESIGN order {
     REMOVE TOOLBARLEFT; // removing from the hierarchy the container with the print and export buttons to xls, thereby making them invisible
 }
-//#design end
 
-//#extendform
 CLASS ItemGroup;
 name = DATA ISTRING[100] (ItemGroup);
 
@@ -425,4 +404,3 @@ EXTEND FORM items
     PROPERTIES(g) READONLY name
     FILTERS itemGroup(i) == g // if the object was added after the object with products, then filtering would go by the group of products, and not by products
 ;
-//#extendform end

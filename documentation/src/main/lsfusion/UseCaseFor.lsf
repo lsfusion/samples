@@ -2,7 +2,6 @@ MODULE UseCaseFor;
 
 REQUIRE Utils;
 
-//#sample1
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book);
 
@@ -14,9 +13,7 @@ FORM books 'Books'
 NAVIGATOR {
     NEW books;
 }
-//#sample1 end
 
-//#solution1
 findNemo 'Find book' ()  { 
     FOR isSubstring(name(Book b), 'Nemo') DO {
         MESSAGE 'Found book ' + name (b) + ' with internal code ' + b;
@@ -25,9 +22,7 @@ findNemo 'Find book' ()  {
 EXTEND FORM books
     PROPERTIES() findNemo
 ;
-//#solution1 end
 
-//#solution2
 add100Books 'Add 100 books' ()  { 
     // Option 1
     FOR iterate(INTEGER i, 1, 100) NEW b = Book DO {
@@ -45,9 +40,7 @@ add100Books 'Add 100 books' ()  {
 EXTEND FORM books
     PROPERTIES() add100Books
 ;
-//#solution2 end
 
-//#sample3
 CLASS Order 'Order';
   
 CLASS OrderDetail 'Order line';
@@ -59,9 +52,7 @@ price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
 
 discount 'Discount, %' = DATA NUMERIC[8,2] (OrderDetail);
 discountPrice 'Discount price' = DATA NUMERIC[14,2] (OrderDetail); 
-//#sample3 end
 
-//#solution3
 makeDiscount 'Make discount' (Order o)  { 
     // Option 1
     FOR order(OrderDetail d) == o AND price(d) > 100 DO {
@@ -73,13 +64,9 @@ makeDiscount 'Make discount' (Order o)  {
     discount(OrderDetail d) <- 10 WHERE order(d) == o AND price(d) > 100;
     discountPrice(OrderDetail d) <- price(d) * (100.0 - discount(d)) / 100.0 WHERE order(d) == o AND price(d) > 100; 
 }
-//#solution3 end
 
-//#sample4
 price 'Price' = DATA NUMERIC[14,2] (Book);
-//#sample4 end
 
-//#solution4
 addSelectedBooks 'Add marked books' (Order o)  { 
     // Option 1
     FOR price(Book b) > 100 NEW d = OrderDetail DO {
@@ -95,4 +82,3 @@ addSelectedBooks 'Add marked books' (Order o)  {
         price(d) <- p;
     }
 }
-//#solution4 end

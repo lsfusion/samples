@@ -5,7 +5,6 @@ CLASS myClass 'myClass';
 myProperty1 = DATA BPSTRING[20] (myClass);
 myProperty2 = DATA BPSTRING[20] (myClass);
 
-//#default
  
 FORM myForm 'myForm'
     OBJECTS myObject = myClass

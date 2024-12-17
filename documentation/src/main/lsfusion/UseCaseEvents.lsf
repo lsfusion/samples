@@ -2,14 +2,11 @@ MODULE UseCaseEvents;
 
 REQUIRE Time, Authentication;
 
-//#sample1
 CLASS Order 'Order';
 isClosed 'Closed' = DATA BOOLEAN (Order);
 date 'Date' = DATA DATE (Order);
 number 'Number' = DATA INTEGER (Order);
-//#sample1 end
 
-//#solution1
 // Option 1
 WHEN SET(date(Order o) < currentDate()) DO
     isClosed(o) <- TRUE;
@@ -17,25 +14,19 @@ WHEN SET(date(Order o) < currentDate()) DO
 // Option 2
 WHEN CHANGED(currentDate()) AND date(Order o) < currentDate() DO
     isClosed(o) <- TRUE;
-//#solution1 end
 
-//#sample2
 CLASS OrderDetail 'Order line';
 order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
 
 quantity 'Qty' = DATA NUMERIC[15,3] (OrderDetail);
 price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
 sum 'Amount' = DATA NUMERIC[16,2] (OrderDetail);
-//#sample2 end
 
-//#solution2
 WHEN LOCAL (CHANGED(quantity(OrderDetail d)) OR CHANGED(price(d)))
             AND NOT CHANGED(sum(d)) DO {
     sum(d) <- NUMERIC[16,2](quantity(d) * price(d));            
 }
-//#solution2 end
 
-//#sample3
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book);
 price 'Price' = DATA NUMERIC[14,2] (Book);
@@ -51,15 +42,11 @@ FORM order
     PROPERTIES(d) nameBook, quantity, price, sum
     FILTERS order(d) == o
 ;
-//#sample3 end
 
-//#solution3
 WHEN LOCAL FORMS order SETCHANGED(book(OrderDetail d)) DO {
     price(d) <- price(book(d));
 }  
-//#solution3 end
 
-//#solution4
 CLASS OrderLog 'Order deletion log';
 date 'Order date' = DATA DATE (OrderLog);
 number 'Order number' = DATA INTEGER (OrderLog);
@@ -76,4 +63,3 @@ WHEN DROPPED(Order o IS Order) DO {
         user(l) <- currentUser();
     }
 }
-//#solution4 end

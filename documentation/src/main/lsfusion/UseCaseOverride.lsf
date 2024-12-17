@@ -1,6 +1,5 @@
 MODULE UseCaseOverride;
 
-//#block1
 CLASS Category 'Category';
 name 'Name' = DATA ISTRING[50] (Category) IN id;
 
@@ -8,44 +7,30 @@ parent 'Parent' = DATA Category (Category) AUTOSET;
 nameParent 'Parent' (Category c) = name(parent(c)) IN id;
 
 markup 'Markup' = DATA NUMERIC[8,2] (Category);
-//#block1 end
 
-//#block2
 level 'Level' (Category child, Category parent) = RECURSION 1l IF child IS Category AND parent == child
                                                                  STEP 2l IF parent == parent($parent) MATERIALIZED;
-//#block2 end
 
-//#block3
 parent (Category child, LONG level) = GROUP MAX Category parent
                                                        BY level(child, parent);
-//#block3 end
 
-//#block4
 nearestGroupLevel 'The closest level for which the markup is set' (Category child) = 
     GROUP MIN level(child, Category parent) IF markup(parent);
-//#block4 end
 
-//#block5
 nearestGroup 'The closest group for which the markup is set' (Category category) = parent(category, nearestGroupLevel(category));
 
 overMarkup 'Overidden markup' (Category category) = markup(nearestGroup(category));
-//#block5 end
 
-//#block6
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[100] (Book) IN id;
 
 category 'Category' = DATA Category (Book) AUTOSET;
 nameCategory 'Category' (Book b) = name(category(b)) IN id; 
-//#block6 end
 
-//#block7
 markup 'Product markup' = DATA NUMERIC[8,2] (Book);
 
 overMarkup 'Overidden markup' (Book b) = OVERRIDE markup(b), overMarkup(category(b));
-//#block7 end
 
-//#block8
 FORM markups 'Markups'
     TREE categories c = Category PARENT parent(c)
     PROPERTIES(c) name READONLY, markup, overMarkup
@@ -67,7 +52,6 @@ DESIGN markups {
         }
     }
 }
-//#block8 end
 
 NAVIGATOR {
     NEW markups;

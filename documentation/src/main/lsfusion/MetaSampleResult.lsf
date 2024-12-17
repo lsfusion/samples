@@ -8,7 +8,6 @@ closeForm  { };
 CLASS Document;
 CLASS Type;
 
-//#resultmeta1
 EXTEND FORM documentForm
     PROPERTIES() showMessage, closeForm
 ;
@@ -16,10 +15,7 @@ EXTEND FORM documentForm
 EXTEND FORM orderForm
     PROPERTIES() showMessage, closeForm
 ;
-//#resultmeta1 end
 
-//#resultmeta2
 DocumentName 'Document name' = DATA BPSTRING[100](Document);
 DocumentType 'Document type' = DATA Type (Document);
 DocumentValue 'Document cost' = DATA INTEGER (Document);
-//#resultmeta2 end

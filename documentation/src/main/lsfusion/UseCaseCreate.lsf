@@ -1,6 +1,5 @@
 MODULE UseCaseCreate;
 
-//#sample1
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book) IN id;
 price 'Price' = DATA NUMERIC[14,2] (Book); 
@@ -17,9 +16,7 @@ FORM books 'Books'
     PROPERTIES(b) READONLY name, price
     PROPERTIES(b) NEWSESSION NEW, EDIT, DELETE
 ;
-//#sample1 end
 
-//#solution1
 copy 'Copy' (Book book)  { 
     NEWSESSION {
         NEW newBook = Book {
@@ -33,9 +30,7 @@ copy 'Copy' (Book book)  {
 EXTEND FORM books
     PROPERTIES(b) copy TOOLBAR
 ;
-//#solution1 end
 
-//#sample2
 // Orders
 CLASS Order 'Order';
 date 'Date' = DATA DATE (Order);
@@ -88,9 +83,7 @@ FORM invoice 'Invoice'
     PROPERTIES(d) nameBook, quantity, price, NEW, DELETE
     FILTERS invoice(d) == i
 ;
-//#sample2 end
 
-//#solution2
 createInvoice 'Create invoice' (Order o)  { 
     NEWSESSION {
         NEW i = Invoice {
@@ -113,9 +106,7 @@ createInvoice 'Create invoice' (Order o)  {
 EXTEND FORM orders
     PROPERTIES(o) createInvoice TOOLBAR
 ; 
-//#solution2 end
 
-//#solution3
 fillOrder 'Fill in by order' (Invoice i)  { 
     DIALOG orders OBJECTS o INPUT DO {
         date(i) <- date(o);
@@ -134,4 +125,3 @@ fillOrder 'Fill in by order' (Invoice i)  {
 EXTEND FORM invoice
     PROPERTIES(i) fillOrder
 ;
-//#solution3 end

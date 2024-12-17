@@ -1,6 +1,5 @@
 MODULE UseCaseInternal;
 
-//#solution1
 ip = DATA LOCAL TEXT();
 getIPJava INTERNAL 'GetIP';
 showIPJava 'Show computer name (Java)' {
@@ -15,9 +14,7 @@ FORM info 'Information'
 NAVIGATOR {
     NEW info;
 }
-//#solution1 end
 
-//#solution1fusion
 getIPFusion INTERNAL <{ findProperty("ip").change((Object)java.net.InetAddress.getLocalHost().toString(), context); }>;
 showIPFusion 'Show computer name (Fusion)' {
     getIPFusion();
@@ -27,9 +24,7 @@ showIPFusion 'Show computer name (Fusion)' {
 EXTEND FORM info
     PROPERTIES() showIPFusion
 ;
-//#solution1fusion end
 
-//#solution2
 gcd = DATA LOCAL INTEGER();
 calculateGCD 'Calculate GCD' INTERNAL 'CalculateGCD' (INTEGER, INTEGER);
 
@@ -43,9 +38,7 @@ FORM gcd 'GCD'
 NAVIGATOR {
     NEW gcd;
 }
-//#solution2 end
 
-//#solution3
 CLASS Calculation;
 a = DATA INTEGER (Calculation);
 b = DATA INTEGER (Calculation);
@@ -56,9 +49,7 @@ EXTEND FORM gcd
     OBJECTS c = Calculation
     PROPERTIES(c) a, b, gcd, calculateGCD GRID, NEW, DELETE 
 ;
-//#solution3 end
 
-//#solution4
 beep INTERNAL 'Beep';
 FORM beep 'Signal'
     PROPERTIES() beep
@@ -67,4 +58,3 @@ FORM beep 'Signal'
 NAVIGATOR {
     NEW beep;
 }
-//#solution4 end

@@ -2,7 +2,6 @@ MODULE UseCaseExternal;
 
 NAMESPACE Location;
 
-//#sample1
 CLASS Country 'Country';
 id 'Code' = DATA STRING[20] (Country) IN id;
 name 'Name' = DATA ISTRING[100] (Country) IN id;
@@ -23,9 +22,7 @@ FORM cities 'Cities'
 NAVIGATOR {
     NEW cities;
 }
-//#sample1 end
 
-//#solution1
 postCity 'Send' (City c)  { 
     EXPORT JSON FROM countryId = id(country(c)), name = name(c);
 
@@ -43,9 +40,7 @@ postCity 'Send' (City c)  {
 EXTEND FORM cities
     PROPERTIES(c) postCity
 ;
-//#solution1 end
  
-//#solution2
 createCity (FILE f)  { 
 
     LOCAL cy = STRING[20] ();
@@ -67,9 +62,7 @@ createCity (FILE f)  {
     
     EXPORT JSON FROM code = '0', message = 'OK';
 }
-//#solution2 end
 
-//#sample3
 CLASS Book 'Book';
 id 'Code' = DATA STRING[10] (Book) IN id;
 name 'Name' = DATA ISTRING[100] (Book) IN id;
@@ -109,9 +102,7 @@ FORM orders 'Orders'
 NAVIGATOR {
     NEW orders;
 }
-//#sample3 end
 
-//#solution3
 FORM exportOrder
     OBJECTS order = Order PANEL
     PROPERTIES dt = date(order), nm = number(order)
@@ -131,9 +122,7 @@ exportOrder 'Send' (Order o)  {
 EXTEND FORM orders
     PROPERTIES(i) exportOrder;
 ;
-//#solution3 end
 
-//#solution4
 date = DATA LOCAL DATE();
 number = DATA LOCAL STRING[10]();
 
@@ -163,9 +152,7 @@ importOrder (FILE f)  {
         APPLY;
     }
 }
-//#solution4 end
 
-//#solution5
 GROUP order;
 FORM exportOrderNew
     OBJECTS o = Order
@@ -186,9 +173,7 @@ exportOrderNew 'Send (new)' (Order o)  {
 EXTEND FORM orders
     PROPERTIES(i) exportOrderNew;
 ;
-//#solution5 end
 
-//#solution6
 FORM importOrderNew
     PROPERTIES IN order dt = date(), nm = number()
     
@@ -212,9 +197,7 @@ importOrderNew (FILE f)  {
         APPLY;
     }
 }
-//#solution6 end
 
-//#solution7
 FORM exportOrders
     OBJECTS date = DATE PANEL
     
@@ -226,4 +209,3 @@ FORM exportOrders
 getOrdersByDate (DATE d) {
     EXPORT exportOrders OBJECTS date = d JSON;
 }
-//#solution7 end

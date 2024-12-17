@@ -1,6 +1,5 @@
 MODULE DesignUseCase;
 
-//#sample1
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[100] (Book);
   
@@ -39,9 +38,7 @@ FORM orders 'Orders'
 NAVIGATOR {
     NEW orders;
 }
-//#sample1 end
 
-//#solution1
 DESIGN orders {
     // adding a new container to the very beginning of the form
     NEW orderList FIRST {
@@ -59,9 +56,7 @@ DESIGN orders {
         }
     }
 } 
-//#solution1 end
 
-//#sample2
 CLASS Customer 'Customer';
 name 'Name' = DATA ISTRING[100] (Customer);
   
@@ -81,9 +76,7 @@ EXTEND FORM orders
     FILTERS date(o) >= dateFrom, date(o) <= dateTo,
             customer(o) == filterCustomer() OR NOT filterCustomer()
 ;
-//#sample2 end
 
-//#solution2
 DESIGN orders {
     orderList { 
         NEW orderHeader FIRST { // creating a new container and adding the first component to the vertical splitter
@@ -104,4 +97,3 @@ DESIGN orders {
         }
     }
 }
-//#solution2 end

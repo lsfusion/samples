@@ -1,6 +1,5 @@
 MODULE UseCaseInternationalization;
 
-//#sample1
 CLASS Book '{use.case.i18n.book}';
 
 name '{use.case.i18n.book.name}' = DATA STRING[40] (Book);
@@ -14,11 +13,8 @@ FORM books '{use.case.i18n.books}'
 NAVIGATOR {
     NEW books;
 }
-//#sample1 end
 
-//#sample2
 description '{use.case.i18n.book.description}' (Book b) = STRING[60] (name(b) + ', {use.case.i18n.book.price} : ' + price(b));
 EXTEND FORM books
     PROPERTIES(b) READONLY description
 ;
-//#sample2 end

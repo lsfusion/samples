@@ -1,6 +1,5 @@
 MODULE ExpressionSample;
 
-//#default
 CLASS Team;
   
 wins(team) = DATA INTEGER(Team);

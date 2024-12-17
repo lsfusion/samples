@@ -1,6 +1,5 @@
 MODULE UseCaseMeta;
 
-//#defineobject
 META defineObject(class, id, shortId, caption, multiCaption)
     CLASS class caption;
     TABLE id(class);
@@ -30,9 +29,6 @@ END
 META defineObject(id, shortId, caption, multiCaption)
     @defineObject(###id, id, shortId, caption, multiCaption);
 END
-//#defineobject end
 
-//#usedefineobject
 @defineObject(book, b, 'Book', 'Books');
 @defineObject(magazine, m, 'Magazine', 'Magazines');
-//#usedefineobject end

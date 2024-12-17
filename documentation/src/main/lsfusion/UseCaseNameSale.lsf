@@ -1,7 +1,5 @@
-//#sample
 MODULE UseCaseNameSale;
 
-//#sample
 NAMESPACE Sale;
 
 CLASS Order 'Order';
@@ -16,4 +14,3 @@ FORM orders 'Sales orders'
 NAVIGATOR {
     NEW orders;
 }
-//#sample end

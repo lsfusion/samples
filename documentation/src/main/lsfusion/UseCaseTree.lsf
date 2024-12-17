@@ -1,34 +1,25 @@
 MODULE UseCaseTree;
 
-//#sample1
 CLASS Category 'Category';
 name 'Name' = DATA ISTRING[50] (Category);
 
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book);
 category 'Category' = DATA Category (Book);
-//#sample1 end
 
-//#solution1
 FORM books 'Books'
     TREE cb c = Category, b = Book
     PROPERTIES name(c), name(b)
     FILTERS category(b) == c 
 ;
-//#solution1 end
 
-//#sample2
 parent 'Parent' = DATA Category (Category);
-//#sample2 end
 
-//#solution2
 FORM categories 'Categories'
     TREE categories c = Category PARENT parent(c)
     PROPERTIES(c) name
 ;
-//#solution2 end
 
-//#solution3
 level 'Level' (Category child, Category parent) = RECURSION 1l IF child IS Category AND parent == child
                                                                  STEP 2l IF parent == parent($parent) MATERIALIZED;
 
@@ -49,4 +40,3 @@ DESIGN categoryBooks {
         MOVE BOX(b);
     }
 }
-//#solution3 end

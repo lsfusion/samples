@@ -1,12 +1,9 @@
 MODULE UseCaseNumerating;
 
-//#numbermaster
 CLASS Book 'Book';
 number 'Number' = DATA INTEGER (Book) IN id;
 name 'Name' = DATA ISTRING[50] (Book) IN id;
-//#numbermaster end
 
-//#numberaggr
 book (INTEGER number) = GROUP AGGR Book b BY number(b);
 
 bookExists (INTEGER number)  { 
@@ -15,22 +12,16 @@ bookExists (INTEGER number)  {
     ELSE
         MESSAGE 'The book with the number ' + number + ' does not exist';
 }
-//#numberaggr end
 
-//#numbergenerate
 WHEN SET(Book b IS Book) AND NOT number(b) DO {
     number(b) <- (GROUP MAX number(Book bb)) (+) 1;
 }
-//#numbergenerate end
 
-//#numerator
 CLASS Numerator 'Numerator';
 name 'Name' = DATA ISTRING[50] (Numerator) IN id;
 
 value = DATA INTEGER (Numerator);
-//#numerator end
 
-//#numeratororder
 CLASS Order 'Order';
 number 'Number' = DATA INTEGER (Order) IN id;
 
@@ -39,11 +30,8 @@ WHEN CHANGED(numerator(Order o)) AND NOT CHANGED(number(o)) DO {
     number(o) <- value(numerator(o));
     value (Numerator n) <- value(n) (+) 1 WHERE n == numerator(o);
 }
-//#numeratororder end
 
-//#numeratororderdefault
 defaultNumerator 'Default numerator' = DATA Numerator();
 
 WHEN SET(Order o IS Order) AND NOT CHANGED(numerator(o)) DO
     numerator(o) <- defaultNumerator();
-//#numeratororderdefault end

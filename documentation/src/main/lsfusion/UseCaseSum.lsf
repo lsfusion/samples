@@ -1,27 +1,18 @@
 MODULE UseCaseSum;
 
-//#sample1
 CLASS Book 'Book';
 CLASS Category 'Category';
   
 category 'Category' = DATA Category (Book);
-//#sample1 end
 
-//#solution1
 countBooks 'Number of books' (Category c) = GROUP SUM 1 BY category(Book book);
-//#solution1 end
 
-//#sample2
 CLASS Tag 'Tag';
   
 in 'On' = DATA BOOLEAN (Tag, Book);
-//#sample2 end
 
-//#solution2
 countBooks 'Number of books' (Tag t) = GROUP SUM 1 IF in(t, Book b);
-//#solution2 end
 
-//#sample3
 CLASS Stock 'Warehouse';
  
   
@@ -31,25 +22,16 @@ stock 'Warehouse' = DATA Stock (Ledger);
   
 quantity 'Qty' = DATA INTEGER (Ledger);
 out 'Expenses' = DATA BOOLEAN (Ledger);
-//#sample3 end
 
-//#solution3
 TABLE bookStock (Book, Stock);
 currentBalance 'Current balance' (Book b, Stock s) = GROUP SUM IF out(Ledger l) THEN -quantity(l) ELSE quantity(l) BY book(l), stock(l) MATERIALIZED;
-//#solution3 end
 
-//#sample4
 date 'Date' = DATA DATE (Ledger) INDEXED; // it is better to add an index to filter by date quickly
-//#sample4 end
 
-//#solution4
 // Option 1
 balance1 'Balance as of date' (Book b, Stock s, DATE d) = GROUP SUM (IF out(Ledger l) THEN -quantity(l) ELSE quantity(l)) IF date(l) < d BY book(l), stock(l);
   
 // Option 2
 balance2 'Balance as of date' (Book b, Stock s, DATE d) = currentBalance(b, s) (-) [ GROUP SUM (IF out(Ledger l) THEN -quantity(l) ELSE quantity(l)) IF date(l) >= d BY book(l), stock(l)](b, s);
-//#solution4 end
 
-//#solution5
 currentBalance 'Current balance' (Book b) = GROUP SUM currentBalance(b, Stock s);
-//#solution5 end

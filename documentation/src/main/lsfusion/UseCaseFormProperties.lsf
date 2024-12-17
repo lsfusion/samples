@@ -1,6 +1,5 @@
 MODULE UseCaseFormProperties;
 
-//#sample1
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book) IN id;
 genre 'Genre' = DATA ISTRING[30] (Book) IN id;
@@ -16,21 +15,16 @@ FORM books 'Books'
 NAVIGATOR {
     NEW books;
 }
-//#sample1 end
 
-//#solution1
 filtered 'Book filtered' (Book b) = FILTER books.b; 
 filteredCount 'Number of books' = GROUP SUM 1 IF filtered(Book b);
 
 EXTEND FORM books
     PROPERTIES() READONLY filteredCount DRAW b TOOLBAR
 ;
-//#solution1 end
 
-//#solution2
 index 'Order' (Book b) = PARTITION SUM 1 IF filtered(b) ORDER [ ORDER books.b](b); 
 
 EXTEND FORM books
     PROPERTIES(b) index
 ;
-//#solution2 end

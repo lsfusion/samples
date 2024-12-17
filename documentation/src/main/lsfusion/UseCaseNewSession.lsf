@@ -1,6 +1,5 @@
 MODULE UseCaseNewSession;
 
-//#sample1
 CLASS Order 'Order';
 
 isPosted 'Completed' = DATA BOOLEAN (Order);
@@ -10,9 +9,7 @@ FORM orders
     OBJECTS o = Order
     PROPERTIES(o) READONLY isPosted, number
 ;
-//#sample1 end
 
-//#solution1
 post 'Complete' (Order o)  { 
     NEWSESSION {
         isPosted(o) <- TRUE;
@@ -23,18 +20,14 @@ post 'Complete' (Order o)  {
 EXTEND FORM orders
     PROPERTIES(o) post TOOLBAR
 ;
-//#solution1 end
 
-//#sample2
 FORM order
     OBJECTS o = Order PANEL
     PROPERTIES(o) isPosted, number
     
     EDIT Order OBJECT o
 ;
-//#sample2 end
 
-//#solution2
 newOrder ()  { 
     NEWSESSION {
         NEW o = Order {
@@ -51,16 +44,12 @@ EXTEND FORM orders
     // Option 2
     PROPERTIES(o) NEWSESSION NEW
 ;
-//#solution2 end
 
-//#sample3
 selected 'Mark' = DATA LOCAL BOOLEAN (Order);
 EXTEND FORM orders
     PROPERTIES(o) selected
 ;
-//#sample3 end
 
-//#solution3
 deleteSelectedOrders 'Delete marked orders' ()  { 
     NEWSESSION NESTED(selected) {
         DELETE Order o WHERE selected(o);
@@ -73,18 +62,14 @@ deleteSelectedOrders 'Delete marked orders' ()  {
 EXTEND FORM orders
     PROPERTIES() deleteSelectedOrders DRAW o TOOLBAR
 ;
-//#solution3 end
 
-//#sample4
 CLASS Payment 'Payment';
 
 date 'Date' = DATA DATE (Payment);
 sum 'Amount' = DATA NUMERIC[14,2] (Payment);
 
 order 'Order' = DATA Order (Payment);
-//#sample4 end
 
-//#solution4
 FORM orderPayments 'Order payments'
     OBJECTS o = Order PANEL // Not adding properties so that this object is not visible on the form at all
     
@@ -102,5 +87,4 @@ editPayments 'Edit payments' (Order o)  {
 EXTEND FORM order
     PROPERTIES(o) editPayments
 ;
-//#solution4 end
 

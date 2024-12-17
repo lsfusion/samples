@@ -1,16 +1,12 @@
-//#define
 MODULE MyModule;
   
 META defineMyClass (className) // declaring the defineMyClass metacode with the className parameter
     CLASS className; // declaring a class named className
     myProperty###className = DATA BPSTRING[20] (className); // adding a property named myProperty + className for the created class
 END
-//#define end
 
-//#implement
 CLASS MySuperClass;
 
 @defineMyClass(MyClass); // calling the metacode that will create the class and property
 
 EXTEND CLASS MyClass : MySuperClass; // inheriting MyClass from MySuperClass, while MyClass will "will receive" all the properties that are declared for the MySuperClass class
-//#implement end

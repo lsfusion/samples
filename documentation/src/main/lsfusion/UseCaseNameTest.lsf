@@ -1,6 +1,5 @@
 MODULE UseCaseNameTest;
 
-//#sample
 REQUIRE UseCaseNamePurchase, UseCaseNameSale;
 
 NAMESPACE Test;
@@ -16,4 +15,3 @@ NAVIGATOR {
     NEW ACTION messagePurchaseCount;
     NEW ACTION messageSaleCount;
 }
-//#sample end

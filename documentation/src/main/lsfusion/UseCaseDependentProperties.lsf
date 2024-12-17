@@ -1,6 +1,5 @@
 MODULE UseCaseDependentProperties;
 
-//#sample1
 CLASS Country 'Country';
 name 'Name' = DATA ISTRING[100] (Country) IN id;
 
@@ -27,29 +26,19 @@ FORM cities 'Cities'
 NAVIGATOR {
     NEW cities;
 }
-//#sample1 end
 
-//#solution1
 CONSTRAINT country(City c) != country(region(c)) CHECKED BY region[City] MESSAGE 'The country of the city region must match the country of the city';
-//#solution1 end
 
-//#solution2
 WHEN LOCAL CHANGED(region(City c)) AND NOT CHANGED(country(c)) DO {
     country(c) <- country(region(c));
 }
-//#solution2 end
 
-//#solution3
 CONSTRAINT region(City c) AND NOT country(c) = country(region(c)) CHECKED BY region[City] MESSAGE 'The country of the city region must match the country of the city';
-//#solution3 end
 
-//#solution4
 WHEN LOCAL CHANGED(country(City c)) AND country(c) != country(region(c)) DO {
     region(c) <- NULL;
 }
-//#solution4 end
 
-//#solution5
 // 1 option
 WHEN SETCHANGED(country(region(City c))) DO
     country(c) <- country(region(c));
@@ -57,4 +46,3 @@ WHEN SETCHANGED(country(region(City c))) DO
 // 2 option
 WHEN SETCHANGED(country(Region r)) DO
     country(City c) <- country(r) WHERE region(c) = r;     
-//#solution5 end

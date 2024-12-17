@@ -1,6 +1,5 @@
 MODULE StaticObjectSample;
 
-//#default
 CLASS Direction 'Direction'
 {
     north 'North',

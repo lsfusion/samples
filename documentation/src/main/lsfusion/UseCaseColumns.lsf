@@ -2,7 +2,6 @@ MODULE UseCaseColumns;
 
 REQUIRE Utils;
 
-//#sample1
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book) IN id;
 
@@ -10,22 +9,16 @@ CLASS Customer 'Customer';
 name 'Name' = DATA ISTRING[50] (Customer) IN id;
 
 price 'Price' = DATA NUMERIC[14,2] (Book, Customer);
-//#sample1 end
 
-//#solution1
 FORM prices 'Prices'
     OBJECTS c = Customer
     
     OBJECTS b = Book
     PROPERTIES name(b) READONLY, price(b, c) COLUMNS (c) HEADER name(c)
 ;
-//#solution1 end
 
-//#sample2
 gracePeriod 'Delay, days' = DATA INTEGER (Book, Customer); 
-//#sample2 end
 
-//#solution2
 selected 'Mark' = DATA BOOLEAN (Customer);
 
 headerName 'Price header' (Customer c) = name(c) + ': Price';
@@ -52,9 +45,7 @@ DESIGN pricesAndGracePeriods {
         }
     }
 }
-//#solution2 end
 
-//#solution3
 in 'On' = DATA BOOLEAN (INTEGER, INTEGER);
 
 row 'Row header' (INTEGER r) = 'Row ' + (r AS INTEGER);
@@ -77,4 +68,3 @@ DESIGN matrix {
     PROPERTY(rs) { caption = 'Number of rows'; }
     PROPERTY(cs) { caption = 'Number of columns'; }
 }
-//#solution3 end

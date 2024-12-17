@@ -1,13 +1,10 @@
 MODULE UseCaseLedger;
 
-//#skumaster
 REQUIRE Utils;
 
 CLASS SKU 'SKU';
 CLASS Stock 'Warehouse';
-//#skumaster end
 
-//#skuledger
 CLASS ABSTRACT SKULedger 'Register of changes in the product balance';
 
 posted 'Completed' = ABSTRACT BOOLEAN (SKULedger);
@@ -21,9 +18,7 @@ quantity 'Qty' = ABSTRACT NUMERIC[14,2] (SKULedger);
 balance 'Balance' = GROUP SUM quantity(SKULedger l) IF posted(l) BY stock(l), sku(l);
 
 balance 'Balance as of date/time' = GROUP SUM quantity(SKULedger l) IF posted(l) AND dateTime(l) <= DATETIME dt BY stock(l), sku(l), dateTime(l);
-//#skuledger end
 
-//#skureceipt
 CLASS Receipt 'Warehouse arrival';
 posted 'Completed' = DATA BOOLEAN (Receipt);
 dateTime 'Date/time' = DATA DATETIME (Receipt);
@@ -37,9 +32,7 @@ sku 'SKU' = DATA SKU (ReceiptDetail);
 
 quantity 'Qty' = DATA NUMERIC[14,2] (ReceiptDetail);
 price 'Price' = DATA NUMERIC[14,2] (ReceiptDetail);
-//#skureceipt end
 
-//#skureceiptimplement
 EXTEND CLASS ReceiptDetail : SKULedger;
 
 // [SKULedger] must be specified, since ReceiptDetail also inherits PriceLedger in the same example and the platform needs to know which property needs to be implemented
@@ -50,9 +43,7 @@ stock[SKULedger](ReceiptDetail d) += stock(receipt(d));
 
 sku[SKULedger](ReceiptDetail d) += sku(d);
 quantity[SKULedger](ReceiptDetail d) += quantity(d);
-//#skureceiptimplement end
 
-//#skutransfer
 CLASS Transfer 'Moving from warehouse to warehouse';
 posted 'Completed' = DATA BOOLEAN (Transfer);
 dateTime 'Date/time' = DATA DATETIME (Transfer);
@@ -67,9 +58,7 @@ sku 'SKU' = DATA SKU (TransferDetail);
 
 quantity 'Qty' = DATA NUMERIC[14,2] (TransferDetail);
 price 'Price' = DATA NUMERIC[14,2] (TransferDetail);
-//#skutransfer end
 
-//#skutransferimplement
 EXTEND CLASS TransferDetail : SKULedger;
 
 posted(TransferDetail d) += posted(transfer(d));
@@ -79,9 +68,7 @@ stock(TransferDetail d) += fromStock(transfer(d));
 
 sku(TransferDetail d) += sku(d);
 quantity(TransferDetail d) += -quantity(d);
-//#skutransferimplement end
 
-//#skutransferaggregation
 CLASS TransferSKULedger 'Moving to warehouse (register)' : SKULedger; 
 transferSKULedger = AGGR TransferSKULedger WHERE posted(TransferDetail transferDetail);
 
@@ -92,9 +79,7 @@ stock(TransferSKULedger d) += toStock(transfer(transferDetail(d)));
 
 sku(TransferSKULedger d) += sku(transferDetail(d));
 quantity(TransferSKULedger d) += quantity(transferDetail(d));
-//#skutransferaggregation end
 
-//#priceledger
 CLASS ABSTRACT PriceLedger 'Receipt price change register';
 
 posted 'Completed' = ABSTRACT BOOLEAN (PriceLedger);
@@ -122,9 +107,7 @@ price 'Price' (SKU sku, DATETIME dateTime) =
           ORDER dateTime(l), l 
           WHERE posted(l) AND dateTime(l) <= dateTime 
           BY sku(l);
-//#priceledger end
 
-//#pricereceiptimplement
 EXTEND CLASS ReceiptDetail : PriceLedger;
 
 // [PriceLedger] must be specified, since ReceiptDetail also inherits SKULedger in the same example and the platform needs to know which property to implement
@@ -135,4 +118,3 @@ stock[PriceLedger](ReceiptDetail d) += stock(receipt(d));
 
 sku[PriceLedger](ReceiptDetail d) += sku(d);
 price[PriceLedger](ReceiptDetail d) += price(d);
-//#pricereceiptimplement end

@@ -4,12 +4,9 @@ REQUIRE Utils, Authentication, Chat, Time, Geo;
 
 CLASS Item;
 
-//#default
 showMessage  { MESSAGE 'Hello World!'; } 								// action declaration
 loadImage 'Upload image'  ABSTRACT ( Item); 	
-//#default end
 
-//#action
 CLASS Currency;
 name = DATA STRING[30] (Currency);
 code = DATA INTEGER (Currency);
@@ -34,9 +31,7 @@ run ()  {
     loadDefaultCurrency('USD', 866);
     loadDefaultCurrency('EUR', 1251);
 }
-//#action end
 
-//#abstract
 exportXls 'Export to Excel'  ABSTRACT CASE ( Order);         // In this case, ABSTRACT CASE OVERRIDE LAST is created
 exportXls (Order o) + WHEN name(currency(o)) == 'USD' THEN { 
     MESSAGE 'Export USD not implemented';
@@ -62,9 +57,7 @@ fill  ABSTRACT LIST ( OrderDetail, InvoiceDetail);   // ABSTRACT LIST LAST
 fill (OrderDetail od, InvoiceDetail id) + { 
     price(id) <- price(od);
 }
-//#abstract end
 
-//#activate
 //Form with two tabs
 FORM myForm 'My form'
     OBJECTS u = CustomUser
@@ -108,17 +101,13 @@ createReceiptDetail 'Add sales line'(STRING[30] barcode)  {
         ACTIVATE PROPERTY POS.quantityGrid;
     }
 }
-//#activate end
 
-//#activeform
 FORM exampleForm;
 testActive  { 
     ACTIVE FORM exampleForm;
     IF isActiveForm() THEN MESSAGE 'Example form is active';
 }
-//#activeform end
 
-//#apply
 CLASS Sku;
 id = DATA INTEGER (Sku);
 
@@ -137,9 +126,7 @@ calculateInTransaction()  {
         id(Sku s) <- (GROUP MAX id(Sku ss)) (+) 1; // putting down a new code inside the transaction 
     }
 }
-//#apply end
 
-//#ask
 testAsk ()  { 
     ASK 'Are you sure you want to continue?' DO {
         MESSAGE 'You continued';
@@ -152,9 +139,7 @@ testAsk ()  {
             MESSAGE 'Using new values';
     }
 }
-//#ask end
 
-//#assign
 // set a 15 percent discount for all customers who have an order amount over 100
 CLASS Customer;
 discount = DATA NUMERIC[5,2] (Customer);
@@ -176,23 +161,17 @@ g = DATA INTEGER (INTEGER);
 copyFG  { 
     f(a) <- g(a);
 }
-//#assign end
 
-//#break
 testBreak ()  { 
     FOR iterate(INTEGER i, 1, 100) DO {
         IF i == 50 THEN BREAK; // will only come up to 50
     } 
 }     
-//#break end
 
-//#cancel
 dropChanges()  { 
     CANCEL NESTED (in[Sku]); // cancel all changes except the in property
 }
-//#cancel end
 
-//#case
 test = DATA INTEGER (INTEGER);
 caseActionTest(a)  { 
     CASE
@@ -200,9 +179,7 @@ caseActionTest(a)  {
         WHEN test(a) > 6 THEN MESSAGE '>6';
         WHEN test(a) > 5 THEN MESSAGE '>5';
 }
-//#case end
 
-//#changeclass
 CLASS Document;
 date = DATA DATE (Document);
 
@@ -211,18 +188,14 @@ CLASS ClosedDocument : Document;
 changeStatus()  { 
     CHANGECLASS Document d TO ClosedDocument WHERE sum(date(d), 14) <= currentDate();
 }
-//#changeclass end
 
-//#custom
 showOnMap 'Show on map' INTERNAL 'lsfusion.server.logics.classes.data.utils.geo.ShowOnMapAction' (DOUBLE, DOUBLE, MapProvider, BPSTRING[100]);
 
 serviceDBMT 'DB maintenance (multithreaded, threadCount, timeout)' INTERNAL 'lsfusion.server.physics.admin.service.action.ServiceDBMultiThreadAction' (INTEGER, INTEGER) NULL;
 
 printlnAction 'Print text to the console'  INTERNAL  <{System.out.println("action test"); }>; 
 setNoCancelInTransaction()  INTERNAL  <{ context.getSession().setNoCancelInTransaction(true); }>; // here context is a parameter of executeInternal method
-//#custom end
 
-//#delete
 // deleting an object
 deleteObject(obj)  { DELETE obj; }
   
@@ -232,9 +205,7 @@ active = DATA BOOLEAN (Article);
 deleteInactiveArticles()  { 
     DELETE Article a WHERE a IS Article AND NOT active(a); // a local parameter a is added corresponding to the objects to be iterated over
 }
-//#delete end
 
-//#dialog
 FORM selectSku
     OBJECTS s = Sku
     PROPERTIES(s) id
@@ -257,9 +228,7 @@ changeSku (OrderDetail d)  {
         sku(d) <- s;
     }
 }
-//#dialog end
 
-//#email
 FORM remindUserPass
     OBJECTS u=CustomUser PANEL
     PROPERTIES(u) READONLY login, name[Contact]
@@ -282,25 +251,19 @@ justSendEmail 'Send letter' ()  {
     TO 'xxx@tut.by'
     BODY resultFile();
 }
-//#email end
 
-//#eval
 addProperty  { EVAL ACTION 'MESSAGE \'Hello World\''; }  // source code consisting of one instruction is specified with a string constant
   
 code 'Source code' = DATA BPSTRING[2000] ();              // a property to which the user can enter the source code
 execute 'Execute code'  { EVAL code(); }      // the action executing this code
-//#eval end
 
-//#exec
 importData(Sku sku, Order order)  { 
     MESSAGE 'Run import for ' + id(sku) + ' ' + customer(order);  
 }                                    // declared above action importData with two parameters 
 
 order = DATA Order (OrderDetail) NONULL DELETE;
 runImport(OrderDetail d)  { importData(sku(d), order(d)); } // declaration of the action runImport that will call importData
-//#exec end
 
-//#exportplain
 CLASS Store;
 
 name = DATA STRING[20] (Sku);
@@ -315,9 +278,7 @@ exportSkus (Store store)  {
     EXPORT FROM ff='HI'; // uploads JSON {"ff":"HI"}, as by default it gets the name value, and the platform gets the object {"value":"HI"} to 
     EXPORT FROM 'HI'; // uploads JSON "HI", as by default it gets the name value, and the platform automatically converts the object {"value": "HI"} to "HI"     
 }
-//#exportplain end
 
-//#export
 FORM exportSku
     OBJECTS st = Store
 
@@ -332,13 +293,11 @@ exportSku (Store store)  {
     EXPORT exportSku XML;
     EXPORT exportSku OBJECTS st = store CSV ','; 
 }
-//#export end
 
 name = DATA STRING[30] (Article);
 barcode = DATA STRING[30] (Article);
 price = DATA INTEGER (Article);
 
-//#external
 testExportFile = DATA FILE ();
 
 externalHTTP()  { 
@@ -366,9 +325,7 @@ externalLSF()  {
     EXTERNAL LSF 'http://localhost:7651' EXEC 'System.testAction[]'; 
 }; 
 
-//#external end
 
-//#for
 name = DATA STRING[100] (Store);
 
 testFor  { 
@@ -410,9 +367,7 @@ createDetails (Order o)  {
     }
 }
 
-//#for end
 
-//#ifthena
 // Action that compares the value of the count property to 3 and displays a message to the user
 moreThan3(obj)  { 
     IF count(obj) > 3 THEN 
@@ -425,11 +380,9 @@ checkNullName (Store st) {
     IF NOT name(st) THEN
         MESSAGE 'Name is null';
 }
-//#ifthena end
 
 quantity = DATA INTEGER (Store,Article);
 
-//#import
 import()  { 
 
     LOCAL xlsFile = EXCELFILE ();
@@ -478,9 +431,7 @@ import()  {
         INPUT memo = FILE DO  
             IMPORT DBF MEMO memo FROM f TO field1 = 'DBFField1', field2 = 'DBFField2';
 }
-//#import end
 
-//#importForm
 
 date = DATA DATE (INTEGER);
 sku = DATA BPSTRING[50] (INTEGER); 
@@ -510,9 +461,7 @@ importForm()  {
         }             
     }
 }
-//#importForm end
 
-//#input
 changeCustomer (Order o)  { 
     INPUT s = STRING[100] DO {
         customer(o) <- s;
@@ -533,14 +482,12 @@ testFile  {
         open(f); // opening the selected file
     }
 }
-//#input end
 
 FORM customers
     OBJECTS c = STRING[100]
     FILTERS [GROUP SUM 1 BY customer(Order o)](c)
 ;
 
-//#request
 
 requestCustomer (Order o)  { 
     LOCAL resultValue = STRING[100] ();
@@ -558,9 +505,7 @@ FORM request
     PROPERTIES(o) customer ON CHANGE requestCustomer(o) // for example, group adjustment will be performed  
 ;
 
-//#request end
 
-//#message
 message  { MESSAGE 'Hello World!'; }                                // plain text message
 
 isGood = DATA BOOLEAN (Item);
@@ -585,9 +530,7 @@ testMessageNowait()  {              // In the case of NOWAIT, one text message c
         MESSAGE i() NOWAIT;
     }
 }
-//#message end
 
-//#multi
 CLASS Shape;
 
 CLASS Square : Shape;
@@ -597,9 +540,7 @@ message (Square s)  { MESSAGE 'Square'; }
 message (Circle c)  { MESSAGE 'Circle'; }
 
 message (Shape s) = MULTI message[Square](s), message[Circle](s);
-//#multi end
 
-//#new
 
 newSku ()  { 
     LOCAL addedSkus = Sku (INTEGER);
@@ -610,9 +551,7 @@ newSku ()  {
     }
 }
 
-//#new end
 
-//#nestedsession
 testNestedSession ()  { 
     NESTEDSESSION {
         name(Sku s) <- 'aaa';
@@ -637,9 +576,7 @@ newNestedSession()  {
         }       
     }
 }
-//#nestedsession end
 
-//#newexecutor
 testExecutor  { 
     NEWEXECUTOR {
         FOR id(Sku s) DO {
@@ -652,9 +589,7 @@ testExecutor  {
         }
     } THREADS 10;
 }
-//#newexecutor end
 
-//#newsession
 testNewSession ()  { 
     NEWSESSION {
         NEW c = Currency {
@@ -683,9 +618,7 @@ testNewSession ()  {
     }
     
 }
-//#newsession end
 
-//#newthread
 testNewThread ()  { 
     //Showing messages 'Message' to all
     FOR user(Connection conn) AND connectionStatus(conn) == ConnectionStatus.connectedConnection AND conn != currentConnection() DO {
@@ -695,9 +628,7 @@ testNewThread ()  {
     //Execution of the 'action' action with a frequency of 10 seconds and a delay of 5 seconds
     NEWTHREAD MESSAGE 'Hello World'; SCHEDULE PERIOD 10000 DELAY 5000;
 }
-//#newthread end
 
-//#print
 FORM printOrder
     OBJECTS o = Order
     PROPERTIES(o) currency, customer
@@ -722,9 +653,7 @@ print (Order o)  {
     //v 2.2 syntax
     //PRINT printOrder OBJECTS o = o XLS SHEET 'encrypted' PASSWORD 'pass';
 }
-//#print end
 
-//#read
 readFiles()  { 
   
     LOCAL importFile = FILE ();
@@ -747,9 +676,7 @@ importXls 'Import markups'()  {
     LOCAL field2 = BPSTRING[10] (INTEGER);
     IMPORT TABLE FROM importFile() TO field1, field2;
 }
-//#read end
 
-//#return
 importFile  { 
     LOCAL file = FILE ();
     INPUT f = FILE DO {
@@ -758,9 +685,7 @@ importFile  {
     
     IF NOT file() THEN RETURN;
 }
-//#return end
 
-//#seek
 number = DATA INTEGER (Order);
 FORM orders
     OBJECTS o = Order
@@ -778,9 +703,7 @@ seekLast  { SEEK LAST orders.o; }
 EXTEND FORM orders
     PROPERTIES(o) newOrder, seekFirst, seekLast
 ;
-//#seek end
 
-//#show
 date = DATA DATE (Order);
 FORM showForm
     OBJECTS dateFrom = DATE, dateTo = DATE PANEL
@@ -799,9 +722,7 @@ testShow ()  {
         }
     }
 }
-//#show end
 
-//#try
 tryToImport(FILE f)  { 
     TRY {
         LOCAL a = BPSTRING[10] (INTEGER);
@@ -825,9 +746,7 @@ singleDo ()  {
         } FINALLY unlock(MyLock.lock);
     }
 }
-//#try end
 
-//#while
 iterateDates (DATE dateFrom, DATE dateTo)  { 
     LOCAL dateCur = DATE();              
        
@@ -837,9 +756,7 @@ iterateDates (DATE dateFrom, DATE dateTo)  {
         dateCur() <- sum(dateCur(), 1);
     }
 }
-//#while end
 
-//#write
 loadAndWrite ()  { 
     INPUT f = FILE DO {
         WRITE f TO 'file:///home/user/loadedfile.csv' APPEND;
@@ -847,4 +764,3 @@ loadAndWrite ()  {
         WRITE CLIENT DIALOG f TO 'loadedfile';
     }
 }
-//#write end

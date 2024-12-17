@@ -1,6 +1,5 @@
 MODULE UseCaseDelete;
 
-//#sample1
 CLASS Order 'Order';
 
 CLASS Book 'Book';
@@ -10,18 +9,14 @@ CLASS OrderDetail 'Order line';
 order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
 book 'Book' = DATA Book (OrderDetail);
 nameBook 'Book' (OrderDetail d) = name(book(d));
-//#sample1 end
 
-//#solution1
 delete (Book b)  { 
     IF NOT [ GROUP SUM 1 BY book(OrderDetail d)](b) THEN
         DELETE b;
     ELSE
         MESSAGE 'It is forbidden to delete a book, as there is an order for it';
 }
-//#solution1 end
 
-//#solution2
 clear (Order o)  { 
 
     // Option 1
@@ -31,4 +26,3 @@ clear (Order o)  {
     FOR order(OrderDetail d) == o DO
         DELETE d;
 }
-//#solution2 end

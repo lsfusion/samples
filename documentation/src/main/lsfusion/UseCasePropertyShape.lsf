@@ -1,26 +1,18 @@
 MODULE Shape;
 
-//#shape
 CLASS ABSTRACT Shape;
 square 'Area' = ABSTRACT DOUBLE (Shape);
-//#shape end
 
-//#concrete
 CLASS Rectangle : Shape;
 width 'Width' = DATA DOUBLE (Rectangle);
 height 'Height' = DATA DOUBLE (Rectangle);
   
 CLASS Circle : Shape;
 radius 'Circle radius' = DATA DOUBLE (Circle);
-//#concrete end
 
-//#extendsimple
 square(rectangle) += width(rectangle) * height(rectangle);
 square(circle) += radius(circle) * radius(circle) * 3.14;
-//#extendsimple end
 
-//#extendover
 overSquareCircle 'Overridden area' = ABSTRACT DOUBLE (Circle);
 square(circle) += OVERRIDE overSquareCircle(circle), (radius(circle) * radius(circle) * 3.14);
-//#extendover end
 

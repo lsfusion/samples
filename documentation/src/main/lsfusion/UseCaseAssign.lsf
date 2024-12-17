@@ -2,7 +2,6 @@ MODULE UseCaseAssign;
 
 REQUIRE Time;
 
-//#sample1
 CLASS Order 'Order';
   
 CLASS Customer 'Customer';
@@ -19,9 +18,7 @@ FORM order
     OBJECTS o = Order PANEL
     PROPERTIES(o) date, nameCustomer, discount
 ;
-//#sample1 end
 
-//#solution1
 setDateDiscount 'Apply discount (late delivery)' (Order o)  { 
     date(o) <- sum(currentDate(), 30);
     discount(o) <- 5.0;
@@ -30,9 +27,7 @@ setDateDiscount 'Apply discount (late delivery)' (Order o)  {
 EXTEND FORM order
     PROPERTIES(o) setDateDiscount
 ;
-//#solution1 end
 
-//#sample2
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book);
 price 'Current price' (Book b) = DATA NUMERIC[14,2] (Book);
@@ -48,9 +43,7 @@ EXTEND FORM order
     OBJECTS d = OrderDetail
     PROPERTIES(d) nameBook, price
 ;
-//#sample2 end
 
-//#solution2
 fillPrice 'Set current prices' (Order o)  { 
     price(OrderDetail d) <- price(book(d)) WHERE order(d) == o;
 }
@@ -58,4 +51,3 @@ fillPrice 'Set current prices' (Order o)  {
 EXTEND FORM order
     PROPERTIES(o) fillPrice
 ;
-//#solution2 end

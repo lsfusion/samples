@@ -1,20 +1,15 @@
 MODULE UseCaseNavigator;
 
-//#sample1
 FORM categories 'Categories';
 FORM books 'Books';
-//#sample1 end
 
-//#solution1
 NAVIGATOR {
     NEW FOLDER application 'Application' WINDOW toolbar FIRST {
         NEW categories;
         NEW books;
     }
 }
-//#solution1 end
 
-//#solution2
 NAVIGATOR {
     application {
         NEW FOLDER masterData 'Directories' {
@@ -23,4 +18,3 @@ NAVIGATOR {
         }
     }
 }
-//#solution2 end

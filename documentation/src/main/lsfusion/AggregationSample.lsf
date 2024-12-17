@@ -2,7 +2,6 @@ MODULE AggregationSample;
 
 REQUIRE Time;
 
-//#aggr
 CLASS A; CLASS B; CLASS C;
 f = DATA INTEGER (A, B);
 c = AGGR C WHERE f(A a, B b) MATERIALIZED INDEXED;
@@ -19,4 +18,3 @@ CLASS ShipmentInvoice 'Delivery by invoice' : Shipment;
 shipment(Invoice invoice) = AGGR ShipmentInvoice WHERE createShipment(invoice); // creating a delivery by invoice, if the option for delivery creation is defined for the invoice
 date(ShipmentInvoice si) += sum(date(invoice(si)),1); // delivery date = invoice date + 1
 
-//#aggr end

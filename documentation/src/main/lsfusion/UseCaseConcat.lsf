@@ -1,18 +1,13 @@
 MODULE UseCaseConcat;
 
-//#sample1
 CLASS Book 'Book';
 CLASS Tag 'Tag';
 name 'Name' = DATA ISTRING[10] (Tag);
   
 in 'On' = DATA BOOLEAN (Tag, Book);
-//#sample1 end
 
-//#solution1
 tags 'Tags' (Book b) = GROUP CONCAT name(Tag t) IF in(t, b), ',' ORDER name(t), t CHARWIDTH 10;
-//#solution1 end
 
-//#sample2
 CLASS Category 'Category';
   
 CLASS Author 'Author';
@@ -20,10 +15,7 @@ name 'Author' = DATA ISTRING[20] (Author);
   
 category 'Category' = DATA Category (Book);
 author 'Author' = DATA Author (Book);
-//#sample2 end 
 
-//#solution2
 countBooks 'Number of books' (Author a, Category c) = GROUP SUM 1 BY author(Book b), category(b);
   
 authors 'Authors' (Category c) = GROUP CONCAT name(Author a) IF countBooks(a, c) ORDER DESC countBooks(a, c), a;
-//#solution2 end

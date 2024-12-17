@@ -2,12 +2,9 @@ MODULE InstructionSample;
 
 REQUIRE Authentication;
 
-//#group
 GROUP base : root; // The caption of this group will be 'base'
 GROUP local 'Local properties'; // The parent group of local will be System.private
-//#group end
 
-//#on
 CLASS Sku;
 name = DATA STRING[100] (Sku);
 
@@ -31,9 +28,7 @@ ON LOCAL {
     FOR CHANGED(customer(Order o)) AND name(customer(o)) == 'Best customer' DO
         discount(o) <- 50;
 }
-//#on end
 
-//#when
 CLASS Stock;
 name = DATA STRING[50] (Stock);
 
@@ -49,9 +44,7 @@ discount = DATA NUMERIC[6,2] (OrderDetail);
 
 WHEN LOCAL CHANGED(customer(Order o)) AND name(customer(o)) == 'Best customer' DO
     discount(OrderDetail d) <- 50 WHERE order(d) == o; 
-//#when end
 
-//#setwhen
 // when adding a client, by default, give him the specified discount
 defaultDiscount = DATA NUMERIC[6,2] ();
 discount = DATA NUMERIC[6,2] (Customer);
@@ -62,9 +55,7 @@ price = DATA NUMERIC[10,2] (OrderDetail);
 sum = DATA NUMERIC[10,2] (OrderDetail);
 
 sum(OrderDetail d) <- quantity(d) * price(d) WHEN CHANGED(quantity(d)) OR CHANGED(price(d));
-//#setwhen end
 
-//#constraint
 // balance not less than 0
 CONSTRAINT balance(Sku s, Stock st) < 0 
     MESSAGE 'The balance cannot be negative for ' + (GROUP CONCAT 'Product: ' + name(Sku ss) + ' Warehouse: ' + name(Stock sst), '\n' IF SET(balance(ss, sst) < 0) ORDER sst);
@@ -79,9 +70,7 @@ in = DATA BOOLEAN (Sku, Customer);
 CONSTRAINT sku(OrderDetail d) AND NOT in(sku(d), customer(order(d)))
     CHECKED BY sku[OrderDetail] // a filter by available sku when selecting an item for an order line will be applied
     MESSAGE 'In the order, a product unavailable to the user is selected for the selected customer';
-//#constraint end
 
-//#means
 is(Sku s) = s IS Sku;
 // the product must have a barcode and name specified
 is(Sku s) => barcode(s);
@@ -108,9 +97,7 @@ is (X x) = x IS X;
 
 f(a,b) => [ GROUP AGGR X x WHERE x IS X BY a(x), b(x)](a,b) RESOLVE LEFT;
 is(X x) => f(a(x), b(x)) RESOLVE RIGHT;
-//#means end
 
-//#class
 CLASS ABSTRACT Document; // The caption of this class will be 'Document'
 CLASS IncomeDocument 'Income' : Document;
 CLASS OutcomeDocument 'Expenses' : Document;
@@ -125,9 +112,7 @@ CLASS PrintOrientation {
     portrait 'Portrait',
     landscape 'Landscape'
 }
-//#class end
 
-//#navigator
 FORM items;
 FORM stocks;
 FORM legalEntities;
@@ -152,9 +137,7 @@ NAVIGATOR {
         MOVE shipments BEFORE h; // an instruction to move the shipments element from the catalogs folder to the document folder before the hello element     
     }
 }
-//#navigator end
 
-//#window
 // creating system windows in the System module
 WINDOW root 'Root' TOOLBAR HIDETITLE HIDESCROLLBARS HORIZONTAL POSITION(0, 0, 100, 6);
 WINDOW toolbar 'Toolbar' TOOLBAR HIDETITLE VERTICAL POSITION(0, 6, 20, 64);
@@ -166,13 +149,9 @@ WINDOW menu MENU HIDESCROLLBARS POSITION(20, 6, 80, 4);
 // a horizontal toolbar at the bottom of the desktop, in which all buttons will be centered and text will be aligned up
 // in this toolbar, for example, it is possible to place forms for quick opening
 WINDOW hotforms TOOLBAR HORIZONTAL VALIGN(CENTER) TEXTVALIGN(START) BOTTOM; 
-//#window end
 
-//#hidewindow
 HIDE WINDOW System.logo;
-//#hidewindow end
 
-//#extendclass
 CLASS ABSTRACT Shape;
 CLASS Box : Shape;
 
@@ -187,9 +166,7 @@ CLASS ShapeType {
 EXTEND CLASS ShapeType { // Adding a static object
 	circle 'Circle'
 }
-//#extendclass end
 
-//#extendproperty
 CLASS ABSTRACT AClass;
 CLASS BClass : AClass;
 CLASS CClass : AClass;
@@ -206,9 +183,7 @@ name(CClass c) = 'C' + innerName(c);
 name[AClass](BClass b) += name(b);
 name(CClass c) += name(c); // Here name[AClass] will be found on the left, because the search goes only among abstract properties, and on the right name[CClass] will be found
 name(DClass d) += 'DClass' + innerName(d) IF d IS DClass;
-//#extendproperty end
 
-//#extendaction
 CLASS ABSTRACT Animal;
 whoAmI  ABSTRACT ( Animal);
 
@@ -239,9 +214,7 @@ testName  ABSTRACT CASE ( Human);
 
 testName (Human h) + WHEN name(h) == 'John' THEN {  MESSAGE 'I am John'; } 
 testName (Human h) + WHEN name(h) == 'Bob' THEN {  MESSAGE 'I am Bob'; } 
-//#extendaction end
 
-//#meta
 META objectProperties(object, type, caption)
     object##Name 'Name'##caption = DATA BPSTRING[100](###object); // capitalizing the first letter
     object##Type 'Type'##caption = DATA type (###object);
@@ -251,9 +224,7 @@ END
 META objectProperties(object, type)
     @objectProperties(object, type, '');
 END
-//#meta end
 
-//#implementmeta
 CLASS Book;
 @objectProperties(book, INTEGER, 'Book');
 
@@ -262,17 +233,13 @@ CLASS Flower;
 
 CLASS Table;
 @objectProperties(table, NUMERIC[14,2]);
-//#implementmeta end
 
-//#materialized
 sum = GROUP SUM sum(OrderDetail od) BY order(od) MATERIALIZED;
 date(OrderDetail od) = date(order(od)) MATERIALIZED;
 
  // such a property cannot be materialized, since it is not NULL for an infinite number of dates
 lastDate(Customer customer, DATE date) = GROUP LAST date(Order order) IF customer(order) = customer AND date(order) < date ORDER order;
-//#materialized end
 
-//#table
 TABLE book (Book);
 
 in = DATA BOOLEAN (Sku, Stock);
@@ -282,36 +249,25 @@ price = DATA NUMERIC[10,2] (Sku, DATE);
 TABLE skuDate (Sku, DATE); // it will store the Sku property
 
 TABLE sku (Sku) FULL;
-//#table end
 
-//#index
 INDEX customer(Order o);
 
 date = DATA DATE (Order);
 INDEX date(Order o), o;
 
 INDEX name(Sku s), price(s, DATE d), d;
-//#index end
 
-//#before
 changeName(Sku s, STRING[100] name)  { name(s) <- name; }
 BEFORE changeName(Sku s, STRING[100] name) DO MESSAGE 'Changing user name'; // The message will be shown before each call to changeName
-//#before end
 
-//#after
 changePrice(Sku s, DATE d, NUMERIC[10,2] price)  { price(s, d) <- price; }
 AFTER changePrice(Sku s, DATE d, NUMERIC[10,2] price) DO MESSAGE 'Price was changed'; // A message will be shown after each call to changePrice
-//#after end
 
-//#loggable
 LOGGABLE name[Sku], price[Sku, DATE];
-//#loggable end
 
-//#empty
 CLASS Result {
     yes 'Yes',
     no 'No'
 };  // semicolon is not needed here, but its presence is not an error
   
 ;;;; // this is valid lsFusion code
-//#empty end

@@ -2,34 +2,25 @@ MODULE UseCaseLast;
 
 REQUIRE Time;
 
-//#sample1
 CLASS Book 'Book';
 CLASS Category 'Category';
   
 category 'Category' = DATA Category (Book);
 date 'Arrival date' = DATA DATE (Book);
-//#sample1 end
 
-//#solution1
 book 'Last book' (Category c) = GROUP LAST Book b ORDER date(b), b BY category(b);
-//#solution1 end
 
-//#sample2
 CLASS Author 'Author';
 CLASS Genre 'Genre';
   
 author 'Author' = DATA Author (Book);
 genre 'Genre' = DATA Genre (Book);
 in 'On' = DATA BOOLEAN (Book, Genre);
-//#sample2 end
 
-//#solution2
 countBooks 'Number of books' (Category c, Author a, Genre g) = GROUP SUM 1 IF in(Book b, g) BY category(b), author(b);
   
 category (Author a, Genre g) = GROUP LAST Category c ORDER countBooks(c, a, g), c WHERE countBooks(c, a, g);
-//#solution2 end
 
-//#sample3
 CLASS Stock 'Warehouse';
 
 CLASS Ledger 'Price change';
@@ -38,21 +29,12 @@ stock = DATA Stock (Ledger);
 book = DATA Book (Ledger);
   
 price = DATA NUMERIC[10,2] (Ledger);
-//#sample3 end
 
-//#solution3
 currentPrice (Book b, Stock s) = GROUP LAST price(Ledger l) ORDER date(l), l BY book(l), stock(l);//#solution3
-//#solution3 end
 
-//#solution4
 price (Book b, Stock s, DATE d) = GROUP LAST price(Ledger l) ORDER date(l), l WHERE date(l) <= d BY book(l), stock(l);
-//#solution4 end
 
-//#sample5
 dateTo 'Valid until (inclusive)' = DATA DATE (Ledger);
-//#sample5 end
 
-//#solution5
 currentPriceDate (Book b, Stock s) = GROUP LAST price(Ledger l) ORDER date(l), l WHERE NOT dateTo(l) < currentDate() BY book(l), stock(l);
 priceDate(Book b, Stock s, DATE d) = GROUP LAST price(Ledger l) ORDER date(l), l WHERE date(l) <= d AND NOT dateTo(l) < d BY book(l), stock(l);
-//#solution5 end

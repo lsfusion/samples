@@ -7,15 +7,12 @@ CLASS Team;
 GROUP baseGroup;
 TABLE team (Team);
 
-//#default
 cost 'Cost' (i) = DATA NUMERIC[12,3] (Item);		// property defined by the context-independent DATA property operator
 weightedSum 'Weighted amount' (a, b) = 2*a + 3*b; 		// property defined by expression 
 diff = a - b; 											// the caption of this property will be 'diff' and the parameters will be (a, b)
  
 teamName 'Team name' = DATA BPSTRING[30](Team) IN baseGroup TABLE team; // property defined by DATA operator with additional property options
-//#default end
 
-//#constant
 CLASS Direction {
     north, east, south, west                        // declaring static objects
 }
@@ -27,9 +24,7 @@ defaultDate() = 1982_07_13;                         // here a constant property 
 CLASS Man;
 age 'Age' = DATA INTEGER (Man);
 isChild (Man m) = age(m) < 17;                        // here a constant property is used created from an integer (integer literal)
-//#constant end
 
-//#set
 CLASS A;
 d = DATA INTEGER (A);
 
@@ -47,10 +42,7 @@ printFWithD { PRINT f OBJECTS d=currentDate(); } // will be executed successfull
 
 printFWithoutD { PRINT f; } // there is no filter for dates, and d IS DATE is not NULL for an infinite number d, the platform will throw an error
 
-//#set end
 
-//#set2
 hs = GROUP SUM 1 IF (a AS INTEGER) >= 4 AND a <= 6;
 messageHS  { MESSAGE hs(); } // theoretically, it should return 3, but the platform will still throw an error
 hi = GROUP SUM 1 IF iterate(a, 4, 6); // workaround: to work with intervals, the iterate property can be used (which, in turn, is implemented through recursion) 
-//#set2 end

@@ -1,6 +1,5 @@
 MODULE UseCaseNew;
 
-//#sample1
 CLASS Order 'Order';
   
 CLASS Customer 'Customer';
@@ -10,18 +9,14 @@ date 'Date' = DATA DATE (Order);
   
 customer 'Customer' = DATA Customer (Order);
 nameCustomer 'Customer' (Order o) = name(customer(o));
-//#sample1 end
 
-//#solution1
 copyOrder 'Copy' (Order o)  { 
     NEW n = Order {
         date(n) <- date(o);
         customer(n) <- customer(o);
     }
 }
-//#solution1 end
 
-//#sample2
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book);
   
@@ -31,9 +26,7 @@ book 'Book' = DATA Book (OrderDetail);
 nameBook 'Book' (OrderDetail d) = name(book(d));
   
 price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
-//#sample2 end
 
-//#solution2
 copyDetail (Order o)  { 
     NEW n = Order {
         date(n) <- date(o);
@@ -45,4 +38,3 @@ copyDetail (Order o)  {
         } 
     }
 }
-//#solution2 end

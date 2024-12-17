@@ -1,28 +1,19 @@
 MODULE UseCasePartition;
 
-//#sample1
 CLASS Order 'Order';
 CLASS OrderDetail 'Order line';
   
 order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
-//#sample1 end
 
-//#solution1
 index 'Line number' (OrderDetail d) = PARTITION SUM 1 ORDER d BY order(d) CHARWIDTH 4;
-//#solution1 end
 
-//#sample2
 date 'Date' = DATA DATE (Order);
   
 CLASS Customer 'Customer';
 customer 'Customer' = DATA Customer (Order);
-//#sample2 end
 
-//#solution2
 prevOrderDate 'Previous order' (Order o) = PARTITION PREV date(o) ORDER date(o), o BY customer(o);
-//#solution2 end
 
-//#sample3
 CLASS Book 'Book';
   
 CLASS Batch 'Batch';
@@ -31,13 +22,10 @@ date 'Arrival date' = DATA DATE (Batch);
   
 CLASS Stock 'Warehouse';
 currentBalance 'Balance' = DATA INTEGER (Batch, Stock); // The balance is made data for the example. This is usually a calculated property.
-//#sample3 end
 
-//#solution3
 quantity = DATA LOCAL INTEGER (Book);
   
 quantityFIFO 'Quantity by FIFO batch' (Batch b, Stock s) = PARTITION UNGROUP quantity
                                                                     LIMIT STRICT currentBalance(b, s)
                                                                     ORDER date(b), b
                                                                     BY book(b);
-//#solution3 end

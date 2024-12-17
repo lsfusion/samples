@@ -1,6 +1,5 @@
 MODULE UseCaseMetaResult;
 
-//#usedefineobject
 CLASS Book 'Book';
 TABLE book(Book);
 
@@ -48,10 +47,7 @@ FORM magazines 'Magazines'
 NAVIGATOR {
     NEW magazines;
 }
-//#usedefineobject end
 
-//#extenddefineobject
 genre 'Genre' = DATA ISTRING[20] (Book);
 EXTEND FORM book PROPERTIES(b) genre; 
 EXTEND FORM books PROPERTIES(b) genre;
-//#extenddefineobject end

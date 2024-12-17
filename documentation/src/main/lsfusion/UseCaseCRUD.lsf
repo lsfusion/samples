@@ -1,29 +1,22 @@
 MODULE CRUDUseCase;
 
-//#sample1
 CLASS Type 'Type' {
     novel 'Novel',
     thriller 'Thriller',
     fiction 'Fiction'
 }
 name 'Name' (Type g) = staticCaption(g) IF g IS Type;
-//#sample1 end
 
-//#solution1
 FORM types 'List of types'
     OBJECTS g = Type
     PROPERTIES(g) READONLY name
  
     LIST Type OBJECT g
 ;
-//#solution1 end
 
-//#sample2
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[30] (Book) IN id;
-//#sample2 end
 
-//#solution2
 FORM book 'Book' // form for displaying "card' // form for displaying the book card
     OBJECTS b = Book PANEL
     PROPERTIES(b) name
@@ -42,14 +35,10 @@ FORM books 'Books'
 NAVIGATOR {
     NEW books;
 }
-//#solution2 end
 
-//#sample3
 CLASS Genre 'Genre';
 name 'Name' = DATA ISTRING[30] (Genre);
-//#sample3 end
 
-//#solution3
 FORM genre 'Genre'
     OBJECTS g = Genre PANEL
     PROPERTIES(g) name
@@ -73,4 +62,3 @@ FORM dialogGenre 'Genres'
 NAVIGATOR {
     NEW genres;
 }
-//#solution3 end

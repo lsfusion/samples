@@ -1,6 +1,5 @@
 MODULE UseCaseFilter;
 
-//#sample1
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[100] (Book);
   
@@ -8,9 +7,7 @@ CLASS Stock 'Warehouse';
 name 'Name' = DATA ISTRING[100] (Stock);
   
 balance 'Balance' = DATA INTEGER (Book, Stock); // for example it is made a data property, although usually it is calculated
-//#sample1 end
 
-//#solution1
 FORM onStockObject 'Balances'
     OBJECTS s = Stock PANEL
     PROPERTIES(s) name SELECTOR
@@ -29,9 +26,7 @@ FORM onStockObject 'Balances'
         FILTER 'With balance' balance(b, s) 'F8' DEFAULT
         FILTER 'No remainder' NOT balance (b, s) 'F7'
 ;
-//#solution1 end
 
-//#solution2
 filterStock = DATA LOCAL Stock ();
 nameFilterStock 'Warehouse' = name(filterStock());
   
@@ -44,9 +39,7 @@ FORM onStockLocal 'Balances'
   
     FILTERS s == filterStock() OR NOT filterStock()
 ;
-//#solution2 end
 
-//#sample3
 CLASS Customer 'Customer';
 name 'Name' = DATA ISTRING[100] (Customer);
   
@@ -55,9 +48,7 @@ date 'Date' = DATA DATE (Order);
   
 customer 'Customer' = DATA Customer (Order);
 nameCustomer 'Customer' (Order o) = name(customer(o));
-//#sample3 end
 
-//#solution3
 filterCustomer = DATA LOCAL Customer ();
 nameFilterCustomer 'Customer' = name(filterCustomer());
   
@@ -73,4 +64,3 @@ FORM orders 'Orders'
     FILTERS date(o) >= dateFrom, date(o) <= dateTo,
             customer(o) == filterCustomer() OR NOT filterCustomer()
 ;
-//#solution3 end

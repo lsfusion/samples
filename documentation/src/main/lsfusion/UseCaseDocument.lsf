@@ -2,7 +2,6 @@ MODULE UseCaseDocument;
 
 REQUIRE Utils;
 
-//#sample1
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[100] (Book) IN id;
   
@@ -18,9 +17,7 @@ nameBook 'Book' (OrderDetail d) = name(book(d));
   
 quantity 'Quantity' = DATA INTEGER (OrderDetail);
 price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
-//#sample1 end
 
-//#solution1
 FORM order 'Order'
     OBJECTS o = Order PANEL
     PROPERTIES(o) date, number
@@ -42,26 +39,20 @@ FORM orders 'Orders'
 NAVIGATOR {
     NEW orders;
 }
-//#solution1 end
 
-//#solution2
 EXTEND FORM orders
     OBJECTS d = OrderDetail
     PROPERTIES(d) READONLY nameBook, quantity, price
     FILTERS order(d) == o
 ;
-//#solution2 end
 
-//#sample3
 posted 'Completed' = DATA BOOLEAN (Order);
 reserved 'Reserved' (Book b) = GROUP SUM quantity(OrderDetail d) IF posted(order(d)) BY book(d);
 
 EXTEND FORM order
     PROPERTIES(o) posted
 ; 
-//#sample3 end
 
-//#solution3
 post 'Complete' (Order o)  { posted(o) <- TRUE; }
 
 EXTEND FORM order
@@ -72,9 +63,7 @@ DESIGN order {
         caption = 'Complete';
     }
 }
-//#solution3 end
 
-//#solution4
 quantity 'Qty' (Order o, Book b) = GROUP SUM quantity(OrderDetail d) BY order(d), book(d);
 lastOrderDetail 'Last line' (Order o, Book b) = GROUP LAST OrderDetail d ORDER d BY order(d), book(d);
 
@@ -113,15 +102,11 @@ DESIGN order {
     }
 }
 
-//#solution4 end
 
 showCaseAction (INTEGER q, Order o, Book b)  { 
-//#solution4a
 quantity(OrderDetail d) <- q WHERE d == lastOrderDetail(o, b);
-//#solution4a end
 }
 
-//#solution5a
 CLASS ABSTRACT Invoice 'Invoice';
 date 'Date' = ABSTRACT DATE (Invoice);
 number 'Number' = ABSTRACT STRING[10] (Invoice);
@@ -132,9 +117,7 @@ book 'Book' = ABSTRACT Book (InvoiceDetail);
 
 quantity 'Quantity' = ABSTRACT INTEGER (InvoiceDetail);
 price 'Price' = ABSTRACT NUMERIC[14,2] (InvoiceDetail);
-//#solution5a end
 
-//#solution5b
 FORM invoices 'Invoices'
     OBJECTS i = Invoice
     PROPERTIES(i) READONLY date, number
@@ -144,9 +127,7 @@ FORM invoices 'Invoices'
 NAVIGATOR {
     NEW invoices;
 }
-//#solution5b end
 
-//#solution5c
 CLASS UserInvoice 'Custom invoice' : Invoice;
 date 'Date' = DATA DATE (UserInvoice);
 number 'Number' = DATA STRING[10] (UserInvoice);
@@ -169,9 +150,7 @@ book (UserInvoiceDetail d) += book(d);
 
 quantity (UserInvoiceDetail d) += quantity(d);
 price (UserInvoiceDetail d) += price(d);
-//#solution5c end
 
-//#solution5d
 FORM userInvoice 'Invoice (custom)'
     OBJECTS i = UserInvoice PANEL
     PROPERTIES(i) date, number
@@ -186,9 +165,7 @@ FORM userInvoice 'Invoice (custom)'
 EXTEND FORM invoices
     PROPERTIES(i) NEWSESSION NEW[UserInvoice]
 ;
-//#solution5d end
 
-//#solution5e
 createInvoice 'Create invoice' = DATA BOOLEAN (Order);
 EXTEND FORM order PROPERTIES(o) createInvoice;
 
@@ -209,8 +186,5 @@ book (OrderInvoiceDetail d) += book(orderDetail(d));
 
 quantity (OrderInvoiceDetail d) += quantity(orderDetail(d));  
 price (OrderInvoiceDetail d) += price(orderDetail(d));
-//#solution5e end
 
-//#solution5f
 edit(OrderInvoice i) + {  edit(order(i)); }
-//#solution5f end

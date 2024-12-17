@@ -1,6 +1,5 @@
 MODULE UseCaseSeek;
 
-//#sample1
 REQUIRE Time;
 
 CLASS Category 'Category';
@@ -32,9 +31,7 @@ FORM books 'Books'
 NAVIGATOR {
     NEW books;
 }
-//#sample1 end
 
-//#solution1
 createBook 'Create book' (Category c)  { 
     NEWSESSION {
         NEW newBook = Book {
@@ -49,9 +46,7 @@ createBook 'Create book' (Category c)  {
 EXTEND FORM books
     PROPERTIES(c) createBook DRAW b TOOLBAR
 ;
-//#solution1 end
 
-//#sample2
 CLASS Customer 'Customer';
 name 'Name' = DATA ISTRING[50] (Customer) IN id;
 
@@ -68,9 +63,7 @@ FORM prices 'Prices'
 NAVIGATOR {
     NEW prices;
 }
-//#sample2 end
 
-//#solution2
 defaultCustomer 'Default customer' = DATA Customer ();
 nameDefaultCustomer 'Default customer' () = name(defaultCustomer());
 
@@ -80,9 +73,7 @@ DESIGN options { commons { MOVE PROPERTY(nameDefaultCustomer()); } }
 EXTEND FORM prices
     EVENTS ON INIT { SEEK prices.c = defaultCustomer(); }
 ;
-//#solution2 end
 
-//#sample3
 FORM report 'Report'
     OBJECTS dFrom = DATE PANEL, dTo = DATE PANEL
     PROPERTIES VALUE(dFrom), VALUE(dTo)
@@ -91,9 +82,7 @@ FORM report 'Report'
 NAVIGATOR {
     NEW report;
 }
-//#sample3 end
 
-//#solution3
 setReportLastWeek 'Last week' ()  { 
     SEEK report.dFrom = subtract(currentDate(), 7);
     SEEK report.dTo = subtract(currentDate(), 1); 
@@ -110,7 +99,6 @@ setReportLastMonth 'Last month' ()  {
 EXTEND FORM report
     PROPERTIES() setReportLastWeek, setReportCurrentMonth, setReportLastMonth
 ;
-//#solution3 end
 
 FORM customers 'Customers'
     OBJECTS c = Customer

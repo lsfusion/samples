@@ -1,24 +1,16 @@
 MODULE UseCaseDBModel;
 
-//#sample1
 CLASS Animal 'Animal';
 TABLE animal(Animal);
 
 name 'Name' = DATA STRING[50] (Animal);
-//#sample1 end
 
-//#sample2
 CLASS Country 'Country';
 
 TABLE animalCountry (Animal, Country);
 population 'Number' = DATA INTEGER (Animal, Country);
-//#sample2 end
 
-//#sample3
 TABLE ageAnimalCountry (Animal, Country);
 averageAge 'Average age' = DATA NUMERIC[8,2] (Animal, Country) TABLE ageAnimalCountry;
-//#sample3 end
 
-//#sample4
 totalPopulation 'Total number' (Animal a) = GROUP SUM population(a, Country c) MATERIALIZED;
-//#sample4 end

@@ -5,11 +5,7 @@ CLASS OrderDetail 'Order';
 
 order = DATA Order (OrderDetail);
  
-//#sums
 sum = DATA NUMERIC[10,2] (OrderDetail);
 sum = GROUP SUM sum(OrderDetail od) BY order(od);
-//#sums end
 
-//#sref
 CONSTRAINT sum(Order o) < 0 MESSAGE 'The order amount must be positive';
-//#sref end

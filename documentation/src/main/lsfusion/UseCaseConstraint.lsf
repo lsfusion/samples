@@ -2,13 +2,10 @@ MODULE UseCaseConstraint;
 
 REQUIRE Time;
 
-//#sample1
 CLASS Book 'Book';
 name 'Name' = DATA ISTRING[50] (Book) IN id;
 price 'Price' = DATA NUMERIC[14,2] (Book);
-//#sample1 end
 
-//#solution1
 // Option 1
 CONSTRAINT price(Book b) > 100
     MESSAGE 'The book price cannot be more than 100 rubles';
@@ -16,26 +13,18 @@ CONSTRAINT price(Book b) > 100
 // Option 2
 CONSTRAINT SET(price(Book b) > 100)
     MESSAGE 'The book price cannot be more than 100 rubles';
-//#solution1 end
 
-//#sample2
 CLASS Order 'Order';
 date 'Date' = DATA DATE (Order) IN id;
 number 'Number' = DATA INTEGER (Order) IN id;
 posted 'Completed' = DATA BOOLEAN (Order) IN id; 
-//#sample2 end
 
-//#solution2
 CONSTRAINT CHANGED(date(Order o)) AND posted(o)
     MESSAGE 'It is forbidden to change the date of a completed order'; 
-//#solution2 end
 
-//#solution3
 CONSTRAINT DROPPED(Order o IS Order) AND PREV(date(o)) < currentDate()
     MESSAGE 'It is forbidden to delete old orders';
-//#solution3 end
 
-//#sample4
 CLASS OrderDetail 'Order line';
 order 'Order' = DATA Order (OrderDetail) NONULL DELETE;
   
@@ -43,29 +32,21 @@ book 'Book' = DATA Book (OrderDetail) NONULL;
 nameBook 'Book' (OrderDetail d) = name(book(d)) IN id;
 
 price 'Price' = DATA NUMERIC[14,2] (OrderDetail);
-//#sample4 end
 
-//#solution4
 CONSTRAINT price(OrderDetail d) > price(book(d)) * 1.1
     MESSAGE 'The price in the order cannot exceed the price of the book by 10%';
-//#solution4 end
 
-//#sample5
 CLASS Customer 'Customer';
 name 'Name' = DATA ISTRING[100] (Customer);
 
 in 'On' = DATA BOOLEAN (Customer, Book);
 
 customer 'Customer' = DATA Customer (OrderDetail);
-//#sample5 end
 
-//#solution5
 CONSTRAINT book(OrderDetail d) AND NOT in(customer(d), book(d))
     CHECKED BY book[OrderDetail]
     MESSAGE 'A book is selected in the order line that is not allowed for the customer';
-//#solution5 end
 
-//#solution6
 // Option 1
 CONSTRAINT (CHANGED(book(OrderDetail d)) OR CHANGED(price(d)) OR CHANGED(posted(order(d)))) AND posted(order(d))
            AND price(d) > price(book(d)) * 1.1
@@ -79,4 +60,3 @@ WHEN (GROUP MAX constraintBook(OrderDetail d)) DO {
             (GROUP CONCAT ('Date ' + date(order(OrderDetail d)) + '; Number ' + number(order(d))) IF constraintBook(d), ',' ORDER d) NOWAIT;
     CANCEL;
 }
-//#solution6 end
