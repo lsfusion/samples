@@ -37,7 +37,7 @@ DESIGN map {
 postgisCreated = DATA BOOLEAN ();
 onStarted() + {
     IF NOT postgisCreated() THEN {
-    	EXTERNAL SQL 'LOCAL' EXEC 'CREATE EXTENSION postgis';
+    	INTERNAL DB 'CREATE EXTENSION postgis';
     	postgisCreated() <- TRUE;
     }
 }
