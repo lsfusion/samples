@@ -1,6 +1,10 @@
+//#header
+//#module
 MODULE Match;
+//#module end
 
 REQUIRE League;
+//#header end
 
 CLASS Match 'Match';
 

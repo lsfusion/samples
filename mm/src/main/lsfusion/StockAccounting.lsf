@@ -1,6 +1,10 @@
+//#header
+//#module
 MODULE StockAccounting;
 
 REQUIRE Stock, Item, LegalEntity, Receipt, Shipment, StockItem;
+//#module end
+//#header end
 
 NAVIGATOR {
     NEW FOLDER masterData 'Directories' FIRST WINDOW toolbar {

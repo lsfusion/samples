@@ -1,6 +1,8 @@
+//#header
 MODULE ExportShipments;
 
 REQUIRE Shipment;
+//#header end
 FORM shipment
     OBJECTS dFrom=DATE, dTo=DATE
     OBJECTS s=Shipment // shipment

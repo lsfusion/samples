@@ -1,6 +1,10 @@
+//#header
+//#module
 MODULE Receipt;
+//#module end
 
 REQUIRE Stock, Item, LegalEntity;
+//#header end
 
 CLASS Receipt 'Receipt';
 CLASS ReceiptDetail 'Receipt line';

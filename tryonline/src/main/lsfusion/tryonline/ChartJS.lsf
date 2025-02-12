@@ -1,4 +1,6 @@
+//#module
 MODULE ChartJS;
+//#module end
 
 REQUIRE Authentication, SystemEvents, Chart, Icon;
 

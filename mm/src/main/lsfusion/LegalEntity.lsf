@@ -1,4 +1,8 @@
+//#header
+//#module
 MODULE LegalEntity;
+//#module end
+//#header end
 
 CLASS LegalEntity 'Organization';
 

@@ -1,6 +1,8 @@
+//#header
 MODULE ExportShipment;
 
 REQUIRE Shipment;
+//#header end
 GROUP money;
 
 FORM shipment

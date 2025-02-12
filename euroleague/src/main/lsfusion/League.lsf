@@ -1,6 +1,10 @@
+//#header
+//#module
 MODULE League;
+//#module end
 
 REQUIRE Master;
+//#header end
 
 CLASS League 'League';
 

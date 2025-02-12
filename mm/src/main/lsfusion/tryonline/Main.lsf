@@ -1,2 +1,6 @@
+//#header
+//#module
 MODULE Main;
+//#module end
 // logic description: https://docs.lsfusion.org/Materials_management/
+//#header end

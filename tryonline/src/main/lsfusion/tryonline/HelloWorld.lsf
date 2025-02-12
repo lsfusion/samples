@@ -1,4 +1,6 @@
+//#module
 MODULE HelloWorld;
+//#module end
 
 REQUIRE Icon;
 

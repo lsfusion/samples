@@ -1,6 +1,10 @@
+//#header
+//#module
 MODULE StockItem;
+//#module end
 
 REQUIRE Shipment, Receipt;
+//#header end
 
 receivedQuantity 'Total income' = GROUP SUM quantity(ReceiptDetail d) BY item(d), stock(receipt(d));
 shippedQuantity 'Total expenses' = GROUP SUM quantity(ShipmentDetail d) BY item(d), stock(shipment(d));

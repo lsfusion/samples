@@ -1,4 +1,6 @@
+//#module
 MODULE KanbanTask;
+//#module end
 
 REQUIRE SystemEvents, JKanban, Icon;
 

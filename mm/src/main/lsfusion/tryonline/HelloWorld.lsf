@@ -1,4 +1,6 @@
+//#header
 MODULE HelloWorld;
+//#header end
 run() {
     exportString() <- 'Hello world!'; // export* properties are the default results of the HTTP request
     

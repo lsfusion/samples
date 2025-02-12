@@ -1,6 +1,8 @@
+//#header
 MODULE SessionOperations;
 
 REQUIRE Shipment, Time;
+//#header end
 sum = GROUP SUM sum(ShipmentDetail sd) BY shipment(sd); 
 
 run() {
