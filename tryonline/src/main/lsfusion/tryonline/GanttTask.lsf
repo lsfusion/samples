@@ -41,11 +41,11 @@ WHEN LOCAL SET(Task t IS Task) AND NOT id(t) DO id(t) <- STRING(t);
 WHEN LOCAL SET(Task t IS Task) AND NOT name(t) DO name(t) <- 'Task ' + t;
 WHEN LOCAL SET(Task t IS Task) AND NOT order(t) DO order(t) <- [GROUP MAX order(Task tt)]() (+) 1;
 WHEN LOCAL SET(Task t IS Task) AND NOT start(t) DO start(t) <- currentDate();
-WHEN LOCAL SET(Task t IS Task) AND NOT end(t) DO end(t) <- currentDate();
+WHEN LOCAL SET(Task t IS Task) AND NOT end(t) DO end(t) <- sum(currentDate(), 7);
 WHEN LOCAL SET(Task t IS Task) AND NOT progress(t) DO progress(t) <- 10;
 
 FORM gantt 'Gantt'
-    OBJECTS t = Task CUSTOM 'gantt_day'
+    OBJECTS t = Task CUSTOM 'gantt' OPTIONS JSON FROM view_mode = r'Day'
     PROPERTIES(t) id, name, start, end, progress, dependencies = idChildren, order
     PROPERTIES(t) NEW
     ORDERS order(t)
