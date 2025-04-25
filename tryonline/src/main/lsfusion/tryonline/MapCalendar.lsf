@@ -10,8 +10,8 @@ CLASS Area : Element;
 
 latitude = DATA DOUBLE (Point);
 longitude = DATA DOUBLE (Point);
-latitude(Point pt) <- 48.8601975346 WHEN SET(pt IS Point);
-longitude(Point pt) <- 2.3435211182 WHEN SET(pt IS Point);
+latitude(Point pt) <- 48.8601975346D WHEN SET(pt IS Point);
+longitude(Point pt) <- 2.3435211182D WHEN SET(pt IS Point);
 
 name = DATA STRING (Element);
 name(Element pt) <- (CASE WHEN pt IS Point THEN 'Dot' ELSE 'Polygon') + ' ' + LONG(pt) WHEN SET(pt IS Element);
