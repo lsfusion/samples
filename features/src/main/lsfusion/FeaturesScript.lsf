@@ -862,9 +862,9 @@ FORM documentArticle 'By documents (caption)'
     PROPERTIES inQuantity(document, article) PANEL, outQuantity(document, article), documentBalance(document, article), selCur(document, article), selAll(document, article), selArt(article)
     PROPERTIES NEW(document), DELETE(document), NEW(article), testAbstractAction(document) GRID
     PROPERTIES globalInt()
-    
+
     FILTERS name(article)
-    
+
     EVENTS
         ON CANCEL cancledMessage(),
         ON APPLY BEFORE appliedMessage(),
@@ -968,12 +968,12 @@ remindPasswordEmail 'Send login to this email' (Contact u, BPSTRING[200] to) {
 
     LOCAL attachFile = FILE ();
     PRINT remindUserPass OBJECTS u= (u AS CustomUser) PDF TO attachFile;
-    
+
     LOCAL attachFiles = FILE(INTEGER);
     attachFiles(0) <- attachFile();
     LOCAL attachNames = STRING(INTEGER);
     attachNames(0) <- 'copy';
-    
+
     EMAIL
         //    FROM 'luxsoft@adsl.by'
         SUBJECT 'Password reminder for ' + email(u)
@@ -1123,7 +1123,7 @@ DESIGN storeArticle {
 
     MOVE TOOLBARBOX BEFORE OBJECTS;
 
-    PROPERTY(storeSizeName(s)) { 
+    PROPERTY(storeSizeName(s)) {
         caption = 'Warehouse size name';
         //works since 6.0
         //captionClass = 'caption-class';
@@ -1389,10 +1389,10 @@ DESIGN TestHotkeysAndFilters {
         changeKey = 'F4;priority=1000;editing=all';
         changeMouse = 'DBLCLK;priority=2000';
     }
-    
+
     //remove user filter
     REMOVE FILTER(storeSizeCode(s));
-    
+
     //remove regular filter
     REMOVE FILTERGROUP(filters1);
 
@@ -1443,13 +1443,13 @@ asonMessage {
 } ASON CHANGE stringWithComment[];
 
 FORM TestPropertyOptions 'Property Options test'
-    PROPERTIES() stringWithComment, stringWithPlaceholder, 
+    PROPERTIES() stringWithComment, stringWithPlaceholder,
         stringWithPattern, numericWithPattern, dateWithStaticPattern, dynamicPattern, dateWithDynamicPattern,
         stringWithStaticRegexp, dynamicRegexp, stringWithDynamicRegexp,
         button1, button21, button22, button3
 
     //PROPERTIES () address ON CHANGE { INPUT sl = STRING[500] CUSTOM 'googleAutocomplete' DO address() <- sl; }
-    
+
     OBJECTS s = Store
     PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
@@ -1461,7 +1461,7 @@ FORM TestPropertyOptions 'Property Options test'
 //        MESSAGE 'before onchange';
 //        beforeCanceled() <- TRUE;
 //    },
-//    
+//
 //    ON CHANGE PROPERTY AFTER stringWithComment() {
 //        MESSAGE 'after onchange';
 //    },
@@ -1483,9 +1483,9 @@ DESIGN TestPropertyOptions {
         //comment = 'custom comment';
         //commentClass = 'comment-class';
         //tag = 'a';
-        
+
         tooltip = 'string with comment';
-        
+
         //works since 6.0
         //panelCommentFirst = FALSE;
         //panelCommentAlignment = CENTER;
@@ -1839,7 +1839,7 @@ FORM TestShowIfReadOnlyIfDisableIf 'ShowIf ReadOnlyIf DisableIf test'
     //PROPERTIES(s) makeReadOnly, makeDisabled
     //PROPERTIES(s) READONLYIF makeReadOnly(s) DISABLEIF makeDisabled(s)
     //    name, storeSizeCode, scolor
-    
+
     //TREE elements e = NavigatorElement PARENT parent(e)
     //PROPERTIES(e) READONLYIF makeReadOnly() DISABLEIF makeDisabled()
     //    caption READONLY, canonicalName DISABLE, number
@@ -1875,7 +1875,7 @@ noWaitMessage() {
 
 FORM TestActions 'Actions test'
     PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage
-;    
+;
 
 //--------------- TREE test ---------------//
 
@@ -1975,11 +1975,11 @@ DESIGN TestFont {
 FORM TestPivot 'Pivot test'
     OBJECTS s = Store
     PROPERTIES(s) name, storeSizeCode, storeSizeName, sinteger, slong, sdouble
-    PIVOT s 'Bar Chart' NOSETTINGS MAX //CONFIG 'configFun' 
-        ROWS name(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)    
+    PIVOT s 'Bar Chart' NOSETTINGS MAX //CONFIG 'configFun'
+        ROWS name(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)
 ;
 
-onWebClientStarted() +{ 
+onWebClientStarted() +{
     //INTERNAL CLIENT WAIT 'pivotMobile.js';
 }
 
@@ -1996,10 +1996,13 @@ onStarted() + {
     //scheduleOnStartAction();
 }
 
-onChangeStoreName() {
-    INPUT i = INTEGER DO {
-        MESSAGE 'Number: ' + i;
-    }
+onChangeStoreName(Store s) {
+    //SHOW customUsers FLOAT;
+    ASK 'how do you do?' DO {
+        INPUT str = STRING DO {
+            name(s) <- str;
+        }
+    };
 }
 
 onChangeSInteger(Store s) {
@@ -2060,7 +2063,7 @@ FORM TestOnActions 'Test "ON actions"'
     OBJECTS s = Store
     PROPERTIES(s) NEWSESSION VALUE,
         //works since 6.0
-        //name ON CHANGE onChangeStoreName() ON CHANGE BEFORE {MESSAGE 'before change';} ON CHANGE AFTER {MESSAGE 'after change';},
+        //name ON CHANGE onChangeStoreName(s) ON CHANGE BEFORE {MESSAGE 'before change';} ON CHANGE AFTER {MESSAGE 'after change';},
         sinteger ON CHANGE onChangeSInteger(s),
         sboolean,
         ssc1 = storeSizeCode ON EDIT onEditStoreSizeCode(),
@@ -2651,7 +2654,7 @@ x = DATA INTEGER (A)
 CONSTRAINT f(A a) > g(a) MESSAGE 'Forbidden';
 f(A a) => g(a) RESOLVE LEFT;
 
-//tstCustom  INTERNAL  'samples.TestCustomActionProperty' ();
+tstCustom  INTERNAL  'samples.TestCustomActionProperty' ();
 
 //EXTERNAL examples
 
@@ -2862,7 +2865,7 @@ NAVIGATOR {
         NEW TestColor;
         NEW TestShowClose;
         NEW TestExport;
-        NEW TestMultithreading;      
+        NEW TestMultithreading;
         NEW TestShowIfReadOnlyIfDisableIf;
         NEW TestActions;
         NEW TestTree;
@@ -3543,3 +3546,8 @@ FORM documentsResult
 //
 //    MESSAGE 'Median: ' + median() + ', Percentile: ' + percentile() + ', Two rows before 6: ' + lag2(6) + ', Rank of 2: ' + rank(2);
 //}
+
+quantity = DATA INTEGER();
+price = DATA NUMERIC[9,2]();
+
+sum() = quantity() * price();

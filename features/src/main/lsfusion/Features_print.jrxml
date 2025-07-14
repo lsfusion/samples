@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.12.2.final using JasperReports Library version 6.12.2-75c5e90a222ab406e416cbf590a5397028a52de3  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Test.print" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="83095160-d042-4da7-baf6-39579e8b9edd">
+	<property name="net.sf.jasperreports.export.xls.print.page.width" value="842"/>
+	<property name="net.sf.jasperreports.export.xls.print.page.height" value="595"/>
+	<style name="DefaultStyle" isDefault="true" vTextAlign="Middle" fontName="Liberation Sans Narrow" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<style name="GroupCellStyle0" mode="Opaque" backcolor="#DFDFDF" vTextAlign="Middle" vImageAlign="Middle" fontName="lsf.TimesNewRoman" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<style name="GroupCellStyle1" mode="Opaque" backcolor="#DFDFDF" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Serif" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<style name="GroupCellStyle2" mode="Opaque" backcolor="#DFDFDF" vTextAlign="Middle" vImageAlign="Middle" fontName="DejaVu Sans" fontSize="10">
+		<box>
+			<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="2" rightIndent="2"/>
+	</style>
+	<title>
+		<band height="60">
+			<staticText>
+				<reportElement x="290" y="15" width="100" height="30" uuid="49bf4689-3a26-4c33-b8be-ca22cda8a010">
+					<!--					<property name="net.sf.jasperreports.style.pdfEncoding" value="Cp1252"/>-->
+				</reportElement>
+				<text><![CDATA[fdf2dfżżń Аўаўаў]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="GroupCellStyle0" x="175" y="25" width="88" height="20" backcolor="#FFFFFF" uuid="e7e7c61b-3ac8-4e71-a56c-063d6fe41c3d"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Грузоотправитель]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="GroupCellStyle1" x="275" y="25" width="88" height="20" backcolor="#FFFFFF" uuid="e7e7c61b-3ac8-4e71-a56c-063d6fe41c3d"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Грузоотправитель]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="GroupCellStyle2" x="375" y="25" width="88" height="20" backcolor="#FFFFFF" uuid="e7e7c61b-3ac8-4e71-a56c-063d6fe41c3d"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Грузоотправитель]]></text>
+			</staticText>
+		</band>
+	</title>
+</jasperReport>
