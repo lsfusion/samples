@@ -10,7 +10,7 @@ MODULE Features;
 //#module end
 
 //UserEvents works since 6.0
-REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler, Icon;//, UserEvents;
+REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler;//, UserEvents;
 
 NAMESPACE Features;
 
@@ -198,8 +198,8 @@ sessionObj() = DATA LOCAL Object ();
 // Expression syntax:
 // [JOIN] (name | '[' propertyDefinition ']') (param1, ..., paramN)
 storeName 'Warehouse' (Document document) = JOIN name(store(document)) IN base;
-storeSizeName = staticCaption(storeSize(Store store)) IN base; // we can omit named parameters to the left of '=', but still use them
-
+storeSizeName = staticCaption(storeSize(Store store));// MATERIALIZED IN base; // we can omit named parameters to the left of '=', but still use them
+storeSizeName2 (Store store) = storeSizeName(store);// STICKY;
 // IS, AS
 // Expression syntax:
 // propertyExpression (AS | IS) className
@@ -218,7 +218,7 @@ outQuantity(document, article) = quantity[Document, Article](document, article) 
 // SUM, MAX, MIN, EQUAL group property
 // Expression syntax:
 // GROUP (SUM | MAX | MIN | EQUAL) propertyExpression [BY propertyExpression1, ..., propertyExpressionN]
-incomeQuantity(store, Article article) = GROUP SUM inQuantity(IncomeDocument document, article) BY store(document);
+incomeQuantity(store, Article article) = GROUP SUM inQuantity(IncomeDocument document, article) BY store(document) ;
 outcomeQuantity(store, article) = GROUP SUM outQuantity(Document doc, article) BY store(doc);
 
 incomeQuantity2(store, Article article) = GROUP SUM quantity(IncomeDocument document, article) IF document IS IncomeDocument BY store(document);
@@ -279,6 +279,10 @@ caseData1 = DATA INTEGER (CaseA);
 caseData2 = DATA INTEGER (CaseA);
 caseData3 = DATA INTEGER (CaseA);
 
+caseData1 = DATA INTEGER (CaseB);
+caseData2 = DATA INTEGER (CaseB);
+caseData3 = DATA INTEGER (CaseB);
+
 caseDataB = DATA INTEGER (CaseB);
 caseDataC = DATA INTEGER (CaseC);
 
@@ -288,6 +292,11 @@ overrideTest 'OVERRIDE' (a) = OVERRIDE caseData3(a), caseData2(a), caseData1(a);
 exclusiveTest 'EXCLUSIVE' (a) = EXCLUSIVE caseData3(a), caseData2(a), caseData1(a);
 
 overrideTestA 'OVERRIDE A' = ABSTRACT VALUE INTEGER (CaseA);
+overrideTestA(a) += caseData1(a);
+overrideTestA(a) += caseData2(a);
+overrideTestA(a) += caseData3(a);
+
+overrideTestA 'OVERRIDE A' = ABSTRACT VALUE INTEGER (CaseB);
 overrideTestA(a) += caseData1(a);
 overrideTestA(a) += caseData2(a);
 overrideTestA(a) += caseData3(a);
@@ -389,7 +398,7 @@ FORM TestCase 'CASE test'
     PROPERTIES NEW(b), NEW(c), caseDataB(b), caseDataC(c), caseAM(), scase(), caseAMN()
 ;
 
-testFormAction { PRINT TestCase ; }
+testFormAction { PRINT TestCase;}// MESSAGE TOP 10 OFFSET 5; }
 testFormActionAUTO { PRINT TestCase NOPREVIEW; }
 testFormActionXLSX { PRINT TestCase XLSX; }
 testFormActionXLS { PRINT TestCase XLS; }
@@ -408,7 +417,6 @@ storeSizeCode 'Warehouse size (code)' (Store s) = sizeCode(storeSize(s)) CHARWID
 // PARTITION (SUM | PREV) propertyExpression
 // [BY propertyExpressionM1, ..., propertyExpressionMN]
 // [ORDER [DESC] propertyExpressionL1, ..., propertyExpressionLK]
-// [WINDOW EXCEPTLAST]
 testPartition(Store store, Article article) = PARTITION SUM incomeQuantity(store, article) ORDER DESC name(article) BY store;
 
 // UNGROUP PROPORTION partition property
@@ -439,8 +447,8 @@ ioQuantity(Store store, Article article) = STRUCT(incomeQuantity(store, article)
 onlyIncomeQuantity 'Test STRUCT' (Store store, Article article) = ioQuantity(store, article)[1];
 
 tstData = DATA INTEGER (Store);
-tstStruct(Store store) = STRUCT(tstData(store), 5) MATERIALIZED;
-tstDestruct(Store store) = tstStruct(store)[1];
+//tstStruct(Store store) = STRUCT(tstData(store), 5) MATERIALIZED;
+//tstDestruct(Store store) = tstStruct(store)[1];
 
 // Abstract property
 // Expression syntax:
@@ -872,6 +880,10 @@ FORM documentArticle 'By documents (caption)'
         ON QUERYOK NOREPLACE {}
 ;
 
+ddd = DATA STRING();
+
+test = replace('xxx xxx', 'xxx', ddd()); 
+
 // Hints list syntax:
 // HINTNOUPDATE | HINTTABLE propertyName1, ..., propertyNameN
 
@@ -967,21 +979,20 @@ remindPasswordEmail 'Send login to this email' (Contact u, BPSTRING[200] to) {
     PRINT remindUserPass OBJECTS u= (u AS CustomUser) HTML TO bodyFile;
 
     LOCAL attachFile = FILE ();
-    PRINT remindUserPass OBJECTS u= (u AS CustomUser) PDF TO attachFile;
-    
+    PRINT remindUserPass OBJECTS u= (u AS CustomUser) PDF TO attachFile ;
     LOCAL attachFiles = FILE(INTEGER);
     attachFiles(0) <- attachFile();
     LOCAL attachNames = STRING(INTEGER);
     attachNames(0) <- 'copy';
     
     EMAIL
-        //    FROM 'luxsoft@adsl.by'
-        SUBJECT 'Password reminder for ' + email(u)
+        FROM 'medway@bk.ru'
+        SUBJECT 'Password reminder for'
         TO (to IF to IS BPSTRING[200])
         CC 'some@someserv.net'
-        //    BCC 'luxsoft@adsl.by'
+        BCC 'luxsoft@adsl.by'
         BODY bodyFile()
-        ATTACH attachFile() NAME 'ATTACH: Password reminder for ' + email(u)
+        ATTACH attachFile() NAME 'ATTACH: Password reminder for'
         ATTACH LIST attachFiles NAME attachNames;
 }
 
@@ -1017,11 +1028,11 @@ loadf(Store s) { open(simage(s)); }
 savef(Store s) { INPUT = simage(s) CHANGE; }
 
 sssFixed = storeSizeName(Store s) CHARWIDTH 51 NOFLEX;
-sss = storeSizeName(Store s);// CHARWIDTH 51;
+sss = storeSizeName(Store s) STICKY;// CHARWIDTH 51;
 
 dataStringFixed = DATA STRING[100] (Store) CHARWIDTH 52 NOFLEX;
 dataStringFlex = DATA STRING[100] (Store) CHARWIDTH 52 FLEX;
-dataString = DATA STRING[100] (Store) CHARWIDTH 50;
+dataString = DATA STRING (Store) CHARWIDTH 50;
 
 FORM storeArticle 'By warehouses'
     OBJECTS s = Store
@@ -1034,13 +1045,19 @@ FORM storeArticle 'By warehouses'
     PROPERTIES DRAW s setDefaultNames(), copyNameToArticles(s), copyStoreNameToArticle(s, a), copyStoreNameToArticleError(s, a), createNewStore(), showDocumentArticleModalForm(), showTestModalForm() TOOLBAR, testRequestInput(s) TOOLBAR
     //    PROPERTIES() countF, setNameX
     PROPERTIES(s, a) incomeQuantity2, outcomeQuantity2, lastQuantity
-    PROPERTIES(s) GRID storeSizeName, dataString, dataStringFixed, dataStringFlex, sss, sssFixed, ssc1 = storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi = simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData
+    PROPERTIES(s) GRID storeSizeName STICKY, storeSizeName2, dataString STICKY, dataStringFixed, dataStringFlex, sss, sssFixed, ssc1 = storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi = simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foo, bar, foobar HEADER name(a), bar2, baz, baz2, balanceQuantity, testUnion HEADER name(s), testPartition, testFormula
     //PROPERTIES tstDestruct(s), onlyIncomeQuantity(s,a) //commented because of assertion
     PROPERTIES currentTime(), allNames()
     FILTERGROUP filters1
         FILTER '{showhuge}' storeIsHuge(s) 'F10'
 ;
+
+DESIGN storeArticle {
+    GRID(s) {
+        //enableManualUpdate = TRUE;
+    }
+}
 
 FORM TestSeek 'SEEK test'
     OBJECTS g = (s = Store, a = Article)
@@ -1139,7 +1156,7 @@ DESIGN storeArticle {
 
 DESIGN storeArticle {
     TOOLBARSYSTEM(s) {
-        showViews = TRUE;
+        //showViews = TRUE;
         //works since 6.0
         //showFilters = TRUE;
         showSettings = FALSE;
@@ -1190,6 +1207,7 @@ DESIGN storeArticle {
         quickSearch = TRUE;
         headerHeight = 50;
         foreground = #00AA00;
+        //enableManualUpdate = TRUE;
     }
 }
 
@@ -1304,48 +1322,62 @@ DESIGN TestTabs {
         NEW tab2 { caption = 'Tab 2'; MOVE BOX(a); }
     }
 }
+
+EXTEND FORM TestTabs
+    //EVENTS ON COLLAPSE tabBox {MESSAGE 'oops'; }
+    //EVENTS ON TAB tab1 { MESSAGE 'activated tab1';}
+    //EVENTS ON TAB tab2 { MESSAGE 'activated tab2';}
+;
+
 activateTab1() { ACTIVATE TAB TestTabs.tab1; }
 activateTab2() { ACTIVATE TAB TestTabs.tab2; }
 EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
     EVENTS ON INIT activateTab2()
     //works since 6.0        
     //,
-           //ON TAB tab2 { MESSAGE 'hello tab2'; }
+    //ON TAB tab2 { MESSAGE 'hello tab2'; }
 ;
 
 //--------------- Hotkeys test ---------------//
 
 sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLCK';
 
+filterValue = DATA LOCAL INTEGER();
+
 FORM TestHotkeysAndFilters 'Hotkeys and Filters test'
     OBJECTS s = Store
-    PROPERTIES(s) ns = name ORDER DESC ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2' LOG; },
-        'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeName
+    //PROPERTIES(s) ns = name ORDER DESC ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2' LOG; },
+    //    'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeName
 
     //fixed filter
-    FILTERS storeSizeName(s)
+    //FILTERS storeSizeName(s)
 
     //two ways setting user filters like by F3
-    PROPERTIES(s) storeSizeCode FILTER
-    USERFILTERS storeSizeCode(s), storeSizeName(s)
+    //PROPERTIES(s) storeSizeCode FILTER
+    //USERFILTERS storeSizeCode(s), storeSizeName(s)
 
     //regular filters
-    FILTERGROUP filters1
-        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F7' DEFAULT
-    FILTERGROUP filters2
-        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F3'
-        FILTER 'Show only big warehouses' storeIsBig(s) 'F9'
-        //works since 6.0
-        //FILTER 'Show only big warehouses' storeIsBig(s) KEY 'F9;priority=1000' SHOW
-        FILTER 'Show only medium warehouses' storeIsMedium(s) 'F4'
-        //works since 6.0
-        //FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE
+//    FILTERGROUP filters1
+//        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F7' DEFAULT
+//    FILTERGROUP filters2
+//        FILTER 'Show only huge warehouses' storeIsHuge(s) 'F3'
+//        FILTER 'Show only big warehouses' storeIsBig(s) 'F9'
+    FILTERGROUP filters3// NONULL
+    //works since 6.0
+    //FILTER 'Show only big warehouses' storeIsBig(s) KEY 'F9;priority=1000' SHOW
+    //FILTER 'Show only medium warehouses' storeIsMedium(s) 'F4'
+    //works since 6.0
+    //FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE
 
     //works since 6.0
-    //EVENTS ON FILTERGROUPS filters2 {
-    //    MESSAGE 'changed filterGroup';
-    //}
+//    EVENTS ON FILTERGROUPS filters2 {
+//FILTERGROUPS TestHotkeysAndFilters.filters2 TO filterValue;//FILTERGROUPS TestHotkeysAndFilters.filters2 TO filterValue;//        FILTERGROUPS TestHotkeysAndFilters.filters2 TO filterValue;
+//        
+//        //MESSAGE 'changed filterGroup';
+//    }
 
+    PROPERTIES storeIsHuge(s) SHOWIF filterValue() == 1;
+    
     //EVENTS ON FILTERS PROPERTY storeSizeName(s) {
     //    MESSAGE 'changed filter property';
     //}
@@ -1365,36 +1397,36 @@ FORM TestHotkeysAndFilters 'Hotkeys and Filters test'
 //}
 //
 //setFilterProperty() {
-//    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM 'small';
+//    //FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM 'small';
 //}
 //readFilterProperty() {
 //    LOCAL to = STRING();
-//    FILTERS PROPERTY TestHotkeysAndFilters.storeSizeName(s) TO to;
+//    //FILTERS PROPERTY TestHotkeysAndFilters.storeSizeName(s) TO to;
 //    MESSAGE to();
 //}
 //clearFilterProperty() {
-//    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM NULL;
+//    //FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM NULL;
 //}
-//
+
 //EXTEND FORM TestHotkeysAndFilters
 //    EXTEND FILTERGROUP filters2
 //        FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
 //
 //    PROPERTIES() setFilterGroup, readFilterGroup, clearFilterGroup,
 //        setFilterProperty, readFilterProperty, clearFilterProperty
+//
+//    //EVENTS ON INIT { setFilterGroup(); }
 //;
 
 DESIGN TestHotkeysAndFilters {
-    PROPERTY(ns) {
-        changeKey = 'F4;priority=1000;editing=all';
-        changeMouse = 'DBLCLK;priority=2000';
-    }
-    
+//    PROPERTY(ns) {
+//        changeKey = 'F4;priority=1000;editing=all';
+//        changeMouse = 'DBLCLK;priority=2000';
+//    }
     //remove user filter
-    REMOVE FILTER(storeSizeCode(s));
-    
+    //REMOVE FILTER(storeSizeCode(s));
     //remove regular filter
-    REMOVE FILTERGROUP(filters1);
+    //REMOVE FILTERGROUP(filters1);
 
     FILTERS(s) {
         //disable user filters
@@ -1405,10 +1437,10 @@ DESIGN TestHotkeysAndFilters {
 //--------------- Property Options test ---------------//
 
 stringWithComment = DATA STRING();
-stringWithPlaceholder = DATA STRING();
-numericWithPattern = DATA NUMERIC() PATTERN '#,##0.##';
-stringWithPattern = DATA STRING();//works since 6.0 PATTERN '9\{2\}-9\{2\}-9\{2\}';
-dateWithStaticPattern = DATA DATE() PATTERN 'yyyy/MM-dd';
+stringWith//placeholder =DATA STRING();
+numericWithPattern = DATA NUMERIC();// PATTERN '#,##0.##';
+stringWithPattern = DATA STRING();// PATTERN '+3759\{9\}';
+dateWithStaticPattern = DATA DATE();// PATTERN 'yyyy/MM-dd';
 dynamicPattern = DATA STRING();
 dateWithDynamicPattern = DATA DATE();
 stringWithStaticRegexp = DATA STRING();//works since 6.0 REGEXP '\\d\{2\}-\\d\{3\}' 'need to be string like 12-345';
@@ -1442,13 +1474,15 @@ asonMessage {
     MESSAGE 'ASON change';
 } ASON CHANGE stringWithComment[];
 
+//address = DATA LOCAL STRING();
+
 FORM TestPropertyOptions 'Property Options test'
-    PROPERTIES() stringWithComment, stringWithPlaceholder, 
-        stringWithPattern, numericWithPattern, dateWithStaticPattern, dynamicPattern, dateWithDynamicPattern,
+    PROPERTIES() stringWithComment, //, stringWithPlaceholder, 
+        //stringWithPattern,//, numericWithPattern, dateWithStaticPattern, dynamicPattern, dateWithDynamicPattern,
         stringWithStaticRegexp, dynamicRegexp, stringWithDynamicRegexp,
         button1, button21, button22, button3
 
-    //PROPERTIES () address ON CHANGE { INPUT sl = STRING[500] CUSTOM 'googleAutocomplete' DO address() <- sl; }
+        //PROPERTIES () address ON CHANGE { INPUT sl = STRING[500] CUSTOM 'googleAutocomplete' DO address() <- sl; }
     
     OBJECTS s = Store
     PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString
@@ -1456,27 +1490,42 @@ FORM TestPropertyOptions 'Property Options test'
     //PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect
 
     //works since 6.0
-//    EVENTS
-//    ON CHANGE PROPERTY BEFORE stringWithComment() {
-//        MESSAGE 'before onchange';
-//        beforeCanceled() <- TRUE;
-//    },
-//    
-//    ON CHANGE PROPERTY AFTER stringWithComment() {
-//        MESSAGE 'after onchange';
-//    },
-//
-//    ON CHANGE OBJECT s {
-//        MESSAGE 'changed s ' + name(s);
-//    }
+    //    EVENTS
+    //    ON CHANGE PROPERTY BEFORE stringWithComment() {
+    //        MESSAGE 'before onchange';
+    //        beforeCanceled() <- TRUE;
+    //    },
+    //    
+    //    ON CHANGE PROPERTY AFTER stringWithComment() {
+    //        MESSAGE 'after onchange';
+    //    },
+    //
+    //    ON CHANGE OBJECT s {
+    //        MESSAGE 'changed s ' + name(s);
+    //    }
 ;
+
+//activeStringWithStaticRegexp = ACTIVE PROPERTY TestPropertyOptions.stringWithStaticRegexp();
+//activeLikeString = ACTIVE PROPERTY TestPropertyOptions.likeString(s);
+
+//EXTEND FORM TestPropertyOptions
+//    PROPERTIES() activeStringWithStaticRegexp, activeLikeString;
+
+//someProp1 = DATA STRING();
+//someProp2 = DATA STRING();
+//FORM someForm
+//    PROPERTIES() someProp1, someProp2;
+//
+//activeSomeProp1 = ACTIVE PROPERTY someForm.someProp1();
+//EXTEND FORM someForm
+//    PROPERTIES() activeSomeProp1;
 
 DESIGN TestPropertyOptions {
     PROPERTY(name(s)) {
-        tooltip = 'header tooltip';
+        //tooltip = 'header tooltip';
         //works since 6.0
         //valueTooltip = 'value tooltip ' + storeSizeCode(s);
-        defaultCompare = '=@';
+        //defaultCompare = '=@';
     }
     PROPERTY(stringWithComment()) {
         //works since 6.0
@@ -1484,25 +1533,24 @@ DESIGN TestPropertyOptions {
         //commentClass = 'comment-class';
         //tag = 'a';
         
-        tooltip = 'string with comment';
-        
+        //tooltip = 'string with comment';
         //works since 6.0
         //panelCommentFirst = FALSE;
         //panelCommentAlignment = CENTER;
         //panelCommentVertical = FALSE;
     }
-    PROPERTY(stringWithPlaceholder()) {
+    //PROPERTY(stringWithPlaceholder()) {
         //works since 6.0
-        //placeholder = 'input phone number';
+        ////placeholder ='input phone number';
         //alignCaption = FALSE;
         //class = 'custom-cls';
         //valueClass = 'custom-value-cls';
         //inputType = 'text';
-    }
-    PROPERTY(dateWithDynamicPattern()) {
-        //works since 6.0
-        //pattern = dynamicPattern();
-    }
+    //}
+    //PROPERTY(dateWithDynamicPattern()) {
+    //works since 6.0
+    //pattern = dynamicPattern();
+    //}
     PROPERTY(stringWithDynamicRegexp()) {
         //works since 6.0
         //regexp = dynamicRegexp();
@@ -1522,17 +1570,17 @@ DESIGN TestPropertyOptions {
         background = RGB (128, 128, 128);
     }
     //works since 6.0
-//    POPUP(s) {
-//        MOVE PROPERTY(button1());
-//        NEW button2Container {
-//            popup = TRUE;
-//            image = 'add.png';
-//            caption = 'button 2';
-//            MOVE PROPERTY(button21());
-//            MOVE PROPERTY(button22());
-//        }
-//        MOVE PROPERTY(button3());
-//    }
+    //    POPUP(s) {
+    //        MOVE PROPERTY(button1());
+    //        NEW button2Container {
+    //            popup = TRUE;
+    //            image = 'add.png';
+    //            caption = 'button 2';
+    //            MOVE PROPERTY(button21());
+    //            MOVE PROPERTY(button22());
+    //        }
+    //        MOVE PROPERTY(button3());
+    //    }
 }
 
 //--------------- Collapsible containers test ---------------//
@@ -1544,10 +1592,13 @@ FORM TestCollapsibleContainers 'Collapsible Containers test'
     PROPERTIES(s) name
 ;
 
+b = DATA BOOLEAN();
+
 DESIGN TestCollapsibleContainers {
     NEW container1 {
         caption = 'FIRST';
         MOVE PROPERTY(stringWithComment());
+        //collapsed = b(); 
     }
 }
 
@@ -1579,7 +1630,7 @@ FORM testJSON
 actionJSON() {
     MESSAGE JSON (testJSON OBJECTS j= 4 FILTERS mod(i, 2) = 0);
     MESSAGE JSON FROM code = '1', message = 'OK';
-    MESSAGE JSONTEXT FROM code = '1', message = 'OK';
+    //MESSAGE JSONTEXT FROM code = '1', message = 'OK';
     MESSAGE STRING ( JSON FROM value = 'Name3' + (INTEGER i AS INTEGER) WHERE iterate(i, 1, 5) ORDER i DESC);
 }
 
@@ -1680,20 +1731,20 @@ DESIGN TestShowClose {
 
 FORM TestExport 'Export test'
     OBJECTS s = Store
-    PROPERTIES(s) name, stime EXTID 'timefield', sdate NOEXTID;
+    PROPERTIES(s) name;//, stime EXTID 'timefield', sdate NOEXTID;
 
 exportPlainXML() {
-    EXPORT XML FROM 'tag' = 'hello', 'time' = currentDateTime();
+    EXPORT XML FROM 'tag' = 'hello', 'time' = currentDateTime() ;
     open(exportFile());
 }
 
 exportFormXML() {
-    EXPORT TestExport XML TOP s=3;
+    //EXPORT TestExport XML TOP s=3;
     open(exportFile());
 }
 
 exportFormJSON() {
-    EXPORT TestExport JSON TOP 3;
+    EXPORT TestExport JSON;// TOP 3 OFFSET 5;
     open(exportFile());
 }
 
@@ -1891,6 +1942,13 @@ FORM TestTree 'Tree test'
 ;
 
 DESIGN TestTree {
+    
+    PROPERTY(caption(e2)) {
+        hide = TRUE;
+    }
+    
+    REMOVE PROPERTY(canonicalName(e2));
+    
     NEW trees BEFORE TOOLBARBOX {
         horizontal = TRUE;
         fill = 1;
@@ -1898,7 +1956,7 @@ DESIGN TestTree {
         MOVE BOX(TREE forms) {
             fill = 1;
         }
-
+        
         GRID(TREE forms) {
             expandOnClick = FALSE;
             headerHeight = 100;
@@ -1973,11 +2031,54 @@ DESIGN TestFont {
 //--------------- Pivot test ---------------//
 
 FORM TestPivot 'Pivot test'
-    OBJECTS s = Store
+    OBJECTS s = Store PIVOT DEFAULT
     PROPERTIES(s) name, storeSizeCode, storeSizeName, sinteger, slong, sdouble
-    PIVOT s 'Bar Chart' NOSETTINGS MAX //CONFIG 'configFun' 
-        ROWS name(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)    
+    PIVOT //s 'Bar Chart' //CONFIG 'configFun'
+    ROWS name(s), MEASURES(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)    
+
+    OBJECTS s2 = Store PIVOT DEFAULT
+    PROPERTIES(s2) name, storeSizeCode, storeSizeName, sinteger, slong, sdouble
+    PIVOT s2 ROWS name(s2) COLUMNS (storeSizeName(s2), MEASURES(s2), MEASURES(s2)) MEASURES storeSizeCode(s)
 ;
+
+
+
+strF = DATA STRING() EVENTID 'SCANNER';
+strD = DATA STRING();
+
+str2 = DATA STRING();
+
+respectF() { MESSAGE 'respect F'; }
+respectS() { MESSAGE 'respect S'; }
+
+//respectD() { MESSAGE 'respect D'; } ASON KEYPRESS 'D' strD[] ASON CONTEXTMENU 'D' strD[];
+changeD() { MESSAGE 'change D'; } ASON CHANGE strD[];
+//усё працуе з S
+strS = DATA STRING() ON CONTEXTMENU {respectS();} ON KEYPRESS 'S' {respectS();} ON CHANGE {MESSAGE 'change S'; }  ;
+
+FORM disableDblClk
+    OBJECTS s = Store
+    PROPERTIES(s) name PANEL
+    PROPERTIES() strF;
+    //усё працуе з F
+//PROPERTIES() strF ON CHANGE {MESSAGE 'change'; } ON CONTEXTMENU respectF() ON KEYPRESS 'F' respectF(), strD, str2 READONLYIF strF(), str3 = str2 READONLYIF TRUE ON CONTEXTMENU {},
+//strS;
+
+
+
+
+/*DESIGN disableDblClk {
+    PROPERTY(str2()) {
+        tag = 'input';
+    }
+    PROPERTY(str3) {
+        focusable = FALSE;
+    }
+}*/
+
+NAVIGATOR {
+    NEW disableDblClk FIRST;
+}
 
 onWebClientStarted() +{ 
     //INTERNAL CLIENT WAIT 'pivotMobile.js';
@@ -2060,26 +2161,26 @@ FORM TestOnActions 'Test "ON actions"'
     OBJECTS s = Store
     PROPERTIES(s) NEWSESSION VALUE,
         //works since 6.0
-        //name ON CHANGE onChangeStoreName() ON CHANGE BEFORE {MESSAGE 'before change';} ON CHANGE AFTER {MESSAGE 'after change';},
-        sinteger ON CHANGE onChangeSInteger(s),
-        sboolean,
-        ssc1 = storeSizeCode ON EDIT onEditStoreSizeCode(),
-        ssc2 = storeSizeCode ON CHANGE onChangeSizeCode(s),
-        DELETE ON CONTEXTMENU 'Hello world!' onHelloWorld() GRID
-    PROPERTIES(str) VALUE
-    EVENTS
-        ON CHANGE str testOnStringChange()
+        name ON CHANGE onChangeStoreName() //ON CHANGE BEFORE {MESSAGE 'before change';} ON CHANGE AFTER {MESSAGE 'after change';},
+        //sinteger ON CHANGE onChangeSInteger(s),
+        //sboolean,
+        //ssc1 = storeSizeCode ON EDIT onEditStoreSizeCode(),
+        //ssc2 = storeSizeCode ON CHANGE onChangeSizeCode(s),
+        //DELETE ON CONTEXTMENU 'Hello world!' onHelloWorld() GRID
+    //PROPERTIES(str) VALUE
+    //EVENTS
+    //    ON CHANGE str testOnStringChange()
 ;
 
-DESIGN TestOnActions {
-    PROPERTY(ssc1) {
-        caption = 'onEditTest';
-    }
-
-    PROPERTY(ssc2) {
-        caption = 'onChangeTest';
-    }
-}
+//DESIGN TestOnActions {
+//    PROPERTY(ssc1) {
+//        caption = 'onEditTest';
+//    }
+//
+//    PROPERTY(ssc2) {
+//        caption = 'onChangeTest';
+//    }
+//}
 
 nameDate 'name:date' (Store store) = name(store) + ':' + sdate(store);
 
@@ -2462,7 +2563,9 @@ FORM TestShowIfInTreeAndContainers 'ShowIf test (tree & containers)'
 ;
 
 DESIGN TestShowIfInTreeAndContainers {
-    BOX(TREE groups) { showIf = storeIsHugeOrBig(s); }
+    BOX(TREE groups) {
+        showIf = storeIsHugeOrBig(s);
+    }
     PANEL { showIf = storeIsHugeOrBig(s); }
     TOOLBARBOX { showIf = storeIsHugeOrBig(s); }
 }
@@ -2640,18 +2743,22 @@ debuggableActionEnd(Store x) {
     name(x) <- 'name from action';
 }
 
-CLASS A;
+//CLASS A;
+//
+//f = DATA INTEGER (A);
+//g = DATA INTEGER (A);
+//x = DATA INTEGER (A)
+//    NONULL
+//    DELETE;
+//
+//CONSTRAINT f(A a) > g(a) MESSAGE 'Forbidden';
+//f(A a) => g(a) RESOLVE LEFT;
 
-f = DATA INTEGER (A);
-g = DATA INTEGER (A);
-x = DATA INTEGER (A)
-    NONULL
-    DELETE;
-
-CONSTRAINT f(A a) > g(a) MESSAGE 'Forbidden';
-f(A a) => g(a) RESOLVE LEFT;
-
-//tstCustom  INTERNAL  'samples.TestCustomActionProperty' ();
+//readReportResources  INTERNAL 'lsfusion.server.physics.dev.integration.external.to.file.report.CopyReportResources' ();
+//
+//onDesktopClientStarted() + {
+//    readReportResources();
+//}
 
 //EXTERNAL examples
 
@@ -2689,34 +2796,34 @@ debuggableAction(Store s) {
 
         apply();
 
-        NEW a = A {
-        }
+        //NEW a = A {
+        //}
 
         //        tstCustom();
 
         apply();
         cancel();
 
-        NEW a = A {
-            x(a) <- 4;
-        }
+//        NEW a = A {
+//            x(a) <- 4;
+//        }
 
         apply();
 
-        FOR A a IS A DO {
-            f(a) <- 5;
-            g(a) <- 6;
-        }
+//        FOR A a IS A DO {
+//            f(a) <- 5;
+//            g(a) <- 6;
+//        }
 
         apply();
         cancel();
 
-        FOR A a IS A DO {
-            x(a) <- NULL;
-        }
-
-        FOR A a IS A DO
-            debuggableActionEnd(s);
+//        FOR A a IS A DO {
+//            x(a) <- NULL;
+//        }
+//
+//        FOR A a IS A DO
+//            debuggableActionEnd(s);
 
         apply();
 
@@ -2868,7 +2975,7 @@ NAVIGATOR {
         NEW TestTree;
         NEW TestCastRound;
         NEW TestFont;
-        NEW TestPivot;
+        //NEW TestPivot;
         NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
         NEW TestAggr;
@@ -3184,6 +3291,41 @@ testExternal(a, b) {
     EXTERNAL SQL 'jdbc:postgresql://localhost/testdb?user=postgres&password=11111' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult;
 }
 
+CLASS AbcClass;
+TABLE abc(AbcClass);
+dateAbc = DATA DATE (AbcClass);
+dateTimeAbc = DATA DATETIME (AbcClass);
+
+exportAction() {
+    EXTERNAL SQL 'jdbc:postgresql://localhost/features316?user=postgres&password=11111' EXEC 'SELECT features_dateabc_abcclass,features_datetimeabc_abcclass FROM features_abc;' TO exportFile;
+
+    IMPORT FROM exportFile() FIELDS DATE dateA, DATE dateTimeA DO{
+        MESSAGE dateA + '/' + dateTimeA NOWAIT;
+    }
+    
+    EXPORT XLS FROM 'hello';
+
+    INPUT f = XMLFILE DO {
+        LOCAL tnvedCode =  STRING(INTEGER);
+        LOCAL gtin =  STRING (INTEGER);
+        IMPORT XML ROOT 'return' FROM f TO gtin = 'gtin', tnvedCode = 'tnvedCode';
+        MESSAGE(CONCAT ' ', gtin(0), tnvedCode(0)) NOWAIT;
+        MESSAGE(CONCAT ' ', gtin(1), tnvedCode(1)) NOWAIT;
+        MESSAGE(CONCAT ' ', gtin(2), tnvedCode(2)) NOWAIT;
+        MESSAGE(CONCAT ' ', gtin(3), tnvedCode(3)) NOWAIT;
+    }
+    
+}
+
+FORM abc
+    PROPERTIES() exportAction
+    OBJECTS a = AbcClass
+    PROPERTIES(a) dateAbc, dateTimeAbc, NEW;
+
+NAVIGATOR {
+    NEW abc FIRST;
+}
+
 xa = DATA LOCAL DOUBLE (INTEGER);
 xb = DATA LOCAL TEXT (INTEGER);
 xc = DATA LOCAL TEXT (INTEGER);
@@ -3198,7 +3340,7 @@ FORM ShowX
 
 testExport (Store s) {
     LOCAL t = FILE ();
-    EXPORT TABLE FROM a = incomeQuantity(s, Article a), b = name(a), c = barcode(a), d = name(a), s = name(s) WHERE incomeQuantity(s, a) TO t;
+    //EXPORT TABLE FROM a = incomeQuantity(s, Article a), b = name(a), c = barcode(a), d = name(a), s = name(s) WHERE incomeQuantity(s, a) TOP 3 OFFSET 5 TO t;
     //    open(t());
     //    IMPORT XML ROOT 'export' TO xa=a, xb=b, xc=c, xd=d, xs=s FROM t();
 
@@ -3236,9 +3378,9 @@ NAVIGATOR {
 
 testImport (FILE cf) {
     IMPORT TABLE FROM cf TO xa = a, xb = b, xc = c, xd = d, xs = s;
-    FOR barcode(Article a) = xc(INTEGER i) AND name(Store s) = xs(i) DO {
-        impQ(s, a) <- xa(i);
-    }
+    //FOR barcode(Article a) = xc(INTEGER i) AND name(Store s) = xs(i)  TOP 5 OFFSET 10  INLINE DO {
+    //    impQ(s, a) <- xa(i);
+    //}
     APPLY;
 }
 
@@ -3528,7 +3670,13 @@ FORM documentsResult
 //CUSTOM aggregates in the GROUP / PARTITION operators
 //value = DATA INTEGER (INTEGER);
 //
-//median() = GROUP CUSTOM 'mode' WITHIN ORDER value(INTEGER i);
+CLASS TaskExecute;
+unit = DATA STRING(TaskExecute);
+
+//xxx = GROUP CONCAT unit(TaskExecute te), ',' ORDER DESC unit(te);
+//xxx2 = GROUP CUSTOM 'any_value' unit(TaskExecute te) ORDER DESC unit(te);
+//xxx3 = GROUP CUSTOM 'any_value' unit(TaskExecute te);// ORDER DESC unit(te);
+
 //percentile() = GROUP CUSTOM 'percentile_cont' 0.5 WITHIN ORDER value(INTEGER i);
 //lag2(INTEGER i) = PARTITION CUSTOM NULL 'lag' value(i), 2 ORDER i;
 //rank(INTEGER i) = PARTITION CUSTOM INTEGER 'rank' ORDER DESC value(i), i;
@@ -3543,3 +3691,1285 @@ FORM documentsResult
 //
 //    MESSAGE 'Median: ' + median() + ', Percentile: ' + percentile() + ', Two rows before 6: ' + lag2(6) + ', Rank of 2: ' + rank(2);
 //}
+
+mes2() {
+    MESSAGE 'ok2';
+} CHANGEKEY 'F5';
+
+mes1() {
+    MESSAGE 'ok11';
+} CHANGEKEY 'F5';
+
+messageComputer() {
+    MESSAGE 'computer';
+} CHANGEKEY 'F9';
+
+messageUser() {
+    MESSAGE 'user';
+} CHANGEMOUSE 'DBLCLK;priority=1234;cell=ALL';
+
+messageGlobal() {
+    MESSAGE 'global';
+} CHANGEKEY 'F9';
+
+testExport() {
+    EXPORT JSON FROM login(CustomUser u) ORDER login(u) DESC;// TOP 3;// OFFSET 2 ;// TOP 3 FROM login(CustomUser u); 
+    open(exportFile());
+}
+
+testExportForm() {
+    EXPORT Authentication.customUsers;// TOP u = 3, lu = 3 OFFSET u=1, lu=2;
+    open(exportFile());
+}
+
+top3 = 3;
+
+//topOffset 1: GROUP
+testGroup = GROUP CONCAT login(CustomUser u), ', ' ORDER DESC login(u) ;//TOP 3 OFFSET 2 WHERE login(u);
+testJson = JSON FROM login(CustomUser u)  ORDER login(u);//TOP top3() OFFSET 5 ORDER login(u); //TOP top3() 
+//testJsonForm = JSON (Authentication.customUsers );// TOP 3 OFFSET 5); // 
+
+index 'Номер строки' (TableColumn d) = PARTITION SUM 1 ORDER d IF sid(d) BY table(d);
+index2 'Номер строки 2' (TableColumn d) = PARTITION SUM 1 ORDER d IF sid(d)  ;//TOP 3 BY table(d);
+index3 'Номер строки 3' (TableColumn d) = PARTITION SUM 1 ORDER d IF sid(d) BY table(d);// TOP 3 OFFSET 1;
+
+EXTEND FORM Reflection.physicalModel
+PROPERTIES(tc) index, index2, index3;
+
+FORM print
+;
+print () {
+    PRINT print;
+}
+
+FORM testX
+    PROPERTIES() print
+;
+
+NAVIGATOR {
+    NEW testX FIRST ;
+}
+
+GROUP body EXTID 'S:Body';
+GROUP MED_GetInsurantDataResponse EXTID 'ns2=http://tempuri.org/:MED_GetInsurantDataResponse' : body;
+GROUP MED_GetInsurantDataResult EXTID 'ns2:MED_GetInsurantDataResult' : MED_GetInsurantDataResponse;
+GROUP insurantData EXTID '=http://schemas.datacontract.org/2004/07/MED_DataContracts:InsurantData' : MED_GetInsurantDataResult;
+GROUP MED_InsurantData EXTID ':MED_InsurantData' : insurantData;
+GROUP insRisk EXTID ':InsRisk' : MED_InsurantData;
+GROUP insurantAddress1 EXTID ':InsurantAddress' : MED_InsurantData;
+GROUP insurantBarcode EXTID ':InsurantBarcode' : MED_InsurantData;
+GROUP insurantBirthDate1 EXTID ':InsurantBirthDate' : MED_InsurantData;
+
+header = DATA LOCAL STRING();
+responseCode = DATA LOCAL STRING();
+responseMessage = DATA LOCAL STRING();
+BSOCodeForm = DATA LOCAL STRING();
+BSONumber = DATA LOCAL STRING();
+BSOSeries = DATA LOCAL STRING();
+contractID = DATA LOCAL STRING();
+departmentID = DATA LOCAL STRING();
+departmentTitle = DATA LOCAL STRING();
+riskID = DATA LOCAL STRING();
+riskName = DATA LOCAL STRING();
+insurantAddress = DATA LOCAL STRING();
+nil = DATA LOCAL STRING();
+barcodeContent = DATA LOCAL STRING();
+barcodeFormat = DATA LOCAL STRING();
+barcodeType = DATA LOCAL STRING();
+insurantBirthDate = DATA LOCAL STRING();
+nil1 = DATA LOCAL STRING();
+insurantCoverageBegin = DATA LOCAL ZDATETIME();
+insurantCoverageEnd = DATA LOCAL ZDATETIME();
+insurantFIO = DATA LOCAL STRING();
+insurantID = DATA LOCAL STRING();
+insurantSex = DATA LOCAL STRING();
+restRiskLimitAmount = DATA LOCAL STRING();
+restRiskLimitCurrencyName = DATA LOCAL STRING(); 
+
+FORM envelope FORMEXTID 'S=http://schemas.xmlsoap.org/soap/envelope/:Envelope'
+    PROPERTIES ATTR ='http://schemas.xmlsoap.org/soap/envelope/' EXTID 'xmlns:SOAP-ENV'
+    PROPERTIES() header EXTID 'SOAP-ENV:Header'
+    PROPERTIES ATTR IN body ='http://schemas.datacontract.org/2004/07/MedDataContracts.MED.Requests' EXTID 'xmlns:ns3', ='http://schemas.microsoft.com/2003/10/Serialization/Arrays' EXTID 'xmlns:ns4', ='http://schemas.datacontract.org/2004/07/MedDataContracts.MED.Responses' EXTID 'xmlns:ns5', ='http://schemas.microsoft.com/2003/10/Serialization/' EXTID 'xmlns:ns6'
+    PROPERTIES() IN MED_GetInsurantDataResult responseCode EXTID ':ResponseCode', responseMessage EXTID ':ResponseMessage'
+    PROPERTIES ATTR IN MED_InsurantData ='http://www.w3.org/2001/XMLSchema-instance' EXTID 'xmlns:xsi'
+    PROPERTIES() IN MED_InsurantData BSOCodeForm EXTID ':BSOCodeForm', BSONumber EXTID ':BSONumber', BSOSeries EXTID ':BSOSeries', contractID EXTID ':ContractID', departmentID EXTID ':DepartmentID', departmentTitle EXTID ':DepartmentTitle', insurantAddress EXTID ':InsurantAddress', insurantBirthDate EXTID ':InsurantBirthDate', insurantCoverageBegin EXTID ':InsurantCoverageBegin', insurantCoverageEnd EXTID ':InsurantCoverageEnd', insurantFIO EXTID ':InsurantFIO', insurantID EXTID ':InsurantID', insurantSex EXTID ':InsurantSex', restRiskLimitAmount EXTID ':RestRiskLimitAmount', restRiskLimitCurrencyName EXTID ':RestRiskLimitCurrencyName'
+    PROPERTIES() IN insRisk riskID EXTID ':RiskID', riskName EXTID ':RiskName'
+    PROPERTIES() IN insurantAddress1 nil ATTR
+    PROPERTIES() IN insurantBarcode barcodeContent EXTID ':BarcodeContent', barcodeFormat EXTID ':BarcodeFormat', barcodeType EXTID ':BarcodeType'
+    PROPERTIES() IN insurantBirthDate1 nil1 EXTID 'nil' ATTR;
+
+actionv() {
+    INPUT f = NAMEDFILE DO {
+        open(namedFile(f, 'xxx', 'xml'));
+    }
+}
+
+action1(Store s) {
+    MESSAGE name(s) + ' 1';
+}
+
+action2(Store s) {
+    MESSAGE name(s) + ' 2';
+}
+
+action3(Store s) {
+    MESSAGE name(s) + ' 3';
+}
+
+someAction2() {
+    stringToFile('abc');
+    EXPORT JSON FROM code = '123', message = 'OK';
+}
+
+WHEN DROPPED(Store s IS Store) DO {
+    MESSAGE PREV(name(s));
+}
+
+callSomeAction5From6() {
+    LOCAL f = JSONFILE();
+    f() <- JSONFILE(JSON FROM result = 'ok');
+    EXTERNAL HTTP 'localhost:7651/exec/Features.someAction5' PARAMS f();
+}
+
+test123() {
+    printToLog('123');
+}
+     
+testExternalLSF() {
+    //EXTERNAL LSF 'https://demo.lsfusion.org/mycompany' EXEC 'SystemEvents.copyReportResources';
+
+    EXTERNAL LSF 'http://192.168.42.199:7651' EXEC 'Sale.createCustomerOrder' PARAMS exportFile();
+}
+
+a() {
+    listFiles('c:\\work\\');
+    FOR STRING[255] fileName = fileName(INTEGER i) ORDER fileModifiedDateTime(i) DO {
+        MESSAGE fileName(i);
+    }
+}
+
+FORM s2
+    OBJECTS s = Store
+    PROPERTIES(s) name, dataString
+    PROPERTIES callSomeAction5From6(), testExternalLSF(), a();
+
+
+
+someAction3() {
+    PRINT TestCase XLSX TO exportFile;
+}
+
+NAVIGATOR {
+    NEW s2 FIRST;
+    NEW ACTION someAction3 FIRST;
+}
+
+FORM  form1X  'Форма 1'
+;
+
+FORM form2X
+    PROPERTIES
+    open 'открыть форму отчета 1' = {
+        formClose();
+        SHOW form1X DOCKED NEWSESSION ;
+    },
+
+        open2 'открыть форму отчета 2' = {
+            formClose();
+            EVAL ACTION 'SHOW form1X DOCKED NEWSESSION';}
+;
+
+
+NAVIGATOR {
+    NEW form2X FIRST;
+}
+
+someActionX() {
+    FOR DATE date = 2025_06_05 DO {
+        MESSAGE sum(date, extractDay(date));
+    }
+}
+
+NAVIGATOR {
+    NEW someActionX FIRST;
+}
+
+token = DATA LOCAL STRING();
+documentHeaders (TEXT name) = CASE
+    WHEN name = 'Authorization' THEN 'Bearer ' + token();
+
+gismt() {
+    LOCAL result = JSONFILE();
+    TRY {
+        EXTERNAL HTTP GET 'https://markirovka.crpt.ru/api/v4/true-api/doc/list?inputFormat=false&pg=dairy' + '&limit=10000&dateFrom=' + replace(toChar(currentDateTime(), 'yyyy-MM-dd T HH24:MI:SS.MI0Z'), ' ', '') HEADERS documentHeaders TO result;
+    } CATCH {
+        logToFile('gismt', messageCaughtException());
+        logToFile('gismt', FILE(result()));
+        MESSAGE CONCAT ' ', 'Ошибка при получении данных о статусах документов ГИС МТ для группы ' + ':', messageCaughtException();
+        RETURN;
+    }
+    APPLY;
+}
+//
+//CLASS A;
+//
+//a = DATA INTEGER (A);
+//b = DATA INTEGER (A);
+//
+//someActionOk() {
+//    MESSAGE 'OK';
+//} ASON CONTEXTMENU b;
+//
+//menu 'Контекстное меню' () {
+//    MESSAGE 'Тест';
+//}
+//
+//change (A a) {
+//    INPUT i=DOUBLE DO{
+//        a(a) <- INTEGER(i);
+//    }
+//}
+
+//FORM testA
+//    OBJECTS a=A
+//    PROPERTIES ON CONTEXTMENU menu() a(a) ON CHANGE change(a), a=a(a) READONLY
+//    PROPERTIES(a) NEW, DELETE
+//;
+//
+//FORM testB
+//    OBJECTS a=A
+//    PROPERTIES a(a) ON CONTEXTMENU menu() ON CHANGE change(a), a=a(a) READONLY
+//    PROPERTIES(a) NEW, DELETE
+//;
+//
+//NAVIGATOR {
+//    NEW testA FIRST;
+//    NEW testB FIRST;
+//}
+
+
+CLASS Company;
+code = DATA STRING (Company);
+
+CLASS Price;
+
+groupName = DATA STRING(Price);
+name = DATA STRING(Price);
+price = DATA NUMERIC(Price);
+isActive = DATA BOOLEAN (Price);
+company = DATA Company (Price);
+
+companyCode(STRING code) = GROUP AGGR Company c WHERE code(c) == code;
+
+
+FORM exportPricelist
+    OBJECTS company = Company PANEL
+
+    OBJECTS p = Price
+    PROPERTIES (p) groupName, name, price
+    FILTERS isActive(p) AND company(p) = company
+    ORDERS groupName(p)
+;
+
+exportPricelist(STRING code, STRING p) {
+    IF p THEN {
+        EXPORT exportPricelist OBJECTS company = companyCode(code) JSON;
+    }
+} @@noauth;
+
+exportPricelist2(STRING code) {
+    LOCAL result = JSON();
+    EXPORT exportPricelist OBJECTS company = companyCode(code) JSON TO result;
+} @@noauth;
+
+topPanel = DATA INTEGER();
+
+top1 = DATA INTEGER(Computer);
+top2 = DATA INTEGER(Computer);
+top3 = DATA INTEGER(Computer);
+offset1 = DATA INTEGER (CustomUser);// NONULL;
+
+offset2 = DATA INTEGER (CustomUser);// NONULL; 
+offset3 = DATA INTEGER (CustomUser);
+offset5 = DATA INTEGER (CustomUser);
+
+offset1 = DATA INTEGER (Store);// NONULL;
+offset2 = DATA INTEGER (Store);// NONULL;
+
+exportTopOffset(Computer c, CustomUser u) {
+    
+//    EXPORT Reflection.physicalModel XML TOP 5 OFFSET 3;
+//    FBack
+//    EXPORT Reflection.physicalModel XML TOP t=top1(c), tc=top2(c), dc=top3(c) OFFSET t=offset1(u), tc=offset2(u), dc=offset3(u);
+//    open(exportFile());
+}
+
+addNoConstraint() {
+
+    NEWSESSION {
+
+        applyOnlyData();
+        NEW a = CustomUser {
+            login(a) <- 'abcd';
+        }
+        NEW b = CustomUser {
+            login(b) <- 'abc';
+        }
+        APPLY;
+    }
+}
+
+footerSum = GROUP SUM offset1(CustomUser u);
+
+FORM testFooter
+    OBJECTS u = CustomUser
+    PROPERTIES(u) login, offset1 HEADER 1 FOOTER footerSum(), offset2 READONLYIF TRUE HEADER 2 FOOTER footerSum(), offset3 HEADER 3 FOOTER 3
+;
+
+NAVIGATOR {
+    NEW testFooter FIRST;
+}
+
+smth = DATA INTEGER (Item);
+forAction() {
+    
+    FOR iterate(INTEGER j, 0, [GROUP SUM 1 IF Item i IS Item]() / 50)  DO
+        NEWSESSION NEWSQL NEWTHREAD {
+            sleep(15000);
+            //APPLY FOR Item i IS Item ORDER i TOP 50 OFFSET j * 50 DO
+            smth(i) <- smth(i) + 1;
+        }
+}
+
+FORM testChangeKey
+    
+    PROPERTIES() testExport, testExportForm, testGroup//, testJsonForm, testJson
+    
+    OBJECTS c = Computer PIVOT
+    PROPERTIES(c) READONLY hostname CHANGEABLE 
+
+    OBJECTS u = CustomUser PIVOT
+    PROPERTIES(u) READONLY login CHANGEABLE
+
+    PROPERTIES() currentDateTime, messageGlobal, messageComputer DRAW c, messageUser DRAW u
+
+//    EVENTS ON INIT { forceUpdate('c'); }
+//    EVENTS ON INIT { forceUpdate('u'); }
+
+;
+
+//action() {
+//    LOCAL i = INTERVAL[TIME]();
+//    i() <- interval(19:00, 20:00);
+//}
+
+
+bool = DATA BOOLEAN();
+
+DESIGN testChangeKey {
+    TOOLBARSYSTEM(c) {
+        //showManualUpdate = TRUE;
+        //enableManualUpdate = TRUE;
+        //showIf = bool();
+    }
+    BOX(c) {
+        caption = 'xxx';
+        //showIf = bool();
+        //expandOnClick = TRUE;
+    }
+    
+//    GRID(c) {
+//        enableManualUpdate = TRUE;
+//    }
+//
+//
+//    GRID(u) {
+//        enableManualUpdate = TRUE;
+//    }
+    
+}
+
+NAVIGATOR {
+    NEW testChangeKey FIRST;// CHANGEKEY 'F9;priority=1000' SHOW CHANGEMOUSE 'DBLCLK;priority=1235;cell=ALL' HIDE; sssdddddd
+}
+
+
+
+FORM testExportTopOffset
+
+    PROPERTIES mes2(), mes1() 
+    
+    PROPERTIES() topPanel
+    
+    PROPERTIES() addNoConstraint
+    
+    OBJECTS c = Computer
+    PROPERTIES(c) hostname, top1, top2, top3
+    
+    OBJECTS u = CustomUser
+    PROPERTIES(u) login, offset1 FOOTER 10, offset2 FOOTER 20, offset3 FOOTER 30
+    
+    PROPERTIES(c, u) exportTopOffset
+;
+
+DESIGN testExportTopOffset {
+    PROPERTY(top1(c)) {
+        hide = TRUE;
+    }
+    REMOVE PROPERTY(top2(c));
+    REMOVE PROPERTY(topPanel());
+}
+
+NAVIGATOR {
+    NEW testExportTopOffset FIRST;
+}
+
+someAction() {
+    INPUT f = RAWFILE DO {  
+        resultFile() <- file(f, '');
+    }
+    
+    
+}
+
+CLASS TestClass; 
+
+interval = DATA INTERVAL[DATE](TestClass);
+time = DATA TIME (TestClass);
+date = DATA DATE (TestClass);
+datetime = DATA DATETIME (TestClass);
+integer1 = DATA INTEGER (TestClass);
+integer2 = DATA INTEGER (TestClass);
+integer3 = DATA INTEGER (TestClass);
+integer4 = DATA INTEGER (TestClass);
+integer5 = DATA INTEGER (TestClass);
+numeric1 = DATA NUMERIC[14,3] (TestClass);
+numeric2 = DATA NUMERIC[14,3] (TestClass);
+numeric3 = DATA NUMERIC[14,3] (TestClass);
+numeric4 = DATA NUMERIC[14,3] (TestClass);
+numeric5 = DATA NUMERIC[14,3] (TestClass);
+boolean = DATA BOOLEAN (TestClass);
+string1 = DATA STRING (TestClass);
+string2 = DATA STRING (TestClass);
+string3 = DATA STRING (TestClass);
+string4 = DATA STRING (TestClass);
+string5 = DATA STRING (TestClass);  
+
+init() {
+
+    NEWEXECUTOR {
+        FOR iterate(INTEGER i, 0, 10) DO {
+            NEWTHREAD NEWSESSION NEWSQL {
+                FOR iterate(INTEGER j, 0, 100000) NEW t = TestClass2 DO {
+                }
+            }
+            APPLY;
+        }
+    } THREADS 10;
+    
+    
+    FOR iterate(INTEGER j, 0, 2206949734L) DO {
+        NEW t = TestClass {
+//            time(t) <- currentTime();
+//            date(t) <- currentDate();
+            datetime(t) <- currentDateTime();
+            integer1(t) <- j+1;
+//            integer2(t) <- j+2;
+//            integer3(t) <- j+3;
+//            integer4(t) <- j+4;
+//            integer5(t) <- j+5;
+//            numeric1(t) <- j+1;
+//            numeric2(t) <- j+2;
+//            numeric3(t) <- j+3;
+//            numeric4(t) <- j+4;
+//            numeric5(t) <- j+5;
+//            boolean(t) <- TRUE;
+//            string1(t) <- STRING(j+1);
+//            string2(t) <- STRING(j+2);
+//            string3(t) <- STRING(j+3);
+//            string4(t) <- STRING(j+4);
+//            string5(t) <- STRING(j+5);
+        }
+    }
+    APPLY;
+}
+
+FORM TestClass
+OBJECTS t = TestClass
+PROPERTIES(t) interval, time, date, datetime, integer1, integer2, integer3, integer4, integer5,
+    numeric1, numeric2, numeric3, numeric4, numeric5, boolean, string1, string2, string3, string4, string5
+PROPERTIES() init
+;
+
+CLASS TestClass2;
+
+countTestClass2 = GROUP SUM 1 IF TestClass2 t IS TestClass2;
+
+NAVIGATOR {
+    NEW TestClass FIRST;
+}
+
+longitude = DATA LOCAL NUMERIC(CustomUser);
+latitude = DATA LOCAL NUMERIC(CustomUser);
+
+FORM test
+    OBJECTS c = CustomUser MAP 'google'
+    PROPERTIES(c) longitude, latitude
+;
+
+NAVIGATOR {
+    NEW test FIRST;
+}
+
+separator = DATA STRING(Store);
+value1 = DATA STRING[5](Store);
+value2 = DATA STRING[6](Store);
+
+
+testConcat1 (Store s) = CONCAT ',', value1(s), value2(s), value1(s);
+//testConcat2 (Store s) = CONCAT separator(s), value1(s), value2(s), value1(s);   
+
+FORM concat
+    OBJECTS s = Store
+    PROPERTIES(s) separator, value1, value2, testConcat1//, testConcat2
+;
+
+NAVIGATOR {
+    NEW concat FIRST;
+}
+
+dataX = DATA INTEGER();
+testActionX() {
+    dataX() <- dataX() (+) 1;
+    dataX() <- dataX() (+) 1;
+    //MESSAGE dataX();
+}
+
+externalLSF()  {
+
+    EXTERNAL LSF 'http://localhost:7653' EXEC 'Features.testActionX[]';
+    EXTERNAL LSF 'http://localhost:7653' EXEC 'Features.testActionX[]';
+}; 
+
+externalTCP() {  
+    //NEWCONNECTION {
+        EXTERNAL TCP '127.0.0.1:23' PARAMS RAWFILE('hello');
+        //EXTERNAL TCP '127.0.0.1:24' PARAMS RAWFILE('hello2');
+        EXTERNAL TCP '' PARAMS RAWFILE('hello3');
+    //}
+}
+
+externalDB() { 
+    //NEWCONNECTION { 
+        EXTERNAL SQL 'jdbc:postgresql://localhost/features?user=admin&password=fusion' EXEC 'UPDATE _auto SET system_logicscaption=abc';
+    //}
+}
+
+externalDBF() { 
+    LOCAL f = FILE(); 
+    //EXPORT Authentication.customUsers2 TABLE TO u = f;  
+    EXTERNAL DBF 'C:\\work\\sample files\\dbf.dbf' APPEND PARAMS f();
+}
+
+CLASS Calendartest;
+nAme = DATA STRING(Calendartest);
+datefrom = DATA DATE(Calendartest);
+dateTo = DATA DATE(Calendartest);
+
+FORM TestCalendar
+    OBJECTS a = Calendartest
+    PROPERTIES(a) nAme, datefrom, dateTo, NEW, DELETE
+;
+
+NAVIGATOR {
+    NEW TestCalendar;
+}
+
+
+str1 = DATA STRING (CustomUser, DATE);
+str2 = DATA STRING (CustomUser, TIME);
+str3 = DATA STRING (CustomUser, DATETIME);
+str4 = DATA STRING (CustomUser, ZDATETIME);
+
+FORM strs
+    OBJECTS c = CustomUser, d = DATE PANEL, t = TIME PANEL, dt = DATETIME PANEL, zdt = ZDATETIME PANEL
+    PROPERTIES val1 = VALUE (d), val2 = VALUE (t), val3 = VALUE (dt), val4 = VALUE(zdt)
+    PROPERTIES str1(c, d), str2(c, t), str3(c, dt), str4(c, zdt);
+
+NAVIGATOR {
+    NEW strs FIRST;
+}
+
+CLASS ProjectStatus;
+name = DATA STRING (ProjectStatus);
+
+FORM projectStatuses
+    OBJECTS p = ProjectStatus
+    PROPERTIES(p) name, NEW;
+
+status = DATA ProjectStatus ();
+nameStatus 'Статус' = name(status());
+
+number2 'Номер приёмки' = DATA LOCAL STRING ();
+
+FORM inputReceiptStatusAndConditionTestX 'Выбор параметров'
+//    PROPERTIES() number2, nameStatus NOSELECT // без NOSELECT покажет NULL
+;
+
+DESIGN inputReceiptStatusAndConditionTestX {
+//    PROPERTY(number2()) {
+//        showIf = NULL;
+//        select = NULL; 
+//    }
+}
+
+
+FORM inputReceiptStatusAndConditionTestY 'Выбор параметров'
+    //PROPERTIES() number2, nameStatus NOSELECT // без NOSELECT покажет NULL
+;
+
+runX () {
+//    listFilesClient('c:/work/1', TRUE);
+//    MESSAGE CONCAT ',', fileName(0), fileIsDirectory(0), fileModifiedDateTime(0), fileSize(0) NOWAIT;
+//    MESSAGE CONCAT ',', fileName(1), fileIsDirectory(1), fileModifiedDateTime(1), fileSize(1) NOWAIT;
+//
+//    listFilesClient('/system', NULL);
+//    MESSAGE CONCAT ',', fileName(0), fileIsDirectory(0), fileModifiedDateTime(0), fileSize(0) NOWAIT;
+//    MESSAGE CONCAT ',', fileName(1), fileIsDirectory(1), fileModifiedDateTime(1), fileSize(1) NOWAIT;
+
+    //copyClient('c:/work/1/tree2.txt', 'c:/work/1/tree3.txt');
+    //moveClient('c:/work/1/tree3.txt', 'c:/work/1/tree4.txt');
+    //mkdirClient('c:/work/1/2');
+    //deleteClient('c:/work/1/tree4.txt');
+    //fileExistsClient('c:/work/1/tree2.txt');
+    //MESSAGE fileExists();
+    //fileExistsClient('dgdgsgas');
+    //MESSAGE fileExists();
+    
+//    LOCAL f = FILE();
+//    READ CLIENT 'c:/work/hello.txt' TO f;
+//    MESSAGE f();
+//    
+//    READ CLIENT 'c:/work/hello2.txt' TO f;
+//    MESSAGE f();
+
+    //EXTERNAL TCP CLIENT '127.0.0.1:21' PARAMS RAWFILE('hello');
+    //MESSAGE responseTcp();
+    
+ //   EXTERNAL UDP CLIENT '127.0.0.1:21' PARAMS RAWFILE('hello');
+
+//    LOCAL f = FILE();
+//    READ CLIENT 'c:/work/hello.txt' TO f;
+//    WRITE CLIENT f() TO 'c:/work/1/test';
+
+    
+        IMPORT FROM exportFile() FIELDS STRING Artikul, DATE Data, INTEGER Kolich_vidano, DATE God, DATE Srok_SGP_Diler, DATE Data_SGP, STRING Schet_Sklad, STRING N_scheta, INTEGER Sklad DO{
+            LOCAL Schet = STRING ();
+
+            IF Sklad == 1 THEN
+                Schet() <- Schet_Sklad;
+            ELSE
+                Schet() <- N_scheta;
+
+            EXPORT XLS FROM Artikul;
+
+            MESSAGE Artikul + ', ' + Data + ', ' + Kolich_vidano;
+        }
+
+        WRITE exportFile() TO 'C://Users/HasanaevVR/Documents/test.xls';
+    
+    //printPath('c:/work/hello2.pdf');
+    //writeToPrinter('test', 'utf-8', 'Microsoft Print To PDF');
+    //LOCAL f = PDFFILE();
+    //READ CLIENT 'c:/work/hello2.pdf' TO f;
+    //getAvailablePrinters();
+    //printFile(f());
+
+    //cmdClient('ipconfig');
+    //MESSAGE cmdOut();
+
+    //writeToSocket('hello', 'utf-8', '127.0.0.1', 21, TRUE);
+    stringToFile('hello');
+    //writeToComPort(resultFile(), 9600, 1);
+}
+
+
+runY () {
+    pingClient('https://www.google.com');
+    MESSAGE pingError();
+
+    pingClient('https://www.google2.com');
+    MESSAGE pingError();
+    //DIALOG inputReceiptStatusAndConditionTestY DO{
+    //    MESSAGE nameStatus();
+    //}
+}
+
+NAVIGATOR {
+    //NEW projectStatuses FIRST;
+    //NEW runX FIRST;
+    //NEW runY FIRST;
+}
+
+dynamicCaptionValue = DATA STRING();
+dynamicCaptionValue2 = dynamicCaptionValue();
+dynamicCaptionValue3 = dynamicCaptionValue() MATERIALIZED ;
+makeA() {
+    dynamicCaptionValue() <- 'Caption A';
+    APPLY;
+}
+makeB() {
+    dynamicCaptionValue() <- 'Caption B';
+    APPLY;
+}
+
+messagesCount = DATA INTEGER();
+incMessages() {
+    messagesCount() <- messagesCount() (+) 1;
+    dynamicCaptionValue() <- 'HEADER ' + messagesCount();
+}
+messagesCountHeader = 'header ' + messagesCount();
+
+messagesCount = DATA INTEGER(CustomUser);
+incMessages(CustomUser u) {
+    messagesCount(u) <- messagesCount(u) + 1;
+}
+
+FORM f;
+//    OBJECTS c = Connection
+//    PROPERTIES(c) subscription
+//    FILTERS subscription(c);
+
+in = DATA LOCAL BOOLEAN (CustomUser);
+forceHi() {
+//    FOR in(CustomUser u) AND pushConnection(u) DO {
+//        NEWTHREAD {
+//            //navigatorRefresh();
+//        } TO exportInteger;
+//        push(pushConnection(u), exportInteger());
+//    }
+}
+
+
+forceNotify() {
+//    NEWTHREAD {
+//        MESSAGE 'HI';
+//    } TO exportInteger;
+
+    //notify('SOMETHING HAPPENED', exportInteger());
+}
+
+FORM forceHi
+    OBJECTS u = CustomUser
+    PROPERTIES(u) login, in
+    PROPERTIES forceHi(), forceNotify()
+
+    //EVENTS ON SCHEDULE PERIOD 10 formRefresh();
+
+;
+
+NAVIGATOR {
+    //NEW forceHi FIRST;
+
+    //SCHEDULE PERIOD 5 navigatorRefresh();
+    
+    //SCHEDULE PERIOD 5;
+    
+    //NEW ACTION navigatorRefresh;
+    
+    //SCHEDULE PERIOD 10 { navigatorRefresh(); };
+
+}
+
+CLASS TestSelect {
+    one 'one',
+    two 'two'
+}
+
+testSelect = DATA TestSelect();// SELECT 'dropdown';
+
+FORM dynamicCaption
+PROPERTIES() dynamicCaptionValue, dynamicCaptionValue2, dynamicCaptionValue3, makeA, makeB, testSelect;
+DESIGN dynamicCaption {
+    caption = dynamicCaptionValue();
+}
+
+NAVIGATOR {
+    //NEW dynamicCaption HEADER dynamicCaptionValue() FIRST;
+    //NEW makeA FIRST;
+    //NEW makeB FIRST;
+}
+
+CLASS SomeObj;
+s1 = DATA STRING(SomeObj);
+
+FORM someObjView
+    OBJECTS s = SomeObj
+    PROPERTIES (s) s1, NEW, DELETE
+    LIST SomeObj OBJECT s;
+;
+
+FORM someObjEdit
+    OBJECTS s = SomeObj PANEL
+    PROPERTIES (s) s1
+    EDIT SomeObj OBJECT s;
+;
+
+CLASS TreeClass;
+objLink = DATA SomeObj(TreeClass);
+parentTree = DATA TreeClass(TreeClass);
+f1 (TreeClass t) = s1(objLink(t));
+
+somePropTree = DATA INTEGER();
+someActionTree() {
+    somePropTree() <- somePropTree() (+) 1;
+}
+
+FORM tree
+    TREE tree treeO = TreeClass PARENT parentTree(treeO)
+    PROPERTIES (treeO) f1 ON CHANGE {DIALOG someObjEdit OBJECTS s = objLink(treeO);}, NEW, DELETE
+    PROPERTIES (treeO) parentTree
+    PROPERTIES() somePropTree
+    EVENTS ON SCHEDULE PERIOD 5 formRefresh()
+;
+
+//DESIGN tree {
+//    BOX(TREE tree) {
+//        charWidth = 5;
+// }
+//
+
+NAVIGATOR {
+    //NEW tree FIRST;
+    //NEW someObjView FIRST;
+    //{navigatorRefresh();} SCHEDULE PERIOD 1;
+}
+
+CLASS Product;
+name = DATA STRING(Product);
+
+productX = DATA Product();
+nameProductX = name(productX());
+
+FORM testXX
+    PROPERTIES() nameProductX ON CHANGE {
+        INPUT p = productX() LIST name(p) WHERE name(p) LIKE '%аб%' DO
+            productX() <- p;
+    }
+    PROPERTIES() p2 = nameProductX ON CHANGE {
+        DIALOG LIST Product = productX() CHANGE o LIST name(o) FILTERS name(object) LIKE '%аб%';
+    }
+;
+
+str1 = DATA STRING(Store);
+str2 = DATA STRING[50](Store);
+str3 = DATA STRING[100](Store);
+int = DATA INTEGER(Store);
+bool = DATA BOOLEAN(Store);
+txt = DATA TEXT(Store);
+
+FORM strings
+    OBJECTS s = Store
+    PROPERTIES(s) str1, str2, str3, int, bool, txt
+
+    ON OK BEFORE {
+        ASK 'Вы не заполнили значения, хотите их запоFлнить?' answer = YESNO DO {
+            IF answer THEN beforeCanceled() <- TRUE;
+        }
+    }
+;
+
+DESIGN strings {
+    PROPERTY(str1(s)) {
+        valueWidth = -1;
+    }
+}
+
+NAVIGATOR {
+    //NEW strings FIRST;
+}
+    
+
+
+
+//run() {
+//    SHOW testXX;
+//}
+
+CLASS ItemX;
+code ' sdgsdgsg' = DATA STRING[16](ItemX);
+name  = DATA STRING[16](ItemX) STICKY;
+
+FORM item1
+    OBJECTS i = ItemX PANEL
+    PROPERTIES code(i)
+    PROPERTIES name(i)
+    //PROPERTIES(i) *
+    EDIT ItemX OBJECT i
+;
+
+FORM item2
+    OBJECTS i = ItemX PANEL
+    PROPERTIES code(i)
+    PROPERTIES name(i)
+    EDIT ItemX OBJECT i
+;
+
+someAction1(ItemX i) {
+    MESSAGE 'ok';
+};
+
+someAction2 'xxx' (ItemX i) { 
+    MESSAGE 'ok'; 
+} ASON CONTEXTMENU code[ItemX]; 
+
+FORM items
+    OBJECTS i = ItemX
+    PROPERTIES(i) NEW, DELETE
+    OBJECTS s = Store
+    //PROPERTIES(s) *
+
+    //PROPERTIES *(i), *(s)
+    PROPERTIES code(i) ON CONTEXTMENU someAction1(i)
+    //PROPERTIES name(i)
+    LIST ItemX OBJECT i
+
+;
+
+NAVIGATOR {
+    //NEW items FIRST;
+}
+
+CLASS StoreX;
+
+TABLE storeX1(StoreX);
+TABLE storeX2(StoreX);
+
+someProp1 = DATA STRING (StoreX);
+someProp2 = DATA STRING (StoreX) TABLE storeX2;
+someProp3 = DATA STRING (StoreX) TABLE storeX2;
+
+//dateFromWeek(DATE df, INTEGER w) = getWeekStart(INTEGER(extractYear(df)), w);
+
+CLASS ABSTRACT VehicalCatalog;
+
+code = DATA STRING (VehicalCatalog);
+name = DATA STRING (VehicalCatalog);
+
+CLASS FuelType 'Вид топлива': VehicalCatalog;
+
+CLASS VehicleCategory 'Типы ТС': VehicalCatalog;
+
+CLASS VehicleEngineType 'Типы двигателей': VehicalCatalog;
+
+in = DATA BOOLEAN (VehicleEngineType, FuelType);
+
+//nameFuelType 'Вид топлива' (VehicleEngineType vet) =
+//    GROUP CONCAT name(FuelType ft) IF in(vet, ft), ' ' ORDER name(ft);
+
+
+FORM nameFuelType 'Типы топлива'
+    OBJECTS o = FuelType
+    PROPERTIES (o) code, name
+    //PROPERTIES(o) nameFuelType
+    PROPERTIES(o) NEW, DELETE GRID
+    FILTERS o IS FuelType
+;
+
+FORM nameVehicleEngineType 'Типы двигателей'
+    OBJECTS o = VehicleEngineType
+    PROPERTIES (o) code, name
+    //PROPERTIES(o) nameFuelType
+    PROPERTIES(o) NEW, DELETE GRID
+    FILTERS o IS VehicleEngineType
+;
+
+
+
+NAVIGATOR {
+    //NEW nameFuelType FIRST;
+    //NEW nameVehicleEngineType FIRST;
+}
+
+xmlText = DATA XMLLINK();
+text = DATA TEXT();
+
+//testXML() {
+//    
+//    
+//    
+//    xmlText() <- XMLLINK('<a href="https://youtube.com">Ссылка</a>');
+//    text() <- 'Нажми на ${xmlText()}';
+//    EXPORT xml XML TO xml;
+//    fileToString(FILE(xml()));
+//    EXTERNAL HTTP GET address() + '?chat_id=' + chat_id() + '&text=' + resultString() TO result;
+//}
+
+stringField = DATA STRING();
+
+testXML2() {
+    LOCAL tagKey = STRING(INTEGER);
+    stringField() <- '<tagKey>tagValue</tagKey>';
+    IMPORT XML ATTR FROM XMLFILE(stringField()) TO tagKey;
+    MESSAGE tagKey(0);
+}
+
+FORM testShowIfForm
+    OBJECTS s = Store
+    PROPERTIES(s) name, storeSizeName SHOWIF storeIsHugeOrBig(s)
+;
+
+exportXML() {
+    LOCAL f = XMLFILE();
+    EXPORT testShowIfForm XML TO f;
+    open(f());
+}
+
+NAVIGATOR {
+    //NEW testShowIfForm FIRST;
+}
+
+FORM testPattern
+    PROPERTIES currentDate();
+;
+
+runPattern() {
+    PRINT testPattern;
+}
+
+FORM runPattern
+PROPERTIES runPattern();
+
+NAVIGATOR {
+    NEW runPattern FIRST;
+}
+
+
+someActionA(FILE file) {
+    LOCAL a = INTEGER();
+    MESSAGE 'ok';
+} //EXTID 'documents/result-check';
+
+passwordTopBy 'Пароль TopBy' = DATA STRING[100] ();// ECHO;
+prop1 = DATA STRING();// ECHO;
+prop2 = DATA STRING();
+prop3 = DATA STRING();
+prop4 = DATA STRING();
+
+prop1 = DATA STRING(Store);
+prop2 = DATA STRING(Store);
+prop3 = DATA STRING(Store);
+FORM testExportShowIf
+    OBJECTS s = Store
+    PROPERTIES(s) prop1, prop2 SHOWIF prop2(), prop3
+    PROPERTIES passwordTopBy(), prop1(), prop2() EXTNULL, prop4() SHOWIF prop1() EXTNULL, prop3() SHOWIF prop1();
+
+testExportShowIf() {
+    LOCAL f = JSONFILE();
+    EXPORT testExportShowIf JSON TO f;
+    MESSAGE f();
+}
+
+testJSONShowIf() {
+    MESSAGE JSON (testExportShowIf);
+}
+
+testJSONTextShowIf() {
+    MESSAGE JSONTEXT (testExportShowIf);
+}
+
+//testJSON = JSON FROM prop1() SHOWIF prop3(), prop2() EXTNULL, prop3();
+
+EXTEND FORM testExportShowIf
+    PROPERTIES() testExportShowIf, testJSONShowIf, testJSONTextShowIf;
+
+NAVIGATOR {
+    NEW testExportShowIf FIRST;
+}
+
+//bd_zttn.dbf
+ss1 'Импорт возвратов' () {
+    NEWSESSION {
+        INPUT fileInvoice = CSVFILE DO {
+            LOCAL sysn = NUMERIC[20,0](INTEGER);
+            LOCAL nd = STRING[48](INTEGER);
+            LOCAL dt = DATE(INTEGER);
+            LOCAL kpp1_id = INTEGER(INTEGER);
+            LOCAL kpp2_id = INTEGER(INTEGER);
+            LOCAL sum = NUMERIC[16,4](INTEGER);
+            LOCAL sumocs = NUMERIC[16,4](INTEGER);
+            LOCAL kol = INTEGER(INTEGER);
+            LOCAL sumnds = NUMERIC[18,4](INTEGER);
+            LOCAL sum5 = INTEGER(INTEGER);
+            LOCAL sumnds10 = NUMERIC[18,4](INTEGER);
+            LOCAL sumnds18 = NUMERIC[18,4](INTEGER);
+            LOCAL sumcps = NUMERIC[16,4](INTEGER);
+            LOCAL ser = BPSTRING[2](INTEGER);
+            LOCAL td1 = INTEGER(INTEGER);
+            //            IMPORT CSV '↔' NOHEADER CHARSET 'UTF-8' FROM convertedCsv() AS CSVFILE TO sysn = A, dt = C, kpp1_id = D, kpp2_id = E, nd = B, ser = N;
+            //            IMPORT CSV '↔' NOHEADER CHARSET 'UTF-8' FROM convertedCsv() AS CSVFILE TO sysn = 'sysn', dt = 'dt', kpp1_id = 'kpp1_id', kpp2_id = 'kpp2_id', nd = 'nd', ser = 'ser';
+            IMPORT CSV '↔' NOHEADER CHARSET 'UTF-8' FROM fileInvoice AS CSVFILE TO sysn = sysn, dt = dt, kpp1_id = kpp1_id, kpp2_id = kpp2_id, nd = nd, ser = ser;
+            //            IMPORT CSV '↔' NOHEADER CHARSET 'UTF-8' FROM convertedCsv() AS CSVFILE TO sysn = SYSN, dt = DT, kpp1_id = KPP1_ID, kpp2_id = KPP2_ID, nd = ND, ser = SER;
+            //            IMPORT CSV '↔' NOHEADER CHARSET 'UTF-8' FROM convertedCsv() AS CSVFILE TO sysn = A, dt = C, kpp1_id = D, kpp2_id = E, nd = B, ser = N;
+            MESSAGE 1;
+        }
+    }
+}
+//BD_STTN.DBF
+ss2() {
+    NEWSESSION {
+        //        INPUT f = DBFFILE DO {
+        //            convertDBFVIIToCsv(f, '↔', 'CP1251');
+        //            open(convertedCsv());
+        //        }
+
+        INPUT fileInvoice = CSVFILE DO {
+            
+            LOCAL sysn = STRING[100] (INTEGER );
+            LOCAL kpp1 = STRING[100] (INTEGER );//kpp1
+            LOCAL idBin = STRING[100] (INTEGER );
+            LOCAL kpp2 = STRING[100] (INTEGER );//kpp2
+            LOCAL date = DATE (STRING[100]);//dt
+
+            LOCAL idSku = STRING[100] (INTEGER );//KMC
+            LOCAL kole = NUMERIC[16,5] (INTEGER );
+            LOCAL series = STRING[20] (INTEGER );
+
+            LOCAL cenp = NUMERIC[16,4] (INTEGER ); //Цена изг homeprice или manufacturingPrice
+            LOCAL cena = NUMERIC[16,4] (INTEGER );//отпускная цена price           
+            LOCAL cens = NUMERIC[16,4] (INTEGER );//цпс -     shipmentPrice(p)     
+            //        LOCAL cenr = NUMERIC[16,4] (INTEGER );//цена розничная       
+
+            LOCAL sums = NUMERIC[16,4] (INTEGER ); //сумма в цпс
+            LOCAL sum = NUMERIC[16,4] (INTEGER );//сумма оптовая           
+            LOCAL sumr = NUMERIC[16,4] (INTEGER );//сумма розничная       
+
+            LOCAL pnds = NUMERIC[16,4] (INTEGER );//valueVAT(p) 
+            LOCAL snds = NUMERIC[16,4] (INTEGER );//VATSum       
+
+            IMPORT CSV '↔' HEADER CHARSET 'UTF-8' FROM fileInvoice AS CSVFILE TO sysn = SYSN, kpp1 = KPP1, kpp2 = KPP2,
+                    idSku = KMC, kole = KOLE, series = SER,
+                    cenp = CENP, cena = CENA, cens = CENS, sums = SUMS, sum = 'SUM', sumr = SUMR, pnds = PNDS, snds = SNDS;
+
+            MESSAGE 1;
+
+        }
+    }
+
+}
+
+testImportAction() {
+    INPUT f = FILE DO {
+        LOCAL Articul = STRING (INTEGER);
+
+        IMPORT XLS FROM f TO Articul = A;
+
+
+        EXPORT JSON FROM result_BD = Articul(0);
+    }
+}
+
+fib(i, to) = RECURSION 1 IF (i==0 OR i==1) AND to IS INTEGER STEP 1 IF (i==$i+1 OR i==$i+2) AND i<to CYCLES IMPOSSIBLE;
+
+CLASS Account;
+token = DATA STRING(Account);
+tokenCount = GROUP SUM 1 BY token(Account a);
+CONSTRAINT tokenCount(account) > 1 MESSAGE 'Аккаунт с данным токеном уже существует';
+
+someProp = DATA STRING();
+
+recalculateStatsQ 'Пересчет статистики (быстрый)' () {
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+ MESSAGE 'ok';
+} ASON CONTEXTMENU someProp[];
+
+FORM someForm
+PROPERTIES() someProp, recalculateStatsQ;
+NAVIGATOR {NEW TestPivot FIRST;}
+
+zoomConfig = DATA JSON ();
+textConfig = DATA TEXT ();
+
+sendMessageByConnection(TEXTFILE f) {
+    logToFile('mylog', 'Headers: \n' + (GROUP CONCAT (TEXT h) + ': ' + headers(h),'\n' ORDER h));
+    EXPORT JSON FROM headerKey = 'user-connection', headerValue = headers('User-connection');
+//    FOR user(Connection conn) AND connectionStatus(conn) == ConnectionStatus.connectedConnection AND conn == LONG(headers('user-connection')) DO {
+//        NEWTHREAD {
+//            open(f);
+//        } CONNECTION conn;
+//    }
+}
+
+createReport(LONG conn, FILE f) {
+
+    NEWEXECUTOR {
+        NEWTHREAD NEWSESSION NESTED LOCAL {
+
+//            IMPORT getRevenueReportSeparatelyResponse FROM f;
+//            sum() <- GROUP SUM sum(INTEGER i) IF i IS INTEGER AND imported(i);
+//            num() <- GROUP SUM 1 IF sum(INTEGER i) IF i IS INTEGER AND AND num(i) > 0;
+//            PRINT getSum XLSX TO excelFile;
+
+            FOR user(Connection c)
+                AND connectionStatus(c) == ConnectionStatus.connectedConnection AND LONG(c) == conn
+                DO {
+                NEWTHREAD {
+                    open(excelFile());
+                } CONNECTION c;
+            }
+        }
+    } THREADS 1 NOWAIT;
+
+}
+
+sendReportByConnection(FILE f) {
+
+    createReport(LONG(headers('user-connection')), f);
+
+    EXPORT JSON FROM success = TTRUE;
+}
+
+someActionK() {
+    LOCAL k = INTEGER();
+    k() <- 5;
+    LOCAL Document = STRING();
+    LOCAL INN = STRING();
+    INN() <- '123';
+    IF k() > 0 THEN {
+        FOR iterate(INTEGER d, 0, k()) DO {
+            Document() <- '\{"participant_inn":"' + INN() + '","reaggregation_type": "REMOVING","uitu": "' + INN() + '",';
+            Document() <- Document() + '"uit_uitu_list": [';
+            Document() <- left(Document(), length(Document())-1);
+            Document() <- Document() + ']\}';
+            stringToFile(Document());
+            WRITE TEXTFILE (resultFile()) TO 'telo.txt' APPEND;
+        }
+    }
+}
+
+someMultithreadAction() {
+    NEWEXECUTOR {
+        FOR name(Store s) DO {
+            NEWTHREAD {
+                NEWSESSION {
+                    //name(s) <- '-TEST-';
+                    //APPLY;
+                    FOR LONG r == 12147483648l DO {
+                        LOCAL q = INTEGER ();
+                        q() <- [FORMULA '$1 /0'](r);
+                        MESSAGE q() NOWAIT;
+                    }
+                }
+            }
+        }
+    } THREADS 10 WAIT;
+}
