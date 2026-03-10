@@ -9,8 +9,7 @@
 MODULE Features;
 //#module end
 
-//UserEvents works since 6.0
-REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler, Icon;//, UserEvents;
+REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler, Icon, UserEvents;
 
 NAMESPACE Features;
 
@@ -46,7 +45,7 @@ CLASS OutcomeDocument 'Expenses' : Document, EmptyClass;
 
 CONSTRAINT name(Named o) = '-TEST-' MESSAGE 'STRANGE NAME';
 
-nameArticle(Named artGroup) = name(artGroup);// LAZY; works since 6.0
+nameArticle(Named artGroup) = name(artGroup) LAZY;
 parent = DATA ArticleGroup (ArticleGroup) AUTOSET;
 nameParent 'Parent object' = nameArticle(parent(ArticleGroup articleGroup)) IN base;
 
@@ -121,7 +120,7 @@ EXTEND CLASS Features.StoreSize
     small 'small'
 }
 
-storeCaption(StoreSize storeSize) = staticCaption(storeSize) IF storeSize IS StoreSize IN base;
+storeCaption(StoreSize storeSize) = caption(storeSize) IF storeSize IS StoreSize IN base;
 
 //////////// PROPERTY STATEMENT///////////
 // Common syntax:
@@ -198,7 +197,7 @@ sessionObj() = DATA LOCAL Object ();
 // Expression syntax:
 // [JOIN] (name | '[' propertyDefinition ']') (param1, ..., paramN)
 storeName 'Warehouse' (Document document) = JOIN name(store(document)) IN base;
-storeSizeName = staticCaption(storeSize(Store store)) IN base; // we can omit named parameters to the left of '=', but still use them
+storeSizeName = caption(storeSize(Store store)) IN base; // we can omit named parameters to the left of '=', but still use them
 
 // IS, AS
 // Expression syntax:
@@ -995,14 +994,12 @@ justSendEmail 'Just send an email' (BPSTRING[200] to) {
 FORM TestEmailForm 'EMAIL test'
     OBJECTS s 'Email:' = STRING[100] PANEL, u = CustomUser
     PROPERTIES VALUE(s), login(u), email(u), NEW(u), remindPasswordEmail(u, s) DRAW s, justSendEmail(s)
-    //works since 6.0
-    //EVENTS ON INIT { forceUpdate('s'); }
+    EVENTS ON INIT { forceUpdate('s'); }
 ;
 
 DESIGN TestEmailForm {
     GRID(s) {
-        //works since 6.0
-        //enableManualUpdate = TRUE;
+        enableManualUpdate = TRUE;
     }
 }
 
@@ -1125,13 +1122,12 @@ DESIGN storeArticle {
 
     PROPERTY(storeSizeName(s)) { 
         caption = 'Warehouse size name';
-        //works since 6.0
-        //captionClass = 'caption-class';
+        captionClass = 'caption-class';
     }
 
     PROPERTY(foo(s, a)) {
         focusable = FALSE;
-        panelCaptionVertical = TRUE;
+        captionVertical = TRUE;
     }
 
     NEW newCont;
@@ -1140,31 +1136,29 @@ DESIGN storeArticle {
 DESIGN storeArticle {
     TOOLBARSYSTEM(s) {
         showViews = TRUE;
-        //works since 6.0
-        //showFilters = TRUE;
+        showFilters = TRUE;
         showSettings = FALSE;
         showCountQuantity = FALSE;
         showCalculateSum = FALSE;
         showPrintGroupXls = TRUE;
-        //works since 6.0
-        //showManualUpdate = FALSE;
+        showManualUpdate = FALSE;
     }
     PROPERTY(setNameX()) {
-        imagePath = 'add.png';
+        image = 'add.png';
         flex = 3;
         askConfirm = TRUE;
         askConfirmMessage = 'ORLY?';
     }
     PROPERTY(countF()) {
-        imagePath = 'add.png';
+        image = 'add.png';
     }
 
     PROPERTY(currentTime()) {
-        imagePath = 'add.png';
+        image = 'add.png';
     }
 
     PROPERTY(allNames()) {
-        imagePath = 'add.png';
+        image = 'add.png';
         alignment = CENTER;
         align = CENTER;
         valueHeight = 20;
@@ -1175,7 +1169,7 @@ DESIGN storeArticle {
         maxValue = 1000000;
         notNull = TRUE;
         foreground = #00AA00;
-        panelCaptionLast = TRUE;
+        captionLast = TRUE;
     }
 
     newCont {
@@ -1188,7 +1182,7 @@ DESIGN storeArticle {
     GRID(s) {
         tabVertical = TRUE;
         quickSearch = TRUE;
-        headerHeight = 50;
+        captionHeight = 50;
         foreground = #00AA00;
     }
 }
@@ -1238,7 +1232,7 @@ storeHeader2 (Store s, StoreSize ss) = OVERRIDE storeString(s, ss),
 
 FORM TestColumnGroupObjects 'Group in columns test (StoreSize/Store)'
     OBJECTS ss = StoreSize, s = Store
-    PROPERTIES staticCaption(ss), sizeCode(ss)
+    PROPERTIES caption(ss), sizeCode(ss)
     PROPERTIES VALUE(s), name(s), scolor(s), storeSizeCode(s)
     PROPERTIES storeString(s, ss) COLUMNS 'cols1' (ss) HEADER storeHeader(ss)
     PROPERTIES storeString2(s, ss) COLUMNS 'cols1' (ss) HEADER storeHeader2(s, ss) BACKGROUND colorizeMatching(s, ss)
@@ -1307,10 +1301,7 @@ DESIGN TestTabs {
 activateTab1() { ACTIVATE TAB TestTabs.tab1; }
 activateTab2() { ACTIVATE TAB TestTabs.tab2; }
 EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
-    EVENTS ON INIT activateTab2()
-    //works since 6.0        
-    //,
-           //ON TAB tab2 { MESSAGE 'hello tab2'; }
+    EVENTS ON INIT activateTab2(), ON TAB tab2 { MESSAGE 'hello tab2'; }
 ;
 
 //--------------- Hotkeys test ---------------//
@@ -1335,54 +1326,50 @@ FORM TestHotkeysAndFilters 'Hotkeys and Filters test'
     FILTERGROUP filters2
         FILTER 'Show only huge warehouses' storeIsHuge(s) 'F3'
         FILTER 'Show only big warehouses' storeIsBig(s) 'F9'
-        //works since 6.0
-        //FILTER 'Show only big warehouses' storeIsBig(s) KEY 'F9;priority=1000' SHOW
+        FILTER 'Show only big warehouses' storeIsBig(s) KEY 'F9;priority=1000' SHOW
         FILTER 'Show only medium warehouses' storeIsMedium(s) 'F4'
-        //works since 6.0
-        //FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE
+        FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE
 
-    //works since 6.0
-    //EVENTS ON FILTERGROUPS filters2 {
-    //    MESSAGE 'changed filterGroup';
-    //}
+    EVENTS ON FILTERGROUPS filters2 {
+        MESSAGE 'changed filterGroup';
+    }
 
-    //EVENTS ON FILTERS PROPERTY storeSizeName(s) {
-    //    MESSAGE 'changed filter property';
-    //}
+    EVENTS ON FILTERS PROPERTY storeSizeName(s) {
+        MESSAGE 'changed filter property';
+    }
 ;
 
-//works since 6.0
-//setFilterGroup() {
-//    FILTERGROUP TestHotkeysAndFilters.filters2 FROM 2;
-//}
-//readFilterGroup() {
-//    LOCAL to = INTEGER();
-//    FILTERGROUPS TestHotkeysAndFilters.filters2 TO to;
-//    MESSAGE to();
-//}
-//clearFilterGroup() {
-//    FILTERGROUP TestHotkeysAndFilters.filters2;
-//}
-//
-//setFilterProperty() {
-//    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM 'small';
-//}
-//readFilterProperty() {
-//    LOCAL to = STRING();
-//    FILTERS PROPERTY TestHotkeysAndFilters.storeSizeName(s) TO to;
-//    MESSAGE to();
-//}
-//clearFilterProperty() {
-//    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM NULL;
-//}
-//
-//EXTEND FORM TestHotkeysAndFilters
-//    EXTEND FILTERGROUP filters2
-//        FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
-//
-//    PROPERTIES() setFilterGroup, readFilterGroup, clearFilterGroup,
-//        setFilterProperty, readFilterProperty, clearFilterProperty
-//;
+setFilterGroup() {
+    FILTERGROUP TestHotkeysAndFilters.filters2 FROM 2;
+}
+readFilterGroup() {
+    LOCAL to = INTEGER();
+    FILTERGROUPS TestHotkeysAndFilters.filters2 TO to;
+    MESSAGE to();
+}
+clearFilterGroup() {
+    FILTERGROUP TestHotkeysAndFilters.filters2;
+}
+
+setFilterProperty() {
+    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM 'small';
+}
+readFilterProperty() {
+    LOCAL to = STRING();
+    FILTERS PROPERTY TestHotkeysAndFilters.storeSizeName(s) TO to;
+    MESSAGE to();
+}
+clearFilterProperty() {
+    FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM NULL;
+}
+
+EXTEND FORM TestHotkeysAndFilters
+    EXTEND FILTERGROUP filters2
+        FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
+
+    PROPERTIES() setFilterGroup, readFilterGroup, clearFilterGroup,
+        setFilterProperty, readFilterProperty, clearFilterProperty
+;
 
 DESIGN TestHotkeysAndFilters {
     PROPERTY(ns) {
@@ -1407,36 +1394,30 @@ DESIGN TestHotkeysAndFilters {
 stringWithComment = DATA STRING();
 stringWithPlaceholder = DATA STRING();
 numericWithPattern = DATA NUMERIC() PATTERN '#,##0.##';
-stringWithPattern = DATA STRING();//works since 6.0 PATTERN '9\{2\}-9\{2\}-9\{2\}';
+stringWithPattern = DATA STRING() PATTERN '9\{2\}-9\{2\}-9\{2\}';
 dateWithStaticPattern = DATA DATE() PATTERN 'yyyy/MM-dd';
 dynamicPattern = DATA STRING();
 dateWithDynamicPattern = DATA DATE();
-stringWithStaticRegexp = DATA STRING();//works since 6.0 REGEXP '\\d\{2\}-\\d\{3\}' 'need to be string like 12-345';
+stringWithStaticRegexp = DATA STRING() REGEXP '\\d\{2\}-\\d\{3\}' 'need to be string like 12-345';
 dynamicRegexp = DATA STRING();
 stringWithDynamicRegexp = DATA STRING();
 
-//works since 6.0
 //need filled apiKey in Geo.lsf 
-//address = DATA STRING[500];
+address = DATA STRING[500];
 
 likeString = DATA STRING (Store) INDEXED LIKE;
 matchString = DATA STRING (Store) INDEXED MATCH;
 boolean = DATA BOOLEAN (Store);
 tboolean = DATA TBOOLEAN (Store);
 
-//works since 6.0
-//storeSizeNameDefault(Store s) = staticCaption(storeSize(s));
-//storeSizeNameSelect(Store s) = staticCaption(storeSize(s)) SELECT 'buttonGroup';
-//storeSizeNameNoSelect(Store s) = staticCaption(storeSize(s)) NOSELECT;
+storeSizeNameDefault(Store s) = caption(storeSize(s));
+storeSizeNameSelect(Store s) = caption(storeSize(s)) SELECT 'buttonGroup';
+storeSizeNameNoSelect(Store s) = caption(storeSize(s)) NOSELECT;
 
-button1 {MESSAGE 'button 1';}
-//works since 6.0
-//button1 {MESSAGE 'button 1' HEADER 'info';}
+button1 {MESSAGE 'button 1' HEADER 'info';}
 button21 { MESSAGE 'button 2-1';}
 button22 { MESSAGE 'button 2-2';}
-button3 {ASK 'button 3 ?';}
-//works since 6.0
-//button3 {ASK 'button 3 ?' HEADER 'question';}
+button3 {ASK 'button 3 ?' HEADER 'question';}
 
 asonMessage {
     MESSAGE 'ASON change';
@@ -1454,85 +1435,73 @@ FORM TestPropertyOptions 'Property Options test'
     PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
     //PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect
+    
+    EVENTS
+    ON CHANGE PROPERTY BEFORE stringWithComment() {
+        MESSAGE 'before onchange';
+        beforeCanceled() <- TRUE;
+    },
 
-    //works since 6.0
-//    EVENTS
-//    ON CHANGE PROPERTY BEFORE stringWithComment() {
-//        MESSAGE 'before onchange';
-//        beforeCanceled() <- TRUE;
-//    },
-//    
-//    ON CHANGE PROPERTY AFTER stringWithComment() {
-//        MESSAGE 'after onchange';
-//    },
-//
-//    ON CHANGE OBJECT s {
-//        MESSAGE 'changed s ' + name(s);
-//    }
+    ON CHANGE PROPERTY AFTER stringWithComment() {
+        MESSAGE 'after onchange';
+    },
+
+    ON CHANGE OBJECT s {
+        MESSAGE 'changed s ' + name(s);
+    }
 ;
 
 DESIGN TestPropertyOptions {
     PROPERTY(name(s)) {
         tooltip = 'header tooltip';
-        //works since 6.0
-        //valueTooltip = 'value tooltip ' + storeSizeCode(s);
+        valueTooltip = 'value tooltip ' + storeSizeCode(s);
         defaultCompare = '=@';
     }
     PROPERTY(stringWithComment()) {
-        //works since 6.0
-        //comment = 'custom comment';
-        //commentClass = 'comment-class';
-        //tag = 'a';
-        
+        comment = 'custom comment';
+        commentClass = 'comment-class';
+        tag = 'a';
         tooltip = 'string with comment';
-        
-        //works since 6.0
-        //panelCommentFirst = FALSE;
-        //panelCommentAlignment = CENTER;
-        //panelCommentVertical = FALSE;
+        panelCommentFirst = FALSE;
+        panelCommentAlignment = CENTER;
+        panelCommentVertical = FALSE;
     }
     PROPERTY(stringWithPlaceholder()) {
-        //works since 6.0
-        //placeholder = 'input phone number';
-        //alignCaption = FALSE;
-        //class = 'custom-cls';
-        //valueClass = 'custom-value-cls';
-        //inputType = 'text';
+        placeholder = 'input phone number';
+        alignCaption = FALSE;
+        class = 'custom-cls';
+        valueClass = 'custom-value-cls';
+        inputType = 'text';
     }
     PROPERTY(dateWithDynamicPattern()) {
-        //works since 6.0
-        //pattern = dynamicPattern();
+        pattern = dynamicPattern();
     }
     PROPERTY(stringWithDynamicRegexp()) {
-        //works since 6.0
-        //regexp = dynamicRegexp();
-        //regexpMessage = 'incorrect value';
-
-        //works since 6.0
-        //overflowHorz = 'auto';
-        //overflowVert = 'visible';
-        //valueAlignmentHorz = STRETCH;
-        //valueAlignmentVert = CENTER;
-        //valueOverflowHorz = 'auto';
-        //valueOverflowVert = 'visible';
-        //valueShrinkHorz = TRUE;
-        //valueShrinkVert = TRUE;
+        regexp = dynamicRegexp();
+        regexpMessage = 'incorrect value';
+        overflowHorz = 'auto';
+        overflowVert = 'visible';
+        valueAlignmentHorz = STRETCH;
+        valueAlignmentVert = CENTER;
+        valueOverflowHorz = 'auto';
+        valueOverflowVert = 'visible';
+        valueShrinkHorz = TRUE;
+        valueShrinkVert = TRUE;
     }
     PROPERTY(likeString(s)) {
         background = RGB (128, 128, 128);
     }
-    //works since 6.0
-//    POPUP(s) {
-//        MOVE PROPERTY(button1());
-//        NEW button2Container {
-//            popup = TRUE;
-//            image = 'add.png';
-//            caption = 'button 2';
-//            MOVE PROPERTY(button21());
-//            MOVE PROPERTY(button22());
-//        }
-//        MOVE PROPERTY(button3());
-//    }
+    POPUP(s) {
+        MOVE PROPERTY(button1());
+        NEW button2Container {
+            popup = TRUE;
+            image = 'add.png';
+            caption = 'button 2';
+            MOVE PROPERTY(button21());
+            MOVE PROPERTY(button22());
+        }
+        MOVE PROPERTY(button3());
+    }
 }
 
 //--------------- Collapsible containers test ---------------//
@@ -1551,19 +1520,18 @@ DESIGN TestCollapsibleContainers {
     }
 }
 
-//works since 6.0
-//EXTEND FORM TestCollapsibleContainers
-//EVENTS
-//    ON EXPAND container1 {
-//        MESSAGE 'FIRST expanded';
-//    },
-//    ON COLLAPSE container1 {
-//        MESSAGE 'FIRST collapsed';
-//    },
-//    ON EXPAND BOX(s) {
-//        MESSAGE 'BOX(s) expanded';
-//    }
-//;
+EXTEND FORM TestCollapsibleContainers
+EVENTS
+    ON EXPAND container1 {
+        MESSAGE 'FIRST expanded';
+    },
+    ON COLLAPSE container1 {
+        MESSAGE 'FIRST collapsed';
+    },
+    ON EXPAND BOX(s) {
+        MESSAGE 'BOX(s) expanded';
+    }
+;
 
 //--------------- Files & JSON test ---------------//
 
@@ -1586,12 +1554,11 @@ actionJSON() {
 rawFile = DATA RAWFILE ();
 file = DATA FILE ();
 namedFile = DATA NAMEDFILE ();
-//works since 6.0
-//videoFile = DATA VIDEOFILE();
-//videoLink = DATA VIDEOLINK();
+videoFile = DATA VIDEOFILE();
+videoLink = DATA VIDEOLINK();
 
 FORM TestFilesAndJSON 'Files & JSON test'
-    PROPERTIES() rawFile, file, namedFile, actionJSON;//, videoFile, videoLink;
+    PROPERTIES() rawFile, file, namedFile, actionJSON, videoFile, videoLink;
 
 //--------------- Links test ---------------//
 
@@ -1670,11 +1637,10 @@ DESIGN TestShowClose {
     };
 }
 
-//works since 6.0
-//showTestColor() { SHOW 'colors' = TestColor IN TestShowClose.innerContainer;}
-//closeTestColor() { CLOSE FORM 'colors'; }
-//EXTEND FORM TestShowClose
-//    PROPERTIES() showTestColor, closeTestColor;
+showTestColor() { SHOW 'colors' = TestColor IN TestShowClose.innerContainer;}
+closeTestColor() { CLOSE FORM 'colors'; }
+EXTEND FORM TestShowClose
+    PROPERTIES() showTestColor, closeTestColor;
 
 //--------------- Export test ---------------//
 
@@ -1828,21 +1794,20 @@ readonlyDisabledProp() = DATA STRING();
 
 FORM TestShowIfReadOnlyIfDisableIf 'ShowIf ReadOnlyIf DisableIf test'
     PROPERTIES makeReadOnly(), makeDisabled(), showIfReadOnly() SHOWIF makeReadOnly()
-    //works since 6.0
-    //PROPERTIES() okAction READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+    PROPERTIES() okAction READONLYIF makeReadOnly() DISABLEIF makeDisabled()
 
-    //PROPERTIES() readOnlyProp READONLYIF makeReadOnly(),
-    //    disabledProp DISABLEIF makeDisabled(),
-    //    readonlyDisabledProp READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+    PROPERTIES() readOnlyProp READONLYIF makeReadOnly(),
+        disabledProp DISABLEIF makeDisabled(),
+        readonlyDisabledProp READONLYIF makeReadOnly() DISABLEIF makeDisabled()
 
-    //OBJECTS s = Store
-    //PROPERTIES(s) makeReadOnly, makeDisabled
-    //PROPERTIES(s) READONLYIF makeReadOnly(s) DISABLEIF makeDisabled(s)
-    //    name, storeSizeCode, scolor
+    OBJECTS s = Store
+    PROPERTIES(s) makeReadOnly, makeDisabled
+    PROPERTIES(s) READONLYIF makeReadOnly(s) DISABLEIF makeDisabled(s)
+        name, storeSizeCode, scolor
     
-    //TREE elements e = NavigatorElement PARENT parent(e)
-    //PROPERTIES(e) READONLYIF makeReadOnly() DISABLEIF makeDisabled()
-    //    caption READONLY, canonicalName DISABLE, number
+    TREE elements e = NavigatorElement PARENT parent(e)
+    PROPERTIES(e) READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+        caption READONLY, canonicalName DISABLE, number
 ;
 
 //--------------- Actions test ---------------//
@@ -1855,8 +1820,7 @@ breakContinueMessage() {
     WHILE i() < 5 DO {
         i() <- i() + 1;
         IF i() == 2 THEN {
-            //works since 6.0
-            //CONTINUE;
+            CONTINUE;
         } ELSE IF i() == 4 THEN {
             BREAK;
         }
@@ -1900,10 +1864,8 @@ DESIGN TestTree {
         }
 
         GRID(TREE forms) {
-            expandOnClick = FALSE;
-            headerHeight = 100;
-            //works since 6.0
-            //hierarchicalWidth = 60;
+            captionHeight = 100;
+            hierarchicalWidth = 60;
         }
 
         MOVE BOX(TREE forms2) {
@@ -2031,7 +1993,7 @@ onEditSimple() { MESSAGE 'Edit!'; }
 
 FORM SelectStoreSize
     OBJECTS ss = StoreSize
-    PROPERTIES(ss) READONLY VALUE, staticName, staticCaption, sizeCode
+    PROPERTIES(ss) READONLY VALUE, name, caption, sizeCode
 ;
 
 onChangeSizeCode(Store store) {
@@ -2059,8 +2021,7 @@ FORM TestOnActions 'Test "ON actions"'
 
     OBJECTS s = Store
     PROPERTIES(s) NEWSESSION VALUE,
-        //works since 6.0
-        //name ON CHANGE onChangeStoreName() ON CHANGE BEFORE {MESSAGE 'before change';} ON CHANGE AFTER {MESSAGE 'after change';},
+        name ON CHANGE onChangeStoreName() ON CHANGE BEFORE {MESSAGE 'before change';} ON CHANGE AFTER {MESSAGE 'after change';},
         sinteger ON CHANGE onChangeSInteger(s),
         sboolean,
         ssc1 = storeSizeCode ON EDIT onEditStoreSizeCode(),
@@ -2248,8 +2209,8 @@ DESIGN TestLayout {
                 caption = 'Equally';
                 horizontal = TRUE;
                 alignment = STRETCH;
-                MOVE PROPERTY(st7) { caption = 'short'; fill = 1; panelCaptionVertical = TRUE; }
-                MOVE PROPERTY(st8) { caption = 'this caption is much loooooonger than the first one'; fill = 1; panelCaptionVertical = TRUE; }
+                MOVE PROPERTY(st7) { caption = 'short'; fill = 1; captionVertical = TRUE; }
+                MOVE PROPERTY(st8) { caption = 'this caption is much loooooonger than the first one'; fill = 1; captionVertical = TRUE; }
             }
         }
     }
@@ -2419,11 +2380,11 @@ DESIGN TestRichText {
             fill = 1;
 
             MOVE PROPERTY(s1) {
-                panelCaptionVertical = TRUE;
+                captionVertical = TRUE;
                 fill = 1;
             }
             MOVE PROPERTY(sr1) {
-                panelCaptionVertical = TRUE;
+                captionVertical = TRUE;
                 fill = 1;
             }
         }
@@ -2524,9 +2485,9 @@ disappearingAction(SubStore ss) {
 
 FORM TestDisappearingActon 'Disappearing button test'
     OBJECTS s = Store, ss = SubStore
-    PROPERTIES (s) name, objectClassName
+    PROPERTIES (s) name, className
     PROPERTIES (ss) name, substoreTitle, disappearingAction
-    FILTERS objectClass(s) == objectClass(ss)
+    FILTERS class(s) == class(ss)
 
     EVENTS ON SCHEDULE PERIOD 1 formRefresh()
 ;
@@ -2603,7 +2564,7 @@ DESIGN TestHTMLInReports {
         NEW richBox BEFORE TOOLBARBOX {
             fill = 1;
             MOVE PROPERTY(sr) {
-                panelCaptionVertical = TRUE;
+                captionVertical = TRUE;
                 fill = 1;
             }
         }
@@ -2850,11 +2811,8 @@ NAVIGATOR {
     }
 
     NEW FOLDER tests 'Tests' WINDOW toolbar {
-        NEW TestTabs;
-        //works since 6.0
-        //NEW TestTabs SHOWIF isDesktop();
-        //works since 6.0
-        NEW TestHotkeysAndFilters;// CHANGEKEY 'F9;priority=1000' SHOW;
+        NEW TestTabs SHOWIF isDesktop();
+        NEW TestHotkeysAndFilters CHANGEKEY 'F9;priority=1000' SHOW;
         NEW TestPropertyOptions;
         NEW TestCollapsibleContainers;
         NEW TestFilesAndJSON;
@@ -3064,7 +3022,7 @@ FORM testAdd
     PROPERTIES () addIncomeDocument DRAW d
     PROPERTIES (d) GRID editCIncomeDocument, testFormNull
     PROPERTIES (d) a = NEWEDIT[CIncomeDocument]
-    PROPERTIES (d) VALUE, objectClassName, storeName, NEW NEWSESSION, an = NEW NESTEDSESSION, as = NEWEDIT, EDIT, en = EDIT, es = EDIT, DELETE GRID, ds = DELETE GRID, testDelete GRID, newTestDelete GRID
+    PROPERTIES (d) VALUE, className, storeName, NEW NEWSESSION, an = NEW NESTEDSESSION, as = NEWEDIT, EDIT, en = EDIT, es = EDIT, DELETE GRID, ds = DELETE GRID, testDelete GRID, newTestDelete GRID
 ;
 
 DESIGN testAdd {
@@ -3466,8 +3424,7 @@ doSomething(STRING[100] p1, STRING[100] p2) {
 
 externalAction() {
     EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' PARAMS '1', '2';
-    //NOENCODE works since 6.0
-    //EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' NOENCODE PARAMS '1', '2';
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' NOENCODE PARAMS '1', '2';
 }
 
 action () {
@@ -3523,23 +3480,3 @@ FORM documentsResult
         message EXTID 'Message',
         errorCode EXTID 'ErrorCode'
 ;
-
-//works since 6.0
-//CUSTOM aggregates in the GROUP / PARTITION operators
-//value = DATA INTEGER (INTEGER);
-//
-//median() = GROUP CUSTOM 'mode' WITHIN ORDER value(INTEGER i);
-//percentile() = GROUP CUSTOM 'percentile_cont' 0.5 WITHIN ORDER value(INTEGER i);
-//lag2(INTEGER i) = PARTITION CUSTOM NULL 'lag' value(i), 2 ORDER i;
-//rank(INTEGER i) = PARTITION CUSTOM INTEGER 'rank' ORDER DESC value(i), i;
-//
-//customExample() {
-//    value(1) <- 5;
-//    value(2) <- 16;
-//    value(3) <- 15;
-//    value(4) <- 10;
-//    value(5) <- 10;
-//    value(6) <- 4;
-//
-//    MESSAGE 'Median: ' + median() + ', Percentile: ' + percentile() + ', Two rows before 6: ' + lag2(6) + ', Rank of 2: ' + rank(2);
-//}
