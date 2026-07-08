@@ -190,7 +190,7 @@ FORM examples 'Examples'
     PROPERTIES (e) path, mode, order, NEW, DELETE
     ORDERS mode(e), order(e)
     OBJECTS l 'Captions' = Locale 
-    PROPERTIES 'Locale' = STRING[2](staticCaption(l)), caption(e, l)
+    PROPERTIES 'Locale' = STRING[2](caption(l)), caption(e, l)
     OBJECTS i = INTEGER
     FILTERS iterate(i, 1, 10)
     PROPERTIES exPath(e, i); 
@@ -244,6 +244,6 @@ getExamples(JSONFILE file) {
             }
             file(ex) <- text();
         }
-        EXPORT JSON FROM caption = caption(Example ex, nameStatic('Main_Locale.' + locale)), text = file(ex) WHERE file(ex) ORDER order(ex);                          
+        EXPORT JSON FROM caption = caption(Example ex, staticObject('Main_Locale.' + locale)), text = file(ex) WHERE file(ex) ORDER order(ex);                          
     }
 } @@noauth;
