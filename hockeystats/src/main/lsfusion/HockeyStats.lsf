@@ -56,7 +56,7 @@ CLASS GameResult 'G/R' {
     winSO 'LB'
 }
 
-resultName 'Name' (GameResult game) = staticCaption(game) IF game IS GameResult IN base;
+resultName 'Name' (GameResult game) = caption(game) IF game IS GameResult IN base;
 
 userResult = DATA GameResult (Game);
 result (Game game) = OVERRIDE userResult(game),
