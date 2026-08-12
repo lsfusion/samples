@@ -20,7 +20,7 @@ messageCountOrders 'Count the number of orders' (DATE dFrom, DATE dTo)  {
     
     // Option 2
     FOR iterate(DATE date, dFrom, dTo) DO
-        MESSAGE 'Number of orders for ' + date + ' : ' + OVERRIDE countOrders(date()), 0.0;
+        MESSAGE 'Number of orders for ' + date + ' : ' + OVERRIDE countOrders(date), 0.0;
 }
 
 CLASS OrderDetail 'Order line';
@@ -39,9 +39,10 @@ distributeDiscount 'Distribute discount' (Order o, NUMERIC[14,2] discount)  {
     WHILE discount() > 0 DO {
         FOR OrderDetail d == [ GROUP LAST OrderDetail od ORDER leftSum(od), od BY order(od)](o) DO { // finding the row with the largest "remaining" amount
             discountSum(d) <- MIN leftSum(d), discount();
-            discount() <- discount() (-) discountSum(d); 
+            discount() <- discount() (-) discountSum(d);
+            leftSum(d) <- leftSum(d) (-) discountSum(d);
         }
-        IF (GROUP SUM 1 IF leftSum(OrderDetail d) > 0) THEN
+        IF NOT (GROUP SUM 1 IF leftSum(OrderDetail d) > 0) THEN
             BREAK; // nothing left to break down
     }
 }

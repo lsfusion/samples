@@ -23,8 +23,8 @@ create3Categories 'Create 3 categories' ()  {
 parent 'Parent' = DATA Category (Category); // if the value is NULL, then there is no parent
 
 depth = DATA INTEGER (Category);
-fillDepth (Category c, INTEGER depth)  { 
-    FOR parent(Category i) == c DO {
+fillDepth (Category c, INTEGER depth)  {
+    FOR (parent(Category i) == c OR (NOT parent(i) AND NOT c)) DO {
         depth(i) <- depth;
         fillDepth(i, depth + 1);
     }

@@ -63,4 +63,4 @@ number 'Number' = DATA INTEGER (Book);
 freeNumber1 () = (GROUP MAX number(Book b)) (+) 1;
   
 // Equivalent to:
-freeNumber2() = (OVERRIDE 0, (GROUP MAX number(Book b))) + 1;
+freeNumber2() = (OVERRIDE (GROUP MAX number(Book b)), 0) + 1;
