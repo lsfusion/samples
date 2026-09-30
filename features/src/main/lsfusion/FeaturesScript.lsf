@@ -78,15 +78,6 @@ canonicalName 'Full name' (ArticleGroup articleGroup) = STRING[255](
     (GROUP CONCAT nameArticle(ArticleGroup parent), ' / ' ORDER DESC level(articleGroup, parent)))
     CHARWIDTH 50 MATERIALIZED;
 
-FORM parents
-    TREE skuTree sg = ArticleGroup PARENT parent(sg)
-    PROPERTIES(sg) nameArticle, EDIT, NEWEDIT, nnn = NEW, DELETE
-
-    OBJECTS p = ArticleGroup
-    PROPERTIES (p) nameArticle, nameParent, childNumber, descendantNumber, isLeaf, canonicalName, NEW, DELETE GRID
-    PROPERTIES (sg, p) level, levelRoot, isParent
-;
-
 WHEN LOCAL Article a IS Article DO name(a) <- 'Product ' + INTEGER(a);
 WHEN LOCAL ArticleGroup a IS ArticleGroup DO name(a) <- 'Product group ' + INTEGER(a);
 WHEN LOCAL Store s IS Store DO name(s) <- 'Warehouse ' + INTEGER(s);
@@ -1232,15 +1223,6 @@ stringEqualsAll (BPSTRING[3] string) = string == BPSTRING[3]('All');
 
 showStores(ArticleGroup ag, Store s) = aginteger(ag) > 5 AND s IS Store;
 
-FORM TestExpandables 'Expandables test'
-    TREE groups a = BPSTRING[3], ag = ArticleGroup PARENT parent(ag), s = Store
-    PROPERTIES(a) VALUE
-    PROPERTIES(ag) VALUE, name, nameParent, aginteger
-    PROPERTIES(s) VALUE, name, storeSizeCode, sinteger
-    FILTERS stringEqualsAll(a)
-    FILTERS showStores(ag, s)
-;
-
 FORM TestHeaders 'Headers test'
     OBJECTS s = Store, a = Article
     PROPERTIES(s) name, storeSizeCode
@@ -1826,7 +1808,7 @@ FORM TestActions 'Actions test'
 
 //--------------- TREE test ---------------//
 
-FORM TestTree 'Tree test'
+FORM TestTree 'Trees'
     TREE forms e = NavigatorElement PARENT parent(e)
     PROPERTIES(e) VALUE, caption, canonicalName, number BACKGROUND colorizeElementWithNumberGreaterFour(e)
 
@@ -1835,24 +1817,77 @@ FORM TestTree 'Tree test'
     PROPERTIES(e2) VALUE, caption, canonicalName
 
     FILTERS stringEqualsAll(a)
+
+    // hierarchy properties built with RECURSION (level, isParent, descendantNumber, ...)
+    TREE skuTree sg = ArticleGroup PARENT parent(sg)
+    PROPERTIES(sg) nameArticle, EDIT, NEWEDIT, nnn = NEW, DELETE
+
+    OBJECTS p = ArticleGroup
+    PROPERTIES(p) nameArticle, nameParent, childNumber, descendantNumber, isLeaf, canonicalName, NEW, DELETE GRID
+    PROPERTIES(sg, p) level, levelRoot, isParent
+
+    // tree of several object groups: string -> product groups (hierarchy) -> warehouses
+    TREE expandables ea = BPSTRING[3], eag = ArticleGroup PARENT parent(eag), es = Store
+    PROPERTIES(ea) VALUE
+    PROPERTIES(eag) VALUE, name, nameParent, aginteger
+    PROPERTIES(es) VALUE, name, storeSizeCode, sinteger
+    FILTERS stringEqualsAll(ea)
+    FILTERS showStores(eag, es)
+
+    // SHOWIF of properties and showIf of containers depending on another object group
+    OBJECTS ss = Store
+    PROPERTIES(ss) VALUE, name, storeSizeCode
+
+    TREE showIfGroups sa = BPSTRING[3], sag = ArticleGroup PARENT parent(sag)
+    PROPERTIES(sa) SHOWIF storeIsBig(ss) VALUE
+    PROPERTIES(sag) SHOWIF storeIsBig(ss) VALUE, name, nameParent, DELETE GRID
+    FILTERS stringEqualsAll(sa)
 ;
 
 DESIGN TestTree {
     NEW trees BEFORE TOOLBARBOX {
-        horizontal = TRUE;
+        tabbed = TRUE;
         fill = 1;
 
-        MOVE BOX(TREE forms) {
-            fill = 1;
+        NEW navigatorTab {
+            caption = 'Navigator';
+            horizontal = TRUE;
+
+            MOVE BOX(TREE forms) {
+                fill = 1;
+            }
+
+            GRID(TREE forms) {
+                captionHeight = 100;
+                hierarchicalWidth = 60;
+            }
+
+            MOVE BOX(TREE forms2) {
+                fill = 1;
+            }
         }
 
-        GRID(TREE forms) {
-            captionHeight = 100;
-            hierarchicalWidth = 60;
+        NEW hierarchyTab {
+            caption = 'Hierarchy';
+            horizontal = TRUE;
+            MOVE BOX(TREE skuTree);
+            MOVE BOX(p);
         }
 
-        MOVE BOX(TREE forms2) {
-            fill = 1;
+        NEW expandablesTab {
+            caption = 'Several object groups';
+            MOVE BOX(TREE expandables);
+        }
+
+        NEW showIfTab {
+            caption = 'SHOWIF';
+            MOVE BOX(ss);
+            NEW showIfContainer {
+                caption = 'Shown for huge or big warehouses (properties - only for big)';
+                fill = 1;
+                showIf = storeIsHugeOrBig(ss);
+                MOVE BOX(TREE showIfGroups);
+            }
         }
     }
 }
@@ -2443,23 +2478,6 @@ FORM TestColumns 'Group in columns test (Store/Article)'
     PROPERTIES(s, a) COLUMNS 'store' (s) HEADER name(s) sainteger
 ;
 
-FORM TestShowIfInTreeAndContainers 'ShowIf test (tree & containers)'
-    OBJECTS s = Store
-    PROPERTIES(s) VALUE, name, storeSizeCode
-
-    TREE groups a = BPSTRING[3], ag = ArticleGroup PARENT parent(ag)
-    PROPERTIES(a) SHOWIF storeIsBig(s) VALUE
-    PROPERTIES(ag) SHOWIF storeIsBig(s) VALUE, name, nameParent, DELETE GRID
-
-    FILTERS stringEqualsAll(a)
-;
-
-DESIGN TestShowIfInTreeAndContainers {
-    BOX(TREE groups) { showIf = storeIsHugeOrBig(s); }
-    PANEL { showIf = storeIsHugeOrBig(s); }
-    TOOLBARBOX { showIf = storeIsHugeOrBig(s); }
-}
-
 substoreTitle = DATA BPSTRING[15] (SubStore);
 
 FORM wideModalForm
@@ -2871,12 +2889,10 @@ NAVIGATOR {
         NEW TestMargins;
         NEW TestToolbars;
         NEW TestImage;
-        NEW TestExpandables;
         NEW TestFocus;
         NEW TestRichText;
         NEW TestLabelWidth;
         NEW TestColumns;
-        NEW TestShowIfInTreeAndContainers;
         NEW TestDisappearingActon;
         NEW TestSessionProps;
         NEW TestNestedSessions;
@@ -2949,7 +2965,6 @@ NAVIGATOR {
     NEW newTestForm;
     NEW testChangeClass;
     NEW testAddObject;
-    NEW parents;
 }
 
 testMakeZipFile() {
