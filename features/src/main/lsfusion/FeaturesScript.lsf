@@ -424,11 +424,6 @@ testPropPartition(Store store, Article article) = PARTITION UNGROUP testAmount P
 // [ORDER [DESC] propertyExpressionL1, ..., propertyExpressionLK]
 testLimitPartition(Store store, Article article) = PARTITION UNGROUP testAmount LIMIT STRICT testData(article) ORDER DESC name(article) BY store;
 
-//FORM TestPartition
-//OBJECTS s=Store, a=Article
-//PROPERTIES NEW(s), NEW(a), testAmount(s), testData(a), testPartition(s, a), testPropPartition(s, a), testLimitPartition(s, a) 
-//;
-
 // Concatenation/Deconcatenation property
 // Expression syntax:
 // STRUCT(propertyExpression1[, ..., propertyExpressionN])
@@ -1216,13 +1211,6 @@ timeProp(Store store) = 18:00 AND store IS Store;
 variableDateTime(store) = DATA DATETIME (Store);
 teststring(Store store) = '\n\'\\ghhgh\\"' AND store IS Store;
 
-FORM TestDataPropForm 'Date test'
-    OBJECTS store = Store
-    PROPERTIES(store) dateProp, variableDateTime
-    PROPERTIES dateTimeProp(store), teststring(store)
-    PROPERTIES timeProp(store)
-;
-
 colorizeMatching (Store s, StoreSize ss) = scolor(s) IF storeSize(s) == ss;
 storeString (s, ss) = DATA BPSTRING[10] (Store, StoreSize);
 storeString2 (s, ss) = DATA BPSTRING[10] (Store, StoreSize);
@@ -1251,11 +1239,6 @@ FORM TestExpandables 'Expandables test'
     PROPERTIES(s) VALUE, name, storeSizeCode, sinteger
     FILTERS stringEqualsAll(a)
     FILTERS showStores(ag, s)
-;
-
-FORM TestAggr 'Aggregation test'
-    OBJECTS s = QuantityString
-    PROPERTIES NEWSESSION dateDocument(s), storeNameDocument(s), nameArticle(s), DELETE(s) GRID
 ;
 
 FORM TestHeaders 'Headers test'
@@ -1910,9 +1893,6 @@ rounding = DATA NUMERIC[10,3](); //12345.678
 rounded1 = ROUND(rounding(), 2); //12345.68
 rounded2 = ROUND(rounding(), -2); //12300.00
 
-FORM TestCastRound 'CAST & ROUND test'
-    PROPERTIES() str, strToInt, long, longToStr, rounding, rounded1, rounded2;
-
 //--------------- Font test ---------------//
 
 largeFont = DATA STRING();
@@ -2072,7 +2052,16 @@ concatVarNotNull(Named store) = CONCAT '', 'name: ' IF store IS Store, name(stor
 //castToInt = INTEGER(sstring(s));
 castToNumeric = NUMERIC[10,3](sbpstring(Store s));
 
-FORM TestOperators 'Test of operators CONCAT, "+ - *"'
+partitionToArticles(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION ROUND(0) sadouble(store, article) ORDER name(article) BY store;
+pToAStrict(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION STRICT ROUND(0) sadouble(store, article) ORDER name(article) BY store;
+pToAStrictR2(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION STRICT ROUND(2) sadouble(store, article) ORDER name(article) BY store;
+pToAL(Store store, Article article) = PARTITION UNGROUP sinteger LIMIT sainteger(store, article) ORDER name(article) BY store;
+pToALStrict(Store store, Article article) = PARTITION UNGROUP sdouble LIMIT STRICT sainteger(store, article) ORDER name(article) BY store;
+
+fib(INTEGER i, INTEGER to) = GROUP MAX INTEGER f IF (RECURSION i == 1 AND f == 0 AND INTEGER f1 == 1 AND to IS INTEGER
+    STEP i == $i + 1 AND f == $f + 0 + $f1 AND f1 == $f AND i < to CYCLES IMPOSSIBLE);
+
+FORM TestOperators 'Expressions & operators'
     OBJECTS s = Store
     PROPERTIES(s) VALUE, name, stime, sdate, sinteger, slong, sdouble, snumeric, sbpstring, castToNumeric, sstring, sboolean
     PROPERTIES(s) stext
@@ -2080,6 +2069,25 @@ FORM TestOperators 'Test of operators CONCAT, "+ - *"'
     PROPERTIES(s) PANEL concatNull, concatNotNull, concatVarNull, concatVarNotNull, concatToText, concatToVar
     PROPERTIES(s) PANEL subDoubleInt, subDoubleNumeric, subNumericInt, subIntLong
     PROPERTIES(s) PANEL multDoubleInt, multDoubleNumeric, multNumericInt, multIntLong
+    PROPERTIES(s) PANEL dateProp, dateTimeProp, timeProp, teststring, variableDateTime
+    PROPERTIES() str, strToInt, long, longToStr, rounding, rounded1, rounded2
+
+    // PARTITION: values of the current warehouse are distributed between products
+    PROPERTIES(s) PANEL testAmount
+
+    OBJECTS a = Article
+    PROPERTIES(a) VALUE, name, testData
+    PROPERTIES(s, a) sadouble, sainteger, partitionToArticles, pToAStrict, pToAStrictR2, pToALStrict, pToAL,
+        testPartition, testPropPartition, testLimitPartition
+
+    // RECURSION: Fibonacci numbers
+    OBJECTS to = INTEGER PANEL, i = INTEGER
+    PROPERTIES VALUE(to), VALUE(i), fib(i, to)
+    FILTERS fib(i, to)
+
+    // AGGR: an object for every (document, product) pair with quantity
+    OBJECTS q = QuantityString
+    PROPERTIES NEWSESSION dateDocument(q), storeNameDocument(q), nameArticle(q), DELETE(q) GRID
 ;
 
 DESIGN TestOperators {
@@ -2095,7 +2103,7 @@ DESIGN TestOperators {
         tabbed = TRUE;
         flex = 1;
 
-        NEW castTab {
+        NEW concatTab {
             caption = 'concat';
             MOVE PROPERTY(concatNull(s));
             MOVE PROPERTY(concatNotNull(s));
@@ -2130,6 +2138,43 @@ DESIGN TestOperators {
             MOVE PROPERTY(multNumericInt(s));
             MOVE PROPERTY(multDoubleNumeric(s));
             MOVE PROPERTY(multDoubleInt(s));
+        }
+
+        NEW literalsTab {
+            caption = 'literals';
+            MOVE PROPERTY(dateProp(s));
+            MOVE PROPERTY(dateTimeProp(s));
+            MOVE PROPERTY(timeProp(s));
+            MOVE PROPERTY(teststring(s));
+            MOVE PROPERTY(variableDateTime(s));
+        }
+
+        NEW castRoundTab {
+            caption = 'cast & round';
+            MOVE PROPERTY(str());
+            MOVE PROPERTY(strToInt());
+            MOVE PROPERTY(long());
+            MOVE PROPERTY(longToStr());
+            MOVE PROPERTY(rounding());
+            MOVE PROPERTY(rounded1());
+            MOVE PROPERTY(rounded2());
+        }
+
+        NEW partitionTab {
+            caption = 'PARTITION';
+            MOVE PROPERTY(testAmount(s));
+            MOVE BOX(a);
+        }
+
+        NEW recursionTab {
+            caption = 'RECURSION';
+            MOVE BOX(to);
+            MOVE BOX(i);
+        }
+
+        NEW aggrTab {
+            caption = 'AGGR';
+            MOVE BOX(q);
         }
     }
 }
@@ -2340,19 +2385,6 @@ FORM TestToolbars 'Toolbars test'
 DESIGN TestToolbars {
     //    PROPERTY(sinteger) {height = 100; }
 }
-
-partitionToArticles(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION ROUND(0) sadouble(store, article) ORDER name(article) BY store;
-pToAStrict(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION STRICT ROUND(0) sadouble(store, article) ORDER name(article) BY store;
-pToAStrictR2(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION STRICT ROUND(2) sadouble(store, article) ORDER name(article) BY store;
-pToAL(Store store, Article article) = PARTITION UNGROUP sinteger LIMIT sainteger(store, article) ORDER name(article) BY store;
-pToALStrict(Store store, Article article) = PARTITION UNGROUP sdouble LIMIT STRICT sainteger(store, article) ORDER name(article) BY store;
-
-FORM TestPartition 'Partition test'
-    OBJECTS s = Store, a = Article
-    PROPERTIES(s) VALUE, name, storeSizeName, sinteger, sdouble
-    PROPERTIES(a) VALUE, name
-    PROPERTIES(s, a) sadouble, sainteger, partitionToArticles, pToAStrict, pToAStrictR2, pToALStrict, pToAL
-;
 
 FORM TestFocus 'Focus test'
     OBJECTS s = Store, a = Article
@@ -2824,12 +2856,9 @@ NAVIGATOR {
         NEW TestShowIfReadOnlyIfDisableIf;
         NEW TestActions;
         NEW TestTree;
-        NEW TestCastRound;
         NEW TestFont;
         NEW TestPivot;
-        NEW TestDataPropForm;
         NEW TestColumnGroupObjects;
-        NEW TestAggr;
         NEW TestHeaders;
         NEW TestEvalActionForm;
         NEW TestOnActions;
@@ -2842,7 +2871,6 @@ NAVIGATOR {
         NEW TestMargins;
         NEW TestToolbars;
         NEW TestImage;
-        NEW TestPartition;
         NEW TestExpandables;
         NEW TestFocus;
         NEW TestRichText;
@@ -2895,16 +2923,6 @@ END
 // TABLE name(className1, ..., classNameN);
 TABLE documentArticle(Document, Article);
 
-fib(INTEGER i, INTEGER to) = GROUP MAX INTEGER f IF (RECURSION i == 1 AND f == 0 AND INTEGER f1 == 1 AND to IS INTEGER
-    STEP i == $i + 1 AND f == $f + 0 + $f1 AND f1 == $f AND i < to CYCLES IMPOSSIBLE);
-
-//fib(i, to) = RECURSION 1 IF (i==0 OR i==1) AND to IS INTEGER STEP 1 IF (i==$i+1 OR i==$i+2) AND i<to;
-FORM fibForm 'Fibonacci numbers'
-    OBJECTS to = INTEGER PANEL, i = INTEGER
-    PROPERTIES VALUE(to), VALUE(i), fib(i, to)
-    FILTERS fib(i, to)
-;
-
 CLASS Newtest;
 newtf = DATA INTEGER (Newtest);
 ottf = DATA INTEGER (Newtest);
@@ -2927,7 +2945,6 @@ EXTEND FORM newTestForm
     OBJECTS y = Newtest;
 
 NAVIGATOR {
-    NEW fibForm;
     //    NEW caseTest;
     NEW newTestForm;
     NEW testChangeClass;
@@ -3407,6 +3424,38 @@ CLASS YesNoMaybe {
 }
 
 ask = DATA YesNoMaybe (XA);
+captionAsk 'Ask' (XA a) = caption(ask(a));
+
+xbCreated 'XB created' (XA a) = TRUE IF xb(a);
+nameXA 'XA' (XADetailLog l) = name(xa(l));
+
+EXTEND FORM TestOperators
+    OBJECTS xa = XA
+    PROPERTIES(xa) name, createXB, captionAsk, xbCreated READONLY, NEW, DELETE
+
+    OBJECTS xad = XADetail
+    PROPERTIES(xad) name, NEW, DELETE
+    FILTERS xa(xad) = xa
+
+    // filled by WHEN DROPPED when an XADetail is deleted
+    OBJECTS l = XADetailLog
+    PROPERTIES(l) READONLY nameXA, name
+;
+
+DESIGN TestOperators {
+    tabsContainer {
+        NEW aggrObjectsTab {
+            caption = 'AGGR objects';
+            NEW xaPane {
+                horizontal = TRUE;
+                fill = 1;
+                MOVE BOX(xa);
+                MOVE BOX(xad);
+            }
+            MOVE BOX(l);
+        }
+    }
+}
 
 actionXXX {
     htmlLinkInTab(HTMLLINK('https://luxsoft.by/'));
