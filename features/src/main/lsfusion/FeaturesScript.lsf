@@ -1209,38 +1209,41 @@ storeHeader (StoreSize ss) = 'storeSize: ' + sizeCode(ss);
 storeHeader2 (Store s, StoreSize ss) = OVERRIDE storeString(s, ss),
     name(ss) IF s IS Store AND ss IS StoreSize AND ss != StoreSize.small;
 
-FORM TestColumnGroupObjects 'Group in columns test (StoreSize/Store)'
-    OBJECTS ss = StoreSize, s = Store
+FORM TestColumns 'Columns & headers'
+    OBJECTS ss = StoreSize, s = Store, a = Article
     PROPERTIES caption(ss), sizeCode(ss)
-    PROPERTIES VALUE(s), name(s), scolor(s), storeSizeCode(s)
+    PROPERTIES VALUE(s), name(s), scolor(s), storeSizeCode(s), storeSizeName(s)
+    PROPERTIES(a) VALUE, name
+
+    // warehouse sizes in columns of the warehouse table
     PROPERTIES storeString(s, ss) COLUMNS 'cols1' (ss) HEADER storeHeader(ss)
     PROPERTIES storeString2(s, ss) COLUMNS 'cols1' (ss) HEADER storeHeader2(s, ss) BACKGROUND colorizeMatching(s, ss)
+
+    // warehouses in columns of the product table
+    PROPERTIES(s, a) COLUMNS 'store' (s) HEADER name(s) sainteger
+
+    // headers depending on the current objects
+    PROPERTIES(s, a) incomeQuantity2 HEADER outcomeQuantity2(s, a), outcomeQuantity2
+    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar HEADER name(a), testUnion HEADER name(s)
 ;
+
+DESIGN TestColumns {
+    OBJECTS {
+        NEW storesBox FIRST {
+            horizontal = TRUE;
+            fill = 1;
+            alignment = STRETCH;
+            MOVE BOX(ss) { fill = 1; }
+            MOVE BOX(s) { fill = 3; }
+        }
+    }
+}
 
 colorizeElementWithNumberGreaterFour(NavigatorElement element) = #5555ff IF number(element) > 4;
 
 stringEqualsAll (BPSTRING[3] string) = string == BPSTRING[3]('All');
 
 showStores(ArticleGroup ag, Store s) = aginteger(ag) > 5 AND s IS Store;
-
-FORM TestHeaders 'Headers test'
-    OBJECTS s = Store, a = Article
-    PROPERTIES(s) name, storeSizeCode
-    PROPERTIES(a) VALUE, name
-    PROPERTIES(s, a) incomeQuantity2 HEADER outcomeQuantity2(s, a), outcomeQuantity2
-    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar HEADER name(a), testUnion HEADER name(s)
-;
-
-DESIGN TestHeaders {
-    BOX {
-        NEW horizontalBox BEFORE TOOLBARBOX {
-            horizontal = TRUE;
-            fill = 1;
-            MOVE BOX(s);
-            MOVE BOX(a);
-        }
-    }
-}
 
 storeIsHugeOrBig(Store s) = storeIsHuge(s) OR storeIsBig(s);
 
@@ -1848,6 +1851,7 @@ DESIGN TestTree {
     NEW trees BEFORE TOOLBARBOX {
         tabbed = TRUE;
         fill = 1;
+        alignment = STRETCH;
 
         NEW navigatorTab {
             caption = 'Navigator';
@@ -2137,6 +2141,7 @@ DESIGN TestOperators {
     NEW tabsContainer AFTER OBJECTS {
         tabbed = TRUE;
         flex = 1;
+        alignment = STRETCH;
 
         NEW concatTab {
             caption = 'concat';
@@ -2470,13 +2475,6 @@ DESIGN TestLabelWidth {
         MOVE PROPERTY(scolor(s));
     }
 }
-
-FORM TestColumns 'Group in columns test (Store/Article)'
-    OBJECTS s = Store, a = Article
-    PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(a) VALUE, name
-    PROPERTIES(s, a) COLUMNS 'store' (s) HEADER name(s) sainteger
-;
 
 substoreTitle = DATA BPSTRING[15] (SubStore);
 
@@ -2876,8 +2874,6 @@ NAVIGATOR {
         NEW TestTree;
         NEW TestFont;
         NEW TestPivot;
-        NEW TestColumnGroupObjects;
-        NEW TestHeaders;
         NEW TestEvalActionForm;
         NEW TestOnActions;
         NEW TestOperators;
