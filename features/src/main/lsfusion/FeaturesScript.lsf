@@ -2035,32 +2035,6 @@ testOnStringChange() {
     MESSAGE 'On string change';
 }
 
-FORM TestOnActions 'Test "ON actions"'
-    OBJECTS str = BPSTRING[15] PANEL
-
-    OBJECTS s = Store
-    PROPERTIES(s) NEWSESSION VALUE,
-        name ON CHANGE onChangeStoreName() ON CHANGE BEFORE {MESSAGE 'before change';} ON CHANGE AFTER {MESSAGE 'after change';},
-        sinteger ON CHANGE onChangeSInteger(s),
-        sboolean,
-        ssc1 = storeSizeCode ON EDIT onEditStoreSizeCode(),
-        ssc2 = storeSizeCode ON CHANGE onChangeSizeCode(s),
-        DELETE ON CONTEXTMENU 'Hello world!' onHelloWorld() GRID
-    PROPERTIES(str) VALUE
-    EVENTS
-        ON CHANGE str testOnStringChange()
-;
-
-DESIGN TestOnActions {
-    PROPERTY(ssc1) {
-        caption = 'onEditTest';
-    }
-
-    PROPERTY(ssc2) {
-        caption = 'onChangeTest';
-    }
-}
-
 nameDate 'name:date' (Store store) = name(store) + ':' + sdate(store);
 
 sumDoubleInt 'double+integer' (Store store) = sdouble(store) + sinteger(store) CHARWIDTH 25;
@@ -2320,12 +2294,6 @@ changeAddDetailInputBarcode(Article article) {
 };
 addDetailInputBarcode 'Barcode input:' (article) = DATA LOCAL BPSTRING[15] (Article) TOOLBAR CHANGEKEY 'F4' EVENTID 'SCANNER'
     ON CHANGE { changeAddDetailInputBarcode(article); }
-FORM TestRequest 'RequestInput test'
-    OBJECTS s = Store PANEL, a = Article
-    PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble
-    PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode
-    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, balanceQuantity
-;
 
 contextStore(article) = DATA Store (Article);
 contextStoreName(Article article) = name(contextStore(article));
@@ -2340,20 +2308,6 @@ changeContextStore(Article article) {
 }
 
 barcodeMoreThanSome(Article article) = barcode(article AS Article) > '3';
-FORM TestContextFilters 'ContextFilters test'
-    OBJECTS s = Store, a = Article, a2 = Article
-    PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(a) VALUE, name, csn1 = contextStoreName, csn2 = contextStoreName ON CHANGE changeContextStore(a), barcode
-    PROPERTIES(a2) VALUE, name, csn3 = contextStoreName, csn4 = contextStoreName ON CHANGE changeContextStore(a)
-    FILTERS storeSize(contextStore(a)) == StoreSize.huge
-;
-
-DESIGN TestContextFilters {
-    PROPERTY(csn1) { caption = 'Default ON CHANGE'; }
-    PROPERTY(csn2) { caption = 'Custom ON CHANGE'; }
-    PROPERTY(csn3) { caption = 'Default ON CHANGE'; }
-    PROPERTY(csn4) { caption = 'Custom ON CHANGE'; }
-}
 
 FORM TestQuickFilter 'QuickFilter test'
     OBJECTS s = Store, a = Article GRID
@@ -2800,6 +2754,236 @@ FORM TestReadWrite 'READ/WRITE test'
     PROPERTIES(s) GRID VALUE, name, path, readA, writeA
 ;
 
+dq = DATA DOUBLE (Store, Article);
+
+changeB(Store s, Article a) {
+    ASK 'Are you sure?' DO
+        INPUT d = DOUBLE DO
+            dq(s, a) <- d (+) 1;
+}
+
+CONSTRAINT dq(s, a) < 10 MESSAGE 'ddd';
+
+FORM InputC
+    OBJECTS c = DOUBLE PANEL
+    PROPERTIES (c) VALUE
+
+    OBJECTS d = DOUBLE PANEL
+    PROPERTIES (d) VALUE
+
+    OBJECTS s = Store PANEL
+;
+
+CLASS ABSTRACT A0;
+a = ABSTRACT VALUE STRING[30] (A0) IN base;
+
+CLASS A1 : A0;
+a1 = DATA STRING[30] (A1);
+a(A1 a1) += a1(a1);
+FORM TFA1 'TEST 1'
+    OBJECTS a1 = A1 PANEL
+    PROPERTIES (a1) a1, VALUE
+    EDIT A1 OBJECT a1
+;
+
+// no EDIT form: NEW[A2] / EDIT open the automatic edit form
+CLASS A2 : A0;
+a2 = DATA STRING[30] (A2);
+a(A2 a2) += a2(a2);
+
+CLASS A3 : A0;
+a3 = DATA STRING[30] (A3);
+a(A3 a3) += a3(a3);
+FORM TFA3 'TEST 3'
+    OBJECTS a3 = A3 PANEL
+    PROPERTIES (a3) a3
+    EDIT A3 OBJECT a3
+;
+
+changeC(Store s, Article a) {
+    INPUT
+        z = dq(s, a) CHANGE DO {
+        DIALOG InputC OBJECTS
+            c= dq(s, a) CHANGE NOCONSTRAINTFILTER NOASSIGN;
+    };
+
+    //    ASK 'Are you sure?' d=YESNO DO {
+    //        ASK 'Definitely' IF NOT d DO { 
+    //            DIALOG InputC OBJECTS c INPUT z DO 
+    //                dq(s, a) <- z;       
+    //        }
+    //    }
+
+    //    FOR DOUBLE c == 5 DO {
+    //        LOCAL rrr = DOUBLE ();
+    //        DIALOG InputC OBJECTS c=dq(s,a) INPUT b TO rrr,d INPUT y, s INPUT z DO 
+    //            dq(s, a) <- b (+) y;
+    //    }
+}
+
+changeA(A0 a) {
+    formEdit(a);
+}
+
+fltest = DATA FILE ();
+test 'TEST INPUT FILE' () {
+    INPUT = fltest() CHANGE;
+}
+
+FORM ListA0
+    OBJECTS a0 = A0
+    PROPERTIES (a0) a
+;
+
+testExternalResult = DATA LOCAL FILE ();
+testExternal(a, b) {
+    EXTERNAL SQL 'jdbc:postgresql://localhost/testdb?user=postgres&password=11111' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult;
+}
+
+xa = DATA LOCAL DOUBLE (INTEGER);
+xb = DATA LOCAL TEXT (INTEGER);
+xc = DATA LOCAL TEXT (INTEGER);
+xd = DATA LOCAL TEXT (INTEGER);
+xs = DATA LOCAL TEXT (INTEGER);
+
+FORM ShowX
+    OBJECTS i = INTEGER
+    PROPERTIES (i) xa, xb, xc, xd
+    FILTERS imported(i)
+;
+
+testExport (Store s) {
+    LOCAL t = FILE ();
+    EXPORT TABLE FROM a = incomeQuantity(s, Article a), b = name(a), c = barcode(a), d = name(a), s = name(s) WHERE incomeQuantity(s, a) TO t;
+    //    open(t());
+    //    IMPORT XML ROOT 'export' TO xa=a, xb=b, xc=c, xd=d, xs=s FROM t();
+
+    //    EXTERNAL SQL '$1' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $2 x WHERE x.a > $3;' PARAMS 'jdbc:postgresql://localhost/vitalur?user=postgres&password=11111', t(), 7 TO testExternalResult;
+    testExternal(t(), 7);
+
+    IMPORT TABLE FROM testExternalResult() FIELDS DOUBLE a, TEXT b, TEXT c, TEXT d DO {
+        xa(row) <- a;
+        xb(row) <- b;
+        xc(row) <- c;
+        xd(row) <- d;
+    }
+
+    SHOW ShowX;
+
+    testExternal(t(), 8);
+
+    IMPORT TABLE FROM testExternalResult() TO xa = a, xb = b, xc = c, xd = d;
+
+    SHOW ShowX DOCKED;
+
+    EXTERNAL LSF 'http://localhost:7651' EXEC 'Features.testImport[FILE]' PARAMS t();
+}
+
+FORM TestRequestInput 'Input & ON CHANGE'
+    // INPUT / DIALOG
+    OBJECTS s = Store PANEL, a = Article
+    PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, testExport
+    PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode, contextStore
+    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, balanceQuantity, b = dq ON CHANGE test(), c = dq ON CHANGE changeC(s, a)
+    PROPERTIES(s, a) d = dq ON CHANGE {
+        INPUT z = dq(s, a) CHANGE;
+        ACTIVATE PROPERTY TestRequestInput.b;
+    }, e = dq ON CHANGE changeB(s, a)
+
+    OBJECTS a0 = A0
+    PROPERTIES (a0) a, 'Add A1' = NEW[A1], 'Add A2' = NEW[A2], EDIT, DELETE
+    PROPERTIES fltest(), 'TESTCAPTION' = 5 ON CHANGE {
+        DIALOG ListA0 OBJECTS a0= a0 NULL INPUT x DO {
+            SEEK TestRequestInput.a0 = x;
+        }
+    }, v = {
+        MESSAGE 'HI';
+        formEdit(a0);
+    }, test()
+
+    // ON CHANGE / ON EDIT / ON CONTEXTMENU
+    OBJECTS str = BPSTRING[15] PANEL
+
+    OBJECTS os = Store
+    PROPERTIES(os) NEWSESSION VALUE,
+        name ON CHANGE onChangeStoreName() ON CHANGE BEFORE {MESSAGE 'before change';} ON CHANGE AFTER {MESSAGE 'after change';},
+        sinteger ON CHANGE onChangeSInteger(os),
+        sboolean,
+        ssc1 = storeSizeCode ON EDIT onEditStoreSizeCode(),
+        ssc2 = storeSizeCode ON CHANGE onChangeSizeCode(os),
+        DELETE ON CONTEXTMENU 'Hello world!' onHelloWorld() GRID
+    PROPERTIES(str) VALUE
+
+    // CONSTRAINT ... CHECKED filters the change dialog of contextStore
+    OBJECTS cs = Store, ca = Article, ca2 = Article
+    PROPERTIES(cs) VALUE, name, storeSizeName
+    PROPERTIES(ca) VALUE, name, csn1 = contextStoreName, csn2 = contextStoreName ON CHANGE changeContextStore(ca), barcode
+    PROPERTIES(ca2) VALUE, name, csn3 = contextStoreName, csn4 = contextStoreName ON CHANGE changeContextStore(ca2)
+    FILTERS storeSize(contextStore(ca)) == StoreSize.huge
+
+    EVENTS
+        ON CHANGE str testOnStringChange()
+;
+
+DESIGN TestRequestInput {
+    PROPERTY (b) {
+        caption = 'ON CHANGE: INPUT file';
+    }
+    PROPERTY (c) {
+        caption = 'ON CHANGE: DIALOG CHANGE NOASSIGN';
+    }
+    PROPERTY (d) {
+        caption = 'ON CHANGE: INPUT + ACTIVATE';
+    }
+    PROPERTY (e) {
+        caption = 'ON CHANGE: ASK + INPUT';
+    }
+
+    PROPERTY(ssc1) {
+        caption = 'onEditTest';
+    }
+    PROPERTY(ssc2) {
+        caption = 'onChangeTest';
+    }
+
+    PROPERTY(csn1) { caption = 'Default ON CHANGE'; }
+    PROPERTY(csn2) { caption = 'Custom ON CHANGE'; }
+    PROPERTY(csn3) { caption = 'Default ON CHANGE'; }
+    PROPERTY(csn4) { caption = 'Custom ON CHANGE'; }
+
+    NEW tabs BEFORE TOOLBARBOX {
+        tabbed = TRUE;
+        fill = 1;
+        alignment = STRETCH;
+
+        NEW inputTab {
+            caption = 'INPUT / DIALOG';
+            MOVE BOX(s);
+            MOVE BOX(a);
+            MOVE BOX(a0);
+            MOVE PANEL;
+        }
+
+        NEW onChangeTab {
+            caption = 'ON CHANGE / ON EDIT';
+            MOVE BOX(str);
+            MOVE BOX(os);
+        }
+
+        NEW contextFiltersTab {
+            caption = 'Context filters';
+            horizontal = TRUE;
+            MOVE BOX(cs);
+            NEW contextArticles {
+                fill = 2;
+                alignment = STRETCH;
+                MOVE BOX(ca);
+                MOVE BOX(ca2);
+            }
+        }
+    }
+}
+
 //////////////// INDEX STATEMENT //////////////////
 // Syntax:
 // INDEX propertyName1(param1, ..., paramN) | paramI  [, ..., propertyNameN (param1, ..., paramN) | paramI];
@@ -2875,11 +3059,8 @@ NAVIGATOR {
         NEW TestFont;
         NEW TestPivot;
         NEW TestEvalActionForm;
-        NEW TestOnActions;
         NEW TestOperators;
         NEW TestLayout;
-        NEW TestRequest;
-        NEW TestContextFilters;
         NEW TestQuickFilter;
         NEW TestQuickSearch;
         NEW TestMargins;
@@ -2900,6 +3081,7 @@ NAVIGATOR {
         NEW TestReadWrite;
         NEW TestImport;
         NEW TestEmailForm;
+        NEW TestRequestInput;
     }
 
     MOVE storeArticle;
@@ -3080,135 +3262,6 @@ NAVIGATOR {
     NEW testAdd;
 }
 
-dq = DATA DOUBLE (Store, Article);
-
-changeB(Store s, Article a) {
-    ASK 'Are you sure?' DO
-        INPUT d = DOUBLE DO
-            dq(s, a) <- d (+) 1;
-}
-
-CONSTRAINT dq(s, a) < 10 MESSAGE 'ddd';
-
-FORM InputC
-    OBJECTS c = DOUBLE PANEL
-    PROPERTIES (c) VALUE
-
-    OBJECTS d = DOUBLE PANEL
-    PROPERTIES (d) VALUE
-
-    OBJECTS s = Store PANEL
-;
-
-CLASS ABSTRACT A0;
-a = ABSTRACT VALUE STRING[30] (A0) IN base;
-
-CLASS A1 : A0;
-a1 = DATA STRING[30] (A1);
-a(A1 a1) += a1(a1);
-FORM TFA1 'TEST 1'
-    OBJECTS a1 = A1 PANEL
-    PROPERTIES (a1) a1, VALUE
-    EDIT A1 OBJECT a1
-;
-
-CLASS A2 : A0;
-a2 = DATA STRING[30] (A2);
-a(A2 a2) += a2(a2);
-FORM TFA2 'TEST 2'
-    OBJECTS a2 = A2 PANEL
-    PROPERTIES (a2) a2
-    //    EDIT A2 OBJECT a2
-;
-
-CLASS A3 : A0;
-a3 = DATA STRING[30] (A3);
-a(A3 a3) += a3(a3);
-FORM TFA3 'TEST 3'
-    OBJECTS a3 = A3 PANEL
-    PROPERTIES (a3) a3
-    EDIT A3 OBJECT a3
-;
-
-changeC(Store s, Article a) {
-    INPUT
-        z = dq(s, a) CHANGE DO {
-        DIALOG InputC OBJECTS
-            c= dq(s, a) CHANGE NOCONSTRAINTFILTER NOASSIGN;
-    };
-
-    //    ASK 'Are you sure?' d=YESNO DO {
-    //        ASK 'Definitely' IF NOT d DO { 
-    //            DIALOG InputC OBJECTS c INPUT z DO 
-    //                dq(s, a) <- z;       
-    //        }
-    //    }
-
-    //    FOR DOUBLE c == 5 DO {
-    //        LOCAL rrr = DOUBLE ();
-    //        DIALOG InputC OBJECTS c=dq(s,a) INPUT b TO rrr,d INPUT y, s INPUT z DO 
-    //            dq(s, a) <- b (+) y;
-    //    }
-}
-
-changeA(A0 a) {
-    formEdit(a);
-}
-
-fltest = DATA FILE ();
-test 'TEST INPUT FILE' () {
-    INPUT = fltest() CHANGE;
-}
-
-FORM ListA0
-    OBJECTS a0 = A0
-    PROPERTIES (a0) a
-;
-
-testExternalResult = DATA LOCAL FILE ();
-testExternal(a, b) {
-    EXTERNAL SQL 'jdbc:postgresql://localhost/testdb?user=postgres&password=11111' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult;
-}
-
-xa = DATA LOCAL DOUBLE (INTEGER);
-xb = DATA LOCAL TEXT (INTEGER);
-xc = DATA LOCAL TEXT (INTEGER);
-xd = DATA LOCAL TEXT (INTEGER);
-xs = DATA LOCAL TEXT (INTEGER);
-
-FORM ShowX
-    OBJECTS i = INTEGER
-    PROPERTIES (i) xa, xb, xc, xd
-    FILTERS imported(i)
-;
-
-testExport (Store s) {
-    LOCAL t = FILE ();
-    EXPORT TABLE FROM a = incomeQuantity(s, Article a), b = name(a), c = barcode(a), d = name(a), s = name(s) WHERE incomeQuantity(s, a) TO t;
-    //    open(t());
-    //    IMPORT XML ROOT 'export' TO xa=a, xb=b, xc=c, xd=d, xs=s FROM t();
-
-    //    EXTERNAL SQL '$1' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $2 x WHERE x.a > $3;' PARAMS 'jdbc:postgresql://localhost/vitalur?user=postgres&password=11111', t(), 7 TO testExternalResult;
-    testExternal(t(), 7);
-
-    IMPORT TABLE FROM testExternalResult() FIELDS DOUBLE a, TEXT b, TEXT c, TEXT d DO {
-        xa(row) <- a;
-        xb(row) <- b;
-        xc(row) <- c;
-        xd(row) <- d;
-    }
-
-    SHOW ShowX;
-
-    testExternal(t(), 8);
-
-    IMPORT TABLE FROM testExternalResult() TO xa = a, xb = b, xc = c, xd = d;
-
-    SHOW ShowX DOCKED;
-
-    EXTERNAL LSF 'http://localhost:7651' EXEC 'Features.testImport[FILE]' PARAMS t();
-}
-
 impQ = DATA DOUBLE (Store, Article);
 
 FORM ImpQ
@@ -3240,41 +3293,6 @@ FORM articlesTest
     PROPERTIES(s) VALUE, name
     FILTERS name(s)
 ;
-
-FORM TestRequestInput 'RequestInput test'
-    OBJECTS s = Store PANEL, a = Article
-    PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, testExport
-    PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode, contextStore
-    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, b = dq ON CHANGE test(), c = dq ON CHANGE changeC(s, a)
-    PROPERTIES(s, a) d = dq ON CHANGE {
-        INPUT z = dq(s, a) CHANGE;
-        ACTIVATE PROPERTY TestRequestInput.b;
-    }
-
-    OBJECTS a0 = A0
-    PROPERTIES (a0) a, 'Add A1' = NEW[A1], 'Add A2' = NEW[A2], EDIT, DELETE
-    PROPERTIES fltest(), 'TESTCAPTION' = 5 ON CHANGE {
-        DIALOG ListA0 OBJECTS a0= a0 NULL INPUT x DO {
-            SEEK TestRequestInput.a0 = x;
-        }
-    }, v = {
-        MESSAGE 'HI';
-        formEdit(a0);
-    }, test()
-;
-
-DESIGN TestRequestInput {
-    PROPERTY (b) {
-        caption = 'BQ';
-    }
-    PROPERTY (c) {
-        caption = 'CQ';
-    }
-}
-
-NAVIGATOR {
-    NEW TestRequestInput;
-}
 
 CLASS Class1 'Class1';
 CLASS Class2 'Class2';
