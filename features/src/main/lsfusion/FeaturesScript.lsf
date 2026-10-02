@@ -1448,19 +1448,57 @@ asonMessage {
     MESSAGE 'ASON change';
 } ASON CHANGE stringWithComment[];
 
-FORM TestPropertyOptions 'Property Options test'
-    PROPERTIES() stringWithComment, stringWithPlaceholder, 
+// SHOWIF, READONLYIF, DISABLEIF
+showIfReadOnly = DATA LOCAL STRING();
+
+makeReadOnly = DATA LOCAL BOOLEAN();
+makeDisabled = DATA LOCAL BOOLEAN();
+
+makeReadOnly = DATA LOCAL BOOLEAN (Store);
+makeDisabled = DATA LOCAL BOOLEAN (Store);
+
+okAction() { MESSAGE 'ok'; }
+readOnlyProp() = DATA STRING();
+disabledProp() = DATA STRING();
+readonlyDisabledProp() = DATA STRING();
+
+// fonts
+largeFont = DATA STRING();
+smallFont = DATA STRING();
+
+FORM TestPropertyOptions 'Property options'
+    PROPERTIES() stringWithComment, stringWithPlaceholder,
         stringWithPattern, numericWithPattern, dateWithStaticPattern, dynamicPattern, dateWithDynamicPattern,
         stringWithStaticRegexp, dynamicRegexp, stringWithDynamicRegexp,
         button1, button21, button22, button3
 
     //PROPERTIES () address ON CHANGE { INPUT sl = STRING[500] CUSTOM 'googleAutocomplete' DO address() <- sl; }
-    
+
     OBJECTS s = Store
     PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
     //PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect
-    
+
+    // SHOWIF, READONLYIF, DISABLEIF
+    PROPERTIES makeReadOnly(), makeDisabled(), showIfReadOnly() SHOWIF makeReadOnly()
+    PROPERTIES() okAction READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+
+    PROPERTIES() readOnlyProp READONLYIF makeReadOnly(),
+        disabledProp DISABLEIF makeDisabled(),
+        readonlyDisabledProp READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+
+    OBJECTS rs = Store
+    PROPERTIES(rs) makeReadOnly, makeDisabled
+    PROPERTIES(rs) READONLYIF makeReadOnly(rs) DISABLEIF makeDisabled(rs)
+        name, storeSizeCode, scolor
+
+    TREE elements te = NavigatorElement PARENT parent(te)
+    PROPERTIES(te) READONLYIF makeReadOnly() DISABLEIF makeDisabled()
+        caption READONLY, canonicalName DISABLE, number
+
+    // fonts
+    PROPERTIES() largeFont, smallFont
+
     EVENTS
     ON CHANGE PROPERTY BEFORE stringWithComment() {
         MESSAGE 'before onchange';
@@ -1526,6 +1564,53 @@ DESIGN TestPropertyOptions {
             MOVE PROPERTY(button22());
         }
         MOVE PROPERTY(button3());
+    }
+
+    PROPERTY (largeFont()) {
+        captionFont = 'italic 48';
+        font = 'bold 36';
+    }
+    PROPERTY (smallFont()) {
+        fontSize = 10;
+    }
+
+    NEW tabs BEFORE TOOLBARBOX {
+        tabbed = TRUE;
+        fill = 1;
+        alignment = STRETCH;
+
+        NEW optionsTab {
+            caption = 'Options';
+            MOVE PANEL;
+            MOVE BOX(s);
+        }
+
+        NEW showIfTab {
+            caption = 'SHOWIF / READONLYIF / DISABLEIF';
+            NEW showIfPanel {
+                lines = 2;
+                MOVE PROPERTY(makeReadOnly());
+                MOVE PROPERTY(makeDisabled());
+                MOVE PROPERTY(showIfReadOnly());
+                MOVE PROPERTY(okAction());
+                MOVE PROPERTY(readOnlyProp());
+                MOVE PROPERTY(disabledProp());
+                MOVE PROPERTY(readonlyDisabledProp());
+            }
+            NEW showIfTables {
+                horizontal = TRUE;
+                fill = 1;
+                alignment = STRETCH;
+                MOVE BOX(rs);
+                MOVE BOX(TREE elements);
+            }
+        }
+
+        NEW fontsTab {
+            caption = 'Fonts';
+            MOVE PROPERTY(largeFont());
+            MOVE PROPERTY(smallFont());
+        }
     }
 }
 
@@ -1802,39 +1887,6 @@ FORM TestMultithreading 'Multithreading test'
     PROPERTIES (y) VALUE, dataX;
 ;
 
-//--------------- SHOWIF, READONLYIF, DISABLEIF test ---------------//
-
-showIfReadOnly = DATA LOCAL STRING();
-
-makeReadOnly = DATA LOCAL BOOLEAN();
-makeDisabled = DATA LOCAL BOOLEAN();
-
-makeReadOnly = DATA LOCAL BOOLEAN (Store);
-makeDisabled = DATA LOCAL BOOLEAN (Store);
-
-okAction() { MESSAGE 'ok'; }
-readOnlyProp() = DATA STRING();
-disabledProp() = DATA STRING();
-readonlyDisabledProp() = DATA STRING();
-
-FORM TestShowIfReadOnlyIfDisableIf 'ShowIf ReadOnlyIf DisableIf test'
-    PROPERTIES makeReadOnly(), makeDisabled(), showIfReadOnly() SHOWIF makeReadOnly()
-    PROPERTIES() okAction READONLYIF makeReadOnly() DISABLEIF makeDisabled()
-
-    PROPERTIES() readOnlyProp READONLYIF makeReadOnly(),
-        disabledProp DISABLEIF makeDisabled(),
-        readonlyDisabledProp READONLYIF makeReadOnly() DISABLEIF makeDisabled()
-
-    OBJECTS s = Store
-    PROPERTIES(s) makeReadOnly, makeDisabled
-    PROPERTIES(s) READONLYIF makeReadOnly(s) DISABLEIF makeDisabled(s)
-        name, storeSizeCode, scolor
-    
-    TREE elements e = NavigatorElement PARENT parent(e)
-    PROPERTIES(e) READONLYIF makeReadOnly() DISABLEIF makeDisabled()
-        caption READONLY, canonicalName DISABLE, number
-;
-
 //--------------- Actions test ---------------//
 
 confirmExceptionMessage() { throwException('confirmed'); } CONFIRM;
@@ -1988,25 +2040,6 @@ longToStr 'long->string' () = STRING(long());
 rounding = DATA NUMERIC[10,3](); //12345.678
 rounded1 = ROUND(rounding(), 2); //12345.68
 rounded2 = ROUND(rounding(), -2); //12300.00
-
-//--------------- Font test ---------------//
-
-largeFont = DATA STRING();
-smallFont = DATA STRING();
-
-FORM TestFont 'Font test'
-    PROPERTIES() largeFont, smallFont
-;
-
-DESIGN TestFont {
-    PROPERTY (largeFont()) {
-        captionFont = 'italic 48';
-        font = 'bold 36';
-    }
-    PROPERTY (smallFont()) {
-        fontSize = 10;
-    }
-}
 
 //--------------- Pivot test ---------------//
 
@@ -3078,10 +3111,8 @@ NAVIGATOR {
         NEW TestShowClose;
         NEW TestExport;
         NEW TestMultithreading;      
-        NEW TestShowIfReadOnlyIfDisableIf;
         NEW TestActions;
         NEW TestTree;
-        NEW TestFont;
         NEW TestPivot;
         NEW TestEvalActionForm;
         NEW TestOperators;
