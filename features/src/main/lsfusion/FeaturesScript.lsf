@@ -1025,11 +1025,6 @@ FORM storeArticle 'By warehouses'
         FILTER '{showhuge}' storeIsHuge(s) 'F10'
 ;
 
-FORM TestSeek 'SEEK test'
-    OBJECTS g = (s = Store, a = Article)
-    PROPERTIES VALUE(s), name(s), VALUE(a), name(a), incomeQuantity(s, a), storeSizeName(s)
-;
-
 countF 'Number of filtered warehouses' = GROUP SUM 1 IF [ VIEW storeArticle.s](Store s);
 orderF 'Order in an object group' (Store s) = PARTITION SUM 1 IF [ FILTER storeArticle.s](s) ORDER [ ORDER storeArticle.s](s), s;
 setNameX 'Add X to name'() {
@@ -1050,49 +1045,12 @@ seekX 'Seek object'() {
     }
 }
 
-seekLast { SEEK LAST TestSeek.g ; }
-seekFirst { SEEK FIRST TestSeek.g ; }
-
 editTest = DATA INTEGER ();
 
 EXTEND FORM storeArticle
     PROPERTIES() countF, setNameX, seekX, editTest
     PROPERTIES VALUE(s)
     PROPERTIES(s) orderF
-;
-
-seekLC 'Seek object s Last' () {
-    DIALOG TestSeek OBJECTS s INPUT DO {
-        SEEK LAST TestSeek.s = s;
-    }
-}
-
-seekFC 'Seek object s First'() {
-    DIALOG TestSeek OBJECTS s INPUT DO {
-        SEEK FIRST TestSeek.s = s;
-    }
-}
-
-seekGFC 'Seek group (s, a) First' () {
-    DIALOG TestSeek OBJECTS s INPUT NULL, a INPUT NULL DO {
-        SEEK TestSeek.g OBJECTS s = s, a = a;
-    }
-}
-
-seekPart 'Seek Part s Last' () {
-    DIALOG TestSeek OBJECTS s INPUT NULL DO {
-        SEEK LAST TestSeek.g OBJECTS s = s;
-    }
-}
-
-seekPartF 'Seek Part a First' () {
-    DIALOG TestSeek OBJECTS a INPUT NULL DO {
-        SEEK TestSeek.g OBJECTS a = a;
-    }
-}
-
-EXTEND FORM TestSeek
-    PROPERTIES seekLast(), seekFirst(), seekFC(), seekLC(), seekGFC(), seekPart(), seekPartF()
 ;
 
 //////////////// DESIGN STATEMENT /////////////////
@@ -1274,9 +1232,9 @@ EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
 
 //--------------- Hotkeys test ---------------//
 
-sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLCK';
+sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLK';
 
-FORM TestHotkeysAndFilters 'Hotkeys and Filters test'
+FORM TestHotkeysAndFilters 'Filters, search & hotkeys'
     OBJECTS s = Store
     PROPERTIES(s) ns = name ORDER DESC ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2' LOG; },
         'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeName
@@ -1305,6 +1263,27 @@ FORM TestHotkeysAndFilters 'Hotkeys and Filters test'
     EVENTS ON FILTERS PROPERTY storeSizeName(s) {
         MESSAGE 'changed filter property';
     }
+
+    // QUICKFILTER
+    OBJECTS qs = Store
+    PROPERTIES(qs) VALUE, name, storeSizeName
+    PROPERTIES(qs) QUICKFILTER name(qs) sinteger, sdouble, slong
+
+    // quick search (quickSearch is set in DESIGN for the first table only)
+    OBJECTS qss = Store, qss2 = Store
+    PROPERTIES(qss) READONLY name, VALUE, storeSizeName, sinteger
+    PROPERTIES(qss) sdouble, slong
+    PROPERTIES(qss2) VALUE, name, storeSizeName, sinteger, sdouble, slong
+
+    // SEEK
+    OBJECTS g = (gs = Store, ga = Article)
+    PROPERTIES VALUE(gs), name(gs), VALUE(ga), name(ga), incomeQuantity(gs, ga), storeSizeName(gs)
+
+    // ACTIVATE PROPERTY
+    OBJECTS fs = Store, fa = Article
+    PROPERTIES(fs) VALUE, name, storeSizeName, sdouble
+    PROPERTIES(fa) VALUE, name
+    PROPERTIES(fs, fa) sadouble
 ;
 
 setFilterGroup() {
@@ -1336,7 +1315,47 @@ EXTEND FORM TestHotkeysAndFilters
         FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
 
     PROPERTIES() setFilterGroup, readFilterGroup, clearFilterGroup,
-        setFilterProperty, readFilterProperty, clearFilterProperty
+        setFilterProperty, readFilterProperty, clearFilterProperty, sleepTwoSeconds
+;
+
+seekLast { SEEK LAST TestHotkeysAndFilters.g ; }
+seekFirst { SEEK FIRST TestHotkeysAndFilters.g ; }
+
+seekLC 'Seek object s Last' () {
+    DIALOG TestHotkeysAndFilters OBJECTS gs INPUT DO {
+        SEEK LAST TestHotkeysAndFilters.gs = gs;
+    }
+}
+
+seekFC 'Seek object s First'() {
+    DIALOG TestHotkeysAndFilters OBJECTS gs INPUT DO {
+        SEEK FIRST TestHotkeysAndFilters.gs = gs;
+    }
+}
+
+seekGFC 'Seek group (s, a) First' () {
+    DIALOG TestHotkeysAndFilters OBJECTS gs INPUT NULL, ga INPUT NULL DO {
+        SEEK TestHotkeysAndFilters.g OBJECTS gs = gs, ga = ga;
+    }
+}
+
+seekPart 'Seek Part s Last' () {
+    DIALOG TestHotkeysAndFilters OBJECTS gs INPUT NULL DO {
+        SEEK LAST TestHotkeysAndFilters.g OBJECTS gs = gs;
+    }
+}
+
+seekPartF 'Seek Part a First' () {
+    DIALOG TestHotkeysAndFilters OBJECTS ga INPUT NULL DO {
+        SEEK TestHotkeysAndFilters.g OBJECTS ga = ga;
+    }
+}
+
+focusStoreName 'Move focus to name (s)'() { ACTIVATE PROPERTY TestHotkeysAndFilters.name(fs); }
+
+EXTEND FORM TestHotkeysAndFilters
+    PROPERTIES DRAW g seekLast(), seekFirst(), seekFC(), seekLC(), seekGFC(), seekPart(), seekPartF()
+    PROPERTIES DRAW fs focusStoreName()
 ;
 
 DESIGN TestHotkeysAndFilters {
@@ -1354,6 +1373,44 @@ DESIGN TestHotkeysAndFilters {
     FILTERS(s) {
         //disable user filters
         //visible = FALSE;
+    }
+
+    GRID(qss) {
+        quickSearch = TRUE;
+    }
+
+    NEW tabs BEFORE TOOLBARBOX {
+        tabbed = TRUE;
+        fill = 1;
+        alignment = STRETCH;
+
+        NEW hotkeysTab {
+            caption = 'Filters & hotkeys';
+            MOVE BOX(s);
+            MOVE PANEL;
+        }
+
+        NEW quickFilterTab {
+            caption = 'QUICKFILTER';
+            MOVE BOX(qs);
+        }
+
+        NEW quickSearchTab {
+            caption = 'Quick search';
+            MOVE BOX(qss);
+            MOVE BOX(qss2);
+        }
+
+        NEW seekTab {
+            caption = 'SEEK';
+            MOVE BOX(g);
+        }
+
+        NEW focusTab {
+            caption = 'ACTIVATE PROPERTY';
+            MOVE BOX(fs);
+            MOVE BOX(fa);
+        }
     }
 }
 
@@ -2309,25 +2366,6 @@ changeContextStore(Article article) {
 
 barcodeMoreThanSome(Article article) = barcode(article AS Article) > '3';
 
-FORM TestQuickFilter 'QuickFilter test'
-    OBJECTS s = Store, a = Article GRID
-    PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(s) QUICKFILTER name(s) sinteger, sdouble, slong
-;
-
-FORM TestQuickSearch 'QuickSearch test'
-    OBJECTS s = Store, s2 = Store
-    PROPERTIES(s) READONLY name, VALUE, storeSizeName, sinteger
-    PROPERTIES(s) sdouble, slong
-    PROPERTIES(s2) VALUE, name, storeSizeName, sinteger, sdouble, slong
-;
-
-DESIGN TestQuickSearch {
-    GRID(s) {
-        quickSearch = TRUE;
-    }
-}
-
 FORM TestImage 'Image test'
     OBJECTS s = Store
     PROPERTIES(s) VALUE, name, storeSizeName, sinteger, simage
@@ -2379,19 +2417,6 @@ FORM TestToolbars 'Toolbars test'
 DESIGN TestToolbars {
     //    PROPERTY(sinteger) {height = 100; }
 }
-
-FORM TestFocus 'Focus test'
-    OBJECTS s = Store, a = Article
-    PROPERTIES(s) VALUE, name, storeSizeName, sdouble
-    PROPERTIES(a) VALUE, name
-    PROPERTIES(s, a) sadouble, partitionToArticles
-;
-
-focusStoreName 'Move focus to name (s)'() { ACTIVATE PROPERTY TestFocus.name(s); }
-
-EXTEND FORM TestFocus
-    PROPERTIES focusStoreName()
-;
 
 FORM TestRichText 'RichText test'
     OBJECTS s = Store
@@ -3061,12 +3086,9 @@ NAVIGATOR {
         NEW TestEvalActionForm;
         NEW TestOperators;
         NEW TestLayout;
-        NEW TestQuickFilter;
-        NEW TestQuickSearch;
         NEW TestMargins;
         NEW TestToolbars;
         NEW TestImage;
-        NEW TestFocus;
         NEW TestRichText;
         NEW TestLabelWidth;
         NEW TestColumns;
@@ -3077,7 +3099,6 @@ NAVIGATOR {
         NEW TestKeepSessionProps;
         NEW TestActionDebugger;
         NEW TestCase;
-        NEW TestSeek;
         NEW TestReadWrite;
         NEW TestImport;
         NEW TestEmailForm;
