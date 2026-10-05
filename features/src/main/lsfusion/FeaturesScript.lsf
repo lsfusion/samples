@@ -1205,31 +1205,6 @@ showStores(ArticleGroup ag, Store s) = aginteger(ag) > 5 AND s IS Store;
 
 storeIsHugeOrBig(Store s) = storeIsHuge(s) OR storeIsBig(s);
 
-//--------------- Tabs test ---------------//
-
-FORM TestTabs 'Tabs test'
-    OBJECTS s = Store, a = Article
-    PROPERTIES(s) VALUE, name, storeSizeCode
-    PROPERTIES(a) VALUE, name
-    PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foobar, testUnion
-    PROPERTIES SHOWIF storeIsHuge(s) PANEL iq = incomeQuantity(s, a)
-    PROPERTIES SHOWIF storeIsHugeOrBig(s) PANEL oq = outcomeQuantity(s, a)
-;
-
-DESIGN TestTabs {
-    NEW tabBox BEFORE TOOLBARBOX {
-        fill = 1;
-        tabbed = TRUE;
-        NEW tab1 { caption = 'Tab 1'; MOVE BOX(s); }
-        NEW tab2 { caption = 'Tab 2'; MOVE BOX(a); }
-    }
-}
-activateTab1() { ACTIVATE TAB TestTabs.tab1; }
-activateTab2() { ACTIVATE TAB TestTabs.tab2; }
-EXTEND FORM TestTabs PROPERTIES() activateTab1, activateTab2
-    EVENTS ON INIT activateTab2(), ON TAB tab2 { MESSAGE 'hello tab2'; }
-;
-
 //--------------- Hotkeys test ---------------//
 
 sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLK';
@@ -1614,35 +1589,6 @@ DESIGN TestPropertyOptions {
     }
 }
 
-//--------------- Collapsible containers test ---------------//
-
-FORM TestCollapsibleContainers 'Collapsible Containers test'
-    PROPERTIES() stringWithComment
-
-    OBJECTS s = Store
-    PROPERTIES(s) name
-;
-
-DESIGN TestCollapsibleContainers {
-    NEW container1 {
-        caption = 'FIRST';
-        MOVE PROPERTY(stringWithComment());
-    }
-}
-
-EXTEND FORM TestCollapsibleContainers
-EVENTS
-    ON EXPAND container1 {
-        MESSAGE 'FIRST expanded';
-    },
-    ON COLLAPSE container1 {
-        MESSAGE 'FIRST collapsed';
-    },
-    ON EXPAND BOX(s) {
-        MESSAGE 'BOX(s) expanded';
-    }
-;
-
 //--------------- Files & JSON test ---------------//
 
 FORM testJSON
@@ -1799,21 +1745,6 @@ DESIGN TestTypes {
         }
     }
 }
-
-//--------------- Show / Close test ---------------//
-
-FORM TestShowClose 'Show / Close test';
-
-DESIGN TestShowClose {
-    NEW innerContainer {
-        caption = 'inner container';
-    };
-}
-
-showTestTypes() { SHOW 'types' = TestTypes IN TestShowClose.innerContainer;}
-closeTestTypes() { CLOSE FORM 'types'; }
-EXTEND FORM TestShowClose
-    PROPERTIES() showTestTypes, closeTestTypes;
 
 //--------------- Export test ---------------//
 
@@ -2346,7 +2277,7 @@ DESIGN TestOperators {
     }
 }
 
-FORM TestLayout 'Layout test'
+FORM TestLayout 'Layout'
     OBJECTS ss1 = Store, ss2 = Store, sa = Article, ss3 = Store
     PROPERTIES(ss1) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble
     PROPERTIES(ss2) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, st = stext DRAW sa
@@ -2359,12 +2290,37 @@ FORM TestLayout 'Layout test'
     PROPERTIES(ss2) PANEL si5 = simage, st5 = stext
     PROPERTIES(ss2) PANEL si6 = simage, st6 = stext
     PROPERTIES(ss3) PANEL st7 = stext, st8 = stext
+
+    // tabs: ACTIVATE TAB, ON TAB, SHOWIF
+    OBJECTS ts = Store, ta = Article
+    PROPERTIES(ts) VALUE, name, storeSizeCode
+    PROPERTIES(ta) VALUE, name
+    PROPERTIES(ts, ta) incomeQuantity, outcomeQuantity, foobar, testUnion
+    PROPERTIES SHOWIF storeIsHuge(ts) PANEL iq = incomeQuantity(ts, ta)
+    PROPERTIES SHOWIF storeIsHugeOrBig(ts) PANEL oq = outcomeQuantity(ts, ta)
+
+    // margins
+    OBJECTS ms = Store, ma = Article
+    PROPERTIES(ms) VALUE, name, storeSizeName
+    PROPERTIES(ms) PANEL sinteger, sdouble, slong, sbpstring, snumeric
+    PROPERTIES(ma) VALUE, name
+
+    // caption width
+    OBJECTS lw = Store
+    PROPERTIES(lw) VALUE, name, storeSizeName, stime, sdate, sdatetime
+    PROPERTIES(lw) PANEL sinteger, sdouble, slong, sbpstring, snumeric, scolor
+
+    // collapsible containers: ON EXPAND / ON COLLAPSE
+    PROPERTIES() stringWithComment
+    OBJECTS cs = Store
+    PROPERTIES(cs) name
 ;
 
 DESIGN TestLayout {
     NEW layouts BEFORE TOOLBARBOX {
         fill = 1;
         tabbed = TRUE;
+        alignment = STRETCH;
 
         PROPERTY(st) {
             valueSize = (200, 36);
@@ -2425,6 +2381,103 @@ DESIGN TestLayout {
                 MOVE PROPERTY(st8) { caption = 'this caption is much loooooonger than the first one'; fill = 1; captionVertical = TRUE; }
             }
         }
+
+        NEW tabsTab {
+            caption = 'Tabs';
+            NEW tabBox {
+                fill = 1;
+                tabbed = TRUE;
+                NEW tab1 { caption = 'Tab 1'; MOVE BOX(ts); }
+                NEW tab2 { caption = 'Tab 2'; MOVE BOX(ta); }
+            }
+        }
+
+        NEW marginsTab {
+            caption = 'Margins';
+            NEW marginTabs {
+                tabbed = TRUE;
+                fill = 1;
+                margin = 10;
+                MOVE BOX(ms);
+                MOVE BOX(ma);
+            }
+        }
+
+        NEW captionWidthTab {
+            caption = 'Caption width';
+            MOVE BOX(lw);
+        }
+
+        NEW collapsibleTab {
+            caption = 'Collapsible';
+            NEW container1 {
+                caption = 'FIRST';
+                MOVE PROPERTY(stringWithComment());
+            }
+            MOVE BOX(cs);
+        }
+
+        NEW showCloseTab {
+            caption = 'SHOW IN / CLOSE FORM';
+            NEW innerContainer {
+                caption = 'inner container';
+                fill = 1;
+            }
+        }
+    }
+
+    GRID(ms) { margin = 20; }
+    BOX(ms) { margin = 10; }
+    PANEL(ms) {
+        caption = 'Warehouse (panel)';
+        margin = 10;
+    }
+    PROPERTY(sinteger(ms)) {margin = 5;}
+    PROPERTY(sdouble(ms)) {margin = 10;}
+    PROPERTY(slong(ms)) {margin = 15;}
+
+    GROUP(, lw) {
+        lines = 1;
+        MOVE PROPERTY(scolor(lw));
+    }
+}
+
+activateTab1() { ACTIVATE TAB TestLayout.tab1; }
+activateTab2() { ACTIVATE TAB TestLayout.tab2; }
+
+showTestTypes() { SHOW 'types' = TestTypes IN TestLayout.innerContainer;}
+closeTestTypes() { CLOSE FORM 'types'; }
+
+EXTEND FORM TestLayout
+    PROPERTIES() activateTab1, activateTab2, showTestTypes, closeTestTypes
+    EVENTS
+        ON INIT activateTab2(),
+        ON TAB tab2 { MESSAGE 'hello tab2'; },
+        ON EXPAND container1 {
+            MESSAGE 'FIRST expanded';
+        },
+        ON COLLAPSE container1 {
+            MESSAGE 'FIRST collapsed';
+        },
+        ON EXPAND BOX(cs) {
+            MESSAGE 'BOX(cs) expanded';
+        }
+;
+
+DESIGN TestLayout {
+    tabsTab {
+        NEW tabButtons FIRST {
+            horizontal = TRUE;
+            MOVE PROPERTY(activateTab1());
+            MOVE PROPERTY(activateTab2());
+        }
+    }
+    showCloseTab {
+        NEW showCloseButtons FIRST {
+            horizontal = TRUE;
+            MOVE PROPERTY(showTestTypes());
+            MOVE PROPERTY(closeTestTypes());
+        }
     }
 }
 
@@ -2434,10 +2487,10 @@ addDetailBarcode(Article article, BPSTRING[15] barcode) {
 
     IF dialogBarcodeArticle() IS Article THEN {
         //        MESSAGE 'FOUND: ' + name(dialogBarcodeArticle()) + '; current: ' + name(article);
-        SHOW TestTabs OBJECTS a= dialogBarcodeArticle() ;
+        SHOW TestLayout OBJECTS ta = dialogBarcodeArticle() ;
     } ELSE {
         //        MESSAGE 'NOT FOUND: current: ' + name(article);
-        SHOW TestTabs OBJECTS a= article ;
+        SHOW TestLayout OBJECTS ta = article ;
     }
 };
 
@@ -2461,56 +2514,6 @@ changeContextStore(Article article) {
 }
 
 barcodeMoreThanSome(Article article) = barcode(article AS Article) > '3';
-
-FORM TestMargins 'Margins test'
-    OBJECTS s = Store, a = Article
-    PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric
-    PROPERTIES(a) VALUE, name
-;
-
-DESIGN TestMargins {
-    GRID(s) { margin = 20; }
-    BOX(s) { margin = 10; }
-    PANEL(s) {
-        caption = 'Warehouse (panel)';
-        margin = 10;
-    }
-    NEW tabs BEFORE TOOLBARBOX {
-        tabbed = TRUE;
-        fill = 1;
-        margin = 10;
-        MOVE BOX(s);
-        MOVE BOX(a);
-    }
-    PROPERTY(sinteger(s)) {margin = 5;}
-    PROPERTY(sdouble(s)) {margin = 10;}
-    PROPERTY(slong(s)) {margin = 15;}
-}
-
-FORM TestToolbars 'Toolbars test'
-    OBJECTS s = Store, a = Article
-    PROPERTIES(s) VALUE, name, storeSizeName
-    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric
-    PROPERTIES(a) VALUE, name
-;
-
-DESIGN TestToolbars {
-    //    PROPERTY(sinteger) {height = 100; }
-}
-
-FORM TestLabelWidth 'LabelWidth test'
-    OBJECTS s = Store
-    PROPERTIES(s) VALUE, name, storeSizeName, stime, sdate, sdatetime
-    PROPERTIES(s) PANEL sinteger, sdouble, slong, sbpstring, snumeric, scolor
-;
-
-DESIGN TestLabelWidth {
-    GROUP(, s) {
-        lines = 1;
-        MOVE PROPERTY(scolor(s));
-    }
-}
 
 substoreTitle = DATA BPSTRING[15] (SubStore);
 
@@ -3108,12 +3111,9 @@ NAVIGATOR {
     }
 
     NEW FOLDER tests 'Tests' WINDOW toolbar {
-        NEW TestTabs SHOWIF isDesktop();
         NEW TestHotkeysAndFilters CHANGEKEY 'F9;priority=1000' SHOW;
         NEW TestPropertyOptions;
-        NEW TestCollapsibleContainers;
         NEW TestTypes;
-        NEW TestShowClose;
         NEW TestExport;
         NEW TestMultithreading;      
         NEW TestActions;
@@ -3122,11 +3122,8 @@ NAVIGATOR {
         NEW TestEvalActionForm;
         NEW TestOperators;
         NEW TestLayout;
-        NEW TestMargins;
-        NEW TestToolbars;
-        NEW TestLabelWidth;
         NEW TestColumns;
-        NEW TestDisappearingActon;
+        NEW TestDisappearingActon SHOWIF isDesktop();
         NEW TestSessionProps;
         NEW TestNestedSessions;
         NEW TestKeepSessionProps;
