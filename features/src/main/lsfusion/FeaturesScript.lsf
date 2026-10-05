@@ -1667,9 +1667,6 @@ namedFile = DATA NAMEDFILE ();
 videoFile = DATA VIDEOFILE();
 videoLink = DATA VIDEOLINK();
 
-FORM TestFilesAndJSON 'Files & JSON test'
-    PROPERTIES() rawFile, file, namedFile, actionJSON, videoFile, videoLink;
-
 //--------------- Links test ---------------//
 
 fileImage = DATA IMAGEFILE ();
@@ -1694,32 +1691,6 @@ openLinkCustom () { open(linkCustom()); }
 stringLinkStore = DATA STRING(Store);
 linkStore(Store s) = LINK(stringLinkStore(s));
 
-FORM TestLinks 'Links test'
-    PROPERTIES() fileImage, openFileImage, linkImage, openLinkImage,
-        filePDF, openFilePDF, linkPDF, openLinkPDF, linkRaw, openLinkRaw,
-        linkCustom, openLinkCustom
-    OBJECTS s = Store
-    PROPERTIES(s) stringLinkStore, linkStore
-;
-
-DESIGN TestLinks {
-    NEW top {
-        lines = 2;
-        MOVE PROPERTY(fileImage());
-        MOVE PROPERTY(openFileImage());
-        MOVE PROPERTY(linkImage());
-        MOVE PROPERTY(openLinkImage());
-        MOVE PROPERTY(filePDF());
-        MOVE PROPERTY(openFilePDF());
-        MOVE PROPERTY(linkPDF());
-        MOVE PROPERTY(openLinkPDF());
-        MOVE PROPERTY(linkRaw());
-        MOVE PROPERTY(openLinkRaw());
-        MOVE PROPERTY(linkCustom());
-        MOVE PROPERTY(openLinkCustom());
-    }
-}
-
 //--------------- Colors test ---------------//
 
 color (INTEGER i) = CASE
@@ -1728,14 +1699,106 @@ color (INTEGER i) = CASE
     WHEN i = 3 THEN #0000FF
 ;
 
-FORM TestColor 'Colors test'
-    OBJECTS i = INTEGER
-    PROPERTIES (i) color
-    FILTERS iterate(i, 1, 3)
+FORM TestTypes 'Value types'
+    // colors
+    OBJECTS ci = INTEGER
+    PROPERTIES (ci) color
+    FILTERS iterate(ci, 1, 3)
 
-    OBJECTS s = Store
-    PROPERTIES(s) scolor, NEW
+    OBJECTS cs = Store
+    PROPERTIES(cs) scolor, NEW
+
+    // image
+    OBJECTS ims = Store
+    PROPERTIES(ims) VALUE, name, storeSizeName, sinteger, simage
+    PROPERTIES(ims) PANEL si1 = simage
+
+    // RICHTEXT (HTML is also rendered in the printed form)
+    OBJECTS rts = Store
+    PROPERTIES(rts) PANEL s1 = srawrichtext, sr1 = srichtext
+    PROPERTIES(rts) VALUE, name, storeSizeCode, sr2 = srichtext
+
+    // files & JSON
+    PROPERTIES() rawFile, file, namedFile, actionJSON, videoFile, videoLink
+
+    // links
+    PROPERTIES() fileImage, openFileImage, linkImage, openLinkImage,
+        filePDF, openFilePDF, linkPDF, openLinkPDF, linkRaw, openLinkRaw,
+        linkCustom, openLinkCustom
+    OBJECTS ls = Store
+    PROPERTIES(ls) stringLinkStore, linkStore
 ;
+
+DESIGN TestTypes {
+    NEW tabs BEFORE TOOLBARBOX {
+        tabbed = TRUE;
+        fill = 1;
+        alignment = STRETCH;
+
+        NEW colorsTab {
+            caption = 'Colors';
+            horizontal = TRUE;
+            MOVE BOX(ci);
+            MOVE BOX(cs);
+        }
+
+        NEW imageTab {
+            caption = 'Image';
+            horizontal = TRUE;
+            MOVE BOX(ims);
+            MOVE PROPERTY(si1) { caption = ''; fill = 1; }
+        }
+
+        NEW richTextTab {
+            caption = 'RichText / HTML';
+            NEW richTextPanel {
+                horizontal = TRUE;
+                fill = 1;
+                alignment = STRETCH;
+
+                MOVE PROPERTY(s1) {
+                    captionVertical = TRUE;
+                    fill = 1;
+                }
+                MOVE PROPERTY(sr1) {
+                    captionVertical = TRUE;
+                    fill = 1;
+                }
+            }
+            MOVE BOX(rts);
+        }
+
+        NEW filesTab {
+            caption = 'Files & JSON';
+            MOVE PROPERTY(rawFile());
+            MOVE PROPERTY(file());
+            MOVE PROPERTY(namedFile());
+            MOVE PROPERTY(actionJSON());
+            MOVE PROPERTY(videoFile());
+            MOVE PROPERTY(videoLink());
+        }
+
+        NEW linksTab {
+            caption = 'Links';
+            NEW top {
+                lines = 2;
+                MOVE PROPERTY(fileImage());
+                MOVE PROPERTY(openFileImage());
+                MOVE PROPERTY(linkImage());
+                MOVE PROPERTY(openLinkImage());
+                MOVE PROPERTY(filePDF());
+                MOVE PROPERTY(openFilePDF());
+                MOVE PROPERTY(linkPDF());
+                MOVE PROPERTY(openLinkPDF());
+                MOVE PROPERTY(linkRaw());
+                MOVE PROPERTY(openLinkRaw());
+                MOVE PROPERTY(linkCustom());
+                MOVE PROPERTY(openLinkCustom());
+            }
+            MOVE BOX(ls);
+        }
+    }
+}
 
 //--------------- Show / Close test ---------------//
 
@@ -1747,10 +1810,10 @@ DESIGN TestShowClose {
     };
 }
 
-showTestColor() { SHOW 'colors' = TestColor IN TestShowClose.innerContainer;}
-closeTestColor() { CLOSE FORM 'colors'; }
+showTestTypes() { SHOW 'types' = TestTypes IN TestShowClose.innerContainer;}
+closeTestTypes() { CLOSE FORM 'types'; }
 EXTEND FORM TestShowClose
-    PROPERTIES() showTestColor, closeTestColor;
+    PROPERTIES() showTestTypes, closeTestTypes;
 
 //--------------- Export test ---------------//
 
@@ -2399,21 +2462,6 @@ changeContextStore(Article article) {
 
 barcodeMoreThanSome(Article article) = barcode(article AS Article) > '3';
 
-FORM TestImage 'Image test'
-    OBJECTS s = Store
-    PROPERTIES(s) VALUE, name, storeSizeName, sinteger, simage
-    PROPERTIES(s) PANEL si1 = simage
-;
-
-DESIGN TestImage {
-    NEW split BEFORE TOOLBARBOX {
-        horizontal = TRUE;
-        fill = 1;
-        MOVE BOX(s);
-        MOVE PROPERTY(si1) { caption = ''; fill = 1; };
-    }
-}
-
 FORM TestMargins 'Margins test'
     OBJECTS s = Store, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName
@@ -2449,30 +2497,6 @@ FORM TestToolbars 'Toolbars test'
 
 DESIGN TestToolbars {
     //    PROPERTY(sinteger) {height = 100; }
-}
-
-FORM TestRichText 'RichText test'
-    OBJECTS s = Store
-    PROPERTIES(s) PANEL s1 = srawrichtext, sr1 = srichtext
-    PROPERTIES(s) VALUE, name, sr2 = srichtext
-;
-
-DESIGN TestRichText {
-    BOX {
-        NEW split BEFORE TOOLBARBOX {
-            horizontal = TRUE;
-            fill = 1;
-
-            MOVE PROPERTY(s1) {
-                captionVertical = TRUE;
-                fill = 1;
-            }
-            MOVE PROPERTY(sr1) {
-                captionVertical = TRUE;
-                fill = 1;
-            }
-        }
-    }
 }
 
 FORM TestLabelWidth 'LabelWidth test'
@@ -2613,23 +2637,6 @@ FORM TestNestedSessions 'Nested sessions test'
     OBJECTS ag = ArticleGroup
     PROPERTIES(ag) VALUE, name, nameParent, testAddInNestedSession
 ;
-
-FORM TestHTMLInReports 'Test HTML in reports'
-    OBJECTS s = Store
-    PROPERTIES(s) store = VALUE, name, storeSizeCode, srichtext, sr = srichtext PANEL
-;
-
-DESIGN TestHTMLInReports {
-    BOX {
-        NEW richBox BEFORE TOOLBARBOX {
-            fill = 1;
-            MOVE PROPERTY(sr) {
-                captionVertical = TRUE;
-                fill = 1;
-            }
-        }
-    }
-}
 
 testSessionIntegerProperty() = DATA LOCAL NESTED INTEGER();
 FORM TestKeepSessionProps 'Test LOCAL NESTED'
@@ -3105,9 +3112,7 @@ NAVIGATOR {
         NEW TestHotkeysAndFilters CHANGEKEY 'F9;priority=1000' SHOW;
         NEW TestPropertyOptions;
         NEW TestCollapsibleContainers;
-        NEW TestFilesAndJSON;
-        NEW TestLinks;
-        NEW TestColor;
+        NEW TestTypes;
         NEW TestShowClose;
         NEW TestExport;
         NEW TestMultithreading;      
@@ -3119,14 +3124,11 @@ NAVIGATOR {
         NEW TestLayout;
         NEW TestMargins;
         NEW TestToolbars;
-        NEW TestImage;
-        NEW TestRichText;
         NEW TestLabelWidth;
         NEW TestColumns;
         NEW TestDisappearingActon;
         NEW TestSessionProps;
         NEW TestNestedSessions;
-        NEW TestHTMLInReports;
         NEW TestKeepSessionProps;
         NEW TestActionDebugger;
         NEW TestCase;
