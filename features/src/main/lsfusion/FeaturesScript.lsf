@@ -729,30 +729,15 @@ dateDocument(QuantityString s) = date(document(s));
 storeNameDocument(QuantityString s) = storeName(document(s));
 nameArticle(QuantityString s) = name(article(s));
 
-importNumber = DATA INTEGER (INTEGER);
-importName = DATA STRING[100] (INTEGER);
-
-importFile = DATA LOCAL FILE ();
-memoFile = DATA LOCAL FILE ();
-
-sheetNumber = DATA INTEGER ();
+importFile 'DBF file' = DATA LOCAL FILE ();
+memoFile 'FPT (memo) file' = DATA LOCAL FILE ();
 
 kgrmat = DATA STRING[100] (INTEGER);
 polnaim = DATA STRING[100] (INTEGER);
 
-importAction() {
-    READ 'file://c:/sprgrm.dbf' TO importFile;
-    READ 'file:///c:/sprgrm.fpt' TO memoFile;
-
+importAction 'IMPORT DBF MEMO' () {
     IMPORT DBF MEMO memoFile() FROM importFile() TO kgrmat = k_grmat, polnaim = pol_naim;
 }
-
-FORM TestImport 'IMPORT test'
-    OBJECTS i = INTEGER
-    PROPERTIES(i) kgrmat, polnaim
-    PROPERTIES() importAction, sheetNumber
-    FILTERS kgrmat(i)
-;
 
 ///////////////CONSTRAINT STATEMENT//////////////
 // Syntax:
@@ -975,18 +960,6 @@ justSendEmail 'Just send an email' (BPSTRING[200] to) {
         SUBJECT 'Letter subject'
         TO (to IF to IS BPSTRING[200])
         BODY '<font color=#FF0000 size=+3>big red text</font>';
-}
-
-FORM TestEmailForm 'EMAIL test'
-    OBJECTS s 'Email:' = STRING[100] PANEL, u = CustomUser
-    PROPERTIES VALUE(s), login(u), email(u), NEW(u), remindPasswordEmail(u, s) DRAW s, justSendEmail(s)
-    EVENTS ON INIT { forceUpdate('s'); }
-;
-
-DESIGN TestEmailForm {
-    GRID(s) {
-        enableManualUpdate = TRUE;
-    }
 }
 
 testRequestInput 'Testing REQUEST input'(Store s) {
@@ -1776,9 +1749,6 @@ exportFormDBF {
     EXPORT TestExport DBF TO s = exportFile;
     open(exportFile());
 }
-
-EXTEND FORM TestExport
-    PROPERTIES() exportPlainXML, exportFormXML, exportFormJSON, exportFormDBF;
 
 //--------------- Multithreading test ---------------//
 
@@ -2817,11 +2787,6 @@ path(Store s) = DATA BPSTRING[100](Store);
 readA(Store s) { READ path(s) TO file; }
 writeA(Store s) { WRITE file() TO path(s) + 'txt'; }
 
-FORM TestReadWrite 'READ/WRITE test'
-    OBJECTS s = Store
-    PROPERTIES(s) GRID VALUE, name, path, readA, writeA
-;
-
 dq = DATA DOUBLE (Store, Article);
 
 changeB(Store s, Article a) {
@@ -2903,9 +2868,11 @@ FORM ListA0
     PROPERTIES (a0) a
 ;
 
+externalSQLConnection 'JDBC connection string' = DATA STRING ();
+
 testExternalResult = DATA LOCAL FILE ();
 testExternal(a, b) {
-    EXTERNAL SQL 'jdbc:postgresql://localhost/testdb?user=postgres&password=11111' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult;
+    EXTERNAL SQL externalSQLConnection() EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult;
 }
 
 xa = DATA LOCAL DOUBLE (INTEGER);
@@ -2950,7 +2917,7 @@ testExport (Store s) {
 FORM TestRequestInput 'Input & ON CHANGE'
     // INPUT / DIALOG
     OBJECTS s = Store PANEL, a = Article
-    PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble, testExport
+    PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble
     PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode, contextStore
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, balanceQuantity, b = dq ON CHANGE test(), c = dq ON CHANGE changeC(s, a)
     PROPERTIES(s, a) d = dq ON CHANGE {
@@ -3052,6 +3019,205 @@ DESIGN TestRequestInput {
     }
 }
 
+//--------------- Integration test ---------------//
+
+// filled by testExport through EXTERNAL LSF
+impQ = DATA DOUBLE (Store, Article);
+
+testImport (FILE cf) {
+    IMPORT TABLE FROM cf TO xa = a, xb = b, xc = c, xd = d, xs = s;
+    FOR barcode(Article a) = xc(INTEGER i) AND name(Store s) = xs(i) DO {
+        impQ(s, a) <- xa(i);
+    }
+    APPLY;
+}
+
+// IMPORT XML with EXTID groups
+GROUP declaration EXTID 'gd:GoodsDeclaration';
+GROUP shipment EXTID 'cacdo:DeclarationGoodsShipmentDetails';//: declaration;
+order = DATA LOCAL INTEGER (INTEGER);
+
+FORM importDT
+    OBJECTS d = INTEGER EXTID 'cacdo:DeclarationGoodsItemDetails' IN shipment
+    PROPERTIES(d) order EXTID 'casdo:ConsignmentItemOrdinal'
+;
+
+importDeclaration 'IMPORT XML (declaration)' () {
+    INPUT f = FILE DO {
+        IMPORT importDT XML FROM f;
+        MESSAGE 'count=' + (GROUP SUM 1 IF order(INTEGER i));
+    }
+}
+
+GROUP bodyS EXTID 'S:Body';
+GROUP getDocumentsResponse EXTID 'GetDocumentsResponse' : bodyS;
+GROUP getDocumentsResult EXTID 'GetDocumentsResult' : getDocumentsResponse;
+
+succesful = DATA LOCAL NESTED BOOLEAN();
+message = DATA LOCAL NESTED TEXT();
+errorCode = DATA LOCAL NESTED INTEGER();
+
+FORM documentsResult
+    PROPERTIES() IN getDocumentsResult succesful EXTID 'Succesful',
+        message EXTID 'Message',
+        errorCode EXTID 'ErrorCode'
+;
+
+importDocumentsResult 'IMPORT XML (nested groups)' () {
+    INPUT f = FILE DO {
+        IMPORT documentsResult XML FROM f;
+        MESSAGE (CONCAT ', ', 'successful: ' + succesful(), 'message: ' + message(), 'error code: ' + errorCode());
+    }
+}
+
+// EXTERNAL HTTP
+doSomething(STRING[100] p1, STRING[100] p2) {
+    resultString() <- p1;
+}
+
+externalAction 'EXTERNAL HTTP (this server)' () {
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' PARAMS '1', '2';
+    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' NOENCODE PARAMS '1', '2';
+}
+
+externalHttpHeaders 'EXTERNAL HTTP (headers & cookies)' () {
+    LOCAL headers = TEXT(STRING[100]);
+    headers(r'h1') <- 'xxx';
+    headers(r'h2') <- 'yyy';
+
+    LOCAL cookies = TEXT(STRING[100]);
+    cookies(r'c1') <- '12345';
+    cookies(r'c2') <- '09876';
+
+    LOCAL headersTo = TEXT(STRING[100]);
+    LOCAL cookiesTo = TEXT(STRING[100]);
+    EXTERNAL HTTP GET r'https://httpbin.org/headers' HEADERS headers COOKIES cookies HEADERSTO headersTo COOKIESTO cookiesTo TO exportFile;
+    IF failedHttp() THEN MESSAGE 'Alarm!'; ELSE {
+        MESSAGE headersTo(r'Content-Type');
+        MESSAGE cookiesTo(r'c1');
+        open(exportFile());
+    }
+}
+
+// ZIP
+testMakeZipFile 'ZIP two files' () {
+    INPUT f1 = FILE DO
+        INPUT f2 = FILE DO
+            NEWSESSION {
+                zipping(r'first') <- f1;
+                zipping(r'second') <- f2;
+
+                makeZipFile();
+                open(zipped());
+            }
+}
+
+FORM TestIntegration 'Import / Export / External'
+    // EXPORT (the exported structure is the TestExport form)
+    PROPERTIES() exportPlainXML, exportFormXML, exportFormJSON, exportFormDBF
+
+    // IMPORT
+    PROPERTIES() importFile, memoFile, importAction, importDeclaration, importDocumentsResult
+    OBJECTS ii = INTEGER
+    PROPERTIES(ii) kgrmat, polnaim
+    FILTERS kgrmat(ii)
+
+    // READ / WRITE
+    OBJECTS rws = Store
+    PROPERTIES(rws) GRID VALUE, name, path, readA, writeA
+
+    // EXTERNAL SQL / LSF / HTTP
+    PROPERTIES() externalSQLConnection, externalAction, externalHttpHeaders
+    OBJECTS es = Store, ea = Article
+    PROPERTIES(es) VALUE, name, testExport
+    PROPERTIES(ea) VALUE, name, barcode
+    PROPERTIES(es, ea) incomeQuantity, impQ
+
+    // EMAIL (manual update of the email group)
+    OBJECTS em 'Email:' = STRING[100] PANEL, u = CustomUser
+    PROPERTIES VALUE(em), login(u), email(u), NEW(u), remindPasswordEmail(u, em) DRAW em, justSendEmail(em)
+
+    // ZIP
+    PROPERTIES() testMakeZipFile
+
+    EVENTS ON INIT { forceUpdate('em'); }
+;
+
+DESIGN TestIntegration {
+    GRID(em) {
+        enableManualUpdate = TRUE;
+    }
+
+    PROPERTY(externalSQLConnection()) {
+        placeholder = 'jdbc:postgresql://localhost/testdb?user=postgres&password=...';
+    }
+
+    NEW tabs BEFORE TOOLBARBOX {
+        tabbed = TRUE;
+        fill = 1;
+        alignment = STRETCH;
+
+        NEW exportTab {
+            caption = 'EXPORT';
+            MOVE PROPERTY(exportPlainXML());
+            MOVE PROPERTY(exportFormXML());
+            MOVE PROPERTY(exportFormJSON());
+            MOVE PROPERTY(exportFormDBF());
+        }
+
+        NEW importTab {
+            caption = 'IMPORT';
+            NEW importDBF {
+                caption = 'DBF';
+                horizontal = TRUE;
+                MOVE PROPERTY(importFile());
+                MOVE PROPERTY(memoFile());
+                MOVE PROPERTY(importAction());
+            }
+            MOVE BOX(ii);
+            NEW importXML {
+                caption = 'XML';
+                horizontal = TRUE;
+                MOVE PROPERTY(importDeclaration());
+                MOVE PROPERTY(importDocumentsResult());
+            }
+        }
+
+        NEW readWriteTab {
+            caption = 'READ / WRITE';
+            MOVE BOX(rws);
+        }
+
+        NEW externalTab {
+            caption = 'EXTERNAL';
+            NEW externalPanel {
+                horizontal = TRUE;
+                MOVE PROPERTY(externalSQLConnection());
+                MOVE PROPERTY(externalAction());
+                MOVE PROPERTY(externalHttpHeaders());
+            }
+            NEW externalTables {
+                horizontal = TRUE;
+                fill = 1;
+                alignment = STRETCH;
+                MOVE BOX(es);
+                MOVE BOX(ea);
+            }
+        }
+
+        NEW emailTab {
+            caption = 'EMAIL';
+            MOVE BOX(em);
+            MOVE BOX(u);
+        }
+
+        NEW zipTab {
+            caption = 'ZIP';
+            MOVE PROPERTY(testMakeZipFile());
+        }
+    }
+}
+
 //////////////// INDEX STATEMENT //////////////////
 // Syntax:
 // INDEX propertyName1(param1, ..., paramN) | paramI  [, ..., propertyNameN (param1, ..., paramN) | paramI];
@@ -3114,7 +3280,6 @@ NAVIGATOR {
         NEW TestHotkeysAndFilters CHANGEKEY 'F9;priority=1000' SHOW;
         NEW TestPropertyOptions;
         NEW TestTypes;
-        NEW TestExport;
         NEW TestMultithreading;      
         NEW TestActions;
         NEW TestTree;
@@ -3129,10 +3294,8 @@ NAVIGATOR {
         NEW TestKeepSessionProps;
         NEW TestActionDebugger;
         NEW TestCase;
-        NEW TestReadWrite;
-        NEW TestImport;
-        NEW TestEmailForm;
         NEW TestRequestInput;
+        NEW TestIntegration;
     }
 
     MOVE storeArticle;
@@ -3194,19 +3357,6 @@ NAVIGATOR {
     NEW newTestForm;
     NEW testChangeClass;
     NEW testAddObject;
-}
-
-testMakeZipFile() {
-    NEWSESSION {
-        LOCAL zippingFile = FILE ();
-        READ 'file://c:/1.txt' TO zippingFile;
-        zipping(s) <- zippingFile() WHERE s == '1.txt';
-        READ 'file://c:/2.xml' TO zippingFile;
-        zipping(s) <- zippingFile() WHERE s == '2.xml';
-
-        makeZipFile();
-        open(zipped());
-    }
 }
 
 NAVIGATOR {
@@ -3311,25 +3461,6 @@ DESIGN testAdd {
 }
 NAVIGATOR {
     NEW testAdd;
-}
-
-impQ = DATA DOUBLE (Store, Article);
-
-FORM ImpQ
-    OBJECTS (s = Store, a = Article)
-    PROPERTIES name(s), name(a), impQ(s, a)
-;
-
-NAVIGATOR {
-    NEW ImpQ;
-}
-
-testImport (FILE cf) {
-    IMPORT TABLE FROM cf TO xa = a, xb = b, xc = c, xd = d, xs = s;
-    FOR barcode(Article a) = xc(INTEGER i) AND name(Store s) = xs(i) DO {
-        impQ(s, a) <- xa(i);
-    }
-    APPLY;
 }
 
 name = DATA STRING[100] (INTEGER);
@@ -3547,65 +3678,3 @@ NAVIGATOR {
     MOVE testFormAction;
 }
 
-doSomething(STRING[100] p1, STRING[100] p2) {
-    resultString() <- p1;
-}
-
-externalAction() {
-    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' PARAMS '1', '2';
-    EXTERNAL HTTP 'http://localhost:7651/exec?action=doSomething&p=$2&p=$1' NOENCODE PARAMS '1', '2';
-}
-
-action () {
-    LOCAL headers = TEXT(STRING[100]);
-    LOCAL header = TEXT();
-    LOCAL headers = TEXT(INTEGER);
-    headers(TEXT h) <- 'xxx' WHERE h = 'h1';
-    headers(TEXT h) <- 'yyy' WHERE h = 'h2';
-
-    LOCAL cookies = TEXT(STRING[100]);
-    cookies(TEXT c) <- '12345' WHERE c = 'c1';
-    cookies(TEXT c) <- '09876' WHERE c = 'c2';
-
-    LOCAL headersTo = TEXT (TEXT);
-    LOCAL cookiesTo = TEXT (TEXT);
-    //    EXTERNAL HTTP 'https://en.wikipedia.org/wiki/File:Example.jpg' HEADERS headers[TEXT] COOKIES cookies[TEXT] HEADERSTO headersTo COOKIESTO cookiesTo;
-    MESSAGE headersTo('Content-language');
-    MESSAGE cookiesTo('c1');
-    IF failedHttp() THEN MESSAGE 'Alarm!'; ELSE MESSAGE 'OK';
-}
-
-GROUP declaration EXTID 'gd:GoodsDeclaration';
-GROUP shipment EXTID 'cacdo:DeclarationGoodsShipmentDetails';//: declaration;
-order = DATA LOCAL INTEGER (INTEGER);
-
-FORM importDT
-    OBJECTS d = INTEGER EXTID 'cacdo:DeclarationGoodsItemDetails' IN shipment
-    PROPERTIES(d) order EXTID 'casdo:ConsignmentItemOrdinal'
-;
-
-run () {
-    INPUT f = FILE DO {
-        IMPORT importDT XML FROM f;
-        MESSAGE 'count=' + (GROUP SUM 1 IF order(INTEGER i));
-    }
-}
-
-resourcePath() = 'e:/work/2/assets/';
-getResourse(STRING[100] na) {
-    READ 'file:' + resourcePath() + na TO exportFile;
-}
-
-GROUP bodyS EXTID 'S:Body';
-GROUP getDocumentsResponse EXTID 'GetDocumentsResponse' : bodyS;
-GROUP getDocumentsResult EXTID 'GetDocumentsResult' : getDocumentsResponse;
-
-succesful = DATA LOCAL NESTED BOOLEAN();
-message = DATA LOCAL NESTED TEXT();
-errorCode = DATA LOCAL NESTED INTEGER();
-
-FORM documentsResult
-    PROPERTIES() IN getDocumentsResult succesful EXTID 'Succesful',
-        message EXTID 'Message',
-        errorCode EXTID 'ErrorCode'
-;
