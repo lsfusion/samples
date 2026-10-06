@@ -619,10 +619,6 @@ FORM testChangeClass
 script(doc) = DATA TEXT (Document);
 evalScript(Document doc) { EVAL script(doc); }
 
-FORM TestEvalActionForm 'Scripts test'
-    OBJECTS d = Document
-    PROPERTIES(d) store, script, evalScript GRID;
-
 copyNameToArticles 'Copy warehouse name to article names' (Store s) {
     name(Article a) <- (name(s) IF s IS Store) WHERE a IS Article;
 };
@@ -1841,16 +1837,6 @@ testNewThread { NEWTHREAD testActionMsg(); SCHEDULE DELAY intPropD() - 2000; }
 testNewThread2 { NEWTHREAD testActionMsg(); SCHEDULE; }
 testNewThread3 { NEWTHREAD testActionMsg(); SCHEDULE PERIOD intPropD() DELAY 2000L; }
 
-FORM TestMultithreading 'Multithreading test'
-    PROPERTIES testPush(), startFilling(), startChanging(), startAddDelete(), testNewThread(), testNewThread2(), testNewThread3()
-
-    OBJECTS x = X
-    PROPERTIES (x) data
-
-    OBJECTS y = Y
-    PROPERTIES (y) VALUE, dataX;
-;
-
 //--------------- Actions test ---------------//
 
 confirmExceptionMessage() { throwException('confirmed'); } CONFIRM;
@@ -1877,10 +1863,6 @@ noWaitMessage() {
         MESSAGE i() NOWAIT;
     }
 }
-
-FORM TestActions 'Actions test'
-    PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage
-;    
 
 //--------------- TREE test ---------------//
 
@@ -2020,15 +2002,11 @@ onWebClientStarted() +{
 
 //--------------- SCHEDULE test ---------------//
 
-scheduleOnStartAction() {
+scheduleOnStartAction 'NEWSESSION NEWSQL NEWTHREAD SCHEDULE' () {
     NEWSESSION NEWSQL NEWTHREAD {
         MESSAGE 'worked';
         sleepTwoSeconds();
-    } SCHEDULE PERIOD 1000;
-}
-
-onStarted() + {
-    //scheduleOnStartAction();
+    } SCHEDULE DELAY 1000;
 }
 
 onChangeStoreName() {
@@ -2771,14 +2749,80 @@ debuggableAction(Store s) {
         jss() <- jss() + 1;
     }
 }
-FORM TestActionDebugger 'ActionDebugger test'
-    OBJECTS s = Store
-    PROPERTIES(s) VALUE, name, storeSizeCode
-    PROPERTIES(s) debuggableAction
+FORM TestActions 'Actions'
+    // flow: CONFIRM, BREAK / CONTINUE, MESSAGE NOWAIT
+    PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage
 
-    OBJECTS a = Article
-    PROPERTIES(a) VALUE, name
+    // NEWTHREAD / NEWEXECUTOR / SCHEDULE
+    PROPERTIES testPush(), startFilling(), startChanging(), startAddDelete(),
+        testNewThread(), testNewThread2(), testNewThread3(), scheduleOnStartAction()
+
+    OBJECTS x = X
+    PROPERTIES (x) data
+
+    OBJECTS y = Y
+    PROPERTIES (y) VALUE, dataX
+
+    // EVAL
+    OBJECTS d = Document
+    PROPERTIES(d) storeName, script, evalScript GRID
+
+    // action debugger
+    OBJECTS ds = Store
+    PROPERTIES(ds) VALUE, name, storeSizeCode
+    PROPERTIES(ds) debuggableAction
+
+    OBJECTS da = Article
+    PROPERTIES(da) VALUE, name
 ;
+
+DESIGN TestActions {
+    NEW tabs BEFORE TOOLBARBOX {
+        tabbed = TRUE;
+        fill = 1;
+        alignment = STRETCH;
+
+        NEW flowTab {
+            caption = 'Flow';
+            MOVE PROPERTY(confirmExceptionMessage());
+            MOVE PROPERTY(breakContinueMessage());
+            MOVE PROPERTY(noWaitMessage());
+        }
+
+        NEW threadsTab {
+            caption = 'Threads';
+            NEW threadButtons {
+                lines = 2;
+                MOVE PROPERTY(testPush());
+                MOVE PROPERTY(startFilling());
+                MOVE PROPERTY(startChanging());
+                MOVE PROPERTY(startAddDelete());
+                MOVE PROPERTY(testNewThread());
+                MOVE PROPERTY(testNewThread2());
+                MOVE PROPERTY(testNewThread3());
+                MOVE PROPERTY(scheduleOnStartAction());
+            }
+            NEW threadTables {
+                horizontal = TRUE;
+                fill = 1;
+                alignment = STRETCH;
+                MOVE BOX(x);
+                MOVE BOX(y);
+            }
+        }
+
+        NEW evalTab {
+            caption = 'EVAL';
+            MOVE BOX(d);
+        }
+
+        NEW debuggerTab {
+            caption = 'Debugger';
+            MOVE BOX(ds);
+            MOVE BOX(da);
+        }
+    }
+}
 
 //path() = 'file:///C:/temp.txt';
 
@@ -3280,11 +3324,9 @@ NAVIGATOR {
         NEW TestHotkeysAndFilters CHANGEKEY 'F9;priority=1000' SHOW;
         NEW TestPropertyOptions;
         NEW TestTypes;
-        NEW TestMultithreading;      
         NEW TestActions;
         NEW TestTree;
         NEW TestPivot;
-        NEW TestEvalActionForm;
         NEW TestOperators;
         NEW TestLayout;
         NEW TestColumns;
@@ -3292,7 +3334,6 @@ NAVIGATOR {
         NEW TestSessionProps;
         NEW TestNestedSessions;
         NEW TestKeepSessionProps;
-        NEW TestActionDebugger;
         NEW TestCase;
         NEW TestRequestInput;
         NEW TestIntegration;
@@ -3357,10 +3398,6 @@ NAVIGATOR {
     NEW newTestForm;
     NEW testChangeClass;
     NEW testAddObject;
-}
-
-NAVIGATOR {
-    MOVE TestActionDebugger;
 }
 
 //CLASS PA;
