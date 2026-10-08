@@ -558,11 +558,6 @@ addB() { NEW AOB; }
 
 addAllBTo() { NEW AOB WHERE count[AOA](a) > 5 TO AOBfor(a); }
 
-FORM testAddObject
-    OBJECTS a = AOA, b = AOB
-    PROPERTIES name(a), name(b), count(a), addA(), addB(), addAllBTo(), AOBfor(a), countAOAAOB(a, b)
-;
-
 // Custom action
 // statement syntax:
 // INTERNAL 'javaClassName'
@@ -595,13 +590,6 @@ deleteA 'delete A > 5' () { DELETE CCA a WHERE count(a) > 5; }
 
 changeAllAWhenCountAB 'all count CCACCB > 5' (CCB b) { CHANGECLASS CCA a TO CCB WHERE countCCACCB(a, b) > 5; }
 changeAllAWhenCount 'all count CCB > 5' (CCB b) { CHANGECLASS CCA a TO CCB WHERE count(b) > 5 AND a IS CCA; }
-
-FORM testChangeClass
-    OBJECTS a = CCA, b = CCB
-    PROPERTIES name(a), name(b), count(a), count(b), CCBfor(a), countCCACCB(a, b)
-    PROPERTIES change(a) GRID, changeAllA(), deleteA(), changeWhenCount(a, b) GRID, changeWhenCountAB(a, b) GRID
-    PROPERTIES NEWSESSION GRID changeAllAWhenCountAB(b), changeAllAWhenCount(b), DELETE(a), d = DELETE(a)
-;
 
 // Confirm action
 // statement syntax:
@@ -1136,7 +1124,7 @@ storeHeader (StoreSize ss) = 'storeSize: ' + sizeCode(ss);
 storeHeader2 (Store s, StoreSize ss) = OVERRIDE storeString(s, ss),
     name(ss) IF s IS Store AND ss IS StoreSize AND ss != StoreSize.small;
 
-FORM TestColumns 'Columns & headers'
+FORM TestColumns 'Columns & Headers'
     OBJECTS ss = StoreSize, s = Store, a = Article
     PROPERTIES caption(ss), sizeCode(ss)
     PROPERTIES VALUE(s), name(s), scolor(s), storeSizeCode(s), storeSizeName(s)
@@ -1178,7 +1166,7 @@ storeIsHugeOrBig(Store s) = storeIsHuge(s) OR storeIsBig(s);
 
 sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLK';
 
-FORM TestHotkeysAndFilters 'Filters, search & hotkeys'
+FORM TestHotkeysAndFilters 'Filters, Search & Hotkeys'
     OBJECTS s = Store
     PROPERTIES(s) ns = name ORDER DESC ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2' LOG; },
         'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeName
@@ -1329,7 +1317,7 @@ DESIGN TestHotkeysAndFilters {
         alignment = STRETCH;
 
         NEW hotkeysTab {
-            caption = 'Filters & hotkeys';
+            caption = 'Filters & Hotkeys';
             MOVE BOX(s);
             MOVE PANEL;
         }
@@ -1340,7 +1328,7 @@ DESIGN TestHotkeysAndFilters {
         }
 
         NEW quickSearchTab {
-            caption = 'Quick search';
+            caption = 'Quick Search';
             MOVE BOX(qss);
             MOVE BOX(qss2);
         }
@@ -1410,7 +1398,7 @@ readonlyDisabledProp() = DATA STRING();
 largeFont = DATA STRING();
 smallFont = DATA STRING();
 
-FORM TestPropertyOptions 'Property options'
+FORM TestPropertyOptions 'Property Options'
     PROPERTIES() stringWithComment, stringWithPlaceholder,
         stringWithPattern, numericWithPattern, dateWithStaticPattern, dynamicPattern, dateWithDynamicPattern,
         stringWithStaticRegexp, dynamicRegexp, stringWithDynamicRegexp,
@@ -1614,7 +1602,7 @@ color (INTEGER i) = CASE
     WHEN i = 3 THEN #0000FF
 ;
 
-FORM TestTypes 'Value types'
+FORM TestTypes 'Value Types'
     // colors
     OBJECTS ci = INTEGER
     PROPERTIES (ci) color
@@ -1903,7 +1891,7 @@ FORM TestTree 'Trees'
 ;
 
 DESIGN TestTree {
-    NEW trees BEFORE TOOLBARBOX {
+    NEW tabs BEFORE TOOLBARBOX {
         tabbed = TRUE;
         fill = 1;
         alignment = STRETCH;
@@ -1934,7 +1922,7 @@ DESIGN TestTree {
         }
 
         NEW expandablesTab {
-            caption = 'Several object groups';
+            caption = 'Several Object Groups';
             MOVE BOX(TREE expandables);
         }
 
@@ -2106,7 +2094,7 @@ pToALStrict(Store store, Article article) = PARTITION UNGROUP sdouble LIMIT STRI
 fib(INTEGER i, INTEGER to) = GROUP MAX INTEGER f IF (RECURSION i == 1 AND f == 0 AND INTEGER f1 == 1 AND to IS INTEGER
     STEP i == $i + 1 AND f == $f + 0 + $f1 AND f1 == $f AND i < to CYCLES IMPOSSIBLE);
 
-FORM TestOperators 'Expressions & operators'
+FORM TestOperators 'Expressions & Operators'
     OBJECTS s = Store
     PROPERTIES(s) VALUE, name, stime, sdate, sinteger, slong, sdouble, snumeric, sbpstring, castToNumeric, sstring, sboolean
     PROPERTIES(s) stext
@@ -2144,13 +2132,13 @@ DESIGN TestOperators {
         valueSize = ( -1, 17);
     }
 
-    NEW tabsContainer AFTER OBJECTS {
+    NEW tabs AFTER OBJECTS {
         tabbed = TRUE;
         flex = 1;
         alignment = STRETCH;
 
         NEW concatTab {
-            caption = 'concat';
+            caption = 'Concat';
             MOVE PROPERTY(concatNull(s));
             MOVE PROPERTY(concatNotNull(s));
             MOVE PROPERTY(concatVarNull(s));
@@ -2159,7 +2147,7 @@ DESIGN TestOperators {
             MOVE PROPERTY(concatToVar(s));
         }
         NEW sumTab {
-            caption = 'sum';
+            caption = 'Sum';
             MOVE PROPERTY(sumStringBoolean(s));
             MOVE PROPERTY(sumIntLong(s));
             MOVE PROPERTY(sumNumericInt(s));
@@ -2171,7 +2159,7 @@ DESIGN TestOperators {
         }
 
         NEW subTab {
-            caption = 'sub';
+            caption = 'Sub';
             MOVE PROPERTY(subIntLong(s));
             MOVE PROPERTY(subNumericInt(s));
             MOVE PROPERTY(subDoubleNumeric(s));
@@ -2179,7 +2167,7 @@ DESIGN TestOperators {
         }
 
         NEW multTab {
-            caption = 'mult';
+            caption = 'Mult';
             MOVE PROPERTY(multIntLong(s));
             MOVE PROPERTY(multNumericInt(s));
             MOVE PROPERTY(multDoubleNumeric(s));
@@ -2187,7 +2175,7 @@ DESIGN TestOperators {
         }
 
         NEW literalsTab {
-            caption = 'literals';
+            caption = 'Literals';
             MOVE PROPERTY(dateProp(s));
             MOVE PROPERTY(dateTimeProp(s));
             MOVE PROPERTY(timeProp(s));
@@ -2196,7 +2184,7 @@ DESIGN TestOperators {
         }
 
         NEW castRoundTab {
-            caption = 'cast & round';
+            caption = 'Cast & Round';
             MOVE PROPERTY(str());
             MOVE PROPERTY(strToInt());
             MOVE PROPERTY(long());
@@ -2265,7 +2253,7 @@ FORM TestLayout 'Layout'
 ;
 
 DESIGN TestLayout {
-    NEW layouts BEFORE TOOLBARBOX {
+    NEW tabs BEFORE TOOLBARBOX {
         fill = 1;
         tabbed = TRUE;
         alignment = STRETCH;
@@ -2352,7 +2340,7 @@ DESIGN TestLayout {
         }
 
         NEW captionWidthTab {
-            caption = 'Caption width';
+            caption = 'Caption Width';
             MOVE BOX(lw);
         }
 
@@ -3050,7 +3038,7 @@ DESIGN TestRequestInput {
         }
 
         NEW contextFiltersTab {
-            caption = 'Context filters';
+            caption = 'Context Filters';
             horizontal = TRUE;
             MOVE BOX(cs);
             NEW contextArticles {
@@ -3262,6 +3250,122 @@ DESIGN TestIntegration {
     }
 }
 
+//--------------- Object operators test ---------------//
+
+addIncomeDocument 'Add XXX' { };
+
+FORM DialDocument
+    OBJECTS o = IncomeDocument PANEL
+    PROPERTIES (o) VALUE, storeName
+
+    EDIT IncomeDocument OBJECT o;
+;
+
+testDelete(Object o) {
+    IF NOT sessionOwners() THEN {
+        ASK 'Are you sure?' DO {
+            DELETE o;
+            apply();
+        }
+    } ELSE
+        DELETE o;
+}
+
+newTestDelete(Object o) {
+    NEWSESSION {
+        testDelete(o);
+    }
+}
+
+CLASS CIncomeDocument : IncomeDocument;
+
+FORM DialCDocument
+    OBJECTS o = CIncomeDocument PANEL
+    PROPERTIES (o) VALUE, storeName, s = storeName
+
+    EDIT CIncomeDocument OBJECT o;
+;
+
+editCIncomeDocument 'Edit C' (IncomeDocument d) {
+    SHOW EDIT CIncomeDocument = d;
+}
+
+testFormNull(IncomeDocument d) {
+    SHOW DialCDocument OBJECTS o = d;
+}
+
+testNullRun() {
+    testFormNull(NULL);
+}
+
+FORM TestAdd 'NEW / EDIT / DELETE / CHANGECLASS'
+    // object operators NEW, NEWEDIT, EDIT, DELETE in different sessions
+    OBJECTS d = IncomeDocument
+    PROPERTIES () testNullRun DRAW d
+    PROPERTIES () addIncomeDocument DRAW d
+    PROPERTIES (d) GRID editCIncomeDocument, testFormNull
+    PROPERTIES (d) a = NEWEDIT[CIncomeDocument]
+    PROPERTIES (d) VALUE, className, storeName, NEW NEWSESSION, an = NEW NESTEDSESSION, as = NEWEDIT, EDIT, en = EDIT, es = EDIT, DELETE GRID, ds = DELETE GRID, testDelete GRID, newTestDelete GRID
+
+    // NEW ... WHERE ... TO
+    OBJECTS aoa = AOA, aob = AOB
+    PROPERTIES name(aoa), name(aob), count(aoa), AOBfor(aoa), countAOAAOB(aoa, aob)
+    PROPERTIES DRAW aoa addA(), addB(), addAllBTo()
+
+    // CHANGECLASS, DELETE ... WHERE
+    OBJECTS cca = CCA, ccb = CCB
+    PROPERTIES name(cca), name(ccb), count(cca), count(ccb), CCBfor(cca), countCCACCB(cca, ccb)
+    PROPERTIES change(cca) GRID, changeWhenCount(cca, ccb) GRID, changeWhenCountAB(cca, ccb) GRID
+    PROPERTIES DRAW cca changeAllA(), deleteA()
+    PROPERTIES NEWSESSION GRID changeAllAWhenCountAB(ccb), changeAllAWhenCount(ccb), DELETE(cca), dcca = DELETE(cca)
+;
+
+DESIGN TestAdd {
+    PROPERTY (a) {
+        caption = 'Add C';
+    }
+
+    PROPERTY (an) {
+        caption = 'Add nested';
+    }
+    PROPERTY (as) {
+        caption = 'Add session';
+    }
+
+    PROPERTY (en) {
+        caption = 'Edit nested';
+    }
+    PROPERTY (es) {
+        caption = 'Edit session';
+    }
+
+    PROPERTY (ds) {
+        caption = 'Delete session';
+    }
+
+    NEW tabs BEFORE TOOLBARBOX {
+        tabbed = TRUE;
+        fill = 1;
+        alignment = STRETCH;
+
+        NEW operatorsTab {
+            caption = 'NEW / EDIT / DELETE';
+            MOVE BOX(d);
+        }
+
+        NEW newWhereTab {
+            caption = 'NEW WHERE TO';
+            MOVE BOX(aoa);
+            MOVE BOX(aob);
+        }
+
+        NEW changeClassTab {
+            caption = 'CHANGECLASS';
+            MOVE BOX(cca);
+            MOVE BOX(ccb);
+        }
+    }
+}
 //////////////// INDEX STATEMENT //////////////////
 // Syntax:
 // INDEX propertyName1(param1, ..., paramN) | paramI  [, ..., propertyNameN (param1, ..., paramN) | paramI];
@@ -3337,6 +3441,7 @@ NAVIGATOR {
         NEW TestCase;
         NEW TestRequestInput;
         NEW TestIntegration;
+        NEW TestAdd;
     }
 
     MOVE storeArticle;
@@ -3396,8 +3501,6 @@ EXTEND FORM newTestForm
 NAVIGATOR {
     //    NEW caseTest;
     NEW newTestForm;
-    NEW testChangeClass;
-    NEW testAddObject;
 }
 
 //CLASS PA;
@@ -3417,88 +3520,6 @@ NAVIGATOR {
 //NAVIGATOR {
 //    NEW tstPart;
 //}
-
-addIncomeDocument 'Add XXX' { };
-
-FORM DialDocument
-    OBJECTS o = IncomeDocument PANEL
-    PROPERTIES (o) VALUE, storeName
-
-    EDIT IncomeDocument OBJECT o;
-;
-
-testDelete(Object o) {
-    IF NOT sessionOwners() THEN {
-        ASK 'Are you sure?' DO {
-            DELETE o;
-            apply();
-        }
-    } ELSE
-        DELETE o;
-}
-
-newTestDelete(Object o) {
-    NEWSESSION {
-        testDelete(o);
-    }
-}
-
-CLASS CIncomeDocument : IncomeDocument;
-
-FORM DialCDocument
-    OBJECTS o = CIncomeDocument PANEL
-    PROPERTIES (o) VALUE, storeName, s = storeName
-
-    EDIT CIncomeDocument OBJECT o;
-;
-
-editCIncomeDocument 'Edit C' (IncomeDocument d) {
-    SHOW EDIT CIncomeDocument = d;
-}
-
-testFormNull(IncomeDocument d) {
-    SHOW DialCDocument OBJECTS o = d;
-}
-
-testNullRun() {
-    testFormNull(NULL);
-}
-
-FORM testAdd
-    OBJECTS d = IncomeDocument
-    PROPERTIES () testNullRun
-    PROPERTIES () addIncomeDocument DRAW d
-    PROPERTIES (d) GRID editCIncomeDocument, testFormNull
-    PROPERTIES (d) a = NEWEDIT[CIncomeDocument]
-    PROPERTIES (d) VALUE, className, storeName, NEW NEWSESSION, an = NEW NESTEDSESSION, as = NEWEDIT, EDIT, en = EDIT, es = EDIT, DELETE GRID, ds = DELETE GRID, testDelete GRID, newTestDelete GRID
-;
-
-DESIGN testAdd {
-    PROPERTY (a) {
-        caption = 'Add C';
-    }
-
-    PROPERTY (an) {
-        caption = 'Add nested';
-    }
-    PROPERTY (as) {
-        caption = 'Add session';
-    }
-
-    PROPERTY (en) {
-        caption = 'Edit nested';
-    }
-    PROPERTY (es) {
-        caption = 'Edit session';
-    }
-
-    PROPERTY (ds) {
-        caption = 'Delete session';
-    }
-}
-NAVIGATOR {
-    NEW testAdd;
-}
 
 name = DATA STRING[100] (INTEGER);
 barcode = DATA STRING[100] (INTEGER);
@@ -3691,7 +3712,7 @@ EXTEND FORM TestOperators
 ;
 
 DESIGN TestOperators {
-    tabsContainer {
+    tabs {
         NEW aggrObjectsTab {
             caption = 'AGGR objects';
             NEW xaPane {
