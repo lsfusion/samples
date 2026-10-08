@@ -2517,10 +2517,77 @@ FORM TestDisappearingActon 'Disappearing button test'
 
 sessionSstring = DATA LOCAL BPSTRING[30](Store);
 
-FORM TestSessionProps 'Test for passing values between sessions'
+testAddInNestedSession 'Add product group'(ArticleGroup parentGroup) {
+    NESTEDSESSION {
+        NEW ag = ArticleGroup {
+            parent(ag) <- parentGroup;
+            SHOW editArticleGroup OBJECTS ag = ag DOCKED;
+        }
+    }
+}
+
+testSessionIntegerProperty() = DATA LOCAL NESTED INTEGER();
+
+// division by zero in the MATERIALIZED divtf (ottf = 0) makes APPLY fail
+CLASS Newtest;
+newtf = DATA INTEGER (Newtest);
+ottf = DATA INTEGER (Newtest);
+divtf(Newtest a) = newtf(a) / ottf(a) MATERIALIZED;
+ff = DATA LOCAL INTEGER (Newtest);
+
+testChange 'testChange' (Newtest t) {
+    ff(t) <- 1;
+    NEWSESSION NESTED LOCAL {
+        ff(t) <- 2;
+    }
+}
+
+FORM TestSessionProps 'Sessions'
+    // NEWSESSION NESTED LOCAL, APPLY NESTED, NESTEDSESSION + DIALOG
     OBJECTS s = Store
     PROPERTIES (s) VALUE, name, storeSizeCode, ssbpstring, NEW
+
+    // NESTEDSESSION + SHOW
+    OBJECTS ag = ArticleGroup
+    PROPERTIES(ag) VALUE, name, nameParent, testAddInNestedSession
+
+    // LOCAL NESTED
+    OBJECTS ks = Store
+    PROPERTIES(ks) VALUE, name, ssbpstring, ssboolean, ssinteger
+    PROPERTIES testSessionIntegerProperty() DRAW ks
+
+    // exception on APPLY, NEWSESSION NESTED LOCAL
+    OBJECTS nt = Newtest
+    PROPERTIES(nt) NEW, newtf, ottf, testChange GRID
 ;
+
+DESIGN TestSessionProps {
+    NEW tabs BEFORE TOOLBARBOX {
+        tabbed = TRUE;
+        fill = 1;
+        alignment = STRETCH;
+
+        NEW betweenSessionsTab {
+            caption = 'Between Sessions';
+            MOVE BOX(s);
+        }
+
+        NEW nestedSessionTab {
+            caption = 'NESTEDSESSION';
+            MOVE BOX(ag);
+        }
+
+        NEW localNestedTab {
+            caption = 'LOCAL NESTED';
+            MOVE BOX(ks);
+        }
+
+        NEW applyExceptionTab {
+            caption = 'APPLY Exception';
+            MOVE BOX(nt);
+        }
+    }
+}
 testActionInNewSession() {
     LOCAL addedStore = Store();
     //    NEWSESSION (addedStore, ssstring) {
@@ -2560,28 +2627,8 @@ testNestedSession(Store s) {
 };
 
 EXTEND FORM TestSessionProps
-    PROPERTIES testActionInNewSession(), testSessionPropsInApply(), testNestedSession(s)
-;
-
-testAddInNestedSession 'Add product group'(ArticleGroup parentGroup) {
-    NESTEDSESSION {
-        NEW ag = ArticleGroup {
-            parent(ag) <- parentGroup;
-            SHOW editArticleGroup OBJECTS ag = ag DOCKED;
-        }
-    }
-}
-
-FORM TestNestedSessions 'Nested sessions test'
-    OBJECTS ag = ArticleGroup
-    PROPERTIES(ag) VALUE, name, nameParent, testAddInNestedSession
-;
-
-testSessionIntegerProperty() = DATA LOCAL NESTED INTEGER();
-FORM TestKeepSessionProps 'Test LOCAL NESTED'
-    OBJECTS s = Store
-    PROPERTIES(s) VALUE, name, ssbpstring, ssboolean, ssinteger
-    PROPERTIES testSessionIntegerProperty()
+    PROPERTIES DRAW s testActionInNewSession(), testSessionPropsInApply()
+    PROPERTIES testNestedSession(s)
 ;
 
 debuggableActionBegin(Store s) {
@@ -3436,8 +3483,6 @@ NAVIGATOR {
         NEW TestColumns;
         NEW TestDisappearingActon SHOWIF isDesktop();
         NEW TestSessionProps;
-        NEW TestNestedSessions;
-        NEW TestKeepSessionProps;
         NEW TestCase;
         NEW TestRequestInput;
         NEW TestIntegration;
@@ -3476,32 +3521,6 @@ END
 // Syntax:
 // TABLE name(className1, ..., classNameN);
 TABLE documentArticle(Document, Article);
-
-CLASS Newtest;
-newtf = DATA INTEGER (Newtest);
-ottf = DATA INTEGER (Newtest);
-divtf(Newtest a) = newtf(a) / ottf(a) MATERIALIZED;
-ff = DATA LOCAL INTEGER (Newtest);
-
-testChange 'testChange' (Newtest t) {
-    ff(t) <- 1;
-    NEWSESSION NESTED LOCAL {
-        ff(t) <- 2;
-    }
-}
-
-FORM newTestForm 'Test Exception'
-    OBJECTS x = Newtest
-    PROPERTIES(x) NEW, newtf, ottf, testChange GRID
-;
-
-EXTEND FORM newTestForm
-    OBJECTS y = Newtest;
-
-NAVIGATOR {
-    //    NEW caseTest;
-    NEW newTestForm;
-}
 
 //CLASS PA;
 //order = DATA INTEGER (PA);
