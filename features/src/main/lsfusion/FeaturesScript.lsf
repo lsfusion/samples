@@ -15,21 +15,11 @@ NAMESPACE Features;
 
 /////////// GROUP STATEMENT ////////////
 
-// Syntax:
-// GROUP name ['caption'] [: parentGroup];
 GROUP base 'Main group' : System.base;
 GROUP simpleGroup;
 GROUP sampleGroup : System.base; // explicit name qualification
 
 /////////// CLASS STATEMENT ////////////
-// Syntax:
-// CLASS [ABSTRACT] name ['caption']
-// [{
-//      instanceName1 ['instanceCaption1'],
-//      ...
-//      instanceNameN ['instanceCaptionN']
-// }]
-// [: baseClass1 [, baseClass2, ..., baseClassN]];
 
 CLASS ABSTRACT Named 'Object named' ;
 name(obj) = DATA STRING[100] (Named) IN id;
@@ -95,14 +85,6 @@ EXTEND CLASS StoreSize
 }
 
 // Extending class
-// Syntax:
-// EXTEND CLASS className
-// [{
-//      instanceName1 ['instanceCaption1']
-//      ...
-//      instanceNameN ['instanceCaptionN']
-// }]
-// [: baseClass1 [, baseClass2, ..., baseClassN];]
 EXTEND CLASS IncomeDocument : EmptyClass;
 
 EXTEND CLASS Features.StoreSize
@@ -114,26 +96,8 @@ EXTEND CLASS Features.StoreSize
 storeCaption(StoreSize storeSize) = caption(storeSize) IF storeSize IS StoreSize IN base;
 
 //////////// PROPERTY STATEMENT///////////
-// Common syntax:
-// name ['caption'] [(namedParam1, ..., namedParamN)] = propertyExpression [IN group] [MATERIALIZED] [TABLE <table name>]
-//                                                                                                 [TOOLBAR]
-//                                                                                                 [CONTEXTMENU propertyName]
-//                                                                                                 [ASON CHANGE propertyName]
-//                                                                                                 [ASON CHANGEWYS propertyName]
-//                                                                                                 [ASON EDIT propertyName]
-//                                                                                                 [IMAGE 'name'] [CHANGEKEY '<key code>' [SHOW | HIDE]] [AUTOSET] [CONFIRM]
-//                                                                                                 [NONULL [DELETE] [APPLY | SESSION] [FORMS form1, ..., formN]]
-//                                                                                                 [ON (CHANGE | CHANGEWYS | EDIT) action]
-//                                                                                                 [EVENTID 'id'];
-
-// If named parameters are not specified, then they are derived from propertyExpression
 
 // Data property
-// Expression syntax:
-// DATA [LOCAL] returnClass ( [paramClass1, ..., paramClassN] )
-// If LOCAL modifier is specified, then local data property will be created.
-// Built-in types: INTEGER, LONG, DOUBLE, BOOLEAN, DATE, DATETIME, TEXT, BPSTRING, BPISTRING, 
-// TIME, WORDFILE, IMAGEFILE, PDFFILE, FILE, EXCELFILE, NUMERIC, COLOR, TEXTFILE, CSVFILE, HTMLFILE, JSONFILE, XMLFILE, TABLEFILE
 stime 'Time' (store) = DATA TIME (Store) IN base;
 sdate 'Date' (store) = DATA DATE (Store) IN base;
 sdatetime 'DateTime' (store) = DATA DATETIME (Store) IN base;
@@ -185,29 +149,19 @@ barcodeToArticle (barcode) = GROUP AGGR Article article BY barcode(article);
 sessionObj() = DATA LOCAL Object ();
 
 // Join property
-// Expression syntax:
-// [JOIN] (name | '[' propertyDefinition ']') (param1, ..., paramN)
 storeName 'Warehouse' (Document document) = JOIN name(store(document)) IN base;
 storeSizeName = caption(storeSize(Store store)) IN base; // we can omit named parameters to the left of '=', but still use them
 
 // IS, AS
-// Expression syntax:
-// propertyExpression (AS | IS) className
-// IS - is(), AS - object()
 is(IncomeDocument document) = document IS IncomeDocument;
 ttt = DATA INTEGER (IncomeDocument) IN base;
 testtettest(IncomeDocument doc) = (-5 + 2) (-) (-ttt(doc));
 
 // AND, IF (identical in action)
-// Expression syntax:
-// propertyExpression (AND | IF) [NOT] propertyExpression
 inQuantity(IncomeDocument document, Article article) = quantity(document, article) IF is(document);
 outQuantity(document, article) = quantity[Document, Article](document, article) IF document IS OutcomeDocument; // specifying parameter numbers instead of names
 
 // Group property
-// SUM, MAX, MIN, EQUAL group property
-// Expression syntax:
-// GROUP (SUM | MAX | MIN | EQUAL) propertyExpression [BY propertyExpression1, ..., propertyExpressionN]
 incomeQuantity(store, Article article) = GROUP SUM inQuantity(IncomeDocument document, article) BY store(document);
 outcomeQuantity(store, article) = GROUP SUM outQuantity(Document doc, article) BY store(doc);
 
@@ -216,39 +170,18 @@ outcomeQuantity2(store, Article article) = GROUP SUM quantity(OutcomeDocument do
 lastQuantity 'lastQ' (store, Article article) = GROUP LAST inQuantity(IncomeDocument d, article) ORDER oq(d, article), date(d) WHERE inQuantity(d, article) > 5 BY store(d);
 
 // CONCAT group property
-// GROUP CONCAT propertyExpr, separatorPropertyExpr [BY propertyExpr1, ..., propertyExprN] [ORDER [DESC] orderPropertyExpr1, ..., orderPropertyExprK]
 allNames() = GROUP CONCAT name(Named obj) IF obj IS Named, ', ' ORDER DESC name(obj);
 
 // AGGR group property
-// GROUP AGGR propertyExpression [BY propertyExpression1, ..., propertyExpressionN] [WHERE propertyExpression]
-//nameToCountry(name) = GROUP AGGR country BY name(country);
 
 testUnion(Store store, Article article) = incomeQuantity(store, article) (+) outcomeQuantity(store, article);
 
-// OR property
-// Expression syntax:
-// propertyExpression1 OR propertyExpression2
-
-// Recursive property
-// Expression syntax:
-// RECURSION initPropertyExpression STEP stepPropertyExpression [CYCLES (YES | NO | IMPOSSIBLE)]
-// Previous value syntax: $param
-// Default: CYCLES NO
-
 // IF THEN ELSE property
-// Expression syntax:
-// IF propertyExpression0 THEN propertyExpression1 [ELSE propertyExpression2]
 documentTypeString 'Document type' (Document doc) = IF doc IS IncomeDocument
     THEN 'Income'
     ELSE 'Expenses' IF doc IS OutcomeDocument;
 
 // Case property
-// Expression syntax:
-// CASE [OVERRIDE | EXCLUSIVE]
-//      WHEN whenPropertyExpression1 THEN thenPropertyExpression1
-//      ...
-//      WHEN whenPropertyExpressionN THEN thenPropertyExpressionN
-//      [ELSE defaultPropertyExpression]
 sizeCode 'Warehouse size (code)' (StoreSize ss) = CASE
     WHEN ss = StoreSize.huge THEN 'HUGE'
     WHEN ss = StoreSize.big THEN 'BIG'
@@ -257,8 +190,6 @@ sizeCode 'Warehouse size (code)' (StoreSize ss) = CASE
 ;
 
 // Multi property
-// Expression syntax:
-// MULTI propertyExpression1, ..., propertyExpressionN [EXCLUSIVE | OVERRIDE]
 
 CLASS CaseA;
 CLASS CaseB : CaseA;
@@ -283,7 +214,6 @@ overrideTestA(a) += caseData2(a);
 overrideTestA(a) += caseData3(a);
 
 exclusiveTestA 'EXCLUSIVE A' = ABSTRACT VALUE EXCLUSIVE INTEGER (CaseA);
-//exclusiveTestA(a) += caseData1(a);
 exclusiveTestA(a) += caseDataB(a);
 exclusiveTestA(a) += caseDataC(a);
 
@@ -302,16 +232,11 @@ caseTest2(a) = CASE EXCLUSIVE
     WHEN testInt(a) = 5 THEN caseData3(a)
 ;
 
-//caseTestA = ABSTRACT CASE INTEGER (CaseA);
-//caseTestA(a) += WHEN testInt(a) < 5 THEN caseData1(a);
-//caseTestA(a) += WHEN testInt(a) < 6 THEN caseData2(a);
-//caseTestA(a) += WHEN testInt(a) < 7 THEN caseData3(a);
-//caseTestA(a) += WHEN a IS CaseA THEN 0;
-
-//caseTestA2 = ABSTRACT CASE EXCLUSIVE INTEGER (CaseA);
-//caseTestA2(a) += WHEN testInt(a) > 5 THEN caseData1(a);
-//caseTestA2(a) += WHEN testInt(a) < 5 THEN caseData2(a);
-//caseTestA2(a) += WHEN testInt(a) = 5 THEN caseData3(a);
+caseTestA = ABSTRACT CASE INTEGER (CaseA);
+caseTestA(a) += WHEN testInt(a) < 5 THEN caseData1(a);
+caseTestA(a) += WHEN testInt(a) < 6 THEN caseData2(a);
+caseTestA(a) += WHEN testInt(a) < 7 THEN caseData3(a);
+caseTestA(a) += WHEN a IS CaseA THEN 0;
 
 multiTest 'MULTI' (a) = MULTI caseDataB(a), caseDataC(a);
 multiTest2 'MULTI OVER' (a) = MULTI OVERRIDE caseData1(a), caseData2(a);
@@ -320,10 +245,10 @@ multiTestA = ABSTRACT INTEGER (CaseA);
 multiTestA(a) += caseDataB(a);
 multiTestA(a) += caseDataC(a);
 
-//multiTestA2 = ABSTRACT MULTI OVERRIDE CHECKED INTEGER (CaseA);
-//multiTestA2(a) += caseData1(a);
-//multiTestA2(a) += caseDataB(a);
-//multiTestA2(a) += caseDataC(a);
+multiTestA2 = ABSTRACT MULTI OVERRIDE FULL INTEGER (CaseA);
+multiTestA2(a) += caseData1(a);
+multiTestA2(a) += caseDataB(a);
+multiTestA2(a) += caseDataC(a);
 
 caseActionTest(a) {
     CASE
@@ -351,31 +276,15 @@ caseActionTestA(a) + WHEN testInt(a) > 6 THEN { MESSAGE '>6'; }
 caseActionTestA(a) + WHEN testInt(a) = 6 THEN { MESSAGE '=6'; }
 caseActionTestA(a) + WHEN testInt(a) < 6 THEN { MESSAGE '<6'; }
 
-//multiActionTest(a) = MULTI IF a IS CaseB THEN MESSAGE caseDataB(a), IF a IS CaseC THEN MESSAGE caseDataC(a);
-//multiActionTest2(a) = MULTI OVERRIDE IF a IS CaseB THEN MESSAGE caseDataB(a), IF a IS CaseC THEN MESSAGE caseDataC(a);
-
-//multiActionTestA  ABSTRACT MULTI ( CaseA);
-//multiActionTestA(a) += IF a IS CaseB THEN MESSAGE caseDataB(a);
-//multiActionTestA(a) += IF a IS CaseC THEN MESSAGE caseDataC(a);
-
-//multiActionTestA2  ABSTRACT MULTI OVERRIDE ( CaseA);
-//multiActionTestA2(a) += IF a IS CaseB THEN MESSAGE caseDataB(a);
-//multiActionTestA2(a) += IF a IS CaseB THEN MESSAGE caseDataC(a);
-
 scase = DATA BOOLEAN ();
 caseAM() { FOR IF scase() THEN TEXT s = '{classes.image}' ELSE s = '{classes.image.link}' DO MESSAGE s; };
 caseAMN { MESSAGE 'Hello world!' NOWAIT; }
 
-dr(a) {
-    //DRILLDOWN overrideTest(a); 
-}
-
 FORM TestCase 'CASE test'
     OBJECTS a = CaseA, b = CaseB, c = CaseC
-    PROPERTIES(a) GRID NEW TOOLBAR, testInt, caseData1, caseData2, caseData3, overrideTest, overrideTestA, exclusiveTest, exclusiveTestA, caseTest, caseTest2, //caseTestA, caseTestA2, 
-        multiTest, multiTestA, multiTest2, // multiTestA2,
-        caseActionTest, caseActionTestA, caseActionTest2, caseActionTestA2//, multiActionTest, multiActionTestA, multiActionTest2, multiActionTestA2
-        , dr
+    PROPERTIES(a) GRID NEW TOOLBAR, testInt, caseData1, caseData2, caseData3, overrideTest, overrideTestA, exclusiveTest, exclusiveTestA, caseTest, caseTest2, caseTestA,
+        multiTest, multiTestA, multiTest2, multiTestA2,
+        caseActionTest, caseActionTestA, caseActionTest2, caseActionTestA2
     PROPERTIES NEW(b), NEW(c), caseDataB(b), caseDataC(c), caseAM(), scase(), caseAMN()
 ;
 
@@ -393,33 +302,17 @@ EXTEND FORM TestCase
 storeSizeCode 'Warehouse size (code)' (Store s) = sizeCode(storeSize(s)) CHARWIDTH 50;
 
 // Partition property
-// SUM, PREV partition property
-// Expression syntax:
-// PARTITION (SUM | PREV) propertyExpression
-// [BY propertyExpressionM1, ..., propertyExpressionMN]
-// [ORDER [DESC] propertyExpressionL1, ..., propertyExpressionLK]
-// [WINDOW EXCEPTLAST]
 testPartition(Store store, Article article) = PARTITION SUM incomeQuantity(store, article) ORDER DESC name(article) BY store;
 
 // UNGROUP PROPORTION partition property
-// PARTITION UNGROUP propertyObject PROPORTION [STRICT] ROUND(precision) proportionPropertyExpression
-// [BY propertyExpressionM1, ..., propertyExpressionMN]
-// [ORDER [DESC] propertyExpressionL1, ..., propertyExpressionLK]
 testAmount(Store store) = 20.0 IF store IS Store;
 testData(article) = DATA DOUBLE (Article);
 testPropPartition(Store store, Article article) = PARTITION UNGROUP testAmount PROPORTION STRICT ROUND(2) testData(article) ORDER name(article) BY store;
 
 // UNGROUP LIMIT partition property
-// PARTITION UNGROUP propertyObject LIMIT [STRICT] limitPropertyExpression
-// [BY propertyExpressionM1, ..., propertyExpressionMN]
-// [ORDER [DESC] propertyExpressionL1, ..., propertyExpressionLK]
 testLimitPartition(Store store, Article article) = PARTITION UNGROUP testAmount LIMIT STRICT testData(article) ORDER DESC name(article) BY store;
 
 // Concatenation/Deconcatenation property
-// Expression syntax:
-// STRUCT(propertyExpression1[, ..., propertyExpressionN])
-// Access expression syntax with one-base indices:
-// concatenatePropertyExpression[2]
 ioQuantity(Store store, Article article) = STRUCT(incomeQuantity(store, article), outcomeQuantity(store, article)) MATERIALIZED;
 onlyIncomeQuantity 'Test STRUCT' (Store store, Article article) = ioQuantity(store, article)[1];
 
@@ -428,34 +321,18 @@ tstStruct(Store store) = STRUCT(tstData(store), 5) MATERIALIZED;
 tstDestruct(Store store) = tstStruct(store)[1];
 
 // Abstract property
-// Expression syntax:
-// ABSTRACT [CASE [OVERRIDE | EXCLUSIVE] | MULTI [OVERRIDE | EXCLUSIVE] | OVERRIDE | EXCLUSIVE] [CHECKED] returnClass (paramClass1, ..., paramClassN)
 testAbstract(named) = ABSTRACT INTEGER (Named);
-// overriding abstract property syntax:
-// propertyName(namedParam1, ..., namedParamN) += expression;
-// or
-// propertyName(namedParam1, ..., namedParamN) += WHEN expression1 THEN expression2;
 testAbstract(Article named) += 5 IF named IS Article;
 testAbstract(Store named) += 6 IF named IS Store;
 
 // Abstract action
-// Expression syntax:
-// ACTION ABSTRACT [CASE [OVERRIDE | EXCLUSIVE] | MULTI [OVERRIDE | EXCLUSIVE] | LIST] [CHECKED] (className1, ..., classNameN)
-
 testAbstractAction ABSTRACT LIST ( Object);
-// overriding abstract action syntax:
-// actionName(namedParam1, ..., namedParamN) += actionBody;
-// or
-// actionName(namedParam1, ..., namedParamN) += WHEN expression THEN actionBody;
-
 testAbstractAction(Store store) + { IF store IS Store THEN MESSAGE 'testing store'; }
 testAbstractAction(Store store) + { IF store IS Store THEN MESSAGE 'testing store2'; }
 testAbstractAction(Document document) + { IF document IS Document THEN MESSAGE 'testing document'; }
 testAbstractAction(Document document) + { IF document IS Document THEN MESSAGE 'testing document2'; }
 
 // Formula property
-// Expression syntax:
-// FORMULA [primitiveType] 'formula text $1 + $2'
 sum12 = FORMULA DOUBLE '($1)+($2)*2';
 testFormula(Store store, Article article) = sum12(incomeQuantity(store, article), outcomeQuantity(store, article));
 
@@ -490,61 +367,8 @@ storeIsHuge2(Store store) = (storeSize(store) == StoreSize.huge) == TRUE;
 documentBalance(Document document, Article article) = balanceQuantity(store(document), article);
 
 /////////////////////ACTIONS//////////////////
-// General Syntax:
-// ACTION [(param1, ..., paramN)] actionBody
-
-// List action
-// statement syntax:
-// [NEWSESSION [AUTOAPPLY]]  {
-//      actionStatement1 | LOCAL name = returnClass ( [paramClass1, ..., paramClassK1] )
-//      ...
-//      actionStatementN | LOCAL name = returnClass ( [paramClass1, ..., paramClassKN] );
-// }
-//
-// If NEWSESSION is specified than action will be performed in new session.
-// If AUTOAPPLY is specified - this new session will be applied by default,
-// if not - one should do 'EXEC apply();' explicitly.
-
-// Exec action
-// statement syntax:
-// [EXEC] actionPropertyName(propertyExpr1, ..., propertyExprN)
-// or
-// [EXEC] [actionPropertyExpr](propertyExpr1, ..., propertyExprN)
-
-// Set action
-// statement syntax:
-// [SET] name(param1, .., paramN) <- propertyExpressionFrom [WHERE conditionalExpression]
-
-// If action
-// statement syntax:
-// IF propertyExpresson
-//      THEN actionStatement1
-//     [ELSE actionStatement2]
-
-// Case action
-// statement syntax
-// CASE [OVERRIDE | EXCLUSIVE]
-//      WHEN propertyExpr1 THEN action1
-//      ...
-//      WHEN propertyExprN THEN actionN
-
-// Multi action
-// statement syntax:
-// MULTI [OVERRIDE | EXCLUSIVE] action1, ..., actionN
-
-// For/While action
-// statement syntax:
-// (FOR | WHILE) propertyExpression [ORDER [DESC] orderExpression1, ..., orderExpressionN] DO actionStatement
-
-// Form action
-// statement syntax:
-// FORM formName
-// [OBJECTS object1 =mappingExpr1, ..., objectN =mappinExprN]
-// [NEWSESSION | | OLDSESSION] [DOCKED | FLOAT] [CHECK] [PRINT [AUTO]]
 
 // Add object action
-// statement syntax:
-// NEW className [WHERE expression] [TO propertyName(param1, ..., paramN)]
 
 CLASS AOA : Named;
 CLASS AOB : Named;
@@ -558,22 +382,7 @@ addB() { NEW AOB; }
 
 addAllBTo() { NEW AOB WHERE count[AOA](a) > 5 TO AOBfor(a); }
 
-// Custom action
-// statement syntax:
-// INTERNAL 'javaClassName'
-
-// Message action
-// statement syntax:
-// MESSAGE propertyExpr
-
-// Delete action
-// statement syntax:
-// DELETE object [WHERE expression]
-
 // Change class action
-// statement syntax:
-// CHANGECLASS object TO className [WHERE expression]
-// built-in or abstract class names are forbidden
 
 CLASS CCA : Named;
 CLASS CCB : Named;
@@ -591,18 +400,7 @@ deleteA 'delete A > 5' () { DELETE CCA a WHERE count(a) > 5; }
 changeAllAWhenCountAB 'all count CCACCB > 5' (CCB b) { CHANGECLASS CCA a TO CCB WHERE countCCACCB(a, b) > 5; }
 changeAllAWhenCount 'all count CCB > 5' (CCB b) { CHANGECLASS CCA a TO CCB WHERE count(b) > 5 AND a IS CCA; }
 
-// Confirm action
-// statement syntax:
-// CONFIRM propertyExpression
-
-// Request action
-// statement syntax:
-// REQUEST type (INPUT | [objectName] actionStatement)
-// type can be built-in type or OBJECT
-
 // Eval action
-// statement syntax:
-// EVAL expression
 
 script(doc) = DATA TEXT (Document);
 evalScript(Document doc) { EVAL script(doc); }
@@ -724,27 +522,11 @@ importAction 'IMPORT DBF MEMO' () {
 }
 
 ///////////////CONSTRAINT STATEMENT//////////////
-// Syntax:
-// CONSTRAINT propertyExpression [CHECKED [BY propertyName1, ..., propertyNameN]] propertyExpression MESSAGE 'message';
 CONSTRAINT foo(store, article) > 1000 CHECKED MESSAGE 'error: >1000';
 
-////////////////FOLLOWS STATEMENT////////////////
-// Syntax:
-// propertyName(param1, ..., paramN) => propertyExpression [RESOLVE [LEFT] [RIGHT] [SESSION]],
-//foo(store, article) => foo2(store, article) RESOLVE LEFT;
-
-////////////////WRITEWHEN STATEMENT//////////////
-// Syntax:
-// propertyName(param1, ..., paramN) <- valuePropertyExpression WHEN changePropertyExpression;
-
-// inQuantity(document, article) <- 15 WHEN CHANGED(foo(store(document), article));
-
 ///////////////////EVENT STATEMENT//////////////
-// Syntax:
-// WHEN expression DO action [ORDER [DESC] expr1, ..., exprN] [SESSION];
 
 constraintAction (Store store, Article article) {
-    //    EXEC cancel();
     IF foo(store, article) > 300000 THEN {
         MESSAGE name(article);
     }
@@ -753,15 +535,11 @@ constraintAction (Store store, Article article) {
 WHEN LOCAL foo(Store store, Article article) > 10000 ORDER name(article) DO constraintAction(store, article);
 
 /////////////GLOBAL EVENT STATEMENT//////////////
-// Syntax:
-// ON (GLOBAL | SESSION) action;
 
 globalInt() = DATA INTEGER ();
 ON LOCAL globalInt() <- globalInt() (+) 1;
 
 ///////////////////ASPECT STATEMENT//////////////
-// Syntax:
-// BEFORE | AFTER propertyName(param1, ..., paramN) DO action;
 
 BEFORE constraintAction(store, article) DO MESSAGE 'Before Aspect';
 
@@ -779,36 +557,8 @@ okMessage() {
 }
 
 //////////////// FORM STATEMENT /////////////////
-// Syntax:
-// FORM name ['caption'] [DOCKED | FLOAT] | EXTEND FORM name
-// [(GroupObjects list | TreeGroupObjects list | Properties list | Filters list | Hints list | OrderBy list | filterGroup | dialog form | edit form)]
-// ...
-// [(GroupObjects list | TreeGroupObjects list | Properties list | Filters list | Hints list | OrderBy list | filterGroup | dialog form | edit form)];
 FORM documentArticle 'By documents (caption)'
-
-    // GroupObjects list syntax:
-    // OBJECTS object definition | [groupAlias=] (object1 definition, ..., objectN definition) [INIT | NOFLEX] [PANEL | GRID] [PAGESIZE <int value>],
-    //         ...
-    //         object definition | [groupAlias=] (object1 definition, ..., objectN definition) [INIT | NOFLEX] [PANEL | GRID] [PAGESIZE <int value>]
-
-    // Object definition syntax:
-    // [alias=] className ['<caption>'] [ON CHANGE action]
-
     OBJECTS document = Document, article = Article
-
-    // TreeGroup list syntax:
-    // TREE [SID] [alias=] className ['<caption>'] [PARENT <property>] | [groupAlias=] (object1 definition, ..., objectN definition) [PARENT <properties separated with space>],
-    //            ...
-    //            [alias=] className ['<caption>'] [PARENT <property>] | [groupAlias=] (object1 definition, ..., objectN definition) [PARENT <properties separated with space>]
-
-    // Property list syntax:
-    // PROPERTIES [commonOptions] [alias1=]propName1(param1, ..., paramN1) [options1], ..., [aliasK=]propNameK(param1, ..., paramNK) [optionsK]
-    // or
-    // PROPERTIES(param1, ..., paramN) [commonOptions] [alias1=]propName1 [options1], ..., [aliasK=]propNameK [optionsK]
-    // Special properties: VALUE, NEW, DELETE
-    // Property option:    [READONLY] [CHANGEABLE] [SELECTOR] [HINTNOUPDATE] [HINTTABLE] [COLUMNS (<groupObject list>)] [SHOWIF <mappedProperty>] [BACKGROUND <mappedProperty>]
-    //                     [HEADER <mappedProperty>] [FOOTER <mappedProperty>] [READONLYIF <mappedProperty>] [PANEL | GRID] [DRAW <groupObject>]
-    //                     [FOREGROUND <mappedProperty>] [ON (CHANGE | CHANGEWYS | CONTEXTMENU | EDIT) <mappedAction>] [(BEFORE | AFTER) (propertyAlias | <mappedProperty>)] [EVENTID 'id']
 
     PROPERTIES(document) GRID documentTypeString, storeName, date, testPush, testPush2, copy
     PROPERTIES name(article)
@@ -825,12 +575,6 @@ FORM documentArticle 'By documents (caption)'
         ON QUERYCLOSE REPLACE {},
         ON QUERYOK NOREPLACE {}
 ;
-
-// Hints list syntax:
-// HINTNOUPDATE | HINTTABLE propertyName1, ..., propertyNameN
-
-// Order list syntax:
-// ORDER (propertyAlias1 | <mappedProperty1>), ..., (propertyAliasN | <mappedPropertyN>)
 
 showDocumentArticleModalForm 'Show modal "By documents"'() {
     NEWSESSION {
@@ -865,9 +609,6 @@ testAction 'Show "By documents" 3 times'() {
         DIALOG documentArticle DO {
             MESSAGE 'You pressed "ok"';
         }
-        //        ELSE {
-        //            MESSAGE 'You pressed "close"';
-        //        }
 
         i() <- i() + 1;
     };
@@ -899,16 +640,9 @@ setDefaultNames 'Set default names' () {
     FOR Article a IS Article DO {
         name(a) <- 'Product ' + a;
     }
-    //    FOR Store s IS Store DO {
-    //        staticCaption(s) <- 'Warehouse ' + s;
-    //    }
-    //    FOR Article a IS Article DO {
-    //        staticCaption(a) <- 'Product ' + a;
-    //    }
 };
 
 name(Store s) <- 'Warehouse ' + s WHEN SET(s IS Store);
-//staticCaption(Store s) <- 'Warehouse ' + s WHEN SET(s IS Store);
 
 FORM remindUserPass 'Login reminder'
 
@@ -929,11 +663,9 @@ remindPasswordEmail 'Send login to this email' (Contact u, BPSTRING[200] to) {
     attachNames(0) <- 'copy';
     
     EMAIL
-        //    FROM 'luxsoft@adsl.by'
         SUBJECT 'Password reminder for ' + email(u)
         TO (to IF to IS BPSTRING[200])
         CC 'some@someserv.net'
-        //    BCC 'luxsoft@adsl.by'
         BODY bodyFile()
         ATTACH attachFile() NAME 'ATTACH: Password reminder for ' + email(u)
         ATTACH LIST attachFiles NAME attachNames;
@@ -957,7 +689,7 @@ loadf(Store s) { open(simage(s)); }
 savef(Store s) { INPUT = simage(s) CHANGE; }
 
 sssFixed = storeSizeName(Store s) CHARWIDTH 51 NOFLEX;
-sss = storeSizeName(Store s);// CHARWIDTH 51;
+sss = storeSizeName(Store s);
 
 dataStringFixed = DATA STRING[100] (Store) CHARWIDTH 52 NOFLEX;
 dataStringFlex = DATA STRING[100] (Store) CHARWIDTH 52 FLEX;
@@ -972,11 +704,9 @@ FORM storeArticle 'By warehouses'
     OBJECTS a = Article
     PROPERTIES sname = name(s), obja = VALUE(a), aname = name(a)
     PROPERTIES DRAW s setDefaultNames(), copyNameToArticles(s), copyStoreNameToArticle(s, a), copyStoreNameToArticleError(s, a), createNewStore(), showDocumentArticleModalForm(), showTestModalForm() TOOLBAR, testRequestInput(s) TOOLBAR
-    //    PROPERTIES() countF, setNameX
     PROPERTIES(s, a) incomeQuantity2, outcomeQuantity2, lastQuantity
     PROPERTIES(s) GRID storeSizeName, dataString, dataStringFixed, dataStringFlex, sss, sssFixed, ssc1 = storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi = simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foo, bar, foobar HEADER name(a), bar2, baz, baz2, balanceQuantity, testUnion HEADER name(s), testPartition, testFormula
-    //PROPERTIES tstDestruct(s), onlyIncomeQuantity(s,a) //commented because of assertion
     PROPERTIES currentTime(), allNames()
     FILTERGROUP filters1
         FILTER '{showhuge}' storeIsHuge(s) 'F10'
@@ -992,10 +722,6 @@ setNameX 'Add X to name'() {
         name(s) <- 'X' + k() + name(s);
     }
 }
-//WHEN LOCAL CHANGED([ VIEW storeArticle.s](s)) DO {
-//    name(s) <- 'U' + name(s);
-//}
-
 seekX 'Seek object'() {
     DIALOG storeArticle OBJECTS s INPUT NULL DO {
         SEEK storeArticle.s = s;
@@ -1302,9 +1028,9 @@ DESIGN TestHotkeysAndFilters {
     //remove regular filter
     REMOVE FILTERGROUP(filters1);
 
-    FILTERS(s) {
-        //disable user filters
-        //visible = FALSE;
+    // hide the user filters of a group (on the second quick search table, the first tab shows them)
+    FILTERS(qss2) {
+        visible = FALSE;
     }
 
     GRID(qss) {
@@ -1359,9 +1085,6 @@ stringWithStaticRegexp = DATA STRING() REGEXP '\\d\{2\}-\\d\{3\}' 'need to be st
 dynamicRegexp = DATA STRING();
 stringWithDynamicRegexp = DATA STRING();
 
-//need filled apiKey in Geo.lsf 
-address = DATA STRING[500];
-
 likeString = DATA STRING (Store) INDEXED LIKE;
 matchString = DATA STRING (Store) INDEXED MATCH;
 boolean = DATA BOOLEAN (Store);
@@ -1404,12 +1127,10 @@ FORM TestPropertyOptions 'Property Options'
         stringWithStaticRegexp, dynamicRegexp, stringWithDynamicRegexp,
         button1, button21, button22, button3
 
-    //PROPERTIES () address ON CHANGE { INPUT sl = STRING[500] CUSTOM 'googleAutocomplete' DO address() <- sl; }
-
     OBJECTS s = Store
     PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
-    //PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect
+    PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect
 
     // SHOWIF, READONLYIF, DISABLEIF
     PROPERTIES makeReadOnly(), makeDisabled(), showIfReadOnly() SHOWIF makeReadOnly()
@@ -1980,13 +1701,9 @@ rounded2 = ROUND(rounding(), -2); //12300.00
 FORM TestPivot 'Pivot test'
     OBJECTS s = Store
     PROPERTIES(s) name, storeSizeCode, storeSizeName, sinteger, slong, sdouble
-    PIVOT s 'Bar Chart' NOSETTINGS MAX //CONFIG 'configFun' 
+    PIVOT s 'Bar Chart' NOSETTINGS MAX CONFIG 'configFun' // the client JS function overriding the renderer options; no options if it is not defined
         ROWS name(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)    
 ;
-
-onWebClientStarted() +{ 
-    //INTERNAL CLIENT WAIT 'pivotMobile.js';
-}
 
 //--------------- SCHEDULE test ---------------//
 
@@ -2082,7 +1799,6 @@ concatToVar(Named store) = CONCAT ', ', name(store), sbpstring(store), slong(sto
 concatVarNull(Store store) = 'name: ' + name(store) + '; long: ' + slong(store) + '; string: ' + sbpstring(store);
 concatVarNotNull(Named store) = CONCAT '', 'name: ' IF store IS Store, name(store), '; long: ' IF store IS Store, slong(store), '; string: ' IF store IS Store, sbpstring(store);
 
-//castToInt = INTEGER(sstring(s));
 castToNumeric = NUMERIC[10,3](sbpstring(Store s));
 
 partitionToArticles(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION ROUND(0) sadouble(store, article) ORDER name(article) BY store;
@@ -2422,10 +2138,8 @@ addDetailBarcode(Article article, BPSTRING[15] barcode) {
     dialogBarcodeArticle() <- barcodeToArticle(barcode);
 
     IF dialogBarcodeArticle() IS Article THEN {
-        //        MESSAGE 'FOUND: ' + name(dialogBarcodeArticle()) + '; current: ' + name(article);
         SHOW TestLayout OBJECTS ta = dialogBarcodeArticle() ;
     } ELSE {
-        //        MESSAGE 'NOT FOUND: current: ' + name(article);
         SHOW TestLayout OBJECTS ta = article ;
     }
 };
@@ -2515,8 +2229,6 @@ FORM TestDisappearingActon 'Disappearing button test'
     EVENTS ON SCHEDULE PERIOD 1 formRefresh()
 ;
 
-sessionSstring = DATA LOCAL BPSTRING[30](Store);
-
 testAddInNestedSession 'Add product group'(ArticleGroup parentGroup) {
     NESTEDSESSION {
         NEW ag = ArticleGroup {
@@ -2590,7 +2302,6 @@ DESIGN TestSessionProps {
 }
 testActionInNewSession() {
     LOCAL addedStore = Store();
-    //    NEWSESSION (addedStore, ssstring) {
     NEWSESSION NESTED LOCAL {
         NEW s = Store {
             DIALOG TestSessionProps OBJECTS s = s DO {
@@ -2632,7 +2343,6 @@ EXTEND FORM TestSessionProps
 ;
 
 debuggableActionBegin(Store s) {
-    //    MESSAGE 'Begin';
     name(s) <- 'name from action';
 
     LOCAL i = INTEGER();
@@ -2647,7 +2357,6 @@ debuggableActionBegin(Store s) {
     name(s) <- 'name from action';
 }
 debuggableActionEnd(Store x) {
-    //    MESSAGE 'End';
     name(x) <- 'name from action';
     name(x) <- 'name from action';
     name(x) <- 'name from action';
@@ -2665,34 +2374,7 @@ x = DATA INTEGER (A)
 CONSTRAINT f(A a) > g(a) MESSAGE 'Forbidden';
 f(A a) => g(a) RESOLVE LEFT;
 
-//tstCustom  INTERNAL  'samples.TestCustomActionProperty' ();
-
-//EXTERNAL examples
-
-//testFile = DATA LOCAL FILE ();
-//testFile2 = DATA LOCAL FILE ();
-//str1 = DATA LOCAL STRING[100] (Store);
-//str2 = DATA LOCAL STRING[100] (Store);
-//str3 = DATA LOCAL STRING[100] (Store);
-//externalDB = EXTERNAL DB 'jdbc:($1)://($2)/eqs?user=root&password=' EXEC 'select ($3), date from history' TO testFile;
-//externalHTTP = EXTERNAL HTTP 'https://www.gastronom.ru/($1)/images/20170418/b7568ebc.jpg' TO testFile, testFile2;
-//
-//testCustomHTTP(Store s)  { 
-//    str1(s) <- 'binfiles';
-//    externalHTTP(str1(s));
-//    open(testFile());
-//    open(testFile2());
-//}
-//
-//testCustomDB(Store s)  { 
-//    str1(s) <- 'mysql';
-//    str2(s) <- 'localhost';
-//    str3(s) <- 'id';
-//    externalDB(str1(s),str2(s), str3(s));
-//}
-
-//WHEN f(A a) < g(a) DO
-//    tstCustom();
+tstCustom 'INTERNAL (Java)' INTERNAL 'samples.TestCustomActionProperty' ();
 
 jss() = DATA INTEGER ();
 debuggableAction(Store s) {
@@ -2705,8 +2387,6 @@ debuggableAction(Store s) {
 
         NEW a = A {
         }
-
-        //        tstCustom();
 
         apply();
         cancel();
@@ -2786,7 +2466,7 @@ debuggableAction(Store s) {
 }
 FORM TestActions 'Actions'
     // flow: CONFIRM, BREAK / CONTINUE, MESSAGE NOWAIT
-    PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage
+    PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage, tstCustom
 
     // NEWTHREAD / NEWEXECUTOR / SCHEDULE
     PROPERTIES testPush(), startFilling(), startChanging(), startAddDelete(),
@@ -2822,6 +2502,7 @@ DESIGN TestActions {
             MOVE PROPERTY(confirmExceptionMessage());
             MOVE PROPERTY(breakContinueMessage());
             MOVE PROPERTY(noWaitMessage());
+            MOVE PROPERTY(tstCustom());
         }
 
         NEW threadsTab {
@@ -2858,8 +2539,6 @@ DESIGN TestActions {
         }
     }
 }
-
-//path() = 'file:///C:/temp.txt';
 
 path(Store s) = DATA BPSTRING[100](Store);
 
@@ -2919,18 +2598,6 @@ changeC(Store s, Article a) {
             c= dq(s, a) CHANGE NOCONSTRAINTFILTER NOASSIGN;
     };
 
-    //    ASK 'Are you sure?' d=YESNO DO {
-    //        ASK 'Definitely' IF NOT d DO { 
-    //            DIALOG InputC OBJECTS c INPUT z DO 
-    //                dq(s, a) <- z;       
-    //        }
-    //    }
-
-    //    FOR DOUBLE c == 5 DO {
-    //        LOCAL rrr = DOUBLE ();
-    //        DIALOG InputC OBJECTS c=dq(s,a) INPUT b TO rrr,d INPUT y, s INPUT z DO 
-    //            dq(s, a) <- b (+) y;
-    //    }
 }
 
 changeA(A0 a) {
@@ -2969,10 +2636,6 @@ FORM ShowX
 testExport (Store s) {
     LOCAL t = FILE ();
     EXPORT TABLE FROM a = incomeQuantity(s, Article a), b = name(a), c = barcode(a), d = name(a), s = name(s) WHERE incomeQuantity(s, a) TO t;
-    //    open(t());
-    //    IMPORT XML ROOT 'export' TO xa=a, xb=b, xc=c, xd=d, xs=s FROM t();
-
-    //    EXTERNAL SQL '$1' EXEC 'SELECT x.a,x.b,x.c,x.d FROM $2 x WHERE x.a > $3;' PARAMS 'jdbc:postgresql://localhost/vitalur?user=postgres&password=11111', t(), 7 TO testExternalResult;
     testExternal(t(), 7);
 
     IMPORT TABLE FROM testExternalResult() FIELDS DOUBLE a, TEXT b, TEXT c, TEXT d DO {
@@ -3113,7 +2776,7 @@ testImport (FILE cf) {
 
 // IMPORT XML with EXTID groups
 GROUP declaration EXTID 'gd:GoodsDeclaration';
-GROUP shipment EXTID 'cacdo:DeclarationGoodsShipmentDetails';//: declaration;
+GROUP shipment EXTID 'cacdo:DeclarationGoodsShipmentDetails';
 order = DATA LOCAL INTEGER (INTEGER);
 
 FORM importDT
@@ -3413,9 +3076,12 @@ DESIGN TestAdd {
         }
     }
 }
+
+openLink {
+    htmlLinkInTab(HTMLLINK('https://lsfusion.org/'));
+}
+
 //////////////// INDEX STATEMENT //////////////////
-// Syntax:
-// INDEX propertyName1(param1, ..., paramN) | paramI  [, ..., propertyNameN (param1, ..., paramN) | paramI];
 INDEX quantity(Document document, Article article);
 
 //////////////// NAVIGATOR STATEMENT /////////////////
@@ -3491,17 +3157,13 @@ NAVIGATOR {
 
     MOVE storeArticle;
     NEW documentArticle;
+
+    NEW ACTION testFormAction;
+    NEW ACTION lsfusionSite 'lsFusion site' = openLink;
+    MOVE testFormAction;
 }
 
 //////////////// METACODE STATEMENT /////////////
-// Syntax:
-// META codeName([param1, ..., paramN]) metacode END
-//
-// Metacode usage syntax:
-// @codeName([[param1], ..., [paramN]]);
-//
-// concatenation operator: ##
-// concatenation capitalize operator: ###
 
 META metaCodeSample(name)
     CLASS name##Class;
@@ -3518,141 +3180,7 @@ END
 @metaCodeSample(TestName1, TestName2);
 
 //////////////// TABLE STATEMENT ////////////////
-// Syntax:
-// TABLE name(className1, ..., classNameN);
 TABLE documentArticle(Document, Article);
-
-//CLASS PA;
-//order = DATA INTEGER (PA);
-//restr = DATA INTEGER (PA);
-//ungroup = DATA INTEGER ();
-//ungroup2 = DATA INTEGER ();
-//result (PA a) = PARTITION UNGROUP ungroup LIMIT restr(a) ORDER order(a);
-//result2 (PA a) = PARTITION UNGROUP ungroup LIMIT STRICT restr(a) ORDER order(a);
-//
-//FORM tstPart
-//    PROPERTIES () ungroup, ungroup2
-//    OBJECTS a=PA
-//    PROPERTIES (a) NEW, order, restr, result, result2
-//;
-//
-//NAVIGATOR {
-//    NEW tstPart;
-//}
-
-name = DATA STRING[100] (INTEGER);
-barcode = DATA STRING[100] (INTEGER);
-
-FORM articlesTest
-    OBJECTS a = INTEGER
-    PROPERTIES(a) 'ORDER' = name, barcode = barcode
-    FILTERS name(a)
-
-    OBJECTS s = INTEGER
-    PROPERTIES(s) VALUE, name
-    FILTERS name(s)
-;
-
-CLASS Class1 'Class1';
-CLASS Class2 'Class2';
-
-GROUP tgr 'ggf';
-t(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 10 NOFLEX;
-ta(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 50;
-tv(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 10;
-x(Class2 c1) = 5 IF c1 IS Class2 IN tgr;
-zz(Class1 c1) = 5 IF c1 IS Class1 IN tgr CHARWIDTH 20;
-zz(Class2 c1) = 5 IF c1 IS Class2 IN tgr;
-
-ggg = 5 IN tgr;
-
-o1 = DATA Class1 (Class2) NONULL DELETE;
-tstl = DATA LOCAL NESTED INTEGER (Class2);
-
-FORM x
-    OBJECTS c1 = Class1, c2 = Class2
-    PROPERTIES (c1) zz, ta, t, tv PANEL
-    PROPERTIES (c2) zz, o1, tstl, NEW, DELETE
-    FILTERS o1(c2) = c1
-;
-
-DESIGN x {
-    NEW splitCont AFTER OBJECTS {
-        caption = 'dsds';
-        fill = 1;
-        MOVE BOX(c1) {
-            fill = 1;
-        }
-        MOVE BOX(c2) {
-            fill = 1;
-        }
-    }
-    NEW fff {
-        caption = 'fdfd';
-    }
-
-    GROUP (tgr, c1) {
-        horizontal = TRUE;
-        fill = 1;
-        PROPERTY(tv(c1)) {
-            charWidth = 15;
-        }
-    }
-}
-
-tstdt = DATA DATE ();
-tstdtm = DATA DATETIME ();
-tsttime = DATA TIME ();
-
-FORM tst
-    TREE gt t = ArticleGroup
-    PROPERTIES (t) canonicalName
-
-    OBJECTS a = Article
-    PROPERTIES (a) aboolean
-    PROPERTIES () tstdt, tstdtm, tsttime
-;
-
-integerAG = DATA INTEGER(Article, ArticleGroup);
-integerAGPanel = DATA INTEGER(Article, ArticleGroup);
-
-FORM tst2
-    OBJECTS df = DATE PANEL
-    PROPERTIES Date = VALUE(df)
-
-    OBJECTS g = ArticleGroup
-    PROPERTIES (g) naaame = name
-
-    OBJECTS a = Article
-    PROPERTIES (a) tstBool = aboolean, tstLong = along SHOWIF aboolean(a)
-    PROPERTIES(a, g) integerAG DRAW g, integerAGPanel PANEL
-    PROPERTIES () tstDate = tstdt, tstDateTime = tstdtm, tstTime = tsttime
-;
-
-CLASS Item;
-id = DATA STRING[100] (Item);
-name = DATA STRING[100] (Item);
-
-CLASS ItemDetail;
-id = DATA STRING[100] (ItemDetail);
-name = DATA STRING[100] (ItemDetail);
-item = DATA Item (ItemDetail);
-
-FORM tst3
-    //OBJECTS dt = DATE PANEL 
-    //PROPERTIES date = VALUE(dt)
-
-    OBJECTS i = Item
-    PROPERTIES (i) idItem = id, nameItem = name, NEW, DELETE
-
-    OBJECTS d = ItemDetail
-    PROPERTIES (d) idItemDetail = id, nameItemDetail = name SHOWIF id(item(d)), NEW, DELETE
-    FILTERS item(d) == i, id(i), id(d)
-;
-
-NAVIGATOR {
-    NEW tst BEFORE storeArticle;
-}
 
 CLASS XA 'XA';
 CLASS XADetail 'XADetail';
@@ -3744,14 +3272,3 @@ DESIGN TestOperators {
         }
     }
 }
-
-actionXXX {
-    htmlLinkInTab(HTMLLINK('https://luxsoft.by/'));
-}
-
-NAVIGATOR {
-    NEW ACTION testFormAction;
-    NEW ACTION xxx = actionXXX;
-    MOVE testFormAction;
-}
-
