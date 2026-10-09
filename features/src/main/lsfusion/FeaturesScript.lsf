@@ -933,7 +933,7 @@ FORM TestHotkeysAndFilters 'Filters, Search & Hotkeys'
     PROPERTIES(qss) sdouble, slong
     PROPERTIES(qss2) VALUE, name, storeSizeName, sinteger, sdouble, slong
 
-    // SEEK
+    // SEEK / ACTIVATE / ACTIVE
     OBJECTS g = (gs = Store, ga = Article)
     PROPERTIES VALUE(gs), name(gs), VALUE(ga), name(ga), incomeQuantity(gs, ga), storeSizeName(gs)
 
@@ -1009,10 +1009,16 @@ seekPartF 'Seek Part a First' () {
     }
 }
 
+// ACTIVATE - the same as SEEK (the current spelling since 6.2), ACTIVE object - the current value of the form object
+activeStoreName 'Current warehouse (ACTIVE)' () = name(ACTIVE TestHotkeysAndFilters.gs);
+activateLastOfStore 'ACTIVATE LAST a of current s' () {
+    ACTIVATE LAST TestHotkeysAndFilters.g OBJECTS gs = ACTIVE TestHotkeysAndFilters.gs;
+}
+
 focusStoreName 'Move focus to name (s)'() { ACTIVATE PROPERTY TestHotkeysAndFilters.name(fs); }
 
 EXTEND FORM TestHotkeysAndFilters
-    PROPERTIES DRAW g seekLast(), seekFirst(), seekFC(), seekLC(), seekGFC(), seekPart(), seekPartF()
+    PROPERTIES DRAW g seekLast(), seekFirst(), seekFC(), seekLC(), seekGFC(), seekPart(), seekPartF(), activeStoreName(), activateLastOfStore()
     PROPERTIES DRAW fs focusStoreName()
 ;
 
@@ -1060,7 +1066,7 @@ DESIGN TestHotkeysAndFilters {
         }
 
         NEW seekTab {
-            caption = 'SEEK';
+            caption = 'SEEK / ACTIVATE';
             MOVE BOX(g);
         }
 
