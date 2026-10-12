@@ -224,7 +224,6 @@ caseTest(a) = CASE
     WHEN testInt(a) < 6 THEN caseData2(a)
     WHEN testInt(a) < 7 THEN caseData3(a)
     ELSE 0 IF a IS CaseA;
-;
 
 caseTest2(a) = CASE EXCLUSIVE
     WHEN testInt(a) >= 5 THEN caseData1(a)
@@ -271,16 +270,16 @@ caseActionTestA(a) + WHEN testInt(a) > 7 THEN { MESSAGE '>7'; }
 caseActionTestA(a) + WHEN testInt(a) > 6 THEN { MESSAGE '>6'; }
 caseActionTestA(a) + WHEN testInt(a) > 5 THEN { MESSAGE '>5'; }
 
+// EXCLUSIVE: the classes of the WHEN conditions must not intersect (as in exclusiveTestA)
 caseActionTestA2 ABSTRACT CASE EXCLUSIVE ( CaseA);
-caseActionTestA(a) + WHEN testInt(a) > 6 THEN { MESSAGE '>6'; }
-caseActionTestA(a) + WHEN testInt(a) = 6 THEN { MESSAGE '=6'; }
-caseActionTestA(a) + WHEN testInt(a) < 6 THEN { MESSAGE '<6'; }
+caseActionTestA2(CaseB b) + WHEN caseDataB(b) > 6 THEN { MESSAGE 'CaseB: >6'; }
+caseActionTestA2(CaseC c) + WHEN caseDataC(c) > 6 THEN { MESSAGE 'CaseC: >6'; }
 
 scase = DATA BOOLEAN ();
 caseAM() { FOR IF scase() THEN TEXT s = '{classes.image}' ELSE s = '{classes.image.link}' DO MESSAGE s; };
 caseAMN { MESSAGE 'Hello world!' NOWAIT; }
 
-FORM TestCase 'CASE test'
+FORM TestCase 'CASE, MULTI & ABSTRACT'
     OBJECTS a = CaseA, b = CaseB, c = CaseC
     PROPERTIES(a) GRID NEW TOOLBAR, testInt, caseData1, caseData2, caseData3, overrideTest, overrideTestA, exclusiveTest, exclusiveTestA, caseTest, caseTest2, caseTestA,
         multiTest, multiTestA, multiTest2, multiTestA2,
@@ -440,7 +439,7 @@ selArt = DATA LOCAL BOOLEAN (Article);
 
 testExec(Document document, Article article) {
     IF quantity(document, article) > 3 THEN
-        name(article) <- 'More then 3';
+        name(article) <- 'More than 3';
 }
 
 testPush(Document document) {
@@ -543,7 +542,7 @@ ON LOCAL globalInt() <- globalInt() (+) 1;
 
 BEFORE constraintAction(store, article) DO MESSAGE 'Before Aspect';
 
-cancledMessage() {
+canceledMessage() {
     MESSAGE 'changes were canceled';
 }
 
@@ -570,7 +569,7 @@ FORM documentArticle 'By documents (caption)'
     FILTERS name(article)
     
     EVENTS
-        ON CANCEL cancledMessage(),
+        ON CANCEL canceledMessage(),
         ON APPLY BEFORE appliedMessage(),
         ON QUERYCLOSE REPLACE {},
         ON QUERYOK NOREPLACE {}
@@ -722,16 +721,16 @@ setNameX 'Add X to name'() {
         name(s) <- 'X' + k() + name(s);
     }
 }
-seekX 'Seek object'() {
+activateX 'Activate object'() {
     DIALOG storeArticle OBJECTS s INPUT NULL DO {
-        SEEK storeArticle.s = s;
+        ACTIVATE storeArticle.s = s;
     }
 }
 
 editTest = DATA INTEGER ();
 
 EXTEND FORM storeArticle
-    PROPERTIES() countF, setNameX, seekX, editTest
+    PROPERTIES() countF, setNameX, activateX, editTest
     PROPERTIES VALUE(s)
     PROPERTIES(s) orderF
 ;
@@ -933,7 +932,7 @@ FORM TestHotkeysAndFilters 'Filters, Search & Hotkeys'
     PROPERTIES(qss) sdouble, slong
     PROPERTIES(qss2) VALUE, name, storeSizeName, sinteger, sdouble, slong
 
-    // SEEK / ACTIVATE / ACTIVE
+    // ACTIVATE / ACTIVE
     OBJECTS g = (gs = Store, ga = Article)
     PROPERTIES VALUE(gs), name(gs), VALUE(ga), name(ga), incomeQuantity(gs, ga), storeSizeName(gs)
 
@@ -976,40 +975,40 @@ EXTEND FORM TestHotkeysAndFilters
         setFilterProperty, readFilterProperty, clearFilterProperty, sleepTwoSeconds
 ;
 
-seekLast { SEEK LAST TestHotkeysAndFilters.g ; }
-seekFirst { SEEK FIRST TestHotkeysAndFilters.g ; }
+activateLast 'ACTIVATE LAST' { ACTIVATE LAST TestHotkeysAndFilters.g; }
+activateFirst 'ACTIVATE FIRST' { ACTIVATE FIRST TestHotkeysAndFilters.g; }
 
-seekLC 'Seek object s Last' () {
+activateLC 'Activate object s Last' () {
     DIALOG TestHotkeysAndFilters OBJECTS gs INPUT DO {
-        SEEK LAST TestHotkeysAndFilters.gs = gs;
+        ACTIVATE LAST TestHotkeysAndFilters.gs = gs;
     }
 }
 
-seekFC 'Seek object s First'() {
+activateFC 'Activate object s First' () {
     DIALOG TestHotkeysAndFilters OBJECTS gs INPUT DO {
-        SEEK FIRST TestHotkeysAndFilters.gs = gs;
+        ACTIVATE FIRST TestHotkeysAndFilters.gs = gs;
     }
 }
 
-seekGFC 'Seek group (s, a) First' () {
+activateGFC 'Activate group (s, a)' () {
     DIALOG TestHotkeysAndFilters OBJECTS gs INPUT NULL, ga INPUT NULL DO {
-        SEEK TestHotkeysAndFilters.g OBJECTS gs = gs, ga = ga;
+        ACTIVATE TestHotkeysAndFilters.g OBJECTS gs = gs, ga = ga;
     }
 }
 
-seekPart 'Seek Part s Last' () {
+activatePart 'Activate part s Last' () {
     DIALOG TestHotkeysAndFilters OBJECTS gs INPUT NULL DO {
-        SEEK LAST TestHotkeysAndFilters.g OBJECTS gs = gs;
+        ACTIVATE LAST TestHotkeysAndFilters.g OBJECTS gs = gs;
     }
 }
 
-seekPartF 'Seek Part a First' () {
+activatePartF 'Activate part a' () {
     DIALOG TestHotkeysAndFilters OBJECTS ga INPUT NULL DO {
-        SEEK TestHotkeysAndFilters.g OBJECTS ga = ga;
+        ACTIVATE TestHotkeysAndFilters.g OBJECTS ga = ga;
     }
 }
 
-// ACTIVATE - the same as SEEK (the current spelling since 6.2), ACTIVE object - the current value of the form object
+// ACTIVE object - the current value of the form object
 activeStoreName 'Current warehouse (ACTIVE)' () = name(ACTIVE TestHotkeysAndFilters.gs);
 activateLastOfStore 'ACTIVATE LAST a of current s' () {
     ACTIVATE LAST TestHotkeysAndFilters.g OBJECTS gs = ACTIVE TestHotkeysAndFilters.gs;
@@ -1018,7 +1017,7 @@ activateLastOfStore 'ACTIVATE LAST a of current s' () {
 focusStoreName 'Move focus to name (s)'() { ACTIVATE PROPERTY TestHotkeysAndFilters.name(fs); }
 
 EXTEND FORM TestHotkeysAndFilters
-    PROPERTIES DRAW g seekLast(), seekFirst(), seekFC(), seekLC(), seekGFC(), seekPart(), seekPartF(), activeStoreName(), activateLastOfStore()
+    PROPERTIES DRAW g activateLast(), activateFirst(), activateFC(), activateLC(), activateGFC(), activatePart(), activatePartF(), activeStoreName(), activateLastOfStore()
     PROPERTIES DRAW fs focusStoreName()
 ;
 
@@ -1065,8 +1064,8 @@ DESIGN TestHotkeysAndFilters {
             MOVE BOX(qss2);
         }
 
-        NEW seekTab {
-            caption = 'SEEK / ACTIVATE';
+        NEW activateObjectTab {
+            caption = 'ACTIVATE / ACTIVE';
             MOVE BOX(g);
         }
 
@@ -1704,7 +1703,7 @@ rounded2 = ROUND(rounding(), -2); //12300.00
 
 //--------------- Pivot test ---------------//
 
-FORM TestPivot 'Pivot test'
+FORM TestPivot 'Pivot'
     OBJECTS s = Store
     PROPERTIES(s) name, storeSizeCode, storeSizeName, sinteger, slong, sdouble
     PIVOT s 'Bar Chart' NOSETTINGS MAX CONFIG 'configFun' // the client JS function overriding the renderer options; no options if it is not defined
@@ -1719,6 +1718,8 @@ scheduleOnStartAction 'NEWSESSION NEWSQL NEWTHREAD SCHEDULE' () {
         sleepTwoSeconds();
     } SCHEDULE DELAY 1000;
 }
+
+//--------------- ON CHANGE / ON EDIT test ---------------//
 
 onChangeStoreName() {
     INPUT i = INTEGER DO {
@@ -1777,6 +1778,8 @@ onHelloWorld(Store s) {
 testOnStringChange() {
     MESSAGE 'On string change';
 }
+
+//--------------- Expressions & Operators test ---------------//
 
 nameDate 'name:date' (Store store) = name(store) + ':' + sdate(store);
 
@@ -1934,6 +1937,8 @@ DESIGN TestOperators {
         }
     }
 }
+
+//--------------- Layout test ---------------//
 
 FORM TestLayout 'Layout'
     OBJECTS ss1 = Store, ss2 = Store, sa = Article, ss3 = Store
@@ -2139,6 +2144,8 @@ DESIGN TestLayout {
     }
 }
 
+//--------------- Barcode input & context filters test ---------------//
+
 addDetailBarcode(Article article, BPSTRING[15] barcode) {
     LOCAL dialogBarcodeArticle = Article ();
     dialogBarcodeArticle() <- barcodeToArticle(barcode);
@@ -2170,6 +2177,8 @@ changeContextStore(Article article) {
 }
 
 barcodeMoreThanSome(Article article) = barcode(article AS Article) > '3';
+
+//--------------- Disappearing button test ---------------//
 
 substoreTitle = DATA BPSTRING[15] (SubStore);
 
@@ -2226,7 +2235,7 @@ disappearingAction(SubStore ss) {
     SHOW wideModalForm OBJECTS s = ss ;
 }
 
-FORM TestDisappearingActon 'Disappearing button test'
+FORM TestDisappearingAction 'Disappearing Button'
     OBJECTS s = Store, ss = SubStore
     PROPERTIES (s) name, className
     PROPERTIES (ss) name, substoreTitle, disappearingAction
@@ -2234,6 +2243,8 @@ FORM TestDisappearingActon 'Disappearing button test'
 
     EVENTS ON SCHEDULE PERIOD 1 formRefresh()
 ;
+
+//--------------- Sessions test ---------------//
 
 testAddInNestedSession 'Add product group'(ArticleGroup parentGroup) {
     NESTEDSESSION {
@@ -2306,6 +2317,7 @@ DESIGN TestSessionProps {
         }
     }
 }
+
 testActionInNewSession() {
     LOCAL addedStore = Store();
     NEWSESSION NESTED LOCAL {
@@ -2317,7 +2329,7 @@ testActionInNewSession() {
         }
     }
     IF addedStore() THEN {
-        SEEK TestSessionProps.s = addedStore();
+        ACTIVATE TestSessionProps.s = addedStore();
     }
 };
 
@@ -2347,6 +2359,8 @@ EXTEND FORM TestSessionProps
     PROPERTIES DRAW s testActionInNewSession(), testSessionPropsInApply()
     PROPERTIES testNestedSession(s)
 ;
+
+//--------------- Debugger & INTERNAL test ---------------//
 
 debuggableActionBegin(Store s) {
     name(s) <- 'name from action';
@@ -2470,6 +2484,7 @@ debuggableAction(Store s) {
         jss() <- jss() + 1;
     }
 }
+
 FORM TestActions 'Actions'
     // flow: CONFIRM, BREAK / CONTINUE, MESSAGE NOWAIT
     PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage, tstCustom
@@ -2546,10 +2561,7 @@ DESIGN TestActions {
     }
 }
 
-path(Store s) = DATA BPSTRING[100](Store);
-
-readA(Store s) { READ path(s) TO file; }
-writeA(Store s) { WRITE file() TO path(s) + 'txt'; }
+//--------------- Input & ON CHANGE test ---------------//
 
 dq = DATA DOUBLE (Store, Article);
 
@@ -2620,48 +2632,6 @@ FORM ListA0
     PROPERTIES (a0) a
 ;
 
-externalSQLConnection 'JDBC connection string' = DATA STRING ();
-
-testExternalResult = DATA LOCAL FILE ();
-testExternal(a, b) {
-    EXTERNAL SQL externalSQLConnection() EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult;
-}
-
-xa = DATA LOCAL DOUBLE (INTEGER);
-xb = DATA LOCAL TEXT (INTEGER);
-xc = DATA LOCAL TEXT (INTEGER);
-xd = DATA LOCAL TEXT (INTEGER);
-xs = DATA LOCAL TEXT (INTEGER);
-
-FORM ShowX
-    OBJECTS i = INTEGER
-    PROPERTIES (i) xa, xb, xc, xd
-    FILTERS imported(i)
-;
-
-testExport (Store s) {
-    LOCAL t = FILE ();
-    EXPORT TABLE FROM a = incomeQuantity(s, Article a), b = name(a), c = barcode(a), d = name(a), s = name(s) WHERE incomeQuantity(s, a) TO t;
-    testExternal(t(), 7);
-
-    IMPORT TABLE FROM testExternalResult() FIELDS DOUBLE a, TEXT b, TEXT c, TEXT d DO {
-        xa(row) <- a;
-        xb(row) <- b;
-        xc(row) <- c;
-        xd(row) <- d;
-    }
-
-    SHOW ShowX;
-
-    testExternal(t(), 8);
-
-    IMPORT TABLE FROM testExternalResult() TO xa = a, xb = b, xc = c, xd = d;
-
-    SHOW ShowX DOCKED;
-
-    EXTERNAL LSF 'http://localhost:7651' EXEC 'Features.testImport[FILE]' PARAMS t();
-}
-
 FORM TestRequestInput 'Input & ON CHANGE'
     // INPUT / DIALOG
     OBJECTS s = Store PANEL, a = Article
@@ -2677,7 +2647,7 @@ FORM TestRequestInput 'Input & ON CHANGE'
     PROPERTIES (a0) a, 'Add A1' = NEW[A1], 'Add A2' = NEW[A2], EDIT, DELETE
     PROPERTIES fltest(), 'TESTCAPTION' = 5 ON CHANGE {
         DIALOG ListA0 OBJECTS a0= a0 NULL INPUT x DO {
-            SEEK TestRequestInput.a0 = x;
+            ACTIVATE TestRequestInput.a0 = x;
         }
     }, v = {
         MESSAGE 'HI';
@@ -2768,6 +2738,53 @@ DESIGN TestRequestInput {
 }
 
 //--------------- Integration test ---------------//
+
+path(Store s) = DATA BPSTRING[100](Store);
+
+readA(Store s) { READ path(s) TO file; }
+writeA(Store s) { WRITE file() TO path(s) + 'txt'; }
+
+externalSQLConnection 'JDBC connection string' = DATA STRING ();
+
+testExternalResult = DATA LOCAL FILE ();
+testExternal(a, b) {
+    EXTERNAL SQL externalSQLConnection() EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult;
+}
+
+xa = DATA LOCAL DOUBLE (INTEGER);
+xb = DATA LOCAL TEXT (INTEGER);
+xc = DATA LOCAL TEXT (INTEGER);
+xd = DATA LOCAL TEXT (INTEGER);
+xs = DATA LOCAL TEXT (INTEGER);
+
+FORM ShowX
+    OBJECTS i = INTEGER
+    PROPERTIES (i) xa, xb, xc, xd
+    FILTERS imported(i)
+;
+
+testExport (Store s) {
+    LOCAL t = FILE ();
+    EXPORT TABLE FROM a = incomeQuantity(s, Article a), b = name(a), c = barcode(a), d = name(a), s = name(s) WHERE incomeQuantity(s, a) TO t;
+    testExternal(t(), 7);
+
+    IMPORT TABLE FROM testExternalResult() FIELDS DOUBLE a, TEXT b, TEXT c, TEXT d DO {
+        xa(row) <- a;
+        xb(row) <- b;
+        xc(row) <- c;
+        xd(row) <- d;
+    }
+
+    SHOW ShowX;
+
+    testExternal(t(), 8);
+
+    IMPORT TABLE FROM testExternalResult() TO xa = a, xb = b, xc = c, xd = d;
+
+    SHOW ShowX DOCKED;
+
+    EXTERNAL LSF 'http://localhost:7651' EXEC 'Features.testImport[FILE]' PARAMS t();
+}
 
 // filled by testExport through EXTERNAL LSF
 impQ = DATA DOUBLE (Store, Article);
@@ -3153,7 +3170,7 @@ NAVIGATOR {
         NEW TestOperators;
         NEW TestLayout;
         NEW TestColumns;
-        NEW TestDisappearingActon SHOWIF isDesktop();
+        NEW TestDisappearingAction SHOWIF isDesktop();
         NEW TestSessionProps;
         NEW TestCase;
         NEW TestRequestInput;
@@ -3213,10 +3230,10 @@ name = DATA ISTRING[100] (XBDetail);
 
 CLASS XC 'XC' : XBC;
 name = DATA ISTRING[100] (XC);
-CLASS XCDetail 'XBDetail' : XBCDetail;
+CLASS XCDetail 'XCDetail' : XBCDetail;
 name = DATA ISTRING[100] (XCDetail);
 
-TABLE xbc (XBCDetail);
+TABLE xbc (XBC);
 TABLE xbcd (XBCDetail);
 
 xb = AGGR XB WHERE createXB(XA xa) MATERIALIZED INDEXED;
