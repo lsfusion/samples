@@ -1,9 +1,4 @@
 //////////////// MODULE HEADER //////////////////
-// Syntax:
-// MODULE moduleName;
-// [REQUIRE moduleName1, ..., moduleNameN;]
-// [PRIORITY namespace1, ..., namespaceK;]
-// [NAMESPACE namespaceName;]
 
 //#module
 MODULE Features;
@@ -53,6 +48,7 @@ INDEX level(ArticleGroup child, ArticleGroup parent), levelRoot(child, parent);
 INDEX ArticleGroup child, level(child, ArticleGroup parent), levelRoot(child, parent);
 
 articleGroupRoot (ArticleGroup child, level) = GROUP NAGGR ArticleGroup parent BY levelRoot(child, parent);
+nameRootGroup 'Root group (NAGGR)' (ArticleGroup child) = nameArticle(articleGroupRoot(child, 1));
 
 isParent 'Descendant of' (ArticleGroup child, ArticleGroup parent) = TRUE IF level(child, parent);
 
@@ -61,8 +57,6 @@ childNumber 'Number of children' (articleGroup) = GROUP SUM 1 BY parent(ArticleG
 descendantNumber 'Number of all descendants' (ArticleGroup parent) = GROUP SUM 1 IF isParent(ArticleGroup child, parent) MATERIALIZED;
 
 isLeaf 'Sheet' (ArticleGroup articleGroup) = articleGroup IS ArticleGroup AND NOT childNumber(articleGroup) MATERIALIZED;
-
-isParentLeaf (ArticleGroup child, ArticleGroup parent) = isParent(child, parent) AND isLeaf(child);
 
 canonicalName 'Full name' (ArticleGroup articleGroup) = STRING[255](
     (GROUP CONCAT nameArticle(ArticleGroup parent), ' / ' ORDER DESC level(articleGroup, parent)))
@@ -73,8 +67,6 @@ WHEN LOCAL ArticleGroup a IS ArticleGroup DO name(a) <- 'Product group ' + INTEG
 WHEN LOCAL Store s IS Store DO name(s) <- 'Warehouse ' + INTEGER(s);
 
 date(doc) = DATA DATE (Document);
-
-CLASS EmptyInst;
 
 CLASS StoreSize 'Warehouse size' {} : Named;
 
@@ -92,8 +84,6 @@ EXTEND CLASS Features.StoreSize
     medium 'medium',
     small 'small'
 }
-
-storeCaption(StoreSize storeSize) = caption(storeSize) IF storeSize IS StoreSize IN base;
 
 //////////// PROPERTY STATEMENT///////////
 
@@ -155,7 +145,7 @@ storeSizeName = caption(storeSize(Store store)) IN base; // we can omit named pa
 // IS, AS
 is(IncomeDocument document) = document IS IncomeDocument;
 ttt = DATA INTEGER (IncomeDocument) IN base;
-testtettest(IncomeDocument doc) = (-5 + 2) (-) (-ttt(doc));
+unaryMinusTest '(-5 + 2) (-) (-ttt)' (IncomeDocument doc) = (-5 + 2) (-) (-ttt(doc));
 
 // AND, IF (identical in action)
 inQuantity(IncomeDocument document, Article article) = quantity(document, article) IF is(document);
@@ -287,12 +277,12 @@ FORM TestCase 'CASE, MULTI & ABSTRACT'
     PROPERTIES NEW(b), NEW(c), caseDataB(b), caseDataC(c), caseAM(), scase(), caseAMN()
 ;
 
-testFormAction { PRINT TestCase ; }
-testFormActionAUTO { PRINT TestCase NOPREVIEW; }
-testFormActionXLSX { PRINT TestCase XLSX; }
-testFormActionXLS { PRINT TestCase XLS; }
-testFormActionPDF { PRINT TestCase PDF; }
-testFormActionExport { PRINT TestCase PDF TO exportFile; }
+testFormAction 'PRINT TestCase' { PRINT TestCase; }
+testFormActionAUTO 'PRINT NOPREVIEW' { PRINT TestCase NOPREVIEW; }
+testFormActionXLSX 'PRINT XLSX' { PRINT TestCase XLSX; }
+testFormActionXLS 'PRINT XLS' { PRINT TestCase XLS; }
+testFormActionPDF 'PRINT PDF' { PRINT TestCase PDF; }
+testFormActionExport 'PRINT PDF TO' { PRINT TestCase PDF TO exportFile; }
 
 EXTEND FORM TestCase
     PROPERTIES() testFormAction, testFormActionAUTO, testFormActionXLS, testFormActionXLSX, testFormActionPDF, testFormActionExport
@@ -550,16 +540,11 @@ appliedMessage() {
     MESSAGE 'form apply message';
 }
 
-okMessage() {
-    MESSAGE 'Now closing...';
-    formClose();
-}
-
 //////////////// FORM STATEMENT /////////////////
 FORM documentArticle 'By documents (caption)'
     OBJECTS document = Document, article = Article
 
-    PROPERTIES(document) GRID documentTypeString, storeName, date, testPush, testPush2, copy
+    PROPERTIES(document) GRID documentTypeString, storeName, date, ttt, unaryMinusTest, testPush, testPush2, copy
     PROPERTIES name(article)
     PROPERTIES quantity(document, article), oq(document, article), testDisable(document, article) GRID
     PROPERTIES inQuantity(document, article) PANEL, outQuantity(document, article), documentBalance(document, article), selCur(document, article), selAll(document, article), selArt(article)
@@ -641,7 +626,8 @@ setDefaultNames 'Set default names' () {
     }
 };
 
-name(Store s) <- 'Warehouse ' + s WHEN SET(s IS Store);
+// calculated event (WHEN SET) - the name of a new store is set by the WHEN LOCAL event above
+sdate(Store s) <- currentDate() WHEN SET(s IS Store);
 
 FORM remindUserPass 'Login reminder'
 
@@ -703,8 +689,8 @@ FORM storeArticle 'By warehouses'
     OBJECTS a = Article
     PROPERTIES sname = name(s), obja = VALUE(a), aname = name(a)
     PROPERTIES DRAW s setDefaultNames(), copyNameToArticles(s), copyStoreNameToArticle(s, a), copyStoreNameToArticleError(s, a), createNewStore(), showDocumentArticleModalForm(), showTestModalForm() TOOLBAR, testRequestInput(s) TOOLBAR
-    PROPERTIES(s, a) incomeQuantity2, outcomeQuantity2, lastQuantity
-    PROPERTIES(s) GRID storeSizeName, dataString, dataStringFixed, dataStringFlex, sss, sssFixed, ssc1 = storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi = simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData
+    PROPERTIES(s, a) incomeQuantity2, outcomeQuantity2, lastQuantity, onlyIncomeQuantity
+    PROPERTIES(s) GRID storeSizeName, dataString, dataStringFixed, dataStringFlex, sss, sssFixed, ssc1 = storeSizeCode, storeIsHuge, stime, sdate, sdatetime, ssi = simage, spdf, scustom, sexcel, testAbstractAction, loadf, savef, tstData, tstDestruct
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, foo, bar, foobar HEADER name(a), bar2, baz, baz2, balanceQuantity, testUnion HEADER name(s), testPartition, testFormula
     PROPERTIES currentTime(), allNames()
     FILTERGROUP filters1
@@ -824,9 +810,7 @@ EXTEND FORM storeArticle
 FORM editStore 'Editing warehouse'
     OBJECTS s = Store PANEL
     PROPERTIES(s) name, storeSizeName, storeIsHuge, storeIsHuge2
-    // To use this form as EDIT\DIALOG\LIST form for some class (for ex. store)
-    // Use this syntax:
-    //(EDIT | DIALOG | LIST) <className> OBJECT <objectName>
+    // the form is used to edit Store objects (NEW / EDIT / SHOW EDIT)
     EDIT Store OBJECT s
 ;
 
@@ -1595,7 +1579,7 @@ FORM TestTree 'Trees'
     PROPERTIES(sg) nameArticle, EDIT, NEWEDIT, nnn = NEW, DELETE
 
     OBJECTS p = ArticleGroup
-    PROPERTIES(p) nameArticle, nameParent, childNumber, descendantNumber, isLeaf, canonicalName, NEW, DELETE GRID
+    PROPERTIES(p) nameArticle, nameParent, childNumber, descendantNumber, isLeaf, canonicalName, nameRootGroup, NEW, DELETE GRID
     PROPERTIES(sg, p) level, levelRoot, isParent
 
     // tree of several object groups: string -> product groups (hierarchy) -> warehouses
@@ -2176,8 +2160,6 @@ changeContextStore(Article article) {
     DIALOG Stores OBJECTS s= contextStore(article) CHANGE;
 }
 
-barcodeMoreThanSome(Article article) = barcode(article AS Article) > '3';
-
 //--------------- Disappearing button test ---------------//
 
 substoreTitle = DATA BPSTRING[15] (SubStore);
@@ -2499,6 +2481,9 @@ FORM TestActions 'Actions'
     OBJECTS y = Y
     PROPERTIES (y) VALUE, dataX
 
+    OBJECTS co = CommonObject
+    PROPERTIES (co) VALUE, balanceChange
+
     // EVAL
     OBJECTS d = Document
     PROPERTIES(d) storeName, script, evalScript GRID
@@ -2545,6 +2530,7 @@ DESIGN TestActions {
                 alignment = STRETCH;
                 MOVE BOX(x);
                 MOVE BOX(y);
+                MOVE BOX(co);
             }
         }
 
@@ -2616,10 +2602,6 @@ changeC(Store s, Article a) {
             c= dq(s, a) CHANGE NOCONSTRAINTFILTER NOASSIGN;
     };
 
-}
-
-changeA(A0 a) {
-    formEdit(a);
 }
 
 fltest = DATA FILE ();
@@ -2751,15 +2733,15 @@ testExternal(a, b) {
     EXTERNAL SQL externalSQLConnection() EXEC 'SELECT x.a,x.b,x.c,x.d FROM $1 x WHERE x.a > $2;' PARAMS a, b TO testExternalResult;
 }
 
-xa = DATA LOCAL DOUBLE (INTEGER);
-xb = DATA LOCAL TEXT (INTEGER);
-xc = DATA LOCAL TEXT (INTEGER);
-xd = DATA LOCAL TEXT (INTEGER);
-xs = DATA LOCAL TEXT (INTEGER);
+impA = DATA LOCAL DOUBLE (INTEGER);
+impB = DATA LOCAL TEXT (INTEGER);
+impC = DATA LOCAL TEXT (INTEGER);
+impD = DATA LOCAL TEXT (INTEGER);
+impS = DATA LOCAL TEXT (INTEGER);
 
 FORM ShowX
     OBJECTS i = INTEGER
-    PROPERTIES (i) xa, xb, xc, xd
+    PROPERTIES (i) impA, impB, impC, impD
     FILTERS imported(i)
 ;
 
@@ -2769,17 +2751,17 @@ testExport (Store s) {
     testExternal(t(), 7);
 
     IMPORT TABLE FROM testExternalResult() FIELDS DOUBLE a, TEXT b, TEXT c, TEXT d DO {
-        xa(row) <- a;
-        xb(row) <- b;
-        xc(row) <- c;
-        xd(row) <- d;
+        impA(row) <- a;
+        impB(row) <- b;
+        impC(row) <- c;
+        impD(row) <- d;
     }
 
     SHOW ShowX;
 
     testExternal(t(), 8);
 
-    IMPORT TABLE FROM testExternalResult() TO xa = a, xb = b, xc = c, xd = d;
+    IMPORT TABLE FROM testExternalResult() TO impA = a, impB = b, impC = c, impD = d;
 
     SHOW ShowX DOCKED;
 
@@ -2790,9 +2772,9 @@ testExport (Store s) {
 impQ = DATA DOUBLE (Store, Article);
 
 testImport (FILE cf) {
-    IMPORT TABLE FROM cf TO xa = a, xb = b, xc = c, xd = d, xs = s;
-    FOR barcode(Article a) = xc(INTEGER i) AND name(Store s) = xs(i) DO {
-        impQ(s, a) <- xa(i);
+    IMPORT TABLE FROM cf TO impA = a, impB = b, impC = c, impD = d, impS = s;
+    FOR barcode(Article a) = impC(INTEGER i) AND name(Store s) = impS(i) DO {
+        impQ(s, a) <- impA(i);
     }
     APPLY;
 }
@@ -3110,14 +3092,6 @@ INDEX quantity(Document document, Article article);
 //////////////// NAVIGATOR STATEMENT /////////////////
 //configuring the navigator
 NAVIGATOR {
-    // to add an existing element to another element, the following command is used
-    // NEW <name> ['<new caption>'] [((AFTER | BEFORE) <name2>) | FIRST] [WINDOW <new window>];
-    // here by default it will be added to the element of the current scope
-    // (when used right inside the NAVIGATOR, it will be added to the baseElement)
-    //
-    // to create a new item, the following command is used:
-    // NEW <name> ['<caption>'] [ACTION <action name>] [((AFTER | BEFORE) <name2>) | FIRST] [WINDOW <window name>] [IMAGE <path to icon>];
-
     security {
         NEW FOLDER element1 'Element 1' AFTER securityPolicy;
         NEW FOLDER element2 'Element 2' BEFORE securityPolicy;
@@ -3142,9 +3116,7 @@ NAVIGATOR {
 
     // it is also possible to just customize an existing element without moving it
     testNavigators 'Test navigators' {
-        MOVE element1 {
-            //...
-        }
+        MOVE element1;
         MOVE element2;
         NEW editStore;
         NEW testModalForm;
@@ -3161,21 +3133,21 @@ NAVIGATOR {
     }
 
     NEW FOLDER tests 'Tests' WINDOW toolbar {
-        NEW TestHotkeysAndFilters CHANGEKEY 'F9;priority=1000' SHOW;
-        NEW TestPropertyOptions;
+        NEW TestOperators;
+        NEW TestCase;
         NEW TestTypes;
-        NEW TestActions;
+        NEW TestPropertyOptions;
+        NEW TestColumns;
+        NEW TestLayout;
         NEW TestTree;
         NEW TestPivot;
-        NEW TestOperators;
-        NEW TestLayout;
-        NEW TestColumns;
-        NEW TestDisappearingAction SHOWIF isDesktop();
-        NEW TestSessionProps;
-        NEW TestCase;
+        NEW TestHotkeysAndFilters CHANGEKEY 'F9;priority=1000' SHOW;
         NEW TestRequestInput;
-        NEW TestIntegration;
+        NEW TestActions;
         NEW TestAdd;
+        NEW TestSessionProps;
+        NEW TestIntegration;
+        NEW TestDisappearingAction SHOWIF isDesktop();
     }
 
     MOVE storeArticle;
