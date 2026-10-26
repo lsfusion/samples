@@ -109,24 +109,13 @@ sbpstring 'BPString' (store) = DATA BPSTRING[300] (Store);
 sstring 'String (no rtrim)' (store) = DATA STRING[300] (Store);
 
 ssinteger 'Session Integer' (store) = DATA LOCAL INTEGER (Store);
-sslong 'Session Long' (store) = DATA LOCAL LONG (Store);
-ssdouble 'Session Double' (store) = DATA LOCAL DOUBLE (Store);
 ssboolean 'Session Boolean' (store) = DATA LOCAL BOOLEAN (Store);
-sstext 'Session Text' (store) = DATA LOCAL TEXT (Store);
-ssrichtext 'Session RichText' (store) = DATA LOCAL RICHTEXT (Store);
-ssrawrichtext 'Session RawRichText' (Store store) = TEXT(srichtext(store));
 ssbpstring 'Session BPString' (store) = DATA LOCAL BPSTRING[300] (Store);
-ssstring 'Session String (no rtrim)' (store) = DATA LOCAL STRING[300] (Store);
-
-ainteger 'Integer' (article) = DATA INTEGER (Article);
-along 'Long' (article) = DATA LONG (Article);
-aboolean 'Boolean' (article) = DATA BOOLEAN (Article);
 
 aginteger 'Integer' (articleGroup) = DATA INTEGER (ArticleGroup);
 
 sadouble(store, article) = DATA DOUBLE (Store, Article);
 sainteger(store, article) = DATA INTEGER (Store, Article);
-salong(store, article) = DATA LONG (Store, Article);
 
 store(document) = DATA Store (Document) NONULL DELETE;
 quantity(document, article) = DATA DOUBLE (Document, Article) IN base;
@@ -184,7 +173,6 @@ sizeCode 'Warehouse size (code)' (StoreSize ss) = CASE
 CLASS CaseA;
 CLASS CaseB : CaseA;
 CLASS CaseC : CaseA;
-CLASS CaseD : CaseC;
 
 caseData1 = DATA INTEGER (CaseA);
 caseData2 = DATA INTEGER (CaseA);
@@ -192,8 +180,6 @@ caseData3 = DATA INTEGER (CaseA);
 
 caseDataB = DATA INTEGER (CaseB);
 caseDataC = DATA INTEGER (CaseC);
-
-caseDataD = DATA INTEGER (CaseD);
 
 overrideTest 'OVERRIDE' (a) = OVERRIDE caseData3(a), caseData2(a), caseData1(a);
 exclusiveTest 'EXCLUSIVE' (a) = EXCLUSIVE caseData3(a), caseData2(a), caseData1(a);
@@ -1735,8 +1721,6 @@ onEditStoreSizeCode() {
         }
     }
 }
-
-onEditSimple() { MESSAGE 'Edit!'; }
 
 FORM SelectStoreSize
     OBJECTS ss = StoreSize
