@@ -1548,6 +1548,35 @@ noWaitMessage() {
     }
 }
 
+tryCatchFinally 'TRY / CATCH / FINALLY' () {
+    TRY {
+        throwException('thrown in TRY');
+    } CATCH {
+        MESSAGE 'Caught: ' + messageCaughtException() ERROR;
+    } FINALLY {
+        MESSAGE 'FINALLY is executed in any case';
+    }
+}
+
+messageTypes 'MESSAGE INFO / SUCCESS / WARN / ERROR' () {
+    MESSAGE 'Information' INFO;
+    MESSAGE 'Done' HEADER 'Success' SUCCESS;
+    MESSAGE 'Warning' WARN;
+    MESSAGE 'Error' ERROR;
+}
+
+askYesNo 'ASK YESNO' () {
+    ASK 'Save the changes?' HEADER 'Question' yes = YESNO DO {
+        IF yes THEN {
+            MESSAGE 'Yes' SUCCESS;
+        } ELSE {
+            MESSAGE 'No' WARN;
+        }
+    } ELSE {
+        MESSAGE 'Cancel';
+    }
+}
+
 //--------------- TREE test ---------------//
 
 FORM TestTree 'Trees'
@@ -1778,6 +1807,17 @@ concatVarNotNull(Named store) = CONCAT '', 'name: ' IF store IS Store, name(stor
 
 castToNumeric = NUMERIC[10,3](sbpstring(Store s));
 
+xorBooleanInt 'boolean XOR integer>5' (Store store) = sboolean(store) XOR sinteger(store) > 5;
+maxIntLong 'MAX integer, long' (Store store) = MAX sinteger(store), slong(store);
+minIntLong 'MIN integer, long' (Store store) = MIN sinteger(store), slong(store);
+isClassInteger 'ISCLASS(integer)' (Store store) = ISCLASS(sinteger(store));
+minArticleInteger 'GROUP MIN integer' (Store store) = GROUP MIN sainteger(store, Article a);
+
+prevName 'PREV(name)' (Store store) = PREV(name(store));
+changedName 'CHANGED(name)' (Store store) = CHANGED(name(store));
+setChangedInteger 'SETCHANGED(integer)' (Store store) = SETCHANGED(sinteger(store));
+dropChangedInteger 'DROPCHANGED(integer)' (Store store) = DROPCHANGED(sinteger(store));
+
 partitionToArticles(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION ROUND(0) sadouble(store, article) ORDER name(article) BY store;
 pToAStrict(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION STRICT ROUND(0) sadouble(store, article) ORDER name(article) BY store;
 pToAStrictR2(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION STRICT ROUND(2) sadouble(store, article) ORDER name(article) BY store;
@@ -1796,6 +1836,8 @@ FORM TestOperators 'Expressions & Operators'
     PROPERTIES(s) PANEL subDoubleInt, subDoubleNumeric, subNumericInt, subIntLong
     PROPERTIES(s) PANEL multDoubleInt, multDoubleNumeric, multNumericInt, multIntLong
     PROPERTIES(s) PANEL dateProp, dateTimeProp, timeProp, teststring, variableDateTime
+    PROPERTIES(s) PANEL xorBooleanInt, maxIntLong, minIntLong, isClassInteger, minArticleInteger
+    PROPERTIES(s) PANEL prevName, changedName, setChangedInteger, dropChangedInteger
     PROPERTIES() str, strToInt, long, longToStr, rounding, rounded1, rounded2
 
     // PARTITION: values of the current warehouse are distributed between products
@@ -1874,6 +1916,23 @@ DESIGN TestOperators {
             MOVE PROPERTY(timeProp(s));
             MOVE PROPERTY(teststring(s));
             MOVE PROPERTY(variableDateTime(s));
+        }
+
+        NEW logicalTab {
+            caption = 'XOR, MAX / MIN, ISCLASS';
+            MOVE PROPERTY(xorBooleanInt(s));
+            MOVE PROPERTY(maxIntLong(s));
+            MOVE PROPERTY(minIntLong(s));
+            MOVE PROPERTY(isClassInteger(s));
+            MOVE PROPERTY(minArticleInteger(s));
+        }
+
+        NEW changesTab {
+            caption = 'PREV / CHANGED';
+            MOVE PROPERTY(prevName(s));
+            MOVE PROPERTY(changedName(s));
+            MOVE PROPERTY(setChangedInteger(s));
+            MOVE PROPERTY(dropChangedInteger(s));
         }
 
         NEW castRoundTab {
@@ -2321,9 +2380,26 @@ testNestedSession(Store s) {
     }
 };
 
+WHEN LOCAL FORMS TestSessionProps CHANGED(name(Store s)) AND PREV(s IS Store) DO
+    MESSAGE 'Warehouse renamed in the Sessions form session: ' + name(s);
+
+testNewSessionForms 'NEWSESSION FORMS' (Store s) {
+    NEWSESSION FORMS TestSessionProps {
+        name(s) <- name(s) + '*';
+        APPLY;
+    }
+}
+
+testApplySerializable 'APPLY SERIALIZABLE' (Store s) {
+    name(s) <- name(s) + '!';
+    APPLY SERIALIZABLE;
+    IF canceled() THEN
+        MESSAGE applyMessage() WARN;
+}
+
 EXTEND FORM TestSessionProps
     PROPERTIES DRAW s testActionInNewSession(), testSessionPropsInApply()
-    PROPERTIES testNestedSession(s)
+    PROPERTIES testNestedSession(s), testNewSessionForms(s), testApplySerializable(s)
 ;
 
 //--------------- Debugger & INTERNAL test ---------------//
@@ -2453,7 +2529,8 @@ debuggableAction(Store s) {
 
 FORM TestActions 'Actions'
     // flow: CONFIRM, BREAK / CONTINUE, MESSAGE NOWAIT
-    PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage, tstCustom
+    PROPERTIES() confirmExceptionMessage, breakContinueMessage, noWaitMessage, tstCustom,
+        tryCatchFinally, messageTypes, askYesNo
 
     // NEWTHREAD / NEWEXECUTOR / SCHEDULE
     PROPERTIES testPush(), startFilling(), startChanging(), startAddDelete(),
@@ -2493,6 +2570,9 @@ DESIGN TestActions {
             MOVE PROPERTY(breakContinueMessage());
             MOVE PROPERTY(noWaitMessage());
             MOVE PROPERTY(tstCustom());
+            MOVE PROPERTY(tryCatchFinally());
+            MOVE PROPERTY(messageTypes());
+            MOVE PROPERTY(askYesNo());
         }
 
         NEW threadsTab {
@@ -3073,6 +3153,8 @@ openLink {
 //////////////// INDEX STATEMENT //////////////////
 INDEX quantity(Document document, Article article);
 
+WINDOW testsWindow 'Tests' VERTICAL POSITION(0, 6, 20, 94);
+
 //////////////// NAVIGATOR STATEMENT /////////////////
 //configuring the navigator
 NAVIGATOR {
@@ -3116,7 +3198,7 @@ NAVIGATOR {
         MOVE dictionaries 'Dictionaries';
     }
 
-    NEW FOLDER tests 'Tests' WINDOW toolbar {
+    NEW FOLDER tests 'Tests' WINDOW testsWindow {
         NEW TestOperators;
         NEW TestCase;
         NEW TestTypes;
