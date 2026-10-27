@@ -2789,6 +2789,8 @@ path(Store s) = DATA BPSTRING[100](Store);
 
 readA(Store s) { READ path(s) TO file; }
 writeA(Store s) { WRITE file() TO path(s) + 'txt'; }
+appendA(Store s) { WRITE file() TO path(s) + 'txt' APPEND; }
+writeClientDialog 'WRITE CLIENT DIALOG' () { WRITE CLIENT DIALOG file() TO 'features'; }
 
 externalSQLConnection 'JDBC connection string' = DATA STRING ();
 
@@ -2841,6 +2843,24 @@ testImport (FILE cf) {
         impQ(s, a) <- impA(i);
     }
     APPLY;
+}
+
+exportImportCSV 'EXPORT / IMPORT CSV' () {
+    EXPORT CSV ';' NOHEADER NOESCAPE CHARSET 'CP1251' FROM name(Store s), storeSizeName(s) WHERE s IS Store ORDER name(s);
+    IMPORT CSV ';' NOHEADER NOESCAPE CHARSET 'CP1251' FROM exportFile() TO impB, impC;
+    SHOW ShowX;
+}
+
+exportImportXLSX 'EXPORT / IMPORT XLSX' () {
+    EXPORT XLSX SHEET 'Warehouses' HEADER FROM name = name(Store s), size = storeSizeName(s) WHERE s IS Store ORDER name(s);
+    IMPORT XLS HEADER SHEET 1 FROM exportFile() TO impB = name, impC = size;
+    SHOW ShowX;
+}
+
+exportImportXML 'EXPORT / IMPORT XML' () {
+    EXPORT XML ROOT 'stores' TAG 'store' ATTR FROM name = name(Store s), size = storeSizeName(s) WHERE s IS Store ORDER name(s);
+    IMPORT XML ROOT 'stores' ATTR FROM exportFile() TO impB = name, impC = size;
+    SHOW ShowX;
 }
 
 // IMPORT XML with EXTID groups
@@ -2929,13 +2949,15 @@ FORM TestIntegration 'Import / Export / External'
 
     // IMPORT
     PROPERTIES() importFile, memoFile, importAction, importDeclaration, importDocumentsResult
+    PROPERTIES() exportImportCSV, exportImportXLSX, exportImportXML
     OBJECTS ii = INTEGER
     PROPERTIES(ii) kgrmat, polnaim
     FILTERS kgrmat(ii)
 
     // READ / WRITE
     OBJECTS rws = Store
-    PROPERTIES(rws) GRID VALUE, name, path, readA, writeA
+    PROPERTIES(rws) GRID VALUE, name, path, readA, writeA, appendA
+    PROPERTIES() writeClientDialog
 
     // EXTERNAL SQL / LSF / HTTP
     PROPERTIES() externalSQLConnection, externalAction, externalHttpHeaders
@@ -2992,11 +3014,19 @@ DESIGN TestIntegration {
                 MOVE PROPERTY(importDeclaration());
                 MOVE PROPERTY(importDocumentsResult());
             }
+            NEW exportImport {
+                caption = 'EXPORT -> IMPORT';
+                horizontal = TRUE;
+                MOVE PROPERTY(exportImportCSV());
+                MOVE PROPERTY(exportImportXLSX());
+                MOVE PROPERTY(exportImportXML());
+            }
         }
 
         NEW readWriteTab {
             caption = 'READ / WRITE';
             MOVE BOX(rws);
+            MOVE PROPERTY(writeClientDialog());
         }
 
         NEW externalTab {
