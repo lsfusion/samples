@@ -2678,10 +2678,33 @@ FORM ListA0
     PROPERTIES (a0) a
 ;
 
+dialogCheckNoCancel 'DIALOG FILTERS CHECK NOCANCEL FLOAT' (Store s) {
+    DIALOG SelectStoreSize OBJECTS ss = storeSize(s) INPUT FILTERS ss != StoreSize.small CHECK NOCANCEL FLOAT DO {
+        storeSize(s) <- ss;
+    }
+}
+
+showReadOnly 'SHOW READONLY NOMANAGESESSION THISSESSION' (Store s) {
+    SHOW TestSessionProps OBJECTS s = s READONLY NOMANAGESESSION THISSESSION;
+}
+
+inputListWhere 'INPUT CHANGE LIST WHERE' (Store s) {
+    INPUT ss = storeSize(s) CHANGE LIST name(ss) WHERE ss != StoreSize.small;
+}
+
+inputNoChange 'INPUT CHANGE NOCHANGE ... ELSE' (Store s) {
+    INPUT n = name(s) CHANGE NOCHANGE DO {
+        MESSAGE 'Entered, the name is not changed: ' + n;
+    } ELSE {
+        MESSAGE 'Canceled';
+    }
+}
+
 FORM TestRequestInput 'Input & ON CHANGE'
     // INPUT / DIALOG
     OBJECTS s = Store PANEL, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble
+    PROPERTIES(s) dialogCheckNoCancel, showReadOnly, inputListWhere, inputNoChange
     PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode, contextStore
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, balanceQuantity, b = dq ON CHANGE test(), c = dq ON CHANGE changeC(s, a)
     PROPERTIES(s, a) d = dq ON CHANGE {
