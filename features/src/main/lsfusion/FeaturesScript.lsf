@@ -269,9 +269,32 @@ testFormActionXLSX 'PRINT XLSX' { PRINT TestCase XLSX; }
 testFormActionXLS 'PRINT XLS' { PRINT TestCase XLS; }
 testFormActionPDF 'PRINT PDF' { PRINT TestCase PDF; }
 testFormActionExport 'PRINT PDF TO' { PRINT TestCase PDF TO exportFile; }
+testFormActionDOC 'PRINT DOC' { PRINT TestCase DOC; }
+testFormActionDOCX 'PRINT DOCX' { PRINT TestCase DOCX; }
+testFormActionRTF 'PRINT RTF' { PRINT TestCase RTF; }
+testFormActionXLSXSheet 'PRINT XLSX SHEET' { PRINT TestCase XLSX SHEET 'Cases'; }
+testFormActionXLSPassword 'PRINT XLS SHEET PASSWORD' { PRINT TestCase XLS SHEET 'Cases' PASSWORD 'pass'; }
+testFormActionPreviewWait 'PRINT PREVIEW WAIT' { PRINT TestCase PREVIEW WAIT; }
+testFormActionNoWait 'PRINT NOPREVIEW NOWAIT' { PRINT TestCase NOPREVIEW NOWAIT; }
+
+printerName 'Printer' = DATA STRING ();
+testFormActionPrinter 'PRINT NOPREVIEW TO printer' { PRINT TestCase NOPREVIEW TO printerName(); }
+testFormActionServer 'PRINT SERVER NOPREVIEW TO printer' { PRINT SERVER TestCase NOPREVIEW TO printerName(); }
+
+testFormActionMessage 'PRINT FILTERS MESSAGE WARN TOP' { PRINT TestCase FILTERS testInt(a) > 5 MESSAGE WARN TOP 10; }
+testFormActionMessageOffset 'PRINT MESSAGE NOWAIT TOP OFFSET' { PRINT TestCase MESSAGE NOWAIT TOP a = 3 OFFSET a = 1; }
+
+reportPathTestCase 'REPORT' = DATA STRING ();
+reportPathTestCaseA 'REPORTFILES a' = DATA STRING ();
 
 EXTEND FORM TestCase
-    PROPERTIES() testFormAction, testFormActionAUTO, testFormActionXLS, testFormActionXLSX, testFormActionPDF, testFormActionExport
+    PROPERTIES() testFormAction, testFormActionAUTO, testFormActionXLS, testFormActionXLSX, testFormActionPDF, testFormActionExport,
+        testFormActionDOC, testFormActionDOCX, testFormActionRTF, testFormActionXLSXSheet, testFormActionXLSPassword,
+        testFormActionPreviewWait, testFormActionNoWait, printerName, testFormActionPrinter, testFormActionServer,
+        testFormActionMessage, testFormActionMessageOffset, reportPathTestCase, reportPathTestCaseA
+
+    REPORT reportPathTestCase()
+    REPORTFILES a reportPathTestCaseA()
 ;
 
 storeSizeCode 'Warehouse size (code)' (Store s) = sizeCode(storeSize(s)) CHARWIDTH 50;
