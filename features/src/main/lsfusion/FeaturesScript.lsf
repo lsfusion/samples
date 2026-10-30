@@ -1774,6 +1774,38 @@ onEditStoreSizeCode() {
     }
 }
 
+latitude 'Latitude' = DATA NUMERIC[11,6] (Store);
+longitude 'Longitude' = DATA NUMERIC[11,6] (Store);
+
+totalSInteger = GROUP SUM sinteger(Store s);
+foregroundSInteger (Store s) = RGB(200, 0, 0) IF sinteger(s) < 0;
+
+changeWYSStoreSizeName (Store s) {
+    INPUT n = STRING DO
+        storeSize(s) <- GROUP LAST StoreSize ss ORDER ss WHERE caption(ss) = n;
+}
+
+groupChangeSInteger (Store s) {
+    INPUT i = INTEGER DO
+        sinteger(Store st) <- i WHERE storeSize(st) = storeSize(s);
+}
+
+FORM TestListViews 'List views'
+    OBJECTS c = Store CALENDAR
+    PROPERTIES(c) name, sdate
+
+    OBJECTS m = Store MAP
+    PROPERTIES(m) name, latitude, longitude
+
+    OBJECTS p = Store PAGESIZE 0
+    PROPERTIES(p) name FOREGROUND foregroundSInteger(p),
+        sinteger FOOTER totalSInteger() ON GROUPCHANGE groupChangeSInteger(p),
+        storeSizeName ON CHANGEWYS changeWYSStoreSizeName(p)
+
+    OBJECTS ss = StoreSize PANEL
+    PROPERTIES(ss) caption SELECTOR
+;
+
 FORM SelectStoreSize
     OBJECTS ss = StoreSize
     PROPERTIES(ss) READONLY VALUE, name, caption, sizeCode
@@ -3283,6 +3315,7 @@ NAVIGATOR {
         NEW TestLayout;
         NEW TestTree;
         NEW TestPivot;
+        NEW TestListViews;
         NEW TestHotkeysAndFilters CHANGEKEY 'F9;priority=1000' SHOW;
         NEW TestRequestInput;
         NEW TestActions;
