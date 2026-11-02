@@ -2226,6 +2226,116 @@ DESIGN TestLayout {
     }
 }
 
+FORM TestDesignProperties 'Design properties'
+    OBJECTS dp = Store
+    PROPERTIES(dp) VALUE, name, stext, sbpstring, sinteger FOOTER totalSInteger(), sdate
+    PROPERTIES(dp) PANEL pn1 = name, pn2 = name, pn3 = name, pi = sinteger, pd = sdate, pc = scolor,
+        ps = sstring, pt = stext, pl = slong, pz = storeSizeName, pb = sbpstring, pw = sdouble
+
+    OBJECTS ca = Article
+    PROPERTIES PANEL pq = incomeQuantity(dp, ca) COLUMNS (ca) HEADER name(ca)
+
+    TREE groupTree dg = ArticleGroup PARENT parent(dg)
+    PROPERTIES(dg) name
+;
+
+DESIGN TestDesignProperties {
+    NEW designTabs BEFORE TOOLBARBOX {
+        fill = 1;
+        tabbed = TRUE;
+
+        NEW containersTab {
+            caption = 'Containers';
+            NEW gridContainer {
+                caption = 'grid, span, childrenAlignment';
+                lines = 3;
+                grid = TRUE;
+                lineSize = 150;
+                captionLineSize = 100;
+                border = TRUE;
+                childrenAlignment = CENTER;
+                MOVE PROPERTY(pn1) { span = 2; }
+                MOVE PROPERTY(pi);
+                MOVE PROPERTY(pd);
+                MOVE PROPERTY(pc) { span = 3; }
+            }
+            NEW wrapContainer {
+                caption = 'wrap, resizeOverflow, collapsed';
+                horizontal = TRUE;
+                wrap = TRUE;
+                resizeOverflow = TRUE;
+                collapsible = TRUE;
+                collapsed = TRUE;
+                MOVE PROPERTY(pl) { width = 150; height = 60; shrink = TRUE; alignShrink = TRUE; }
+                MOVE PROPERTY(pw) { marginTop = 5; marginBottom = 10; marginLeft = 15; marginRight = 20; }
+            }
+        }
+
+        NEW propertiesTab {
+            caption = 'Properties';
+            activated = TRUE;
+            NEW captionsBox {
+                caption = 'Captions';
+                alignCaptions = TRUE;
+                MOVE PROPERTY(pn2) {
+                    caption = 'A long caption that wraps onto several lines';
+                    captionWrap = TRUE;
+                    captionWrapWordBreak = TRUE;
+                    captionWidth = 80;
+                    captionCharHeight = 3;
+                }
+                MOVE PROPERTY(pn3) {
+                    caption = 'A long caption that is cut with an ellipsis';
+                    captionEllipsis = TRUE;
+                    captionCollapse = TRUE;
+                    captionAlignmentHorz = END;
+                    captionAlignmentVert = CENTER;
+                }
+            }
+            NEW valuesBox {
+                caption = 'Values';
+                MOVE PROPERTY(ps) { echoSymbols = TRUE; clearText = TRUE; notSelectAll = TRUE; defaultComponent = TRUE; }
+                MOVE PROPERTY(pt) { charWidth = 40; charHeight = 3; wrap = TRUE; wrapWordBreak = TRUE; autoSize = TRUE; }
+                MOVE PROPERTY(pb) { valueFlex = TRUE; boxed = FALSE; toolbar = FALSE; toolbarActions = FALSE; fontStyle = 'bold italic'; }
+                MOVE PROPERTY(pz) { select = 'dropdown'; changeOnSingleClick = TRUE; showChangeKey = FALSE; showChangeMouse = FALSE; inline = TRUE; }
+                MOVE PROPERTY(pq) { panelColumnVertical = TRUE; }
+            }
+        }
+
+        NEW gridTab {
+            caption = 'Grid';
+            MOVE BOX(dp);
+        }
+
+        NEW treeTab {
+            caption = 'Tree';
+            MOVE BOX(TREE groupTree);
+        }
+    }
+
+    GRID(dp) {
+        autoSize = TRUE;
+        boxed = FALSE;
+        lineWidth = 3;
+        lineHeight = 2;
+        captionCharHeight = 2;
+        resizeOverflow = TRUE;
+    }
+    PROPERTY(name(dp)) { highlightDuplicate = TRUE; noSort = TRUE; }
+    PROPERTY(stext(dp)) { ellipsis = TRUE; collapse = TRUE; }
+    PROPERTY(sbpstring(dp)) { hide = TRUE; }
+    PROPERTY(sinteger(dp)) { footerClass = 'design-footer'; }
+
+    GRID(TREE groupTree) {
+        hierarchicalCaption = 'Groups';
+        autoSize = TRUE;
+        boxed = FALSE;
+        lineWidth = 2;
+        lineHeight = 1;
+        resizeOverflow = TRUE;
+    }
+}
+
 //--------------- Barcode input & context filters test ---------------//
 
 addDetailBarcode(Article article, BPSTRING[15] barcode) {
@@ -3313,6 +3423,7 @@ NAVIGATOR {
         NEW TestPropertyOptions;
         NEW TestColumns;
         NEW TestLayout;
+        NEW TestDesignProperties;
         NEW TestTree;
         NEW TestPivot;
         NEW TestListViews;
