@@ -123,7 +123,6 @@ oq(document, article) = DATA DOUBLE (Document, Article) IN base;
 storeSize(store) = DATA StoreSize (Store);
 
 barcode 'Barcode' (article) = DATA BPSTRING[15] (Article);
-barcodeToArticle (barcode) = GROUP AGGR Article article BY barcode(article);
 
 sessionObj() = DATA LOCAL Object ();
 
@@ -152,6 +151,7 @@ lastQuantity 'lastQ' (store, Article article) = GROUP LAST inQuantity(IncomeDocu
 allNames() = GROUP CONCAT name(Named obj) IF obj IS Named, ', ' ORDER DESC name(obj);
 
 // AGGR group property
+barcodeToArticle (barcode) = GROUP AGGR Article article BY barcode(article);
 
 testUnion(Store store, Article article) = incomeQuantity(store, article) (+) outcomeQuantity(store, article);
 
@@ -363,6 +363,21 @@ storeIsSmall(Store store) = storeSize(store) == StoreSize.small;
 storeIsHuge2(Store store) = (storeSize(store) == StoreSize.huge) == TRUE;
 
 documentBalance(Document document, Article article) = balanceQuantity(store(document), article);
+
+hintBalance(Store store, Article article) = incomeQuantity(store, article) (-) outcomeQuantity(store, article) HINT;
+noHintBalance(Store store, Article article) = incomeQuantity(store, article) (-) outcomeQuantity(store, article) NOHINT;
+lastIncomeDate(store, Article article) = GROUP MAX date(IncomeDocument d) IF inQuantity(d, article) BY store(d) COMPLEX;
+noComplexQuantity = ABSTRACT INTEGER (Named) NOCOMPLEX;
+noComplexQuantity(Store s) += sinteger(s);
+hugeStoreCount() = GROUP SUM 1 IF storeIsHuge(Store s) MATERIALIZED PREREAD;
+incomeArticleCount(Store s) = GROUP SUM 1 IF incomeQuantity(s, Article a) MATERIALIZED 'incomeArticleCountField';
+weakLazyName(Named n) = name(n) LAZY WEAK;
+strongLazyName(Named n) = name(n) LAZY STRONG;
+
+isAncestor(ArticleGroup child, ArticleGroup parent) = RECURSION TRUE IF child IS ArticleGroup AND parent == child
+    STEP TRUE IF parent == parent($parent) CYCLES YES;
+pathCount(ArticleGroup child, ArticleGroup parent) = RECURSION 1 IF child IS ArticleGroup AND parent == child
+    STEP 1 IF parent == parent($parent) CYCLES NO;
 
 /////////////////////ACTIONS//////////////////
 
@@ -727,7 +742,7 @@ editTest = DATA INTEGER ();
 EXTEND FORM storeArticle
     PROPERTIES() countF, setNameX, activateX, editTest
     PROPERTIES VALUE(s)
-    PROPERTIES(s) orderF
+    PROPERTIES(s) orderF, ssw = sword AFTER ssi, scolor AFTER ssw
 ;
 
 //////////////// DESIGN STATEMENT /////////////////
@@ -752,9 +767,7 @@ DESIGN storeArticle {
     }
 
     NEW newCont;
-}
 
-DESIGN storeArticle {
     TOOLBARSYSTEM(s) {
         showViews = TRUE;
         showFilters = TRUE;
@@ -808,14 +821,6 @@ DESIGN storeArticle {
     }
 }
 
-EXTEND FORM storeArticle
-    PROPERTIES(s) ssw = sword AFTER ssi
-;
-
-EXTEND FORM storeArticle
-    PROPERTIES(s) scolor AFTER ssw
-;
-
 FORM editStore 'Editing warehouse'
     OBJECTS s = Store PANEL
     PROPERTIES(s) name, storeSizeName, storeIsHuge, storeIsHuge2
@@ -834,6 +839,16 @@ dateTimeProp(Store store) = 2007_12_01_18:00 AND store IS Store;
 timeProp(Store store) = 18:00 AND store IS Store;
 variableDateTime(store) = DATA DATETIME (Store);
 teststring(Store store) = '\n\'\\ghhgh\\"' AND store IS Store;
+dateTimeSecondsProp(Store store) = 2007_12_01_18:00:30 AND store IS Store;
+timeSecondsProp(Store store) = 18:00:30 AND store IS Store;
+longProp(Store store) = 5L AND store IS Store;
+numericProp(Store store) = 6.35 AND store IS Store;
+doubleProp(Store store) = 6.35d AND store IS Store;
+tbooleanProp(Store store) = TTRUE AND store IS Store;
+rawStringProp(Store store) = r'C:\no\escapes\n' AND store IS Store;
+rawQuoteStringProp(Store store) = r!'it's raw'! AND store IS Store;
+multilineStringProp(Store store) = 'first line
+second line' AND store IS Store;
 
 colorizeMatching (Store s, StoreSize ss) = scolor(s) IF storeSize(s) == ss;
 storeString (s, ss) = DATA BPSTRING[10] (Store, StoreSize);
@@ -1087,6 +1102,8 @@ likeString = DATA STRING (Store) INDEXED LIKE;
 matchString = DATA STRING (Store) INDEXED MATCH;
 boolean = DATA BOOLEAN (Store);
 tboolean = DATA TBOOLEAN (Store);
+pinCode 'PIN (ECHO)' = DATA STRING[10] (Store) ECHO;
+searchCode 'Code (DEFAULTCOMPARE)' = DATA STRING[20] (Store) INDEXED 'searchCodeIndex' DEFAULTCOMPARE '=*';
 
 storeSizeNameDefault(Store s) = caption(storeSize(s));
 storeSizeNameSelect(Store s) = caption(storeSize(s)) SELECT 'buttonGroup';
@@ -1126,7 +1143,7 @@ FORM TestPropertyOptions 'Property Options'
         button1, button21, button22, button3
 
     OBJECTS s = Store
-    PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString
+    PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString, pinCode, searchCode
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
     PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect
 
@@ -1313,6 +1330,40 @@ openLinkCustom () { open(linkCustom()); }
 stringLinkStore = DATA STRING(Store);
 linkStore(Store s) = LINK(stringLinkStore(s));
 
+fileDbf = DATA DBFFILE ();
+fileText = DATA TEXTFILE ();
+fileCsv = DATA CSVFILE ();
+fileHtml = DATA HTMLFILE ();
+fileJson = DATA JSONFILE ();
+fileXml = DATA XMLFILE ();
+fileTable = DATA TABLEFILE ();
+
+linkWord = DATA WORDLINK ();
+linkDbf = DATA DBFLINK ();
+linkExcel = DATA EXCELLINK ();
+linkText = DATA TEXTLINK ();
+linkCsv = DATA CSVLINK ();
+linkHtml = DATA HTMLLINK ();
+linkJson = DATA JSONLINK ();
+linkXml = DATA XMLLINK ();
+linkTable = DATA TABLELINK ();
+
+syear 'YEAR' = DATA YEAR (Store);
+szdatetime 'ZDATETIME' = DATA ZDATETIME (Store);
+sdatetime3 'DATETIME[3]' = DATA DATETIME[3] (Store);
+stime0 'TIME[0]' = DATA TIME[0] (Store);
+sdateinterval 'INTERVAL[DATE]' = DATA INTERVAL[DATE] (Store);
+sdatetimeinterval 'INTERVAL[DATETIME]' = DATA INTERVAL[DATETIME] (Store);
+stimeinterval 'INTERVAL[TIME]' = DATA INTERVAL[TIME] (Store);
+szdatetimeinterval 'INTERVAL[ZDATETIME]' = DATA INTERVAL[ZDATETIME] (Store);
+sdateintervalfrom 'From' (Store s) = from(sdateinterval(s));
+sbpistring 'BPISTRING' = DATA BPISTRING[50] (Store);
+shtmltext 'HTMLTEXT' = DATA HTMLTEXT (Store);
+sjsontext 'JSONTEXT' = DATA JSONTEXT (Store);
+shtml 'HTML' = DATA HTML (Store);
+stsvector 'TSVECTOR' (Store s) = toTsVector('simple', name(s));
+stsquery 'TSQUERY' (Store s) = toTsQuery('simple', name(s));
+
 //--------------- Colors test ---------------//
 
 color (INTEGER i) = CASE
@@ -1341,14 +1392,21 @@ FORM TestTypes 'Value Types'
     PROPERTIES(rts) VALUE, name, storeSizeCode, sr2 = srichtext
 
     // files & JSON
-    PROPERTIES() rawFile, file, namedFile, actionJSON, videoFile, videoLink
+    PROPERTIES() rawFile, file, namedFile, actionJSON, videoFile, videoLink,
+        fileDbf, fileText, fileCsv, fileHtml, fileJson, fileXml, fileTable
 
     // links
     PROPERTIES() fileImage, openFileImage, linkImage, openLinkImage,
         filePDF, openFilePDF, linkPDF, openLinkPDF, linkRaw, openLinkRaw,
-        linkCustom, openLinkCustom
+        linkCustom, openLinkCustom,
+        linkWord, linkDbf, linkExcel, linkText, linkCsv, linkHtml, linkJson, linkXml, linkTable
     OBJECTS ls = Store
     PROPERTIES(ls) stringLinkStore, linkStore
+
+    OBJECTS ts = Store
+    PROPERTIES(ts) name, syear, szdatetime, sdatetime3, stime0,
+        sdateinterval, sdateintervalfrom, sdatetimeinterval, stimeinterval, szdatetimeinterval,
+        sbpistring, shtmltext, sjsontext, shtml, stsvector, stsquery
 ;
 
 DESIGN TestTypes {
@@ -1398,6 +1456,13 @@ DESIGN TestTypes {
             MOVE PROPERTY(actionJSON());
             MOVE PROPERTY(videoFile());
             MOVE PROPERTY(videoLink());
+            MOVE PROPERTY(fileDbf());
+            MOVE PROPERTY(fileText());
+            MOVE PROPERTY(fileCsv());
+            MOVE PROPERTY(fileHtml());
+            MOVE PROPERTY(fileJson());
+            MOVE PROPERTY(fileXml());
+            MOVE PROPERTY(fileTable());
         }
 
         NEW linksTab {
@@ -1416,8 +1481,22 @@ DESIGN TestTypes {
                 MOVE PROPERTY(openLinkRaw());
                 MOVE PROPERTY(linkCustom());
                 MOVE PROPERTY(openLinkCustom());
+                MOVE PROPERTY(linkWord());
+                MOVE PROPERTY(linkDbf());
+                MOVE PROPERTY(linkExcel());
+                MOVE PROPERTY(linkText());
+                MOVE PROPERTY(linkCsv());
+                MOVE PROPERTY(linkHtml());
+                MOVE PROPERTY(linkJson());
+                MOVE PROPERTY(linkXml());
+                MOVE PROPERTY(linkTable());
             }
             MOVE BOX(ls);
+        }
+
+        NEW otherTypesTab {
+            caption = 'Other types';
+            MOVE BOX(ts);
         }
     }
 }
@@ -1732,6 +1811,24 @@ FORM TestPivot 'Pivot'
         ROWS name(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)    
 ;
 
+onWebClientInit() + {
+    onWebClientInit('features-custom.js') <- 100;
+    onWebClientInit('features-custom.css') <- 101;
+}
+
+customCounter 'Counter' = DATA INTEGER (Store);
+
+FORM TestCustom 'CUSTOM views'
+    OBJECTS cc = Store CUSTOM 'featuresStoreCards' OPTIONS JSON FROM caption = 'Warehouses'
+    PROPERTIES(cc) name, sinteger
+
+    OBJECTS cp = Store
+    PROPERTIES(cp) name, customCounter CUSTOM 'featuresCounter' ON CHANGE {
+        INPUT i = INTEGER DO
+            customCounter(cp) <- i;
+    }
+;
+
 //--------------- SCHEDULE test ---------------//
 
 scheduleOnStartAction 'NEWSESSION NEWSQL NEWTHREAD SCHEDULE' () {
@@ -1882,6 +1979,69 @@ pToALStrict(Store store, Article article) = PARTITION UNGROUP sdouble LIMIT STRI
 fib(INTEGER i, INTEGER to) = GROUP MAX INTEGER f IF (RECURSION i == 1 AND f == 0 AND INTEGER f1 == 1 AND to IS INTEGER
     STEP i == $i + 1 AND f == $f + 0 + $f1 AND f1 == $f AND i < to CYCLES IMPOSSIBLE);
 
+CLASS XA 'XA';
+CLASS XADetail 'XADetail';
+
+xa = DATA XA (XADetail)
+    NONULL
+    DELETE
+    INDEXED AGGR;
+name = DATA ISTRING[100] (XA);
+createXB = DATA BOOLEAN (XA);
+createXB(XADetail ad) = createXB(xa(ad)) MATERIALIZED;
+name = DATA ISTRING[100] (XADetail);
+
+TABLE xa (XA);
+TABLE xad (XADetail);
+
+CLASS XBC;
+CLASS XBCDetail;
+
+CLASS XB 'XB' : XBC;
+name = DATA ISTRING[100] (XB);
+CLASS XBDetail 'XBDetail' : XBCDetail;
+name = DATA ISTRING[100] (XBDetail);
+
+CLASS XC 'XC' : XBC;
+name = DATA ISTRING[100] (XC);
+CLASS XCDetail 'XCDetail' : XBCDetail;
+name = DATA ISTRING[100] (XCDetail);
+
+TABLE xbc (XBC);
+TABLE xbcd (XBCDetail);
+
+xb = AGGR XB WHERE createXB(XA xa) MATERIALIZED INDEXED;
+
+xc = AGGR XC WHERE createXB(XA xa) MATERIALIZED INDEXED;
+
+xBDetail = AGGR XBDetail WHERE createXB(XADetail xADetail) MATERIALIZED INDEXED;
+
+xCDetail = AGGR XCDetail WHERE createXB(XADetail xADetail) MATERIALIZED INDEXED;
+
+xb(XBDetail xbd) = xb(xa(xADetail(xbd)));
+xc(XCDetail xbd) = xc(xa(xADetail(xbd)));
+
+CLASS XADetailLog 'Log';
+xa = DATA XA (XADetailLog);
+name = DATA ISTRING[100] (XADetailLog);
+WHEN DROPPED(XADetail d IS XADetail) DO
+    NEW l = XADetailLog{
+        xa(l) <- PREV(xa(d));
+        name(l) <- PREV(name(d));
+    }
+
+CLASS YesNoMaybe {
+    yes 'yes',
+    no 'no',
+    maybe 'maybe'
+}
+
+ask = DATA YesNoMaybe (XA);
+captionAsk 'Ask' (XA a) = caption(ask(a));
+
+xbCreated 'XB created' (XA a) = TRUE IF xb(a);
+nameXA 'XA' (XADetailLog l) = name(xa(l));
+
 FORM TestOperators 'Expressions & Operators'
     OBJECTS s = Store
     PROPERTIES(s) VALUE, name, stime, sdate, sinteger, slong, sdouble, snumeric, sbpstring, castToNumeric, sstring, sboolean
@@ -1890,7 +2050,9 @@ FORM TestOperators 'Expressions & Operators'
     PROPERTIES(s) PANEL concatNull, concatNotNull, concatVarNull, concatVarNotNull, concatToText, concatToVar
     PROPERTIES(s) PANEL subDoubleInt, subDoubleNumeric, subNumericInt, subIntLong
     PROPERTIES(s) PANEL multDoubleInt, multDoubleNumeric, multNumericInt, multIntLong
-    PROPERTIES(s) PANEL dateProp, dateTimeProp, timeProp, teststring, variableDateTime
+    PROPERTIES(s) PANEL dateProp, dateTimeProp, timeProp, teststring, variableDateTime,
+        dateTimeSecondsProp, timeSecondsProp, longProp, numericProp, doubleProp, tbooleanProp,
+        rawStringProp, rawQuoteStringProp, multilineStringProp
     PROPERTIES(s) PANEL xorBooleanInt, maxIntLong, minIntLong, isClassInteger, minArticleInteger
     PROPERTIES(s) PANEL prevName, changedName, setChangedInteger, dropChangedInteger
     PROPERTIES() str, strToInt, long, longToStr, rounding, rounded1, rounded2
@@ -1911,6 +2073,17 @@ FORM TestOperators 'Expressions & Operators'
     // AGGR: an object for every (document, product) pair with quantity
     OBJECTS q = QuantityString
     PROPERTIES NEWSESSION dateDocument(q), storeNameDocument(q), nameArticle(q), DELETE(q) GRID
+
+    OBJECTS xa = XA
+    PROPERTIES(xa) name, createXB, captionAsk, xbCreated READONLY, NEW, DELETE
+
+    OBJECTS xad = XADetail
+    PROPERTIES(xad) name, NEW, DELETE
+    FILTERS xa(xad) = xa
+
+    // filled by WHEN DROPPED when an XADetail is deleted
+    OBJECTS l = XADetailLog
+    PROPERTIES(l) READONLY nameXA, name
 ;
 
 DESIGN TestOperators {
@@ -1971,6 +2144,15 @@ DESIGN TestOperators {
             MOVE PROPERTY(timeProp(s));
             MOVE PROPERTY(teststring(s));
             MOVE PROPERTY(variableDateTime(s));
+            MOVE PROPERTY(dateTimeSecondsProp(s));
+            MOVE PROPERTY(timeSecondsProp(s));
+            MOVE PROPERTY(longProp(s));
+            MOVE PROPERTY(numericProp(s));
+            MOVE PROPERTY(doubleProp(s));
+            MOVE PROPERTY(tbooleanProp(s));
+            MOVE PROPERTY(rawStringProp(s));
+            MOVE PROPERTY(rawQuoteStringProp(s));
+            MOVE PROPERTY(multilineStringProp(s));
         }
 
         NEW logicalTab {
@@ -2016,6 +2198,16 @@ DESIGN TestOperators {
         NEW aggrTab {
             caption = 'AGGR';
             MOVE BOX(q);
+        }
+        NEW aggrObjectsTab {
+            caption = 'AGGR objects';
+            NEW xaPane {
+                horizontal = TRUE;
+                fill = 1;
+                MOVE BOX(xa);
+                MOVE BOX(xad);
+            }
+            MOVE BOX(l);
         }
     }
 }
@@ -3427,6 +3619,7 @@ NAVIGATOR {
         NEW TestTree;
         NEW TestPivot;
         NEW TestListViews;
+        NEW TestCustom;
         NEW TestHotkeysAndFilters CHANGEKEY 'F9;priority=1000' SHOW;
         NEW TestRequestInput;
         NEW TestActions;
@@ -3463,93 +3656,11 @@ END
 //////////////// TABLE STATEMENT ////////////////
 TABLE documentArticle(Document, Article);
 
-CLASS XA 'XA';
-CLASS XADetail 'XADetail';
+TABLE storeArticleNote 'store_article_note' (Store, Article) NODEFAULT;
+noteQuantity 'Note quantity' = DATA INTEGER (Store, Article) TABLE storeArticleNote;
 
-xa = DATA XA (XADetail)
-    NONULL
-    DELETE
-    INDEXED AGGR;
-name = DATA ISTRING[100] (XA);
-createXB = DATA BOOLEAN (XA);
-createXB(XADetail ad) = createXB(xa(ad)) MATERIALIZED;
-name = DATA ISTRING[100] (XADetail);
-
-TABLE xa (XA);
-TABLE xad (XADetail);
-
-CLASS XBC;
-CLASS XBCDetail;
-
-CLASS XB 'XB' : XBC;
-name = DATA ISTRING[100] (XB);
-CLASS XBDetail 'XBDetail' : XBCDetail;
-name = DATA ISTRING[100] (XBDetail);
-
-CLASS XC 'XC' : XBC;
-name = DATA ISTRING[100] (XC);
-CLASS XCDetail 'XCDetail' : XBCDetail;
-name = DATA ISTRING[100] (XCDetail);
-
-TABLE xbc (XBC);
-TABLE xbcd (XBCDetail);
-
-xb = AGGR XB WHERE createXB(XA xa) MATERIALIZED INDEXED;
-
-xc = AGGR XC WHERE createXB(XA xa) MATERIALIZED INDEXED;
-
-xBDetail = AGGR XBDetail WHERE createXB(XADetail xADetail) MATERIALIZED INDEXED;
-
-xCDetail = AGGR XCDetail WHERE createXB(XADetail xADetail) MATERIALIZED INDEXED;
-
-xb(XBDetail xbd) = xb(xa(xADetail(xbd)));
-xc(XCDetail xbd) = xc(xa(xADetail(xbd)));
-
-CLASS XADetailLog 'Log';
-xa = DATA XA (XADetailLog);
-name = DATA ISTRING[100] (XADetailLog);
-WHEN DROPPED(XADetail d IS XADetail) DO
-    NEW l = XADetailLog{
-        xa(l) <- PREV(xa(d));
-        name(l) <- PREV(name(d));
-    }
-
-CLASS YesNoMaybe {
-    yes 'yes',
-    no 'no',
-    maybe 'maybe'
-}
-
-ask = DATA YesNoMaybe (XA);
-captionAsk 'Ask' (XA a) = caption(ask(a));
-
-xbCreated 'XB created' (XA a) = TRUE IF xb(a);
-nameXA 'XA' (XADetailLog l) = name(xa(l));
-
-EXTEND FORM TestOperators
-    OBJECTS xa = XA
-    PROPERTIES(xa) name, createXB, captionAsk, xbCreated READONLY, NEW, DELETE
-
-    OBJECTS xad = XADetail
-    PROPERTIES(xad) name, NEW, DELETE
-    FILTERS xa(xad) = xa
-
-    // filled by WHEN DROPPED when an XADetail is deleted
-    OBJECTS l = XADetailLog
-    PROPERTIES(l) READONLY nameXA, name
-;
-
-DESIGN TestOperators {
-    tabs {
-        NEW aggrObjectsTab {
-            caption = 'AGGR objects';
-            NEW xaPane {
-                horizontal = TRUE;
-                fill = 1;
-                MOVE BOX(xa);
-                MOVE BOX(xad);
-            }
-            MOVE BOX(l);
-        }
-    }
-}
+CLASS ABSTRACT COMPLEX StoreEvent 'Warehouse event';
+CLASS COMPLEX StoreAudit 'Warehouse audit' : StoreEvent;
+TABLE storeEvent (StoreEvent) FULL;
+eventStore 'Warehouse' = DATA Store (StoreEvent);
+eventDateTime 'Time' = DATA DATETIME (StoreEvent);

@@ -1,0 +1,22 @@
+.features-store-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+}
+
+.features-store-card {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.features-store-card-current {
+    border-color: #2563eb;
+    background-color: #dbeafe;
+}
+
+.features-counter {
+    min-width: 48px;
+}
