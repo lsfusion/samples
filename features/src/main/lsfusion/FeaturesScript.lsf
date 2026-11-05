@@ -283,6 +283,7 @@ testFormActionNoWait 'PRINT NOPREVIEW NOWAIT' { PRINT TestCase NOPREVIEW NOWAIT;
 printerName 'Printer' = DATA STRING ();
 testFormActionPrinter 'PRINT NOPREVIEW TO printer' { PRINT TestCase NOPREVIEW TO printerName(); }
 testFormActionServer 'PRINT SERVER NOPREVIEW TO printer' { PRINT SERVER TestCase NOPREVIEW TO printerName(); }
+testFormActionClient 'PRINT CLIENT NOPREVIEW TO printer' { PRINT CLIENT TestCase NOPREVIEW TO printerName(); }
 
 testFormActionMessage 'PRINT FILTERS MESSAGE WARN TOP' { PRINT TestCase FILTERS testInt(a) > 5 MESSAGE WARN TOP 10; }
 testFormActionMessageOffset 'PRINT MESSAGE NOWAIT TOP OFFSET' { PRINT TestCase MESSAGE NOWAIT TOP a = 3 OFFSET a = 1; }
@@ -293,7 +294,7 @@ reportPathTestCaseA 'REPORTFILES a' = DATA STRING ();
 EXTEND FORM TestCase
     PROPERTIES() testFormAction, testFormActionAUTO, testFormActionXLS, testFormActionXLSX, testFormActionPDF, testFormActionExport,
         testFormActionDOC, testFormActionDOCX, testFormActionRTF, testFormActionXLSXSheet, testFormActionXLSPassword,
-        testFormActionPreviewWait, testFormActionNoWait, printerName, testFormActionPrinter, testFormActionServer,
+        testFormActionPreviewWait, testFormActionNoWait, printerName, testFormActionPrinter, testFormActionServer, testFormActionClient,
         testFormActionMessage, testFormActionMessageOffset, reportPathTestCase, reportPathTestCaseA
 
     REPORT reportPathTestCase()
@@ -541,6 +542,7 @@ importAction 'IMPORT DBF MEMO' () {
 
 ///////////////CONSTRAINT STATEMENT//////////////
 CONSTRAINT foo(store, article) > 1000 CHECKED MESSAGE 'error: >1000';
+CONSTRAINT sinteger(Store s) < -1000 CHECKED BY sinteger[Store] MESSAGE 'error: < -1000';
 
 ///////////////////EVENT STATEMENT//////////////
 
@@ -754,7 +756,8 @@ editTest = DATA INTEGER ();
 EXTEND FORM storeArticle
     PROPERTIES() countF, setNameX, activateX, editTest
     PROPERTIES VALUE(s)
-    PROPERTIES(s) orderF, ssw = sword AFTER ssi, scolor AFTER ssw
+    PROPERTIES(s) orderF, ssw = sword AFTER ssi
+    PROPERTIES(s) scolor AFTER ssw
 ;
 
 //////////////// DESIGN STATEMENT /////////////////
@@ -1188,6 +1191,8 @@ FORM TestPropertyOptions 'Property Options'
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
     PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect, storeSizeNameSelectAuto
     PROPERTIES() okImageAuto = okAction IMAGE AUTO
+    PROPERTIES(s) cls = storeSizeCode CLASS 'store-size', evt = sinteger EVENTID 'storeInteger',
+        hnu = sdouble HINTNOUPDATE, ht = slong HINTTABLE, nw = stext NOWAIT
 
     // SHOWIF, READONLYIF, DISABLEIF
     PROPERTIES makeReadOnly(), makeDisabled(), showIfReadOnly() SHOWIF makeReadOnly()
@@ -1448,7 +1453,7 @@ FORM TestTypes 'Value Types'
     OBJECTS ts = Store
     PROPERTIES(ts) name, syear, szdatetime, sdatetime3, stime0,
         sdateinterval, sdateintervalfrom, sdatetimeinterval, stimeinterval, szdatetimeinterval,
-        sbpistring, shtmltext, sjsontext, shtml, stsvector, stsquery
+        sbpistring, shtmltext, sjsontext, shtml, stsvector
 ;
 
 DESIGN TestTypes {
@@ -1576,7 +1581,7 @@ exportFormDBF {
 
 FORM TestExportKeys 'Export keys'
     OBJECTS s = Store EXTKEY
-    PROPERTIES(s) name, sinteger EXTNULL
+    PROPERTIES(s) name, sinteger EXTNULL, code = slong EXTID 'code' ATTR
 
     OBJECTS a = Article SUBREPORT
     PROPERTIES(a) name
@@ -1586,6 +1591,11 @@ FORM TestExportKeys 'Export keys'
 
 exportFormExtKey 'EXPORT JSON (EXTKEY, EXTNULL)' () {
     EXPORT TestExportKeys JSON;
+    open(exportFile());
+}
+
+exportFormAttr 'EXPORT XML (ATTR)' () {
+    EXPORT TestExportKeys XML;
     open(exportFile());
 }
 
@@ -1873,7 +1883,9 @@ FORM TestPivot 'Pivot'
         ROWS name(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)    
 
     OBJECTS ps = Store PIVOT 'Table' SETTINGS
-    PROPERTIES(ps) name ROW, storeSizeName COLUMN, sinteger MEASURE, slong MEASURE
+    PROPERTIES(ps) name ROW, storeSizeName COLUMN, psi = sinteger MEASURE PIVOT SUM, slong MEASURE PIVOT MAX,
+        sdate MEASURE
+    PROPERTIES(ps) sdouble MEASURE PIVOT FORMULA '$1 / $2' (psi)
 ;
 
 onWebClientInit() + {
@@ -1888,7 +1900,7 @@ FORM TestCustom 'CUSTOM views'
     PROPERTIES(cc) name, sinteger
 
     OBJECTS cp = Store
-    PROPERTIES(cp) name, customCounter CUSTOM 'featuresCounter' ON CHANGE {
+    PROPERTIES(cp) name, customCounter CUSTOM 'featuresCounter' OPTIONS JSON FROM step = 1 ON CHANGE {
         INPUT i = INTEGER DO
             customCounter(cp) <- i;
     }
@@ -1954,7 +1966,7 @@ groupChangeSInteger (Store s) {
 
 FORM TestListViews 'List views'
     OBJECTS c = Store CALENDAR
-    PROPERTIES(c) name, sdate
+    PROPERTIES(c) name, date = sdate
 
     OBJECTS m = Store MAP
     PROPERTIES(m) name, latitude, longitude
@@ -2510,8 +2522,19 @@ DESIGN TestLayout {
 
 noImageAction 'NOIMAGE action' () { MESSAGE 'no image'; } NOIMAGE;
 
-showEmbedded 'SHOW EMBEDDED' (Store s) { SHOW editStore OBJECTS s = s EMBEDDED; }
 chosenStore = DATA LOCAL Store ();
+chosenName = DATA LOCAL STRING ();
+
+showEmbedded 'SHOW EMBEDDED' (Store s) { SHOW editStore OBJECTS s = s EMBEDDED; }
+showPopup 'SHOW POPUP' (Store s) { SHOW editStore OBJECTS s = s POPUP; }
+dialogReadOnly 'DIALOG READONLY / CHECK' () {
+    DIALOG storeArticle OBJECTS s INPUT READONLY CHECK DO
+        MESSAGE 'chosen: ' + name(s);
+}
+inputTo 'INPUT ... TO' () {
+    INPUT STRING TO chosenName;
+    MESSAGE 'entered: ' + chosenName();
+}
 dialogConstraintFilter 'DIALOG CONSTRAINTFILTER' () {
     DIALOG storeArticle OBJECTS s = chosenStore() CHANGE CONSTRAINTFILTER;
     DIALOG storeArticle OBJECTS s INPUT CONSTRAINTFILTER = chosenStore() DO
@@ -2524,8 +2547,8 @@ FORM TestDesignProperties 'Design properties' NOIMAGE
     OBJECTS dp = Store
     PROPERTIES(dp) VALUE, name, stext, sbpstring, sinteger FOOTER totalSInteger(), sdate
     PROPERTIES(dp) READONLY scolor, slong CHANGEABLE, sdouble OPTIMISTICASYNC
-    PROPERTIES(dp) showEmbedded
-    PROPERTIES() noImageAction, imageless = noImageAction NOIMAGE, dialogConstraintFilter
+    PROPERTIES(dp) showEmbedded, showPopup
+    PROPERTIES() noImageAction, imageless = noImageAction NOIMAGE, dialogConstraintFilter, dialogReadOnly, inputTo
     PROPERTIES(dp) PANEL pn1 = name, pn2 = name, pn3 = name, pi = sinteger, pd = sdate, pc = scolor,
         ps = sstring, pt = stext, pl = slong, pz = storeSizeName, pb = sbpstring, pw = sdouble
 
@@ -2640,9 +2663,13 @@ DESIGN TestDesignProperties {
 
 expandWrap 'EXPAND CONTAINER' () { EXPAND CONTAINER TestDesignProperties.wrapContainer; }
 collapseWrap 'COLLAPSE CONTAINER' () { COLLAPSE CONTAINER TestDesignProperties.wrapContainer; }
+checkActiveForm 'ACTIVE FORM' () {
+    ACTIVE FORM TestDesignProperties;
+    MESSAGE 'isActiveForm: ' + isActiveForm();
+}
 
 EXTEND FORM TestDesignProperties
-    PROPERTIES() expandWrap, collapseWrap
+    PROPERTIES() expandWrap, collapseWrap, checkActiveForm
 ;
 
 //--------------- Barcode input & context filters test ---------------//
@@ -2742,7 +2769,9 @@ FORM TestDisappearingAction 'Disappearing Button'
 
     EVENTS ON SCHEDULE PERIOD 1 formRefresh(),
         ON SCHEDULE PERIOD 60 FIXED formRefresh(),
-        ON DROP { MESSAGE 'form dropped'; }
+        ON DROP { MESSAGE 'form dropped'; },
+        ON OK AFTER { MESSAGE 'after OK'; },
+        ON CLOSE { MESSAGE 'form closed'; }
 ;
 
 //--------------- Sessions test ---------------//
@@ -2954,6 +2983,9 @@ x = DATA INTEGER (A)
 
 CONSTRAINT f(A a) > g(a) MESSAGE 'Forbidden';
 f(A a) => g(a) RESOLVE LEFT;
+h = DATA INTEGER (A);
+h(A a) => f(a) RESOLVE LEFT RIGHT;
+x(A a) => g(a) RESOLVE RIGHT;
 
 tstCustom 'INTERNAL (Java)' INTERNAL 'samples.TestCustomActionProperty' ();
 
@@ -3333,6 +3365,11 @@ readA(Store s) { READ path(s) TO file; }
 writeA(Store s) { WRITE file() TO path(s) + 'txt'; }
 appendA(Store s) { WRITE file() TO path(s) + 'txt' APPEND; }
 writeClientDialog 'WRITE CLIENT DIALOG' () { WRITE CLIENT DIALOG file() TO 'features'; }
+readClientDialog 'READ CLIENT DIALOG' () {
+    READ CLIENT DIALOG 'features' TO file;
+    open(file());
+}
+readClient 'READ CLIENT' (Store s) { READ CLIENT path(s) TO file; }
 
 externalSQLConnection 'JDBC connection string' = DATA STRING ();
 
@@ -3537,7 +3574,7 @@ testMakeZipFile 'ZIP two files' () {
 
 FORM TestIntegration 'Import / Export / External'
     // EXPORT (the exported structure is the TestExport form)
-    PROPERTIES() exportPlainXML, exportFormXML, exportFormJSON, exportFormDBF, exportFormExtKey, exportCSVEscape
+    PROPERTIES() exportPlainXML, exportFormXML, exportFormJSON, exportFormDBF, exportFormExtKey, exportFormAttr, exportCSVEscape
 
     // IMPORT
     PROPERTIES() importFile, memoFile, importAction, importDeclaration, importDocumentsResult
@@ -3548,8 +3585,8 @@ FORM TestIntegration 'Import / Export / External'
 
     // READ / WRITE
     OBJECTS rws = Store
-    PROPERTIES(rws) GRID VALUE, name, path, readA, writeA, appendA
-    PROPERTIES() writeClientDialog
+    PROPERTIES(rws) GRID VALUE, name, path, readA, writeA, appendA, readClient
+    PROPERTIES() writeClientDialog, readClientDialog
 
     // EXTERNAL SQL / LSF / HTTP
     PROPERTIES() externalSQLConnection, externalAction, externalHttpHeaders, externalHttpMethods,
@@ -3590,6 +3627,7 @@ DESIGN TestIntegration {
             MOVE PROPERTY(exportFormJSON());
             MOVE PROPERTY(exportFormDBF());
             MOVE PROPERTY(exportFormExtKey());
+            MOVE PROPERTY(exportFormAttr());
             MOVE PROPERTY(exportCSVEscape());
         }
 
@@ -3622,6 +3660,7 @@ DESIGN TestIntegration {
             caption = 'READ / WRITE';
             MOVE BOX(rws);
             MOVE PROPERTY(writeClientDialog());
+            MOVE PROPERTY(readClientDialog());
         }
 
         NEW externalTab {
@@ -3867,8 +3906,8 @@ NAVIGATOR {
 
     NEW FOLDER links 'Links' WINDOW linksWindow {
         NEW ACTION lsfusionSiteLink 'lsFusion site' = openLink NOIMAGE;
-        NEW FOLDER sideLinks 'Side links' WINDOW sideLinksWindow {
-            NEW ACTION lsfusionSiteSideLink 'lsFusion site' = openLink;
+        NEW FOLDER sideLinks 'Side links' WINDOW sideLinksWindow PARENT {
+            NEW ACTION lsfusionSiteSideLink 'lsFusion site' = openLink IMAGE CLASS 'side-link' HEADER 'lsFusion: ' + currentDate();
         }
     }
 }
