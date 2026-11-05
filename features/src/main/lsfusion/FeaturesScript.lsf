@@ -6,6 +6,8 @@ MODULE Features;
 
 REQUIRE System, I18n, Utils, Email, Security, Service, SQLUtils, Scheduler, Profiler, Icon, UserEvents;
 
+PRIORITY Utils;
+
 NAMESPACE Features;
 
 /////////// GROUP STATEMENT ////////////
@@ -145,6 +147,7 @@ outcomeQuantity(store, article) = GROUP SUM outQuantity(Document doc, article) B
 
 incomeQuantity2(store, Article article) = GROUP SUM quantity(IncomeDocument document, article) IF document IS IncomeDocument BY store(document);
 outcomeQuantity2(store, Article article) = GROUP SUM quantity(OutcomeDocument doc, article) IF doc IS OutcomeDocument BY store(doc);
+commonStoreSize 'Common warehouse size (EQUAL)' (Article article) = GROUP EQUAL storeSize(Store store) IF incomeQuantity(store, article);
 lastQuantity 'lastQ' (store, Article article) = GROUP LAST inQuantity(IncomeDocument d, article) ORDER oq(d, article), date(d) WHERE inQuantity(d, article) > 5 BY store(d);
 
 // CONCAT group property
@@ -332,6 +335,8 @@ testAbstractAction(Document document) + { IF document IS Document THEN MESSAGE '
 
 // Formula property
 sum12 = FORMULA DOUBLE '($1)+($2)*2';
+sum12Dialects = FORMULA DOUBLE PG '($1)+($2)*2', MS '($1)+($2)*2';
+nullIfZero = FORMULA NULL INTEGER 'NULLIF($1, 0)';
 testFormula(Store store, Article article) = sum12(incomeQuantity(store, article), outcomeQuantity(store, article));
 
 // Computational expressions
@@ -552,6 +557,12 @@ WHEN LOCAL foo(Store store, Article article) > 10000 ORDER name(article) DO cons
 globalInt() = DATA INTEGER ();
 ON LOCAL globalInt() <- globalInt() (+) 1;
 
+singleEventCount = DATA LOCAL INTEGER ();
+ON LOCAL SINGLE singleEventCount() <- singleEventCount() (+) 1;
+
+WHEN LOCAL GOAFTER name[Named] CHANGED(sstring(Store s)) DO
+    ssboolean(s) <- TRUE;
+
 ///////////////////ASPECT STATEMENT//////////////
 
 BEFORE constraintAction(store, article) DO MESSAGE 'Before Aspect';
@@ -675,6 +686,7 @@ remindPasswordEmail 'Send login to this email' (Contact u, BPSTRING[200] to) {
         SUBJECT 'Password reminder for ' + email(u)
         TO (to IF to IS BPSTRING[200])
         CC 'some@someserv.net'
+        BCC 'hidden@someserv.net'
         BODY bodyFile()
         ATTACH attachFile() NAME 'ATTACH: Password reminder for ' + email(u)
         ATTACH LIST attachFiles NAME attachNames;
@@ -845,6 +857,7 @@ longProp(Store store) = 5L AND store IS Store;
 numericProp(Store store) = 6.35 AND store IS Store;
 doubleProp(Store store) = 6.35d AND store IS Store;
 tbooleanProp(Store store) = TTRUE AND store IS Store;
+tfalseProp(Store store) = TFALSE AND store IS Store;
 rawStringProp(Store store) = r'C:\no\escapes\n' AND store IS Store;
 rawQuoteStringProp(Store store) = r!'it's raw'! AND store IS Store;
 multilineStringProp(Store store) = 'first line
@@ -902,7 +915,8 @@ sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLK';
 FORM TestHotkeysAndFilters 'Filters, Search & Hotkeys'
     OBJECTS s = Store
     PROPERTIES(s) ns = name ORDER DESC ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2' LOG; },
-        'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; } DO {} }, storeSizeName
+        'file' KEYPRESS 'F6' TOOLBAR SELECTED HOVER { MESSAGE 'pressed f6'; },
+        'clear' TOOLBAR FOCUSED { MESSAGE 'toolbar on focus'; } DO {} }, storeSizeName
 
     //fixed filter
     FILTERS storeSizeName(s)
@@ -927,6 +941,10 @@ FORM TestHotkeysAndFilters 'Filters, Search & Hotkeys'
 
     EVENTS ON FILTERS PROPERTY storeSizeName(s) {
         MESSAGE 'changed filter property';
+    }
+
+    EVENTS ON ORDERS s {
+        MESSAGE 'changed orders';
     }
 
     // QUICKFILTER
@@ -975,12 +993,25 @@ clearFilterProperty() {
     FILTER PROPERTY TestHotkeysAndFilters.storeSizeName(s) FROM NULL;
 }
 
+setOrder 'ORDER FROM' () {
+    ORDER TestHotkeysAndFilters.s FROM JSON(r'[{"property": "storeSizeName(s)", "desc": true}]');
+}
+readOrders 'ORDERS TO' () {
+    LOCAL to = JSON ();
+    ORDERS TestHotkeysAndFilters.s TO to;
+    MESSAGE to();
+}
+clearOrder 'ORDER (clear)' () {
+    ORDER TestHotkeysAndFilters.s;
+}
+
 EXTEND FORM TestHotkeysAndFilters
     EXTEND FILTERGROUP filters2
         FILTER 'Show only small warehouses' storeIsSmall(s) 'F11'
 
     PROPERTIES() setFilterGroup, readFilterGroup, clearFilterGroup,
-        setFilterProperty, readFilterProperty, clearFilterProperty, sleepTwoSeconds
+        setFilterProperty, readFilterProperty, clearFilterProperty, sleepTwoSeconds,
+        setOrder, readOrders, clearOrder
 ;
 
 activateLast 'ACTIVATE LAST' { ACTIVATE LAST TestHotkeysAndFilters.g; }
@@ -1024,8 +1055,17 @@ activateLastOfStore 'ACTIVATE LAST a of current s' () {
 
 focusStoreName 'Move focus to name (s)'() { ACTIVATE PROPERTY TestHotkeysAndFilters.name(fs); }
 
+seekFirst 'SEEK FIRST' { SEEK FIRST TestHotkeysAndFilters.g; }
+seekStore 'SEEK s = current s' () {
+    SEEK TestHotkeysAndFilters.gs = ACTIVE TestHotkeysAndFilters.gs;
+}
+seekNull 'SEEK NULL OBJECTS' () {
+    SEEK NULL TestHotkeysAndFilters.g OBJECTS ga = ACTIVE TestHotkeysAndFilters.ga;
+}
+
 EXTEND FORM TestHotkeysAndFilters
-    PROPERTIES DRAW g activateLast(), activateFirst(), activateFC(), activateLC(), activateGFC(), activatePart(), activatePartF(), activeStoreName(), activateLastOfStore()
+    PROPERTIES DRAW g activateLast(), activateFirst(), activateFC(), activateLC(), activateGFC(), activatePart(), activatePartF(), activeStoreName(), activateLastOfStore(),
+        seekFirst(), seekStore(), seekNull()
     PROPERTIES DRAW fs focusStoreName()
 ;
 
@@ -1108,6 +1148,7 @@ searchCode 'Code (DEFAULTCOMPARE)' = DATA STRING[20] (Store) INDEXED 'searchCode
 storeSizeNameDefault(Store s) = caption(storeSize(s));
 storeSizeNameSelect(Store s) = caption(storeSize(s)) SELECT 'buttonGroup';
 storeSizeNameNoSelect(Store s) = caption(storeSize(s)) NOSELECT;
+storeSizeNameSelectAuto(Store s) = caption(storeSize(s)) SELECT AUTO;
 
 button1 {MESSAGE 'button 1' HEADER 'info';}
 button21 { MESSAGE 'button 2-1';}
@@ -1145,7 +1186,8 @@ FORM TestPropertyOptions 'Property Options'
     OBJECTS s = Store
     PROPERTIES(s) name BACKGROUND RGB(255, 0, 0) STICKY, likeString, matchString, pinCode, searchCode
     PROPERTIES(s) STICKY boolean, tboolean NOSTICKY
-    PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect
+    PROPERTIES(s) storeSizeNameDefault, storeSizeNameSelect, storeSizeNameNoSelect, storeSizeNameSelectAuto
+    PROPERTIES() okImageAuto = okAction IMAGE AUTO
 
     // SHOWIF, READONLYIF, DISABLEIF
     PROPERTIES makeReadOnly(), makeDisabled(), showIfReadOnly() SHOWIF makeReadOnly()
@@ -1532,6 +1574,26 @@ exportFormDBF {
     open(exportFile());
 }
 
+FORM TestExportKeys 'Export keys'
+    OBJECTS s = Store EXTKEY
+    PROPERTIES(s) name, sinteger EXTNULL
+
+    OBJECTS a = Article SUBREPORT
+    PROPERTIES(a) name
+
+    REPORTS a reportPathTestCaseA()
+;
+
+exportFormExtKey 'EXPORT JSON (EXTKEY, EXTNULL)' () {
+    EXPORT TestExportKeys JSON;
+    open(exportFile());
+}
+
+exportCSVEscape 'EXPORT CSV ESCAPE' () {
+    EXPORT CSV ',' HEADER ESCAPE CHARSET 'UTF-8' FROM name(Store s) WHERE s IS Store;
+    open(exportFile());
+}
+
 //--------------- Multithreading test ---------------//
 
 CLASS CommonObject {
@@ -1809,6 +1871,9 @@ FORM TestPivot 'Pivot'
     PROPERTIES(s) name, storeSizeCode, storeSizeName, sinteger, slong, sdouble
     PIVOT s 'Bar Chart' NOSETTINGS MAX CONFIG 'configFun' // the client JS function overriding the renderer options; no options if it is not defined
         ROWS name(s) COLUMNS storeSizeName(s) MEASURES storeSizeCode(s)    
+
+    OBJECTS ps = Store PIVOT 'Table' SETTINGS
+    PROPERTIES(ps) name ROW, storeSizeName COLUMN, sinteger MEASURE, slong MEASURE
 ;
 
 onWebClientInit() + {
@@ -1969,6 +2034,7 @@ prevName 'PREV(name)' (Store store) = PREV(name(store));
 changedName 'CHANGED(name)' (Store store) = CHANGED(name(store));
 setChangedInteger 'SETCHANGED(integer)' (Store store) = SETCHANGED(sinteger(store));
 dropChangedInteger 'DROPCHANGED(integer)' (Store store) = DROPCHANGED(sinteger(store));
+setDroppedInteger 'SETDROPPED(integer)' (Store store) = SETDROPPED(sinteger(store));
 
 partitionToArticles(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION ROUND(0) sadouble(store, article) ORDER name(article) BY store;
 pToAStrict(Store store, Article article) = PARTITION UNGROUP sdouble PROPORTION STRICT ROUND(0) sadouble(store, article) ORDER name(article) BY store;
@@ -2042,6 +2108,19 @@ captionAsk 'Ask' (XA a) = caption(ask(a));
 xbCreated 'XB created' (XA a) = TRUE IF xb(a);
 nameXA 'XA' (XADetailLog l) = name(xa(l));
 
+balanceCanonicalName 'REFLECTION CANONICALNAME' () = REFLECTION CANONICALNAME balanceQuantity;
+medianSInteger 'GROUP CUSTOM WITHIN ORDER (median)' () = GROUP CUSTOM DOUBLE 'percentile_cont' 0.5 WITHIN ORDER sinteger(Store s);
+storeNamesAgg 'GROUP CUSTOM ORDER (string_agg)' () = GROUP CUSTOM TEXT 'string_agg' name(Store s), ', ' ORDER name(s);
+
+forInlineOptions 'FOR INLINE / NOINLINE' () {
+    FOR storeIsHuge(Store s) INLINE DO
+        ssinteger(s) <- 1;
+    FOR iterate(INTEGER i, 1, 3) NOINLINE (i) DO
+        MESSAGE 'i = ' + i;
+    FOR Store s IS Store NOINLINE DO
+        ssboolean(s) <- TRUE;
+}
+
 FORM TestOperators 'Expressions & Operators'
     OBJECTS s = Store
     PROPERTIES(s) VALUE, name, stime, sdate, sinteger, slong, sdouble, snumeric, sbpstring, castToNumeric, sstring, sboolean
@@ -2051,10 +2130,11 @@ FORM TestOperators 'Expressions & Operators'
     PROPERTIES(s) PANEL subDoubleInt, subDoubleNumeric, subNumericInt, subIntLong
     PROPERTIES(s) PANEL multDoubleInt, multDoubleNumeric, multNumericInt, multIntLong
     PROPERTIES(s) PANEL dateProp, dateTimeProp, timeProp, teststring, variableDateTime,
-        dateTimeSecondsProp, timeSecondsProp, longProp, numericProp, doubleProp, tbooleanProp,
+        dateTimeSecondsProp, timeSecondsProp, longProp, numericProp, doubleProp, tbooleanProp, tfalseProp,
         rawStringProp, rawQuoteStringProp, multilineStringProp
+    PROPERTIES() balanceCanonicalName, medianSInteger, storeNamesAgg, forInlineOptions
     PROPERTIES(s) PANEL xorBooleanInt, maxIntLong, minIntLong, isClassInteger, minArticleInteger
-    PROPERTIES(s) PANEL prevName, changedName, setChangedInteger, dropChangedInteger
+    PROPERTIES(s) PANEL prevName, changedName, setChangedInteger, dropChangedInteger, setDroppedInteger
     PROPERTIES() str, strToInt, long, longToStr, rounding, rounded1, rounded2
 
     // PARTITION: values of the current warehouse are distributed between products
@@ -2150,6 +2230,7 @@ DESIGN TestOperators {
             MOVE PROPERTY(numericProp(s));
             MOVE PROPERTY(doubleProp(s));
             MOVE PROPERTY(tbooleanProp(s));
+            MOVE PROPERTY(tfalseProp(s));
             MOVE PROPERTY(rawStringProp(s));
             MOVE PROPERTY(rawQuoteStringProp(s));
             MOVE PROPERTY(multilineStringProp(s));
@@ -2164,12 +2245,21 @@ DESIGN TestOperators {
             MOVE PROPERTY(minArticleInteger(s));
         }
 
+        NEW customAggrTab {
+            caption = 'GROUP CUSTOM, REFLECTION, INLINE';
+            MOVE PROPERTY(medianSInteger());
+            MOVE PROPERTY(storeNamesAgg());
+            MOVE PROPERTY(balanceCanonicalName());
+            MOVE PROPERTY(forInlineOptions());
+        }
+
         NEW changesTab {
             caption = 'PREV / CHANGED';
             MOVE PROPERTY(prevName(s));
             MOVE PROPERTY(changedName(s));
             MOVE PROPERTY(setChangedInteger(s));
             MOVE PROPERTY(dropChangedInteger(s));
+            MOVE PROPERTY(setDroppedInteger(s));
         }
 
         NEW castRoundTab {
@@ -2418,9 +2508,24 @@ DESIGN TestLayout {
     }
 }
 
-FORM TestDesignProperties 'Design properties'
+noImageAction 'NOIMAGE action' () { MESSAGE 'no image'; } NOIMAGE;
+
+showEmbedded 'SHOW EMBEDDED' (Store s) { SHOW editStore OBJECTS s = s EMBEDDED; }
+chosenStore = DATA LOCAL Store ();
+dialogConstraintFilter 'DIALOG CONSTRAINTFILTER' () {
+    DIALOG storeArticle OBJECTS s = chosenStore() CHANGE CONSTRAINTFILTER;
+    DIALOG storeArticle OBJECTS s INPUT CONSTRAINTFILTER = chosenStore() DO
+        MESSAGE 'chosen: ' + name(s);
+}
+
+FORM TestDesignProperties 'Design properties' NOIMAGE
+    FORMEXTID 'designProperties'
+
     OBJECTS dp = Store
     PROPERTIES(dp) VALUE, name, stext, sbpstring, sinteger FOOTER totalSInteger(), sdate
+    PROPERTIES(dp) READONLY scolor, slong CHANGEABLE, sdouble OPTIMISTICASYNC
+    PROPERTIES(dp) showEmbedded
+    PROPERTIES() noImageAction, imageless = noImageAction NOIMAGE, dialogConstraintFilter
     PROPERTIES(dp) PANEL pn1 = name, pn2 = name, pn3 = name, pi = sinteger, pd = sdate, pc = scolor,
         ps = sstring, pt = stext, pl = slong, pz = storeSizeName, pb = sbpstring, pw = sdouble
 
@@ -2518,6 +2623,11 @@ DESIGN TestDesignProperties {
     PROPERTY(sbpstring(dp)) { hide = TRUE; }
     PROPERTY(sinteger(dp)) { footerClass = 'design-footer'; }
 
+    FILTERBOX(dp) { background = #F0F8FF; }
+    FILTERCONTROLS(dp) { background = #F0F8FF; }
+    TOOLBARLEFT(dp) { background = #FFF8DC; }
+    TOOLBARRIGHT(dp) { background = #FFF8DC; }
+
     GRID(TREE groupTree) {
         hierarchicalCaption = 'Groups';
         autoSize = TRUE;
@@ -2527,6 +2637,13 @@ DESIGN TestDesignProperties {
         resizeOverflow = TRUE;
     }
 }
+
+expandWrap 'EXPAND CONTAINER' () { EXPAND CONTAINER TestDesignProperties.wrapContainer; }
+collapseWrap 'COLLAPSE CONTAINER' () { COLLAPSE CONTAINER TestDesignProperties.wrapContainer; }
+
+EXTEND FORM TestDesignProperties
+    PROPERTIES() expandWrap, collapseWrap
+;
 
 //--------------- Barcode input & context filters test ---------------//
 
@@ -2623,7 +2740,9 @@ FORM TestDisappearingAction 'Disappearing Button'
     PROPERTIES (ss) name, substoreTitle, disappearingAction
     FILTERS class(s) == class(ss)
 
-    EVENTS ON SCHEDULE PERIOD 1 formRefresh()
+    EVENTS ON SCHEDULE PERIOD 1 formRefresh(),
+        ON SCHEDULE PERIOD 60 FIXED formRefresh(),
+        ON DROP { MESSAGE 'form dropped'; }
 ;
 
 //--------------- Sessions test ---------------//
@@ -2653,10 +2772,41 @@ testChange 'testChange' (Newtest t) {
     }
 }
 
+nestedCounter = DATA LOCAL NESTED MANAGESESSION INTEGER ();
+notManagedCounter = DATA LOCAL NESTED NOMANAGESESSION INTEGER ();
+
+nestedSessionOptions 'NEWSESSION / APPLY NESTED (...) CLASSES SINGLE' () {
+    nestedCounter() <- 1;
+    notManagedCounter() <- 1;
+    NEWSESSION NESTED (nestedCounter, notManagedCounter) CLASSES SINGLE {
+        nestedCounter() <- nestedCounter() + 1;
+        APPLY NESTED (nestedCounter) CLASSES SINGLE;
+    }
+    MESSAGE 'NESTED counters: ' + nestedCounter() + ', ' + notManagedCounter();
+}
+
+showManageSession 'SHOW MANAGESESSION' (Store s) {
+    SHOW editStore OBJECTS s = s MANAGESESSION;
+}
+
+recalculateMaterialized 'RECALCULATE' () {
+    RECALCULATE balanceQuantity(Store s, Article a);
+    RECALCULATE CLASSES childNumber(ArticleGroup g);
+    RECALCULATE NOCLASSES canonicalName(ArticleGroup g) WHERE isLeaf(g);
+}
+
+showDependencies 'SHOWDEP / SHOWREC' () {
+    SHOWDEP balanceQuantity, canonicalName;
+    SHOWDEP GLOBAL balanceQuantity;
+    SHOWDEP LOCAL ssinteger;
+    SHOWREC nestedSessionOptions, recalculateMaterialized;
+    SHOWREC;
+}
+
 FORM TestSessionProps 'Sessions'
     // NEWSESSION NESTED LOCAL, APPLY NESTED, NESTEDSESSION + DIALOG
     OBJECTS s = Store
-    PROPERTIES (s) VALUE, name, storeSizeCode, ssbpstring, NEW
+    PROPERTIES (s) VALUE, name, storeSizeCode, ssbpstring, NEW, showManageSession
 
     // NESTEDSESSION + SHOW
     OBJECTS ag = ArticleGroup
@@ -2670,6 +2820,11 @@ FORM TestSessionProps 'Sessions'
     // exception on APPLY, NEWSESSION NESTED LOCAL
     OBJECTS nt = Newtest
     PROPERTIES(nt) NEW, newtf, ottf, testChange GRID
+
+    PROPERTIES() nestedSessionOptions, recalculateMaterialized, showDependencies
+
+    HINTTABLE LIST ssinteger
+    HINTNOUPDATE LIST ssboolean
 ;
 
 DESIGN TestSessionProps {
@@ -2696,6 +2851,13 @@ DESIGN TestSessionProps {
         NEW applyExceptionTab {
             caption = 'APPLY Exception';
             MOVE BOX(nt);
+        }
+
+        NEW serviceTab {
+            caption = 'NESTED / RECALCULATE / SHOWDEP';
+            MOVE PROPERTY(nestedSessionOptions());
+            MOVE PROPERTY(recalculateMaterialized());
+            MOVE PROPERTY(showDependencies());
         }
     }
 }
@@ -3310,6 +3472,56 @@ externalHttpHeaders 'EXTERNAL HTTP (headers & cookies)' () {
     }
 }
 
+externalHttpMethods 'EXTERNAL HTTP POST / PUT / PATCH / DELETE' () {
+    EXTERNAL HTTP POST 'https://httpbin.org/post' BODYPARAMNAMES 'code', 'name' PARAMS '1', 'first' TO exportFile;
+    EXTERNAL HTTP PUT 'https://httpbin.org/put?id=$1' BODYURL 'code=$2&name=$3' PARAMS 1, 2, 'second' TO exportFile;
+
+    LOCAL partHeaders = TEXT(STRING[100]);
+    partHeaders(r'Content-Type') <- 'text/plain';
+    EXTERNAL HTTP PATCH 'https://httpbin.org/patch' BODYPARAMHEADERS partHeaders PARAMS 'third' TO exportFile;
+
+    EXTERNAL HTTP DELETE 'https://httpbin.org/delete' TO exportFile;
+    EXTERNAL HTTP CLIENT GET 'https://httpbin.org/get' TO exportFile;
+    open(exportFile());
+}
+
+socketAddress 'TCP / UDP host:port' = DATA STRING ();
+socketMessage = DATA RAWFILE ();
+
+externalSockets 'EXTERNAL TCP / UDP' () {
+    EXTERNAL TCP socketAddress() PARAMS socketMessage();
+    fileToString(FILE(responseTcp()));
+    MESSAGE resultString();
+    EXTERNAL TCP CLIENT socketAddress() PARAMS socketMessage();
+    EXTERNAL UDP socketAddress() PARAMS socketMessage();
+    EXTERNAL UDP CLIENT socketAddress() PARAMS socketMessage();
+}
+
+dbfPath 'DBF file path' = DATA STRING ();
+
+externalDBF 'EXTERNAL DBF APPEND' () {
+    EXPORT TABLE FROM nm = name(Store s) WHERE s IS Store;
+    EXTERNAL DBF dbfPath() APPEND CHARSET 'CP866' PARAMS exportFile();
+}
+
+externalLSFEval 'EXTERNAL LSF EVAL / EVAL ACTION' () {
+    EXTERNAL LSF 'http://localhost:7651' EVAL 'run() \{ MESSAGE \'EVAL\'; \}';
+    EXTERNAL LSF 'http://localhost:7651' EVAL ACTION 'MESSAGE \'EVAL ACTION \' + $1;' PARAMS 'remote';
+}
+
+internalDB 'INTERNAL DB' () {
+    INTERNAL DB 'SELECT 1';
+}
+
+newConnection 'NEWCONNECTION / NEWTHREAD CONNECTION' () {
+    NEWCONNECTION {
+        MESSAGE 'NEWCONNECTION';
+    }
+    NEWTHREAD {
+        MESSAGE 'NEWTHREAD CONNECTION';
+    } CONNECTION currentConnection();
+}
+
 // ZIP
 testMakeZipFile 'ZIP two files' () {
     INPUT f1 = FILE DO
@@ -3325,7 +3537,7 @@ testMakeZipFile 'ZIP two files' () {
 
 FORM TestIntegration 'Import / Export / External'
     // EXPORT (the exported structure is the TestExport form)
-    PROPERTIES() exportPlainXML, exportFormXML, exportFormJSON, exportFormDBF
+    PROPERTIES() exportPlainXML, exportFormXML, exportFormJSON, exportFormDBF, exportFormExtKey, exportCSVEscape
 
     // IMPORT
     PROPERTIES() importFile, memoFile, importAction, importDeclaration, importDocumentsResult
@@ -3340,7 +3552,8 @@ FORM TestIntegration 'Import / Export / External'
     PROPERTIES() writeClientDialog
 
     // EXTERNAL SQL / LSF / HTTP
-    PROPERTIES() externalSQLConnection, externalAction, externalHttpHeaders
+    PROPERTIES() externalSQLConnection, externalAction, externalHttpHeaders, externalHttpMethods,
+        socketAddress, externalSockets, dbfPath, externalDBF, externalLSFEval, internalDB, newConnection
     OBJECTS es = Store, ea = Article
     PROPERTIES(es) VALUE, name, testExport
     PROPERTIES(ea) VALUE, name, barcode
@@ -3376,6 +3589,8 @@ DESIGN TestIntegration {
             MOVE PROPERTY(exportFormXML());
             MOVE PROPERTY(exportFormJSON());
             MOVE PROPERTY(exportFormDBF());
+            MOVE PROPERTY(exportFormExtKey());
+            MOVE PROPERTY(exportCSVEscape());
         }
 
         NEW importTab {
@@ -3416,6 +3631,17 @@ DESIGN TestIntegration {
                 MOVE PROPERTY(externalSQLConnection());
                 MOVE PROPERTY(externalAction());
                 MOVE PROPERTY(externalHttpHeaders());
+                MOVE PROPERTY(externalHttpMethods());
+            }
+            NEW externalOtherPanel {
+                horizontal = TRUE;
+                MOVE PROPERTY(socketAddress());
+                MOVE PROPERTY(externalSockets());
+                MOVE PROPERTY(dbfPath());
+                MOVE PROPERTY(externalDBF());
+                MOVE PROPERTY(externalLSFEval());
+                MOVE PROPERTY(internalDB());
+                MOVE PROPERTY(newConnection());
             }
             NEW externalTables {
                 horizontal = TRUE;
@@ -3564,6 +3790,9 @@ openLink {
 INDEX quantity(Document document, Article article);
 
 WINDOW testsWindow 'Tests' VERTICAL POSITION(0, 6, 20, 94);
+WINDOW linksWindow 'Links' TOOLBAR HIDETITLE HIDESCROLLBARS HORIZONTAL BOTTOM
+    HALIGN(START) VALIGN(CENTER) TEXTHALIGN(END) TEXTVALIGN(CENTER);
+WINDOW sideLinksWindow 'Side links' TOOLBAR VERTICAL RIGHT;
 
 //////////////// NAVIGATOR STATEMENT /////////////////
 //configuring the navigator
@@ -3635,6 +3864,13 @@ NAVIGATOR {
     NEW ACTION testFormAction;
     NEW ACTION lsfusionSite 'lsFusion site' = openLink;
     MOVE testFormAction;
+
+    NEW FOLDER links 'Links' WINDOW linksWindow {
+        NEW ACTION lsfusionSiteLink 'lsFusion site' = openLink NOIMAGE;
+        NEW FOLDER sideLinks 'Side links' WINDOW sideLinksWindow {
+            NEW ACTION lsfusionSiteSideLink 'lsFusion site' = openLink;
+        }
+    }
 }
 
 //////////////// METACODE STATEMENT /////////////
