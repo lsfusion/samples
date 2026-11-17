@@ -1409,7 +1409,9 @@ shtmltext 'HTMLTEXT' = DATA HTMLTEXT (Store);
 sjsontext 'JSONTEXT' = DATA JSONTEXT (Store);
 shtml 'HTML' = DATA HTML (Store);
 stsvector 'TSVECTOR' (Store s) = toTsVector('simple', name(s));
-stsquery 'TSQUERY' (Store s) = toTsQuery('simple', name(s));
+stsquery 'TSQUERY' (Store s) = toTsQuery('simple', 'warehouse') IF s IS Store;
+stsvectorData 'TSVECTOR (data)' = DATA TSVECTOR (Store);
+searchQuery 'TSQUERY (local)' = DATA LOCAL TSQUERY ();
 
 //--------------- Colors test ---------------//
 
@@ -1453,7 +1455,7 @@ FORM TestTypes 'Value Types'
     OBJECTS ts = Store
     PROPERTIES(ts) name, syear, szdatetime, sdatetime3, stime0,
         sdateinterval, sdateintervalfrom, sdatetimeinterval, stimeinterval, szdatetimeinterval,
-        sbpistring, shtmltext, sjsontext, shtml, stsvector
+        sbpistring, shtmltext, sjsontext, shtml, stsvector, stsquery
 ;
 
 DESIGN TestTypes {
@@ -3251,11 +3253,21 @@ inputNoChange 'INPUT CHANGE NOCHANGE ... ELSE' (Store s) {
     }
 }
 
-FORM TestRequestInput 'Input & ON CHANGE'
+requestStoreName 'REQUEST ... DO ... ELSE' (Store s) {
+    LOCAL newName = STRING[50] ();
+    REQUEST {
+        INPUT = newName() CHANGE;
+    } DO
+        name(s) <- newName();
+    ELSE
+        MESSAGE 'Canceled';
+}
+
+FORM TestRequestInput 'Input & ON CHANGE' LOCALASYNC
     // INPUT / DIALOG
     OBJECTS s = Store PANEL, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble
-    PROPERTIES(s) dialogCheckNoCancel, showReadOnly, inputListWhere, inputNoChange
+    PROPERTIES(s) dialogCheckNoCancel, showReadOnly, inputListWhere, inputNoChange, requestName 'REQUEST' = name ON CHANGE requestStoreName(s)
     PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode, contextStore
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, balanceQuantity, b = dq ON CHANGE test(), c = dq ON CHANGE changeC(s, a)
     PROPERTIES(s, a) d = dq ON CHANGE {
@@ -3828,10 +3840,10 @@ openLink {
 //////////////// INDEX STATEMENT //////////////////
 INDEX quantity(Document document, Article article);
 
-WINDOW testsWindow 'Tests' VERTICAL POSITION(0, 6, 20, 94);
-WINDOW linksWindow 'Links' TOOLBAR HIDETITLE HIDESCROLLBARS HORIZONTAL BOTTOM
+WINDOW testsWindow 'Tests' VERTICAL POSITION(20, 6, 20, 88);
+WINDOW linksWindow 'Links' HIDETITLE HIDESCROLLBARS HORIZONTAL POSITION(20, 94, 80, 6)
     HALIGN(START) VALIGN(CENTER) TEXTHALIGN(END) TEXTVALIGN(CENTER);
-WINDOW sideLinksWindow 'Side links' TOOLBAR VERTICAL RIGHT;
+WINDOW sideLinksWindow 'Side links' VERTICAL POSITION(20, 6, 20, 88);
 
 //////////////// NAVIGATOR STATEMENT /////////////////
 //configuring the navigator
