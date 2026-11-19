@@ -30,6 +30,12 @@ CLASS ABSTRACT Document 'Document';
 CLASS IncomeDocument 'Income' : Document;
 CLASS OutcomeDocument 'Expenses' : Document, EmptyClass;
 
+CLASS Priority 'Priority' IMAGE 'bi bi-flag' {
+    low 'Low' IMAGE 'bi bi-arrow-down',
+    high 'High' NOIMAGE
+}
+isHighPriority 'High priority' (Priority p) = p == Features.Priority.high;
+
 CONSTRAINT name(Named o) = '-TEST-' MESSAGE 'STRANGE NAME';
 
 nameArticle(Named artGroup) = name(artGroup) LAZY;
@@ -228,6 +234,17 @@ multiTestA2(a) += caseData1(a);
 multiTestA2(a) += caseDataB(a);
 multiTestA2(a) += caseDataC(a);
 
+multiTestExclusive 'MULTI ... EXCLUSIVE' (a) = MULTI caseDataB(a), caseDataC(a) EXCLUSIVE;
+multiTestOverride 'MULTI ... OVERRIDE' (a) = MULTI caseData1(a), caseData2(a) OVERRIDE;
+
+overrideFirstA = ABSTRACT MULTI OVERRIDE FIRST INTEGER (CaseA);
+overrideFirstA(a) += caseData1(a);
+overrideFirstA(a) += caseData2(a);
+
+overrideLastA = ABSTRACT CASE OVERRIDE LAST INTEGER (CaseA);
+overrideLastA(a) += WHEN testInt(a) < 5 THEN caseData1(a);
+overrideLastA(a) += WHEN a IS CaseA THEN 0;
+
 caseActionTest(a) {
     CASE
         WHEN testInt(a) > 7 THEN { MESSAGE '>7'; }
@@ -253,6 +270,21 @@ caseActionTestA(a) + WHEN testInt(a) > 5 THEN { MESSAGE '>5'; }
 caseActionTestA2 ABSTRACT CASE EXCLUSIVE ( CaseA);
 caseActionTestA2(CaseB b) + WHEN caseDataB(b) > 6 THEN { MESSAGE 'CaseB: >6'; }
 caseActionTestA2(CaseC c) + WHEN caseDataC(c) > 6 THEN { MESSAGE 'CaseC: >6'; }
+
+multiActionTestA ABSTRACT MULTI (CaseA);
+multiActionTestA(CaseB b) + { MESSAGE 'CaseB'; }
+multiActionTestA(CaseC c) + { MESSAGE 'CaseC'; }
+
+listActionTestA ABSTRACT LIST FIRST (CaseA);
+listActionTestA(CaseA a) + { MESSAGE 'added later, runs first'; }
+listActionTestA(CaseB b) + { MESSAGE 'CaseB'; } OPTIMISTICASYNC
+
+multiOverrideAction 'MULTI OVERRIDE' (CaseA a) {
+    MULTI OVERRIDE { caseActionTest(a); }, { caseActionTest2(a); }
+}
+
+fullActionTestA ABSTRACT CASE FULL (CaseA);
+fullActionTestA(CaseA a) + WHEN a IS CaseA THEN { MESSAGE 'any CaseA'; }
 
 scase = DATA BOOLEAN ();
 caseAM() { FOR IF scase() THEN TEXT s = '{classes.image}' ELSE s = '{classes.image.link}' DO MESSAGE s; };
@@ -314,6 +346,11 @@ testPropPartition(Store store, Article article) = PARTITION UNGROUP testAmount P
 // UNGROUP LIMIT partition property
 testLimitPartition(Store store, Article article) = PARTITION UNGROUP testAmount LIMIT STRICT testData(article) ORDER DESC name(article) BY store;
 
+// PREV / LAST / CUSTOM partition properties
+prevSInteger 'PARTITION PREV' (Store s) = PARTITION PREV sinteger(s) ORDER name(s), s BY storeSize(s);
+lastSInteger 'PARTITION LAST' (Store s) = PARTITION LAST sinteger(s) ORDER name(s), s BY storeSize(s);
+firstSInteger 'PARTITION CUSTOM' (Store s) = PARTITION CUSTOM NULL INTEGER 'first_value' sinteger(s) ORDER name(s), s BY storeSize(s);
+
 // Concatenation/Deconcatenation property
 ioQuantity(Store store, Article article) = STRUCT(incomeQuantity(store, article), outcomeQuantity(store, article)) MATERIALIZED;
 onlyIncomeQuantity 'Test STRUCT' (Store store, Article article) = ioQuantity(store, article)[1];
@@ -338,6 +375,11 @@ testAbstractAction(Document document) + { IF document IS Document THEN MESSAGE '
 sum12 = FORMULA DOUBLE '($1)+($2)*2';
 sum12Dialects = FORMULA DOUBLE PG '($1)+($2)*2', MS '($1)+($2)*2';
 nullIfZero = FORMULA NULL INTEGER 'NULLIF($1, 0)';
+sum12Typed (a, b) = FORMULA DOUBLE '($1)+($2)*2' (DOUBLE, DOUBLE);
+sum12Classes = FORMULA DOUBLE '($1)+($2)*2' (DOUBLE, DOUBLE);
+coalesce2 = FORMULA INTEGER 'COALESCE($1, $2)' NULL;
+nameLikeOne 'LIKE' (Named n) = name(n) LIKE '%1%';
+nameMatches 'MATCH' (Named n) = name(n) MATCH 'warehouse';
 testFormula(Store store, Article article) = sum12(incomeQuantity(store, article), outcomeQuantity(store, article));
 
 // Computational expressions
@@ -543,6 +585,7 @@ importAction 'IMPORT DBF MEMO' () {
 ///////////////CONSTRAINT STATEMENT//////////////
 CONSTRAINT foo(store, article) > 1000 CHECKED MESSAGE 'error: >1000';
 CONSTRAINT sinteger(Store s) < -1000 CHECKED BY sinteger[Store] MESSAGE 'error: < -1000';
+CONSTRAINT slong(Store s) < -1000 MESSAGE 'error: long < -1000' PROPERTIES name(s), slong(s);
 
 ///////////////////EVENT STATEMENT//////////////
 
@@ -568,6 +611,7 @@ WHEN LOCAL GOAFTER name[Named] CHANGED(sstring(Store s)) DO
 ///////////////////ASPECT STATEMENT//////////////
 
 BEFORE constraintAction(store, article) DO MESSAGE 'Before Aspect';
+AFTER constraintAction(store, article) DO MESSAGE 'After Aspect';
 
 canceledMessage() {
     MESSAGE 'changes were canceled';
@@ -593,6 +637,8 @@ FORM documentArticle 'By documents (caption)'
     EVENTS
         ON CANCEL canceledMessage(),
         ON APPLY BEFORE appliedMessage(),
+        ON APPLY AFTER { MESSAGE 'after APPLY'; },
+        ON OK BEFORE { MESSAGE 'before OK'; },
         ON QUERYCLOSE REPLACE {},
         ON QUERYOK NOREPLACE {}
 ;
@@ -698,7 +744,8 @@ justSendEmail 'Just send an email' (BPSTRING[200] to) {
     EMAIL
         SUBJECT 'Letter subject'
         TO (to IF to IS BPSTRING[200])
-        BODY '<font color=#FF0000 size=+3>big red text</font>';
+        BODY '<font color=#FF0000 size=+3>big red text</font>'
+        NOWAIT;
 }
 
 testRequestInput 'Testing REQUEST input'(Store s) {
@@ -915,6 +962,10 @@ storeIsHugeOrBig(Store s) = storeIsHuge(s) OR storeIsBig(s);
 
 sleepTwoSeconds() { sleep(2000); } CHANGEKEY 'F5' CHANGEMOUSE 'DBLCLK';
 
+filterEventCount 'ON FILTER' = DATA LOCAL INTEGER ();
+orderEventCount 'ON ORDER' = DATA LOCAL INTEGER ();
+filtersEventCount 'ON FILTERS' = DATA LOCAL INTEGER ();
+
 FORM TestHotkeysAndFilters 'Filters, Search & Hotkeys'
     OBJECTS s = Store
     PROPERTIES(s) ns = name ORDER DESC ON CHANGE { INPUT st = STRING LIST name(s) ACTIONS 'ok' KEYPRESS 'F2' TOOLBAR ALL { MESSAGE 'pressed f2' LOG; },
@@ -937,6 +988,9 @@ FORM TestHotkeysAndFilters 'Filters, Search & Hotkeys'
         FILTER 'Show only big warehouses' storeIsBig(s) KEY 'F9;priority=1000' SHOW
         FILTER 'Show only medium warehouses' storeIsMedium(s) 'F4'
         FILTER 'Show only medium warehouses' storeIsMedium(s) KEY 'F4;priority=2000' SHOW MOUSE 'DBLCLK;priority=3000;cell=all' HIDE
+    FILTERGROUP filters3 NONULL
+        FILTER 'Huge' storeIsHuge(s) 'F6' DEFAULT
+        FILTER 'Big' storeIsBig(s) 'F8'
 
     EVENTS ON FILTERGROUPS filters2 {
         MESSAGE 'changed filterGroup';
@@ -949,6 +1003,15 @@ FORM TestHotkeysAndFilters 'Filters, Search & Hotkeys'
     EVENTS ON ORDERS s {
         MESSAGE 'changed orders';
     }
+
+    EVENTS ON FILTER s {
+        filterEventCount() <- filterEventCount() (+) 1;
+    }, ON ORDER s {
+        orderEventCount() <- orderEventCount() (+) 1;
+    }, ON FILTERS s {
+        filtersEventCount() <- filtersEventCount() (+) 1;
+    }
+    PROPERTIES() filterEventCount, orderEventCount, filtersEventCount
 
     // QUICKFILTER
     OBJECTS qs = Store
@@ -1002,6 +1065,11 @@ setOrder 'ORDER FROM' () {
 readOrders 'ORDERS TO' () {
     LOCAL to = JSON ();
     ORDERS TestHotkeysAndFilters.s TO to;
+    MESSAGE to();
+}
+readFilters 'FILTERS TO' () {
+    LOCAL to = JSON ();
+    FILTERS TestHotkeysAndFilters.s TO to;
     MESSAGE to();
 }
 clearOrder 'ORDER (clear)' () {
@@ -1065,10 +1133,13 @@ seekStore 'SEEK s = current s' () {
 seekNull 'SEEK NULL OBJECTS' () {
     SEEK NULL TestHotkeysAndFilters.g OBJECTS ga = ACTIVE TestHotkeysAndFilters.ga;
 }
+seekObjectsNull 'SEEK OBJECTS ... NULL' () {
+    SEEK TestHotkeysAndFilters.g OBJECTS gs = ACTIVE TestHotkeysAndFilters.gs NULL, ga = ACTIVE TestHotkeysAndFilters.ga NULL;
+}
 
 EXTEND FORM TestHotkeysAndFilters
     PROPERTIES DRAW g activateLast(), activateFirst(), activateFC(), activateLC(), activateGFC(), activatePart(), activatePartF(), activeStoreName(), activateLastOfStore(),
-        seekFirst(), seekStore(), seekNull()
+        seekFirst(), seekStore(), seekNull(), seekObjectsNull()
     PROPERTIES DRAW fs focusStoreName()
 ;
 
@@ -1342,6 +1413,7 @@ FORM testJSON
 
 actionJSON() {
     MESSAGE JSON (testJSON OBJECTS j= 4 FILTERS mod(i, 2) = 0);
+    MESSAGE JSONTEXT (testJSON OBJECTS j = 4);
     MESSAGE JSON FROM code = '1', message = 'OK';
     MESSAGE JSONTEXT FROM code = '1', message = 'OK';
     MESSAGE STRING ( JSON FROM value = 'Name3' + (INTEGER i AS INTEGER) WHERE iterate(i, 1, 5) ORDER i DESC);
@@ -1739,6 +1811,7 @@ messageTypes 'MESSAGE INFO / SUCCESS / WARN / ERROR' () {
     MESSAGE 'Done' HEADER 'Success' SUCCESS;
     MESSAGE 'Warning' WARN;
     MESSAGE 'Error' ERROR;
+    MESSAGE 'Default' DEFAULT;
 }
 
 askYesNo 'ASK YESNO' () {
@@ -1865,6 +1938,115 @@ collapseAllTop {
 EXTEND FORM TestTree
     PROPERTIES() expandDown, expandUp, expandAllTop, collapseDown, collapseAllTop;
 
+//--------------- Group object options test ---------------//
+
+storeRowColor (Store s) = RGB(255, 240, 200) IF sinteger(s) > 10;
+storeTextColor (Store s) = RGB(200, 0, 0) IF sinteger(s) < 0;
+counterOption 'CUSTOM option' (Store s) = sinteger(s) CUSTOM 'featuresCounter';
+reportPathTop 'REPORTFILES TOP' = DATA STRING ();
+storePriority 'Priority' = DATA Priority (Store);
+
+FORM priorities 'Priorities'
+    OBJECTS pr = Priority
+    PROPERTIES(pr) VALUE
+    LIST Priority OBJECT pr
+;
+
+FORM TestGroupObjectOptions 'Object & property options'
+    OBJECTS f = Store FIRST EXTID 'firstStore'
+    PROPERTIES(f) name, storePriority, sint = sinteger
+    PROPERTIES(f) sl = slong BEFORE sint
+    PROPERTIES(f) sd = sdate FIRST, sdbl = sdouble LAST, sdt = sdatetime DEFAULT
+    PROPERTIES(f) cn1 = ACTION copyNameToArticles,
+        cc1 = sinteger CUSTOM 'featuresCounter' CHANGE,
+        cc2 = sinteger CUSTOM CHANGE 'featuresIntegerEdit',
+        cc3 = slong CUSTOM 'featuresCounter' EDIT LONG 'featuresIntegerEdit'
+    PROPERTIES cn2 = ACTION copyNameToArticles(f)
+    PROPERTIES(f) cn3 = ACTION copyNameToArticles IMAGE 'bi bi-files'
+    PROPERTIES(f) counterOption
+
+    OBJECTS l = Store LAST BACKGROUND storeRowColor(l) FOREGROUND storeTextColor(l)
+    PROPERTIES(l) name, sinteger
+
+    OBJECTS pv = Store PREV BEFORE l
+    PROPERTIES(pv) name
+
+    OBJECTS n = Store NULL AFTER f
+    PROPERTIES(n) name
+
+    OBJECTS tb = Store TOOLBAR DEFAULT
+    PROPERTIES(tb) name
+
+    OBJECTS g = Store GRID
+    PROPERTIES(g) name, popupInt = sinteger POPUP
+
+    OBJECTS pp = Store POPUP
+    PROPERTIES(pp) name
+
+    OBJECTS sr = Article SUBREPORT reportPathTop()
+    PROPERTIES(sr) name
+
+    TREE groupTree tg = ArticleGroup PARENT parent(tg) LAST
+    PROPERTIES(tg) name
+
+    OBJECTS pg = Store PIVOT
+    PROPERTIES(pg) name, storeSizeName, sinteger, slong, sdouble, sdate
+    PIVOT pg COLUMNS storeSizeName(pg), sdate(pg) ROWS (name(pg), slong(pg)), MEASURES(pg) MEASURES sinteger(pg), sdouble(pg)
+
+    ORDERS FIRST name(f)
+
+    REPORTFILES TOP reportPathTop(), sr reportPathTop()
+;
+
+//--------------- Event, index and design variants test ---------------//
+
+whenDoDefault 'WHEN DO' = DATA INTEGER (Store);
+whenDoDefault(Store s) <- 1 WHEN DO SET(s IS Store);
+
+nameChangeCount 'Name changes' = DATA INTEGER ();
+WHEN GLOBAL nameChanged = CHANGED(name(Store s)) DO
+    nameChangeCount() <- nameChangeCount() (+) 1;
+
+ON namedEvent LOCAL FORMS TestCase, TestTypes AFTER globalInt, singleEventCount {
+    singleEventCount() <- singleEventCount() (+) 1;
+}
+
+indexedLike = DATA STRING (Store);
+INDEX 'features_indexed_like' LIKE indexedLike(Store s);
+indexedMatch = DATA STRING (Store);
+INDEX MATCH indexedMatch(Store s);
+
+baseCounter 'Counter' = DATA INTEGER () IN base;
+nameAnySignature (Named n) = name[?](n);
+rawFormula = FORMULA INTEGER r'COALESCE($1, 0)';
+captionAsId captionAsIdText = DATA INTEGER ();
+rawCaption r'Raw caption' = DATA INTEGER ();
+
+FORM designSelectors 'Design selectors'
+    OBJECTS s = Store PANEL EXTID storeAsId
+    PROPERTIES(s) name, sdate, sdatetime, sint = sinteger FILTER
+    PROPERTIES() baseCounter
+;
+
+DESIGN designSelectors 'Design selectors (DESIGN caption)' {
+    GROUP(base, s) { caption = 'GROUP(base, s)'; }
+    GROUP(base) { caption = 'GROUP(base)'; }
+    REMOVE FILTER(sint);
+}
+
+FORM customDesign 'CUSTOM design'
+    OBJECTS s = Store PANEL
+    PROPERTIES(s) name, sdate
+;
+
+DESIGN customDesign CUSTOM {
+    NEW main {
+        fill = 1;
+        MOVE PROPERTY(name(s));
+        MOVE PROPERTY(sdate(s));
+    }
+}
+
 //--------------- CAST and ROUND test ---------------//
 
 str = DATA STRING();
@@ -1888,6 +2070,8 @@ FORM TestPivot 'Pivot'
     PROPERTIES(ps) name ROW, storeSizeName COLUMN, psi = sinteger MEASURE PIVOT SUM, slong MEASURE PIVOT MAX,
         sdate MEASURE
     PROPERTIES(ps) sdouble MEASURE PIVOT FORMULA '$1 / $2' (psi)
+    PROPERTIES(ps) psmin = sinteger MEASURE PIVOT MIN
+    PROPERTIES(ps) psratio = sdouble MEASURE PIVOT FORMULA '$1 / $2' (psi, psmin)
 ;
 
 onWebClientInit() + {
@@ -1972,6 +2156,9 @@ FORM TestListViews 'List views'
 
     OBJECTS m = Store MAP
     PROPERTIES(m) name, latitude, longitude
+
+    OBJECTS mo = Store MAP 'openStreetMap'
+    PROPERTIES(mo) name, latitude, longitude
 
     OBJECTS p = Store PAGESIZE 0
     PROPERTIES(p) name FOREGROUND foregroundSInteger(p),
@@ -2097,6 +2284,9 @@ xc = AGGR XC WHERE createXB(XA xa) MATERIALIZED INDEXED;
 xBDetail = AGGR XBDetail WHERE createXB(XADetail xADetail) MATERIALIZED INDEXED;
 
 xCDetail = AGGR XCDetail WHERE createXB(XADetail xADetail) MATERIALIZED INDEXED;
+
+CLASS XAEvent 'XAEvent';
+xaEvent = AGGR XAEvent WHERE createXB(XA xa) NEW GLOBAL DELETE LOCAL MATERIALIZED INDEXED;
 
 xb(XBDetail xbd) = xb(xa(xADetail(xbd)));
 xc(XCDetail xbd) = xc(xa(xADetail(xbd)));
@@ -2485,6 +2675,13 @@ DESIGN TestLayout {
 
 activateTab1() { ACTIVATE TAB TestLayout.tab1; }
 activateTab2() { ACTIVATE TAB TestLayout.tab2; }
+qualifiedFormIds 'Form IDs with a namespace' () {
+    SEEK FIRST Features.TestHotkeysAndFilters.g;
+    FILTERGROUP Features.TestHotkeysAndFilters.filters2 FROM 1;
+    MESSAGE name(ACTIVE Features.TestHotkeysAndFilters.gs);
+    ACTIVATE PROPERTY Features.TestHotkeysAndFilters.name(fs);
+    ACTIVATE TAB Features.TestLayout.tab1;
+}
 
 showTestTypes() { SHOW 'types' = TestTypes IN TestLayout.innerContainer;}
 closeTestTypes() { CLOSE FORM 'types'; }
@@ -3263,11 +3460,103 @@ requestStoreName 'REQUEST ... DO ... ELSE' (Store s) {
         MESSAGE 'Canceled';
 }
 
+inputCustomEdit 'INPUT CHANGE NOCONSTRAINTFILTER CUSTOM' (Store s) {
+    INPUT i = sinteger(s) CHANGE NOCONSTRAINTFILTER CUSTOM 'featuresIntegerEdit' DO
+        MESSAGE 'Entered: ' + i;
+}
+
+dialogSessionOptions 'DIALOG CHANGE NOCHANGE MANAGESESSION NEWSESSION CANCEL' (Store s) {
+    DIALOG SelectStoreSize OBJECTS ss = storeSize(s) CHANGE NOCHANGE MANAGESESSION NEWSESSION CANCEL DO
+        MESSAGE 'Chosen, the warehouse size is not changed';
+}
+
+dialogInputTo 'DIALOG INPUT TO' () {
+    LOCAL chosen = StoreSize ();
+    DIALOG SelectStoreSize OBJECTS ss INPUT TO chosen DO
+        MESSAGE 'Chosen: ' + sizeCode(chosen());
+}
+
+showWaitNoCancelCheck 'SHOW WAIT NOCANCEL CHECK' () {
+    SHOW TestCase WAIT NOCANCEL CHECK;
+}
+
+evalAction 'EVAL ACTION' () {
+    EVAL ACTION 'MESSAGE \'EVAL ACTION\';';
+}
+
+caseElseAction 'CASE ... ELSE' (Store s) {
+    CASE
+        WHEN sinteger(s) > 10 THEN MESSAGE 'Greater than 10';
+        WHEN sinteger(s) > 0 THEN MESSAGE 'Positive';
+    ELSE MESSAGE 'Not positive';
+}
+
+cancelNestedLocal 'CANCEL NESTED LOCAL' () {
+    CANCEL NESTED LOCAL;
+}
+
+newAutoset 'FOR ... NEW ... AUTOSET' () {
+    FOR iterate(INTEGER i, 1, 2) NEW s = Store AUTOSET DO
+        sinteger(s) <- i;
+}
+
+newExecutorNoWait 'NEWEXECUTOR ... NOWAIT' () {
+    NEWEXECUTOR {
+        NEWSESSION NEWTHREAD {
+            APPLY;
+        }
+    } THREADS 1 NOWAIT;
+}
+
+exportFormHeaders 'EXPORT XLS / XML HEADER, EXPORT ... TO' () {
+    EXPORT TestExport XLS HEADER TO s = exportFile;
+    EXPORT TestExport XML HEADER TO exportFile;
+    open(exportFile());
+}
+
+clientAlert (STRING s) INTERNAL CLIENT NOWAIT 'alert';
+callClientAlert 'INTERNAL CLIENT NOWAIT' () {
+    clientAlert('INTERNAL CLIENT');
+}
+
+clientSum 'INTERNAL CLIENT WAIT ... TO' () {
+    LOCAL result = STRING ();
+    INTERNAL CLIENT WAIT 'featuresSum' PARAMS 1, 2 TO result;
+    MESSAGE result();
+}
+
+internalCode 'INTERNAL code NULL' INTERNAL <{ System.out.println("INTERNAL code"); }> NULL;
+internalCodeImage 'INTERNAL code IMAGE' INTERNAL <{ System.out.println("INTERNAL code with options"); }> IMAGE 'bi bi-code';
+
+actionOptions 'CHANGEKEY SHOW, CHANGEMOUSE HIDE, STICKY, EXTID, @@deprecated' (Store s) {
+    MESSAGE name(s);
+} CHANGEKEY 'F10' SHOW CHANGEMOUSE 'DBLCLK' HIDE STICKY EXTID 'actionOptions' @@deprecated('6.3', 'an example of the annotation parameters');
+
+noWaitOption 'NOWAIT, CHANGEKEY HIDE, CHANGEMOUSE SHOW, ON CONTEXTMENU' () {
+    MESSAGE 'NOWAIT option';
+} NOWAIT CHANGEKEY 'F11' HIDE CHANGEMOUSE 'DBLCLK' SHOW
+    ON CONTEXTMENU 'Context menu item' { MESSAGE 'From the context menu'; }
+
+dialogList 'DIALOG LIST' () {
+    DIALOG LIST Store INPUT s DO
+        MESSAGE name(s);
+}
+
+importNamedFields 'IMPORT FIELDS x = ... NULL' () {
+    EXPORT JSON FROM code = '1', message = 'OK';
+    IMPORT JSON FROM exportFile() FIELDS STRING cd = 'code', STRING msg = 'message' NULL DO
+        MESSAGE cd + ': ' + msg;
+}
+
 FORM TestRequestInput 'Input & ON CHANGE' LOCALASYNC
     // INPUT / DIALOG
     OBJECTS s = Store PANEL, a = Article
     PROPERTIES(s) VALUE, name, storeSizeName, sdate, sinteger, slong, sdouble
     PROPERTIES(s) dialogCheckNoCancel, showReadOnly, inputListWhere, inputNoChange, requestName 'REQUEST' = name ON CHANGE requestStoreName(s)
+    PROPERTIES(s) customInt 'INPUT CUSTOM' = sinteger ON CHANGE inputCustomEdit(s), dialogSessionOptions, caseElseAction
+    PROPERTIES() dialogInputTo, showWaitNoCancelCheck, evalAction, cancelNestedLocal, newAutoset, newExecutorNoWait,
+        exportFormHeaders, callClientAlert, clientSum, internalCode, noWaitOption, dialogList, importNamedFields
+    PROPERTIES(s) actionOptions
     PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode, contextStore
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, balanceQuantity, b = dq ON CHANGE test(), c = dq ON CHANGE changeC(s, a)
     PROPERTIES(s, a) d = dq ON CHANGE {
@@ -3527,7 +3816,9 @@ externalHttpMethods 'EXTERNAL HTTP POST / PUT / PATCH / DELETE' () {
 
     LOCAL partHeaders = TEXT(STRING[100]);
     partHeaders(r'Content-Type') <- 'text/plain';
-    EXTERNAL HTTP PATCH 'https://httpbin.org/patch' BODYPARAMHEADERS partHeaders PARAMS 'third' TO exportFile;
+    LOCAL partHeaders2 = TEXT(STRING[100]);
+    partHeaders2(r'Content-Type') <- 'text/csv';
+    EXTERNAL HTTP PATCH 'https://httpbin.org/patch' BODYPARAMHEADERS partHeaders, partHeaders2 PARAMS 'third', 'fourth' TO exportFile;
 
     EXTERNAL HTTP DELETE 'https://httpbin.org/delete' TO exportFile;
     EXTERNAL HTTP CLIENT GET 'https://httpbin.org/get' TO exportFile;
@@ -3844,6 +4135,8 @@ WINDOW testsWindow 'Tests' VERTICAL POSITION(20, 6, 20, 88);
 WINDOW linksWindow 'Links' HIDETITLE HIDESCROLLBARS HORIZONTAL POSITION(20, 94, 80, 6)
     HALIGN(START) VALIGN(CENTER) TEXTHALIGN(END) TEXTVALIGN(CENTER);
 WINDOW sideLinksWindow 'Side links' VERTICAL POSITION(20, 6, 20, 88);
+WINDOW hiddenWindow 'Hidden' VERTICAL POSITION(20, 6, 20, 88);
+HIDE WINDOW hiddenWindow;
 
 //////////////// NAVIGATOR STATEMENT /////////////////
 //configuring the navigator
@@ -3897,6 +4190,10 @@ NAVIGATOR {
         NEW TestLayout;
         NEW TestDesignProperties;
         NEW TestTree;
+        NEW TestGroupObjectOptions CHANGEKEY 'ctrl F8' HIDE CHANGEMOUSE 'DBLCLK' SHOW;
+        NEW designSelectors;
+        NEW customDesign;
+        NEW FORM typesAgain 'Value Types (FORM =)' = TestTypes CHANGEMOUSE 'DBLCLK' HIDE;
         NEW TestPivot;
         NEW TestListViews;
         NEW TestCustom;
@@ -3939,6 +4236,19 @@ END
 @metaCodeSample(TestName2);
 
 @metaCodeSample(TestName1, TestName2);
+
+META metaCodeValues(prefix, type, value, caption)
+    prefix##Value caption = DATA type ();
+    prefix##Default () = value;
+END
+
+@metaCodeValues(metaInt, INTEGER, 5, 'Meta integer');
+@metaCodeValues(metaStr, STRING, 'text', r'Meta raw caption');
+
+@metaCodeSample(TestName3) {
+    CLASS TestName3Class;
+    GROUP TestName3group;
+};
 
 //////////////// TABLE STATEMENT ////////////////
 TABLE documentArticle(Document, Article);

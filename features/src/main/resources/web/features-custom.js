@@ -48,3 +48,29 @@ function featuresCounter() {
         }
     }
 }
+
+function featuresSum(a, b) {
+    return String(a + b);
+}
+
+function featuresIntegerEdit() {
+    return {
+        render: function (element, controller, value) {
+            let input = document.createElement("input");
+            input.type = "number";
+            input.value = value != null ? value : "";
+            input.onkeydown = function (event) {
+                if (event.key === "Enter")
+                    controller.commit(input.value === "" ? null : Number(input.value));
+                else if (event.key === "Escape")
+                    controller.cancel();
+            };
+            element.appendChild(input);
+            input.focus();
+        },
+        clear: function (element) {
+            while (element.lastChild)
+                element.removeChild(element.lastChild);
+        }
+    }
+}
