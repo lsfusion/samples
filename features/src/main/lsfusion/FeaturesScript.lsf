@@ -377,6 +377,7 @@ sum12Dialects = FORMULA DOUBLE PG '($1)+($2)*2', MS '($1)+($2)*2';
 nullIfZero = FORMULA NULL INTEGER 'NULLIF($1, 0)';
 sum12Typed (a, b) = FORMULA DOUBLE '($1)+($2)*2' (DOUBLE, DOUBLE);
 sum12Classes = FORMULA DOUBLE '($1)+($2)*2' (DOUBLE, DOUBLE);
+sum12Named = FORMULA DOUBLE '($a)+($b)*2' (DOUBLE a, DOUBLE b);
 coalesce2 = FORMULA INTEGER 'COALESCE($1, $2)' NULL;
 nameLikeOne 'LIKE' (Named n) = name(n) LIKE '%1%';
 nameMatches 'MATCH' (Named n) = name(n) MATCH 'warehouse';
@@ -2314,6 +2315,7 @@ nameXA 'XA' (XADetailLog l) = name(xa(l));
 
 balanceCanonicalName 'REFLECTION CANONICALNAME' () = REFLECTION CANONICALNAME balanceQuantity;
 medianSInteger 'GROUP CUSTOM WITHIN ORDER (median)' () = GROUP CUSTOM DOUBLE 'percentile_cont' 0.5 WITHIN ORDER sinteger(Store s);
+modeSInteger 'GROUP CUSTOM WITHIN ORDER (mode)' () = GROUP CUSTOM INTEGER 'mode' WITHIN ORDER sinteger(Store s);
 storeNamesAgg 'GROUP CUSTOM ORDER (string_agg)' () = GROUP CUSTOM TEXT 'string_agg' name(Store s), ', ' ORDER name(s);
 
 forInlineOptions 'FOR INLINE / NOINLINE' () {
@@ -2336,7 +2338,7 @@ FORM TestOperators 'Expressions & Operators'
     PROPERTIES(s) PANEL dateProp, dateTimeProp, timeProp, teststring, variableDateTime,
         dateTimeSecondsProp, timeSecondsProp, longProp, numericProp, doubleProp, tbooleanProp, tfalseProp,
         rawStringProp, rawQuoteStringProp, multilineStringProp
-    PROPERTIES() balanceCanonicalName, medianSInteger, storeNamesAgg, forInlineOptions
+    PROPERTIES() balanceCanonicalName, medianSInteger, modeSInteger, storeNamesAgg, forInlineOptions
     PROPERTIES(s) PANEL xorBooleanInt, maxIntLong, minIntLong, isClassInteger, minArticleInteger
     PROPERTIES(s) PANEL prevName, changedName, setChangedInteger, dropChangedInteger, setDroppedInteger
     PROPERTIES() str, strToInt, long, longToStr, rounding, rounded1, rounded2
@@ -2452,6 +2454,7 @@ DESIGN TestOperators {
         NEW customAggrTab {
             caption = 'GROUP CUSTOM, REFLECTION, INLINE';
             MOVE PROPERTY(medianSInteger());
+            MOVE PROPERTY(modeSInteger());
             MOVE PROPERTY(storeNamesAgg());
             MOVE PROPERTY(balanceCanonicalName());
             MOVE PROPERTY(forInlineOptions());
@@ -3542,6 +3545,14 @@ dialogList 'DIALOG LIST' () {
         MESSAGE name(s);
 }
 
+inputListAction 'INPUT LIST action' () {
+    INPUT s = STRING LIST {
+        inputList(1) <- s + ' (1)';
+        inputList(2) <- s + ' (2)';
+    } DO
+        MESSAGE s;
+}
+
 importNamedFields 'IMPORT FIELDS x = ... NULL' () {
     EXPORT JSON FROM code = '1', message = 'OK';
     IMPORT JSON FROM exportFile() FIELDS STRING cd = 'code', STRING msg = 'message' NULL DO
@@ -3555,7 +3566,7 @@ FORM TestRequestInput 'Input & ON CHANGE' LOCALASYNC
     PROPERTIES(s) dialogCheckNoCancel, showReadOnly, inputListWhere, inputNoChange, requestName 'REQUEST' = name ON CHANGE requestStoreName(s)
     PROPERTIES(s) customInt 'INPUT CUSTOM' = sinteger ON CHANGE inputCustomEdit(s), dialogSessionOptions, caseElseAction
     PROPERTIES() dialogInputTo, showWaitNoCancelCheck, evalAction, cancelNestedLocal, newAutoset, newExecutorNoWait,
-        exportFormHeaders, callClientAlert, clientSum, internalCode, noWaitOption, dialogList, importNamedFields
+        exportFormHeaders, callClientAlert, clientSum, internalCode, noWaitOption, dialogList, inputListAction, importNamedFields
     PROPERTIES(s) actionOptions
     PROPERTIES(a) VALUE, name, barcode, addDetailInputBarcode, contextStore
     PROPERTIES(s, a) incomeQuantity, outcomeQuantity, balanceQuantity, b = dq ON CHANGE test(), c = dq ON CHANGE changeC(s, a)
@@ -3737,6 +3748,37 @@ exportImportXLSX 'EXPORT / IMPORT XLSX' () {
     SHOW ShowX;
 }
 
+importRead = DATA LOCAL BOOLEAN (INTEGER);
+importToWhere 'IMPORT TO (INTEGER) ... WHERE' () {
+    EXPORT CSV ';' NOHEADER FROM name(Store s), storeSizeName(s) WHERE s IS Store ORDER name(s);
+    IMPORT CSV ';' NOHEADER FROM exportFile() TO (INTEGER) impB, impC WHERE importRead;
+    MESSAGE 'read: ' + (GROUP SUM 1 IF importRead(INTEGER i));
+}
+
+importFieldsRow 'IMPORT FIELDS (INTEGER r)' () {
+    EXPORT JSON FROM nm = name(Store s) WHERE s IS Store ORDER name(s);
+    IMPORT JSON FROM exportFile() FIELDS (INTEGER r) TEXT nm DO
+        impB(r) <- nm;
+    MESSAGE GROUP CONCAT impB(INTEGER i), ', ' ORDER i;
+}
+
+importSheetAll 'IMPORT XLS SHEET ALL' () {
+    EXPORT XLSX HEADER FROM name = name(Store s) WHERE s IS Store ORDER name(s);
+    IMPORT XLS HEADER SHEET ALL FROM exportFile() TO impB = name;
+    SHOW ShowX;
+}
+
+FORM importStoresCSV
+    OBJECTS i = INTEGER
+    PROPERTIES(i) impB EXTID 'name', impC EXTID 'size'
+;
+
+importFormCSV 'IMPORT Ns.form CSV FROM group = file' () {
+    EXPORT CSV HEADER FROM name = name(Store s), size = storeSizeName(s) WHERE s IS Store ORDER name(s);
+    IMPORT Features.importStoresCSV CSV HEADER FROM i = exportFile();
+    MESSAGE GROUP CONCAT impB(INTEGER i) + ' ' + impC(i), ', ' ORDER i;
+}
+
 exportImportXML 'EXPORT / IMPORT XML' () {
     EXPORT XML ROOT 'stores' TAG 'store' ATTR FROM name = name(Store s), size = storeSizeName(s) WHERE s IS Store ORDER name(s);
     IMPORT XML ROOT 'stores' ATTR FROM exportFile() TO impB = name, impC = size;
@@ -3882,6 +3924,7 @@ FORM TestIntegration 'Import / Export / External'
     // IMPORT
     PROPERTIES() importFile, memoFile, importAction, importDeclaration, importDocumentsResult
     PROPERTIES() exportImportCSV, exportImportXLSX, exportImportXML
+    PROPERTIES() importToWhere, importFieldsRow, importSheetAll, importFormCSV
     OBJECTS ii = INTEGER
     PROPERTIES(ii) kgrmat, polnaim
     FILTERS kgrmat(ii)
@@ -3956,6 +3999,10 @@ DESIGN TestIntegration {
                 MOVE PROPERTY(exportImportCSV());
                 MOVE PROPERTY(exportImportXLSX());
                 MOVE PROPERTY(exportImportXML());
+                MOVE PROPERTY(importToWhere());
+                MOVE PROPERTY(importFieldsRow());
+                MOVE PROPERTY(importSheetAll());
+                MOVE PROPERTY(importFormCSV());
             }
         }
 
@@ -4139,6 +4186,13 @@ WINDOW hiddenWindow 'Hidden' VERTICAL POSITION(20, 6, 20, 88);
 HIDE WINDOW hiddenWindow;
 
 //////////////// NAVIGATOR STATEMENT /////////////////
+// a client action the navigator calls every hour, and an empty statement
+navigatorTicks = DATA LOCAL INTEGER ();
+NAVIGATOR {
+    SCHEDULE PERIOD 3600 { navigatorTicks() <- navigatorTicks() (+) 1; }
+    ;
+}
+
 //configuring the navigator
 NAVIGATOR {
     security {
