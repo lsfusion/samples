@@ -395,6 +395,8 @@ testFormula(Store store, Article article) = sum12(incomeQuantity(store, article)
 // - (unary)
 //
 // Instances: 5, 5L, 6.35, 6.35d, TRUE, 'some string', class.object, 2011_10_25, 2011_10_25_18:00, 18:00, NULL, #ff0000, RGB(255, 0, 0)
+/* a block comment: everything from the slash and the star
+   to the star and the slash, over several lines */
 balanceQuantity(Store store, Article article) = incomeQuantity(store, article) - outcomeQuantity(store, article) MATERIALIZED;
 
 foo(store, article) = 5 * incomeQuantity(store, article);
@@ -404,6 +406,7 @@ bar2(store, article) = 3.5 * incomeQuantity(store, article) - (5 + outcomeQuanti
 foobar(Store store, Article article) = [ x * x + y](foo(store, article), bar(store, article)); // lambda-like syntax
 baz(Store store, Article article) = bar(store, article) > bar2(store, article) IN base;
 baz2 = foo(Store s, Article a) >= 15 == foo2(s, a) >= 15;
+baz3 = foo(Store s, Article a) <= 15;
 
 storeIsHuge(Store store) = storeSize(store) == StoreSize.huge CHARWIDTH 50 FLEX; // static object
 storeIsBig(Store store) = storeSize(store) == StoreSize.big CHARWIDTH 50 NOFLEX;
@@ -913,6 +916,12 @@ rawStringProp(Store store) = r'C:\no\escapes\n' AND store IS Store;
 rawQuoteStringProp(Store store) = r!'it's raw'! AND store IS Store;
 multilineStringProp(Store store) = 'first line
 second line' AND store IS Store;
+noFractionNumericProp(Store store) = 5. IF store IS Store; // NUMERIC, no digits after the point
+noFractionDoubleProp(Store store) = 5.d IF store IS Store; // DOUBLE
+interpolatedProp(Store store) = 'Warehouse ${name(store)}: ${IF sinteger(store) > 10 THEN \'big\' ELSE \'small\'}';
+inlinedProp(Store store) = '$I{features-inline.txt}'; // the file, read as the module is parsed, with ${name(store)} in it
+resourceProp(Store store) = '$R{features-custom.css}' IF store IS Store; // a link to the file, made as the value is sent
+imageProp(Store store) = HTML('$M{bi bi-flag} flag') IF store IS Store; // an image by the name icons take
 
 colorizeMatching (Store s, StoreSize ss) = scolor(s) IF storeSize(s) == ss;
 storeString (s, ss) = DATA BPSTRING[10] (Store, StoreSize);
@@ -1472,6 +1481,10 @@ syear 'YEAR' = DATA YEAR (Store);
 szdatetime 'ZDATETIME' = DATA ZDATETIME (Store);
 sdatetime3 'DATETIME[3]' = DATA DATETIME[3] (Store);
 stime0 'TIME[0]' = DATA TIME[0] (Store);
+szdatetime3 'ZDATETIME[3]' = DATA ZDATETIME[3] (Store);
+sbpstringNoLength 'BPSTRING' = DATA BPSTRING (Store);
+sbpistringNoLength 'BPISTRING' = DATA BPISTRING (Store);
+sistringNoLength 'ISTRING' = DATA ISTRING (Store);
 sdateinterval 'INTERVAL[DATE]' = DATA INTERVAL[DATE] (Store);
 sdatetimeinterval 'INTERVAL[DATETIME]' = DATA INTERVAL[DATETIME] (Store);
 stimeinterval 'INTERVAL[TIME]' = DATA INTERVAL[TIME] (Store);
@@ -1526,7 +1539,7 @@ FORM TestTypes 'Value Types'
     PROPERTIES(ls) stringLinkStore, linkStore
 
     OBJECTS ts = Store
-    PROPERTIES(ts) name, syear, szdatetime, sdatetime3, stime0,
+    PROPERTIES(ts) name, syear, szdatetime, sdatetime3, stime0, szdatetime3, sbpstringNoLength, sbpistringNoLength, sistringNoLength,
         sdateinterval, sdateintervalfrom, sdatetimeinterval, stimeinterval, szdatetimeinterval,
         sbpistring, shtmltext, sjsontext, shtml, stsvector, stsquery
 ;
@@ -1648,6 +1661,16 @@ exportFormJSON() {
 testJSONData () {
     EXPORT JSON FROM code = '0', message = 'ok';
 } @@noauth;
+// one the API runs, after a login, even with enableAPI = 0
+apiJSONData () {
+    EXPORT JSON FROM code = '0', message = 'api';
+} @@api;
+// a call of the API that is interactive (needs a client), and one that is not, whatever the request says
+apiInteractive () { MESSAGE 'interactive'; } @@ui;
+apiNotInteractive () { EXPORT JSON FROM code = '0'; } @@noui;
+// the values offered while one is typed: always, and never, whatever the cost of reading them
+inputListName 'Name (@@inputlist)' = DATA STRING[50] (Store) @@inputlist;
+noInputListName 'Name (@@noinputlist)' = DATA STRING[50] (Store) @@noinputlist;
 
 exportFormDBF {
     EXPORT TestExport DBF TO s = exportFile;
@@ -2337,7 +2360,8 @@ FORM TestOperators 'Expressions & Operators'
     PROPERTIES(s) PANEL multDoubleInt, multDoubleNumeric, multNumericInt, multIntLong
     PROPERTIES(s) PANEL dateProp, dateTimeProp, timeProp, teststring, variableDateTime,
         dateTimeSecondsProp, timeSecondsProp, longProp, numericProp, doubleProp, tbooleanProp, tfalseProp,
-        rawStringProp, rawQuoteStringProp, multilineStringProp
+        rawStringProp, rawQuoteStringProp, multilineStringProp,
+        noFractionNumericProp, noFractionDoubleProp, interpolatedProp, inlinedProp, resourceProp, imageProp
     PROPERTIES() balanceCanonicalName, medianSInteger, modeSInteger, storeNamesAgg, forInlineOptions
     PROPERTIES(s) PANEL xorBooleanInt, maxIntLong, minIntLong, isClassInteger, minArticleInteger
     PROPERTIES(s) PANEL prevName, changedName, setChangedInteger, dropChangedInteger, setDroppedInteger
@@ -2440,6 +2464,12 @@ DESIGN TestOperators {
             MOVE PROPERTY(rawStringProp(s));
             MOVE PROPERTY(rawQuoteStringProp(s));
             MOVE PROPERTY(multilineStringProp(s));
+            MOVE PROPERTY(noFractionNumericProp(s));
+            MOVE PROPERTY(noFractionDoubleProp(s));
+            MOVE PROPERTY(interpolatedProp(s));
+            MOVE PROPERTY(inlinedProp(s));
+            MOVE PROPERTY(resourceProp(s));
+            MOVE PROPERTY(imageProp(s));
         }
 
         NEW logicalTab {
@@ -2752,7 +2782,9 @@ FORM TestDesignProperties 'Design properties' NOIMAGE
     PROPERTIES(dp) showEmbedded, showPopup
     PROPERTIES() noImageAction, imageless = noImageAction NOIMAGE, dialogConstraintFilter, dialogReadOnly, inputTo
     PROPERTIES(dp) PANEL pn1 = name, pn2 = name, pn3 = name, pi = sinteger, pd = sdate, pc = scolor,
-        ps = sstring, pt = stext, pl = slong, pz = storeSizeName, pb = sbpstring, pw = sdouble
+        ps = sstring, pt = stext, pl = slong, pz = storeSizeName, pb = sbpstring, pw = sdouble,
+        pcn = name, pcd = sdate, pp = sinteger
+    PROPERTIES(dp) inputListName, noInputListName
 
     OBJECTS ca = Article
     PROPERTIES PANEL pq = incomeQuantity(dp, ca) COLUMNS (ca) HEADER name(ca)
@@ -2791,6 +2823,12 @@ DESIGN TestDesignProperties {
                 MOVE PROPERTY(pl) { width = 150; height = 60; shrink = TRUE; alignShrink = TRUE; }
                 MOVE PROPERTY(pw) { marginTop = 5; marginBottom = 10; marginLeft = 15; marginRight = 20; }
             }
+            NEW simpleCustomContainer {
+                caption = 'custom (simple)';
+                custom = ''; // the components one after another, with no layout of the container
+                MOVE PROPERTY(pcn);
+                MOVE PROPERTY(pcd);
+            }
         }
 
         NEW propertiesTab {
@@ -2821,6 +2859,11 @@ DESIGN TestDesignProperties {
                 MOVE PROPERTY(pb) { valueFlex = TRUE; boxed = FALSE; toolbar = FALSE; toolbarActions = FALSE; fontStyle = 'bold italic'; }
                 MOVE PROPERTY(pz) { select = 'dropdown'; changeOnSingleClick = TRUE; showChangeKey = FALSE; showChangeMouse = FALSE; inline = TRUE; }
                 MOVE PROPERTY(pq) { panelColumnVertical = TRUE; }
+            }
+            NEW panelCustomBox {
+                caption = 'panelCustom';
+                alignCaptions = FALSE; // a property with a panel of its own, which panelCustom lays out as is
+                MOVE PROPERTY(pp) { panelCustom = TRUE; }
             }
         }
 
